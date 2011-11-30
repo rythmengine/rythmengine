@@ -4,8 +4,11 @@ public enum PatternStr {
     /**
      * Recursive regexp, used only with com.stevesoft.pat.Regex
      */
-    Expression("[a-zA-Z][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*"),
+    Expression("(?@())*"),
+    Expression2("[a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.\\=]*)*(?@[])*(?@())*)*"),
     VarName("[a-zA-Z0-9_]+"),
+    Blank("([\\s\\r\\n]+)"),
+    NewLine("([\r\n]+)"),
     Type("[a-zA-Z0-9_\\.\\[\\]]+");
     
     private String s_;

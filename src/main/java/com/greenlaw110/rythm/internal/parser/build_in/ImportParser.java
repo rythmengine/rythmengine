@@ -4,14 +4,13 @@ import java.util.regex.Matcher;
 
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.util.TextBuilder;
 
-public class ImportParser extends BuildInParserFactory {
+public class ImportParser extends KeywordParserFactory {
     
     private static final String R = "(%s%s[\\s]+([a-zA-Z0-9_\\.*,\\s]+)(;|\\r?\\n)+).*";
 
@@ -22,8 +21,8 @@ public class ImportParser extends BuildInParserFactory {
         return R;
     }
     
-    public IParser create(DialectBase d, IContext c) {
-        return new ParserBase(d, c) {
+    public IParser create(IContext c) {
+        return new ParserBase(c) {
             @Override
             public TextBuilder go() {
                 Matcher m = ptn(dialect()).matcher(remain());

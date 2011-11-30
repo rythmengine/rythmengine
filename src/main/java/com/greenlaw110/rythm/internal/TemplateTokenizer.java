@@ -4,16 +4,22 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
+import com.greenlaw110.rythm.internal.parser.build_in.BlockCloseParser;
+import com.greenlaw110.rythm.internal.parser.build_in.StringTokenParser;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.util.TextBuilder;
 
 public class TemplateTokenizer implements Iterable<TextBuilder> {
     private IContext ctx;
-    private List<IParser> Parsers = new ArrayList<IParser>();
+    private List<IParser> parsers = new ArrayList<IParser>();
     public TemplateTokenizer(String template, IContext context) {
         ctx = context;
+        parsers.add(new ParserDispatcher(ctx));
+        parsers.add(new BlockCloseParser(ctx));
+        parsers.add(new StringTokenParser(ctx));
 //        Parsers.add(new CommentParser(ctx));
 //        Parsers.add(new ArgParser(ctx));
 //        Parsers.add(new DialectParser(ctx));
@@ -35,7 +41,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
 
             @Override
             public TextBuilder next() {
-                for (IParser p: Parsers) {
+                for (IParser p: parsers) {
                     TextBuilder t = p.go();
                     if (null != t) {
                         return t;

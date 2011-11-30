@@ -10,5 +10,5 @@ package com.greenlaw110.rythm.spi;
  */
 public interface IBlockHandler {
     void openBlock();
-    void closeBlock();
+    String closeBlock();
 }

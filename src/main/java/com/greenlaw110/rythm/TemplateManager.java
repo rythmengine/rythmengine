@@ -18,7 +18,20 @@ public class TemplateManager {
         src = sourceDir;
     }
     
+    private String fn2cn(String filename) {
+        int pPos = filename.indexOf(".rythm");
+        String className = (pPos < 0 ? filename : filename.substring(0, pPos).replaceAll("\\\\", "\\/")).replace('/', '.');
+        return className;
+    }
+    
     public ITemplate process(String filename) throws Exception {
+        String className = fn2cn(filename);
+        try {
+            ITemplate t =  (ITemplate) Class.forName(className).newInstance();
+            return t;
+        } catch (Exception e) {
+            // ignore;
+        }
         CompiledTemplate ct = compile(filename, true);
         return ct.template();
     }
@@ -33,14 +46,15 @@ public class TemplateManager {
         if (null != ct) return ct;
 
         // strip suffix, if any
-        int pPos = filename.indexOf('.');
-        String className = (pPos < 0 ? filename : filename.substring(0, pPos));
+        int pPos = filename.indexOf(".rythm");
+        String className = (pPos < 0 ? filename : filename.substring(0, pPos).replaceAll("\\\\", "\\/"));
         File dstFile = new File(dst, className + ".java");
+
         if (!overwriteExisting && dstFile.canRead()) {
             ct = new CompiledTemplate(IO.readContentAsString(dstFile), className);
             Rythm.cache().set(srcFile.getAbsolutePath(), ct);
         } else {
-            ct = Rythm.compile(srcFile, className);
+            ct = Rythm.compile(srcFile, className, false);
             if (writeToDisk) {
                 File pkgDir = dstFile.getParentFile();
                 pkgDir.mkdirs();

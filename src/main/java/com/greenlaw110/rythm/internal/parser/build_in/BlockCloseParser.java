@@ -1,12 +1,18 @@
-package com.greenlaw110.rythm.internal.parser_;
+package com.greenlaw110.rythm.internal.parser.build_in;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.Token;
+
 
 public class BlockCloseParser extends ParserBase {
 
-    private static final String PTN = "(%s[%s\\s\\n]).*";
+    private static final String PTN = "(%s[\\}\\s\\n]).*";
     
     public BlockCloseParser(IContext context) {
         super(context);
@@ -14,19 +20,19 @@ public class BlockCloseParser extends ParserBase {
 
     @Override
     public Token go() {
+        IContext ctx = ctx();
         if (ctx.currentBlock() == null) return null;
-        Pattern p = Pattern.compile(String.format(PTN, a(), bc()), Pattern.DOTALL);
+        Pattern p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);
         Matcher m = p.matcher(ctx.getRemain());
         if (!m.matches()) return null;
         String s = m.group(1);
         ctx.step(s.length());
-        s = s.replaceFirst(a(), "");
-        return new Token(s, ctx) {
-            @Override
-            public void output() {
-                p("\n}");
-            }
-        };
+        try {
+            s = ctx.closeBlock();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return new CodeToken(s, ctx);
     }
     
     public static void main(String[] args) {

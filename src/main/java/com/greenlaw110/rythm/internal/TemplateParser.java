@@ -3,16 +3,15 @@ package com.greenlaw110.rythm.internal;
 import java.util.Stack;
 
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.dialect.IDialect;
-import com.greenlaw110.rythm.internal.dialect.Japid;
-import com.greenlaw110.rythm.internal.dialect.Razor;
+import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.util.TextBuilder;
 
 class TemplateParser implements IContext {
     private final CodeBuilder cb;
-    private IDialect dialect = Razor.INSTANCE;
+    private IDialect dialect = new Rythm();
     private String template;
     private int cursor = 0;
     
@@ -38,11 +37,7 @@ class TemplateParser implements IContext {
     }
 
     public void setDialect(String dialect) {
-        if ("razor".equalsIgnoreCase(dialect)) {
-            this.dialect = Razor.INSTANCE;  
-        } else if ("japid".equalsIgnoreCase(dialect)) {
-            this.dialect = Japid.INSTANCE;
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -69,15 +64,14 @@ class TemplateParser implements IContext {
     
 
     @Override
-    public IBlockHandler currentBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException("No open block found"); 
-        return blocks.peek();
+    public IBlockHandler currentBlock() {
+        return blocks.isEmpty() ? null : blocks.peek();
     }
 
     @Override
-    public void closeBlock() throws ParseException {
+    public String closeBlock() throws ParseException {
         if (blocks.isEmpty()) throw new ParseException("No open block found"); 
         IBlockHandler bh = blocks.pop();
-        bh.closeBlock();
+        return bh.closeBlock();
     }
 }

@@ -7,6 +7,7 @@ public class BlockCodeToken extends CodeToken implements IBlockHandler {
 
     public BlockCodeToken(String s, IContext context) {
         super(s, context);
+        context.openBlock(this);
     }
 
     @Override
@@ -14,8 +15,8 @@ public class BlockCodeToken extends CodeToken implements IBlockHandler {
     }
 
     @Override
-    public void closeBlock() {
-        p("}");
+    public String closeBlock() {
+        return "}";
     }
 
 }

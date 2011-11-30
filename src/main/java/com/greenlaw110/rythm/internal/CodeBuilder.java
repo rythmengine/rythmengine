@@ -49,6 +49,7 @@ public class CodeBuilder extends TextBuilder {
     
     private String tmpl;
     private String cName;
+    private String pName;
     Set<String> imports = new HashSet<String>();
     // <argName, argClass>
     Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
@@ -56,7 +57,13 @@ public class CodeBuilder extends TextBuilder {
     
     public CodeBuilder(String template, String className) {
         tmpl = template;
+        className = className.replace('/', '.');
         cName = className;
+        int i = className.lastIndexOf('.');
+        if (-1 < i) {
+            cName = className.substring(i + 1);
+            pName = className.substring(0, i);
+        }
     }
 
     public void addImport(String imprt) {
@@ -79,6 +86,7 @@ public class CodeBuilder extends TextBuilder {
     public TextBuilder build() {
         new TemplateParser(this).parse();
         invokeDirectives();
+        pPackage();
         pImports();
         pClassOpen();
         pRenderArgs();
@@ -93,6 +101,10 @@ public class CodeBuilder extends TextBuilder {
                 ((IDirective)b).call();
             }
         }
+    }
+    
+    private void pPackage() {
+        p("\npackage ").p(pName).p(";");
     }
     
     // print imports
@@ -138,7 +150,7 @@ public class CodeBuilder extends TextBuilder {
     }
     
     private void pBuild() {
-        p("\n@Override public com.greenlaw110.rythm.compiler.TextBuilder build(){");
+        p("\n@Override public com.greenlaw110.rythm.util.TextBuilder build(){");
         for (TextBuilder b: builders) {
             b.build();
         }

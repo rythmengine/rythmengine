@@ -4,14 +4,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.util.TextBuilder;
 
-public class ArgsParser extends BuildInParserFactory {
+public class ArgsParser extends KeywordParserFactory {
 
     @Override
     public Keyword keyword() {
@@ -19,8 +18,8 @@ public class ArgsParser extends BuildInParserFactory {
     }
 
     @Override
-    public IParser create(DialectBase dialect, IContext ctx) {
-        return new ParserBase(dialect, ctx) {
+    public IParser create(IContext ctx) {
+        return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
                 Matcher m = ptn(dialect()).matcher(remain());;

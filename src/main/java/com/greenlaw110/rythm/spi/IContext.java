@@ -40,12 +40,16 @@ public interface IContext {
      * @return
      * @throws ParseException 
      */
-    IBlockHandler currentBlock() throws ParseException;
+    IBlockHandler currentBlock();
     
     /**
-     * Notify context to close current block
+     * Notify context to close current block and return 
+     * the block close carets
+     * 
      * @throws ParseException 
      */
-    void closeBlock() throws ParseException;
+    String closeBlock() throws ParseException;
     
+    void setDialect(String dialect);
+    IDialect getDialect();
 }

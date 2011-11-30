@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.util.TextBuilder;
@@ -15,13 +15,14 @@ import com.stevesoft.pat.Regex;
  * 
  * @author luog
  */
-public class ExpressionParser extends BuildInSpecialParserFactory {
+public class ExpressionParser extends CaretParserFactoryBase {
 
     @Override
-    public IParser create(DialectBase dialect, IContext ctx) {
+    public IParser create(IContext ctx) {
         
         Regex r1_ = null, r2_ = null;
         String caret_ = null;
+        final IDialect dialect = ctx.getDialect();
         if (dialect instanceof Rythm) {
             caret_ = dialect.a();
             r1_ = new Regex(String.format(patternStr(), caret_));
@@ -33,7 +34,7 @@ public class ExpressionParser extends BuildInSpecialParserFactory {
             throw new DialectNotSupportException(dialect.id()); 
         }
         
-        return new ParserBase(dialect, ctx){
+        return new ParserBase(ctx){
 
             @Override
             public TextBuilder go() {
@@ -69,7 +70,6 @@ public class ExpressionParser extends BuildInSpecialParserFactory {
         };
     }
 
-    @Override
     protected String patternStr() {
         return "^%s[a-zA-Z][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*";
     }

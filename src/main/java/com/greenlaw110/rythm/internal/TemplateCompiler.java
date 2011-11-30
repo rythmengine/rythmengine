@@ -144,9 +144,20 @@ public class TemplateCompiler {
         public String getClassName() {
             return className;
         }
+        @SuppressWarnings("unchecked")
         public Class<? extends ITemplate> getTemplateClass() {
             if (null == cls) {
-                cls = compile_(src, className);
+                try {
+                    cls = (Class<? extends ITemplate>) Class.forName(className.replace('/', '.'));
+                    System.out.println("Load template class from class loader!");
+                } catch (Exception e) {
+                    // ignore;
+                }
+                
+                if (null == cls) {
+                    System.out.println("Compile template class...");
+                    cls = compile_(src, className);
+                }
             }
             return cls;
         }
@@ -212,7 +223,7 @@ public class TemplateCompiler {
         }
         if (success) {
             try {
-                return (Class<? extends ITemplate>) cl.findClass(className);
+                return (Class<? extends ITemplate>) cl.findClass(className.replace('/', '.'));
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } 

@@ -19,7 +19,7 @@ public class ForEachParserTest extends UnitTest {
     
     private void t(String in, String iterable, String type, String varname) {
         setup(in);
-        IParser p = new ForEachParser().create(d, c);
+        IParser p = new ForEachParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         builder.build();

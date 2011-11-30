@@ -19,9 +19,9 @@ public abstract class ParserBase implements IParser {
     private final DialectBase d_;
     private final IContext c_;
     
-    protected ParserBase(DialectBase dialect, IContext context) {
-        if (null == dialect || null == context) throw new NullPointerException();
-        d_ = dialect;
+    protected ParserBase(IContext context) {
+        if (null == context) throw new NullPointerException();
+        d_ = (DialectBase) context.getDialect();
         c_ = context;
     }
     

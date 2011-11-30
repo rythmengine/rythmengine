@@ -19,6 +19,6 @@ public class ExtensionManager {
     public void registerSpecialCaseParser(String dialect, IParserFactory parser) {
         IDialect d = Rythm.getDialectManager().get(dialect);
         if (null == d) throw new DialectNotFoundException(dialect);
-        d.registerSpecialParser(parser);
+        d.registerParserFactory(parser);
     }
 }

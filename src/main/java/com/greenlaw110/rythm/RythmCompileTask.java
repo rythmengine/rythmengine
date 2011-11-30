@@ -100,7 +100,7 @@ public class RythmCompileTask extends MatchingTask {
         public String[] mapFileName(String sourceName) {
             String targetFileName = sourceName;
             int i = targetFileName.lastIndexOf('.');
-            if (i > 0 && "rythm".equals(targetFileName.substring(i + 1))) {
+            if (i > 0 && targetFileName.indexOf(".rythm.") != -1) {
                 targetFileName = targetFileName.substring(0, i);
                 return new String[] { targetFileName + ".java"};
             }

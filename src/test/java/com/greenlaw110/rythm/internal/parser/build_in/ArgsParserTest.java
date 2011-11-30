@@ -10,7 +10,7 @@ public class ArgsParserTest extends UnitTest {
     @Test
     public void test() {
         setup("@args String name;");
-        IParser p = new ArgsParser().create(d, c);
+        IParser p = new ArgsParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);
@@ -20,7 +20,7 @@ public class ArgsParserTest extends UnitTest {
     @Test
     public void testMultiple() {
         setup("@args String name, int counter;");
-        IParser p = new ArgsParser().create(d, c);
+        IParser p = new ArgsParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);

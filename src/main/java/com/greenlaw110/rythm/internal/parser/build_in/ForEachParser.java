@@ -1,7 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
 import com.greenlaw110.rythm.spi.IContext;
@@ -9,11 +8,11 @@ import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.util.TextBuilder;
 import com.stevesoft.pat.Regex;
 
-public class ForEachParser extends BuildInParserFactory {
+public class ForEachParser extends KeywordParserFactory {
 
     @Override
-    public IParser create(DialectBase dialect, IContext ctx) {
-        return new ParserBase(dialect, ctx) {
+    public IParser create(IContext ctx) {
+        return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
                 Regex r = new Regex(String.format(patternStr(), dialect().a(), keyword()));
@@ -35,7 +34,7 @@ public class ForEachParser extends BuildInParserFactory {
     
     @Override
     protected String patternStr() {
-        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression + ")).*";
+        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")).*";
     }
     
     public static void main(String[] args) {

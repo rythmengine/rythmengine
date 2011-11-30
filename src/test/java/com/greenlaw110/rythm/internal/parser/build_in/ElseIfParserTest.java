@@ -6,7 +6,7 @@ import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.ut.UnitTest;
 import com.greenlaw110.rythm.util.TextBuilder;
 
-public class IfParserTest extends UnitTest {
+public class ElseIfParserTest extends UnitTest {
     
     private void t(String in, String out) {
         setup(in);

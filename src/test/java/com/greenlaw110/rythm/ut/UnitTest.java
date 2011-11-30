@@ -1,7 +1,5 @@
 package com.greenlaw110.rythm.ut;
 
-import org.jmock.Mockery;
-
 import com.greenlaw110.rythm.internal.MockCodeBuilder;
 import com.greenlaw110.rythm.internal.MockContext;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
@@ -26,5 +24,4 @@ public class UnitTest extends org.junit.Assert {
         }
     }
     
-    protected final Mockery mock = new Mockery();
 }

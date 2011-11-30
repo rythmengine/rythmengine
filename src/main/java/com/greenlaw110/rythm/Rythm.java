@@ -22,6 +22,30 @@ public class Rythm {
     
     private static TemplateCompiler compiler = new TemplateCompiler();
     
+    private static File templateRoot = null;
+    
+    public static void setTemplateRoot(File root) {
+        if (null != root) {
+            if (root.isDirectory()) templateRoot = root;
+            else throw new RuntimeException("template root not a director: " + root);
+        }
+    }
+    
+    public static File getTemplateRoot() {
+        if (null == templateRoot) {
+            String root = System.getProperty("rythm.templateRoot");
+            if (null != root) {
+                File f = new File(root);
+                if (f.isDirectory()) {
+                    templateRoot = f;
+                } else {
+                    // TODO log warning message
+                }
+            }
+        }
+        return templateRoot;
+    }
+    
     static ICache cache() {
         return cache;
     }
@@ -70,7 +94,8 @@ public class Rythm {
         CompiledTemplate ct = S.isNotEmpty(cacheKey) ? cache.get(cacheKey) : null;
         if (null == ct) {
             // see if template is a file name
-            File f = new File(template);
+            File root = getTemplateRoot();
+            File f = null == root ? new File(template) : new File(root, template);
             if (f.canRead()) {
                 return getTemplate_(f);
             }
@@ -139,7 +164,7 @@ public class Rythm {
     }
     
     public static void main(String[] args) {
-        test0();
+        test3();
     }
     
     public static void test0() {
@@ -162,7 +187,7 @@ public class Rythm {
         getTemplate(templateSource, items);
         System.out.println();
         long l = System.currentTimeMillis();
-        for (int i = 0; i < 15000; ++i) {
+        for (int i = 0; i < 5000; ++i) {
             render(templateSource, params);
             //t.setRenderArgs(items);
             //t.render();
@@ -172,7 +197,7 @@ public class Rythm {
     }
     
     public static void test1() {
-        String template = "@var String name;Hello @name\nString out = render(\"stocks.rythm.html\", Stock.dummyItems())";
+        String template = "@args String name;Hello @name\nString out = render(\"stocks.rythm.html\", Stock.dummyItems())";
         String out = render(template, "Marco");
         //String out = render("stocks.rythm.html", Stock.dummyItems());
         //System.out.println(out);

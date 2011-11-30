@@ -10,7 +10,7 @@ public class ImportParserTest extends UnitTest {
     @Test
     public void test() {
         setup("@import a.b.z;");
-        IParser p = new ImportParser().create(d, c);
+        IParser p = new ImportParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);
@@ -20,7 +20,7 @@ public class ImportParserTest extends UnitTest {
     @Test
     public void testMultiple() {
         setup("@import a.b.z x.y.z.*;");
-        IParser p = new ImportParser().create(d, c);
+        IParser p = new ImportParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);
@@ -31,7 +31,7 @@ public class ImportParserTest extends UnitTest {
     @Test
     public void testStatic() {
         setup("@import static a.b.z;");
-        IParser p = new ImportParser().create(d, c);
+        IParser p = new ImportParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);
@@ -41,7 +41,7 @@ public class ImportParserTest extends UnitTest {
     @Test
     public void testStaticMultiple() {
         setup("@import static a.b.z x.y.*, static ab.c0.* static a.b.Z;");
-        IParser p = new ImportParser().create(d, c);
+        IParser p = new ImportParser().create(c);
         TextBuilder builder = p.go();
         assertNotNull(builder);
         call(builder);
