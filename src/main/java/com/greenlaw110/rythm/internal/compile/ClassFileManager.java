@@ -2,6 +2,8 @@ package com.greenlaw110.rythm.internal.compile;
 
 import java.io.IOException;
 import java.security.SecureClassLoader;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
@@ -17,7 +19,7 @@ public class ClassFileManager extends
     * Instance of JavaClassObject that will store the
     * compiled bytecode of our class
     */
-    private JavaClassObject jclassObject;
+    private Map<String, JavaClassObject> jclassObjects = new HashMap<String, JavaClassObject>();
 
     /**
     * Will initialize the manager with the specified
@@ -43,14 +45,11 @@ public class ClassFileManager extends
             @Override
             protected Class<?> findClass(String name)
                 throws ClassNotFoundException {
-                byte[] b = jclassObject.getBytes();
-                try {
-                    Class<?> c =  super.defineClass(name, jclassObject
-                        .getBytes(), 0, b.length);
-                    System.out.println(">>>>>>>>> class loaded: " + name);
-                    return c;
-                } catch (Throwable e) {
-                    System.out.println(">>>>>>>>> error loading class: " + name);
+                JavaClassObject jclassObject = jclassObjects.get(name);
+                if (null != jclassObject) {
+                    byte[] b = jclassObject.getBytes();
+                    return super.defineClass(name, b, 0, b.length);
+                } else {
                     ClassLoader cl = Rythm.classLoader;
                     if (null == cl) return super.findClass(name);
                     return cl.loadClass(name);
@@ -67,7 +66,8 @@ public class ClassFileManager extends
     public JavaFileObject getJavaFileForOutput(Location location,
         String className, Kind kind, FileObject sibling)
             throws IOException {
-            jclassObject = new JavaClassObject(className, kind);
+        JavaClassObject jclassObject = new JavaClassObject(className, kind);
+        jclassObjects.put(className, jclassObject);
         return jclassObject;
     }
 }

@@ -41,7 +41,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                 String s = remain();
                 if (r1.search(s)) {
                     s = r1.stringMatched(1);
-                    if (null != s) {
+                    if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
                         s = s.replaceFirst(caret, "");
                         return new Token(s, ctx()) {
@@ -56,7 +56,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                 s = remain();
                 if (r2.search(s)) {
                     s = r2.stringMatched(1);
-                    if (null != s) {
+                    if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
                         return new Token(s.replaceFirst(caret, ""), ctx()) {
                             //TODO support java bean spec
@@ -73,22 +73,23 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr() {
-        return "^(%s[a-zA-Z][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*))*";
+        return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*))*";
     }
     
     public static void main(String[] args) {
         String ps = "^(@(?@())*).*";
         Regex r = new Regex(ps);
         //String s = "@(control.left[bar.foo()])px;\n\ttop: @(control.top)px;";
-        String s = "@(a.b() + x) is something";
+        String s = "@ is something";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }
         
         ps = String.format(new ExpressionParser().patternStr(), "@");
+        System.out.println(ps);
         r = new Regex(ps);
-        s = "@(a.b() + x) is something";
+        s = "@a.b() is something";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

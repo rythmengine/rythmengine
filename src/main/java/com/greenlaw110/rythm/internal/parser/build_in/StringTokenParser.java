@@ -35,9 +35,8 @@ public class StringTokenParser extends ParserBase {
             return null;
         s = m.group(1);
         ctx.step(s.length());
-        if ("".equals(s.trim()))
-            return new Directive();
-        s = s.replace(String.format("%s%s", a, a), a);
+        if ("".equals(s.trim())) s = " ";
+        else s = s.replace(String.format("%s%s", a, a), a);
         return new Token(s, ctx);
     }
 

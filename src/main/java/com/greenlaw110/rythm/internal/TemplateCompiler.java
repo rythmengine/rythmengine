@@ -184,6 +184,9 @@ public class TemplateCompiler {
 
                 if (null == cls) {
                     cls = compile_(src, className);
+                    if (null == cls) {
+                        src = null;
+                    }
                 }
             }
             return cls;
