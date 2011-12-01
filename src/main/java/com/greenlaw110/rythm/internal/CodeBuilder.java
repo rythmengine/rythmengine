@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.greenlaw110.rythm.util.S;
 import com.greenlaw110.rythm.util.TextBuilder;
 
 
@@ -104,7 +105,7 @@ public class CodeBuilder extends TextBuilder {
     }
     
     private void pPackage() {
-        p("\npackage ").p(pName).p(";");
+        if (!S.isEmpty(pName)) p("\npackage ").p(pName).p(";");
     }
     
     // print imports
@@ -142,7 +143,7 @@ public class CodeBuilder extends TextBuilder {
         p("\nint p = 0, l = args.length;");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+            p("\nif (p < l) { Object v = args[p++]; if (null != v) System.out.println(\"<<<\" + v);boolean isString = (\"java.lang.String\".equals(\"")
                 .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                 .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
         }

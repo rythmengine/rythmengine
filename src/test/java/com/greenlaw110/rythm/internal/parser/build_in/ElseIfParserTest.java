@@ -24,7 +24,7 @@ public class ElseIfParserTest extends UnitTest {
     
     @Test
     public void test2() {
-        t("@if (user.registered()) <p>hello @user.name()</p> @", "if (user.registered())");
+        t("@if (user.registered()) <p>hello @user.name()</p> @", "if (user.registered()) {");
     }
     
 }

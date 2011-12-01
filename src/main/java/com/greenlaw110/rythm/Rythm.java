@@ -46,8 +46,16 @@ public class Rythm {
         return templateRoot;
     }
     
+    public static ClassLoader classLoader = null;
+    
+    public static String classPath = "";
+    
     static ICache cache() {
         return cache;
+    }
+    
+    public static void clearCache() {
+        cache.clear();
     }
     
     public static CompiledTemplate compile(String template) {
@@ -139,11 +147,7 @@ public class Rythm {
     }
     
     public static String render(String template, Object... args) {
-        return render(template, "", args);
-    }
-    
-    public static String render(String template, String cacheKey, Object... args) {
-        ITemplate t = getTemplate(template, cacheKey, args);
+        ITemplate t = getTemplate(template, args);
         return t.render();
     }
     
@@ -164,7 +168,7 @@ public class Rythm {
     }
     
     public static void main(String[] args) {
-        test3();
+        test2();
     }
     
     public static void test0() {
