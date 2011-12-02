@@ -79,7 +79,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
     public static void main(String[] args) {
         String ps = "^(@(?@())*).*";
         Regex r = new Regex(ps);
-        //String s = "@(control.left[bar.foo()])px;\n\ttop: @(control.top)px;";
+        //String s = "@(component.left[bar.foo()])px;\n\ttop: @(component.top)px;";
         String s = "@ is something";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

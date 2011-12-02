@@ -23,7 +23,6 @@ public class ImportParser extends KeywordParserFactory {
     
     public IParser create(IContext c) {
         return new ParserBase(c) {
-            @Override
             public TextBuilder go() {
                 Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;

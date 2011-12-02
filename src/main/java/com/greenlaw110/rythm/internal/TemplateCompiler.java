@@ -176,8 +176,6 @@ public class TemplateCompiler {
                 try {
                     cls = (Class<? extends ITemplate>) Class.forName(className
                             .replace('/', '.'));
-                    System.out
-                            .println("Load template class from class loader!");
                 } catch (Exception e) {
                     // ignore;
                 }
@@ -232,7 +230,6 @@ public class TemplateCompiler {
     @SuppressWarnings("unchecked")
     private static Class<? extends ITemplate> compile_(String srcCode,
             String className) {
-        System.out.println("\n\n" + srcCode + "\n\n");
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         //JavaCompiler compiler = new EclipseCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
@@ -248,7 +245,6 @@ public class TemplateCompiler {
                         .getStandardFileManager(null, null, null));
         List options = new ArrayList();
         options.addAll(Arrays.asList("-classpath",System.getProperty("java.class.path") + File.pathSeparator + Rythm.classPath));
-        System.out.println("\n\n!!!!!!!!!!!!!!!" + System.getProperty("java.class.path") + File.pathSeparator + Rythm.classPath + "\n\n");
         //List compilationUnits = Arrays.asList(new MemorySource(className, srcCode));
         List compilationUnits = new ArrayList<JavaFileObject>();
         compilationUnits.add(new CharSequenceJavaFileObject(className, srcCode));

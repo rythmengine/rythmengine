@@ -16,7 +16,6 @@ public class Directive extends Token implements IDirective {
     
     protected void output() {}
 
-    @Override
     public void call() {
     }
 

@@ -10,10 +10,8 @@ import com.stevesoft.pat.Regex;
 
 public class ForEachParser extends KeywordParserFactory {
 
-    @Override
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
-            @Override
             public TextBuilder go() {
                 Regex r = new Regex(String.format(patternStr(), dialect().a(), keyword()));
                 if (!r.search(remain())) return null;
@@ -34,7 +32,7 @@ public class ForEachParser extends KeywordParserFactory {
     
     @Override
     protected String patternStr() {
-        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")).*";
+        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")[\\s\r\n]*).*";
     }
     
     public static void main(String[] args) {
@@ -43,7 +41,7 @@ public class ForEachParser extends KeywordParserFactory {
         System.out.println(p);
         
         Regex r = new Regex(p);
-        String s = "@each models.User[] u: users.foo()[x] Hello world";
+        String s = "@each models.User[] u: users.foo()[x] \nHello world";
         if (r.search(s)) {
             //System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

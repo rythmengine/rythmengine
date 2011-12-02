@@ -143,7 +143,7 @@ public class CodeBuilder extends TextBuilder {
         p("\nint p = 0, l = args.length;");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (p < l) { Object v = args[p++]; if (null != v) System.out.println(\"<<<\" + v);boolean isString = (\"java.lang.String\".equals(\"")
+            p("\nif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
                 .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                 .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
         }

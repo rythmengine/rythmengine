@@ -5,7 +5,6 @@ import com.greenlaw110.rythm.spi.IDialect;
 
 public abstract class CaretParserFactoryBase implements ICaretParserFactory {
 
-    @Override
     public String getCaret(IDialect dialect) {
         return dialect.a();
     }

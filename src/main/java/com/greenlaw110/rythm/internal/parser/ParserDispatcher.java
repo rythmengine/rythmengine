@@ -26,7 +26,6 @@ public class ParserDispatcher extends ParserBase {
         P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), PatternStr.VarName);
     }
 
-    @Override
     public TextBuilder go() {
         DialectBase d = dialect();
         IContext c = ctx();
