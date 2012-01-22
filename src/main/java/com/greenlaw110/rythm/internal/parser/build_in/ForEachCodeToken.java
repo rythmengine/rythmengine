@@ -33,7 +33,7 @@ public class ForEachCodeToken extends BlockCodeToken {
     public void output() {
         String prefix = "_".equals(varname) ? "" : varname;
         p("\nnew com.greenlaw110.rythm.runtime.Each(this).render(").p(iterable)
-            .p(", new com.greenlaw110.rythm.runtime.Each.Body<").p(type).p(">(){\n\tpublic void render(final ") 
+            .p(", new com.greenlaw110.rythm.runtime.Each.IBody<").p(type).p(">(){\n\tpublic void render(final ")
             .p(type).p(" ").p(varname).p(", final int size, final int ").p(prefix).p("_index, final boolean ")
             .p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ")
             .p(prefix).p("_first, final boolean ").p(prefix).p("_last) {\n");

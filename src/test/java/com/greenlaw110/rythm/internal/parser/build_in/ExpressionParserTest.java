@@ -23,13 +23,13 @@ public class ExpressionParserTest extends UnitTest {
     }
 
     @Test
-    public void testComplexExpression() {
-        t("@a.b()[foo.bar()].x() is good", "p(a.b()[foo.bar()].x());");
+    public void test2ndStyle() {
+        t("@(a.b() + x) is something", "\np((a.b() + x));");
     }
 
     @Test
-    public void test2ndStyle() {
-        t("@(a.b() + x) is something", "\np((a.b() + x));");
+    public void testComplexExpression() {
+        t("@a.b()[foo.bar()].x() is good", "p(a.b()[foo.bar()].x());");
     }
 
 }

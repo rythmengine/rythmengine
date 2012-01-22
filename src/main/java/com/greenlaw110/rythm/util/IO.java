@@ -1,16 +1,10 @@
 package com.greenlaw110.rythm.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import sun.security.action.GetPropertyAction;
+
+import java.io.*;
+import java.net.URL;
+import java.security.AccessController;
 
 public class IO {
     
@@ -25,13 +19,45 @@ public class IO {
 
     /**
      * Read file content to a String
+     * @param url The url resource to read
+     * @return The String content
+     */
+    public static String readContentAsString(URL url, String encoding) {
+        try {
+            return readContentAsString(url.openStream());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Read file content to a String (always use utf-8)
+     * @param url the url resource to read
+     * @return The String content
+     */
+    public static String readContentAsString(URL url) {
+        return readContentAsString(url, "utf-8");
+    }
+
+    /**
+     * Read file content to a String
      * @param file The file to read
      * @return The String content
      */
     public static String readContentAsString(File file, String encoding) {
-        InputStream is = null;
         try {
-            is = new FileInputStream(file);
+            return readContentAsString(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String readContentAsString(InputStream is) {
+        return readContentAsString(is, "utf-8");
+    }
+    
+    public static String readContentAsString(InputStream is, String encoding) {
+        try {
             StringWriter result = new StringWriter();
             PrintWriter out = new PrintWriter(result);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding));
@@ -84,6 +110,12 @@ public class IO {
                 //
             }
         }
+    }
+    
+    public static File tmpDir() {
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
+        if (!tmpDir.isDirectory() && !tmpDir.mkdir()) throw new RuntimeException("couldn't create temp dir " + tmpDir.getName());
+        return tmpDir;
     }
 
 

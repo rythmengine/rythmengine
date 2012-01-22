@@ -7,7 +7,7 @@ package com.greenlaw110.rythm.util;
  */
 public class TextBuilder {
 
-    private final StringBuilder out;
+    protected StringBuilder out;
     
     private final TextBuilder caller;
     

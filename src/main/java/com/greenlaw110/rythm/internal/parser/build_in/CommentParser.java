@@ -36,7 +36,7 @@ public class CommentParser extends CaretParserFactoryBase {
             private Pattern inlineComment() {
                 return Pattern.compile(String.format("^(%s//.*?\n).*", a()), Pattern.DOTALL);
             }
-
+            
             private Pattern blockComment() {
                 return Pattern.compile(String.format("^(%s\\{.*?\\}%s).*", a(), a()), Pattern.DOTALL);
             }

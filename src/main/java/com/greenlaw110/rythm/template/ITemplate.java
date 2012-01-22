@@ -13,5 +13,10 @@ public interface ITemplate {
      * @param args
      */
     void setRenderArgs(Object... args);
+
+    /**
+     * Render the output
+     * @return
+     */
     String render();
 }

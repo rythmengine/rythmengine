@@ -4,10 +4,11 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.greenlaw110.rythm.internal.ITemplateClonable;
 import com.greenlaw110.rythm.util.TextBuilder;
 
 
-public abstract class TemplateBase extends TextBuilder implements ITemplate {
+public abstract class TemplateBase extends TextBuilder implements ITemplate, ITemplateClonable {
     
     /* to be used by dynamic generated sub classes */
     @SuppressWarnings("unused")
@@ -39,9 +40,18 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected final void addAllRenderSections(Map<String, String> sections) {
         renderSections.putAll(sections);
     }
-    
+
+    public ITemplate cloneMe() {
+        try {
+            return (ITemplate)super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public String render() {
+        out.setLength(0);
         build();
         if (null != parent) {
             parent.setRenderBody(toString());

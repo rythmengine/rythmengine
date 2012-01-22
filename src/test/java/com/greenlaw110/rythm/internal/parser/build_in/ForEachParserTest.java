@@ -10,8 +10,8 @@ public class ForEachParserTest extends UnitTest {
     
     private String expected(String iterable, String type, String varname) {
         String prefix = "_".equals(varname) ? "" : varname;
-        return String.format("\nnew com.greenlaw110.rythm.runtime.Each(this).render" + 
-                "(%s, new com.greenlaw110.rythm.runtime.Each.Body<%s>(){\n\t"+
+        return String.format("\nnew com.greenlaw110.rythm.runtime.Each(this).render" +
+                "(%s, new com.greenlaw110.rythm.runtime.Each.IBody<%s>(){\n\t"+
                 "public void render(final %s %s, final int size, final int %s_index, " + 
                 "final boolean %s_isOdd, final String %s_parity, final boolean %s_first, " + 
                 "final boolean %s_last) {\n", iterable, type, type, varname, prefix, prefix, prefix, prefix, prefix);
