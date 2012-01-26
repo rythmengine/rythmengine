@@ -114,18 +114,30 @@ public abstract class TemplateResourceBase implements ITemplateResource {
 
     @Override
     public String getSuggestedClassName() {
-        return TemplateClass.CN_PREFIX + UUID.randomUUID().toString().replace('-', '_');
+        return "C" + UUID.randomUUID().toString().replace('-', '_');
     }
-    
+
+    @Override
+    public String tagName() {
+        return null;
+    }
+
     protected static final String path2CN(String path) {
+        int colon = path.indexOf(":");
+        if (++colon > 0) {
+            path = path.substring(colon); // strip the driver letter from windows path and scheme from the URL
+        }
         while (path.startsWith("/")) path = path.substring(1);
         while (path.startsWith("\\")) path = path.substring(1);
-        int lastDotPos = path.lastIndexOf(".");
-        path = path.substring(0, lastDotPos);
-        return path.replace('/', '.').replace('\\', '.');
+        // -- do not strip the file suffix. other wise a.html and a.js template will fetch a same template class
+        //    in the end
+        //int lastDotPos = path.lastIndexOf(".");
+        //path = path.substring(0, lastDotPos);
+        return path.replace('/', '_').replace('\\', '_').replace('.', '_');
     }
     
     public static void main(String[] args) {
-        System.out.println(path2CN("/Black/jack/k.html"));
+        System.out.println(path2CN("http://abc.1.a/Black/jack/k.html"));
+        System.out.println(path2CN("W:\\tmp\\a.b.a.html"));
     }
 }

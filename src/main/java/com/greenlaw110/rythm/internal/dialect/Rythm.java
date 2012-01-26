@@ -13,9 +13,9 @@ public class Rythm extends DialectBase {
     }
 
     protected Class<?>[] buildInParserClasses() {
-        return new Class<?>[]{ArgsParser.class, CommentParser.class, ElseIfParser.class,
-                ExpressionParser.class, ForEachParser.class, IfParser.class,
-                ImportParser.class};
+        return new Class<?>[]{ArgsParser.class, CommentParser.class, DefTagParser.class, ElseIfParser.class,
+                ExpressionParser.class, ExtendsParser.class, ForEachParser.class, IfParser.class,
+                ImportParser.class, RenderBodyParser.class, RenderSectionParser.class, SectionParser.class};
     }
 
 }

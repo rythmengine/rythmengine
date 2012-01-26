@@ -42,4 +42,10 @@ public interface ITemplateResource extends Serializable {
      * @return true if it's a valid resource
      */
     boolean isValid();
+
+    /**
+     * Return non-null value if this resource present a tag
+     * @return
+     */
+    String tagName();
 }

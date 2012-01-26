@@ -4,8 +4,8 @@ import com.greenlaw110.rythm.util.S;
 
 public class MockCodeBuilder extends CodeBuilder {
 
-    public MockCodeBuilder(String template, String className) {
-        super(template, className);
+    public MockCodeBuilder(String template, String className, String tagName) {
+        super(template, className, tagName, null);
     }
 
     public boolean hasImport(String importStr) {

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockCloseParser;
+import com.greenlaw110.rythm.internal.parser.build_in.ScriptParser;
 import com.greenlaw110.rythm.internal.parser.build_in.StringTokenParser;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
@@ -19,6 +20,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         ctx = context;
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));
+        parsers.add(new ScriptParser(ctx));
         parsers.add(new StringTokenParser(ctx));
 //        Parsers.add(new CommentParser(ctx));
 //        Parsers.add(new ArgParser(ctx));

@@ -1,9 +1,11 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.IHotswapAgent;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.util.IO;
 
 import java.io.ByteArrayOutputStream;
@@ -158,20 +160,44 @@ public class TemplateClassLoader extends ClassLoader {
     public RythmEngine engine;
 
     private BytecodeCache bCache;
-
-    public TemplateClassLoader(RythmEngine engine) {
-        super(TemplateClassLoader.class.getClassLoader());
-        this.engine = engine;
-        this.bCache = new BytecodeCache(this);
+    
+    private static ClassLoader getDefParent() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return null == cl ? RythmEngine.class.getClassLoader() : cl;
     }
 
+    public TemplateClassLoader(RythmEngine engine) {
+        this(getDefParent(), engine);
+    }
+
+    public TemplateClassLoader(ClassLoader parent, RythmEngine engine) {
+        super(parent);
+        this.engine = engine;
+        this.bCache = new BytecodeCache(this);
+        for (TemplateClass tc: engine.classes.all()) {
+            tc.uncompile();
+        }
+        pathHash = computePathHash();
+//        try {
+//            CodeSource codeSource = new CodeSource(new URL("file:" + Play.applicationPath.getAbsolutePath()), (Certificate[]) null);
+//            Permissions permissions = new Permissions();
+//            permissions.add(new AllPermission());
+//            protectionDomain = new ProtectionDomain(codeSource, permissions);
+//        } catch (MalformedURLException e) {
+//            throw new UnexpectedException(e);
+//        }
+    }
 
 
     @Override
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        Class<?> c = findLoadedClass(name);
-        if (c != null) {
-            return c;
+        TemplateClass tc = engine.classes.clsNameIdx.get(name);
+        if (null == tc) {
+            // it's not a template class, let's try to find already loaded one
+            Class<?> c = findLoadedClass(name);
+            if (c != null) {
+                return c;
+            }
         }
 
         // First check if it's an application Class
@@ -187,6 +213,7 @@ public class TemplateClassLoader extends ClassLoader {
         return super.loadClass(name, resolve);
     }
 
+    @SuppressWarnings("unchecked")
     private Class<?> loadTemplateClass(String name) {
         Class maybeAlreadyLoaded = findLoadedClass(name);
         if(maybeAlreadyLoaded != null) {
@@ -207,7 +234,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
             if (bc != null) {
                 templateClass.enhancedByteCode = bc;
-                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name, templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
@@ -218,7 +245,7 @@ public class TemplateClassLoader extends ClassLoader {
 
             if (templateClass.javaByteCode != null || templateClass.compile() != null) {
                 templateClass.enhance();
-                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name, templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
                 bCache.cacheBytecode(templateClass.enhancedByteCode, name, templateClass.javaSource);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
@@ -227,7 +254,7 @@ public class TemplateClassLoader extends ClassLoader {
                 logger.trace("%sms to load class %s", System.currentTimeMillis() - start, name);
                 return templateClass.javaClass;
             }
-            engine.classes.clsNameIdx.remove(name);
+            engine.classes.remove(name);
         }
         return null;
     }
@@ -281,11 +308,57 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
     }
+    
+    public void detectChange(TemplateClass tc) {
+        if (!tc.refresh()) return;
+        if (tc.compile() == null) {
+            engine.classes.remove(tc);
+            currentState = new TemplateClassloaderState();
+        } else {
+            int sigChecksum = tc.sigChecksum;
+            tc.enhance();
+            if (sigChecksum != tc.sigChecksum) {
+                throw new RuntimeException("Signature change !");
+            }
+//            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
+//            List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
+//            newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
+//            List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
+//            for (TemplateClass ec: allEmbedded) {
+//                newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
+//            }
+//            currentState = new TemplateClassloaderState();//show others that we have changed..
+//            IHotswapAgent agent = engine.hotswapAgent;
+//            if (null != agent) {
+//                try {
+//                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
+//                } catch (Throwable e) {
+//                    engine.classes.remove(tc);
+//                    throw new RuntimeException("Need reload", e);
+//                }
+//            } else {
+//                throw new RuntimeException("Need reload");
+//            }
+        }
+//        // Now check if there is new classCache or removed classCache
+//        int hash = computePathHash();
+//        if (hash != this.pathHash) {
+//            // Remove class for deleted files !!
+//            for (TemplateClass tc0 : engine.classes.all()) {
+//                if (!tc0.templateResource.isValid()) {
+//                    engine.classes.remove(tc0);
+//                    currentState = new TemplateClassloaderState();//show others that we have changed..
+//                }
+//            }
+//            throw new RuntimeException("Path has changed");
+//        }
+    }
 
     /**
      * Detect Template changes
      */
     public void detectChanges() {
+        if (engine.isProdMode()) return;
         // Now check for file modification
         List<TemplateClass> modifieds = new ArrayList<TemplateClass>();
         for (TemplateClass tc : engine.classes.all()) {
@@ -295,19 +368,31 @@ public class TemplateClassLoader extends ClassLoader {
         modifiedWithDependencies.addAll(modifieds);
         List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
         boolean dirtySig = false;
-        for (TemplateClass TemplateClass : modifiedWithDependencies) {
-            if (TemplateClass.compile() == null) {
-                engine.classes.clsNameIdx.remove(TemplateClass.name);
+        for (TemplateClass tc : modifiedWithDependencies) {
+            if (tc.compile() == null) {
+                engine.classes.remove(tc);
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             } else {
-                int sigChecksum = TemplateClass.sigChecksum;
-                TemplateClass.enhance();
-                if (sigChecksum != TemplateClass.sigChecksum) {
+                int sigChecksum = tc.sigChecksum;
+                tc.enhance();
+                if (sigChecksum != tc.sigChecksum) {
                     dirtySig = true;
                 }
-                bCache.cacheBytecode(TemplateClass.enhancedByteCode, TemplateClass.name, TemplateClass.javaSource);
-                newDefinitions.add(new ClassDefinition(TemplateClass.javaClass, TemplateClass.enhancedByteCode));
+                bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
+                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
                 currentState = new TemplateClassloaderState();//show others that we have changed..
+            }
+        }
+        if (newDefinitions.size() > 0) {
+            IHotswapAgent agent = engine.hotswapAgent;
+            if (null != agent) {
+                try {
+                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
+                } catch (Throwable e) {
+                    throw new RuntimeException("Need reload");
+                }
+            } else {
+                throw new RuntimeException("Need reload");
             }
         }
         // Check signature (variable name & annotations aware !)
@@ -319,15 +404,16 @@ public class TemplateClassLoader extends ClassLoader {
         int hash = computePathHash();
         if (hash != this.pathHash) {
             // Remove class for deleted files !!
-            for (TemplateClass TemplateClass : engine.classes.all()) {
-                if (!TemplateClass.templateResource.isValid()) {
-                    engine.classes.clsNameIdx.remove(TemplateClass.name);
+            for (TemplateClass tc : engine.classes.all()) {
+                if (!tc.templateResource.isValid()) {
+                    engine.classes.remove(tc);
                     currentState = new TemplateClassloaderState();//show others that we have changed..
                 }
             }
             throw new RuntimeException("Path has changed");
         }
     }
+
     /**
      * Used to track change of the application sources path
      */

@@ -6,9 +6,9 @@ public enum Keyword {
      */
     ARGS,
     /**
-     * Output sub template render content in place
+     * Declare this template is a tag
      */
-    DO_LAYOUT("doLayout"),
+    DEFTAG,
     /**
      * Foreach loop
      */
@@ -34,6 +34,18 @@ public enum Keyword {
      */
     GET,
     /**
+     * Output sub template render content in place
+     */
+    RENDER_BODY("(renderBody|doLayout)"),
+    /**
+     * Output sub template section content in place
+     */
+    RENDER_SECTION("(render(Section)?|get)"),
+    /**
+     * Declare a section start
+     */
+    SECTION("(section|set)"),
+    /**
      * Declare named content to be used in parent template
      */
     SET,
@@ -45,7 +57,7 @@ public enum Keyword {
      * Invoke tag (Only used in Japid dialect)
      */
     TAG;
-    
+
     private final String s;
     private Keyword() {
         this.s = name().toLowerCase();
@@ -57,5 +69,9 @@ public enum Keyword {
     @Override
     public String toString() {
         return s;
+    }
+    
+    public boolean isRegexp() {
+        return !s.equals(name().toLowerCase());
     }
 }

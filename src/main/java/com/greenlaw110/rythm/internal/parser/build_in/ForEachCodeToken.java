@@ -11,10 +11,10 @@ public class ForEachCodeToken extends BlockCodeToken {
     
     /**
      * 
-     * @each String [str]: myStrList
-     *         ^     ^       ^
-     *         |     |       |
-     *        type varname  iterable
+     * @each String [str]: myStrList @
+     *         ^     ^       ^        ^
+     *         |     |       |        |
+     *        type varname  iterable endloop
      * 
      * @param type
      * @param varname
@@ -32,7 +32,8 @@ public class ForEachCodeToken extends BlockCodeToken {
     @Override
     public void output() {
         String prefix = "_".equals(varname) ? "" : varname;
-        p("\nnew com.greenlaw110.rythm.runtime.Each(this).render(").p(iterable)
+        String curClassName = ctx.getCodeBuilder().className();
+        p("\nnew com.greenlaw110.rythm.runtime.Each(").p(curClassName).p(".this).render(").p(iterable)
             .p(", new com.greenlaw110.rythm.runtime.Each.IBody<").p(type).p(">(){\n\tpublic void render(final ")
             .p(type).p(" ").p(varname).p(", final int size, final int ").p(prefix).p("_index, final boolean ")
             .p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ")

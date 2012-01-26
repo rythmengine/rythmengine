@@ -1,5 +1,9 @@
 package com.greenlaw110.rythm.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This class defines a chained source code builder. It's some how like a StringBuilder but it's chainable
  * 
@@ -7,15 +11,30 @@ package com.greenlaw110.rythm.util;
  */
 public class TextBuilder {
 
-    protected StringBuilder out;
+    public static class TextBuilderList extends TextBuilder {
+        List<TextBuilder> builders = new ArrayList<TextBuilder>();
+        TextBuilderList(TextBuilder... builders) {
+            this.builders.addAll(Arrays.asList(builders));
+        }
+
+        @Override
+        public TextBuilder build() {
+            for (TextBuilder builder: builders) {
+                builder.build();
+            }
+            return this;
+        }
+    }
+
+    protected StringBuilder _out;
     
-    private final TextBuilder caller;
+    protected TextBuilder caller;
     
     /**
      * Construct a root text builder
      */
     public TextBuilder() {
-        out = new StringBuilder();
+        _out = new StringBuilder();
         caller = null;
     }
     
@@ -25,12 +44,12 @@ public class TextBuilder {
      */
     public TextBuilder(TextBuilder caller) {
         this.caller = caller;
-        out = (null == caller) ? new StringBuilder() : null;
+        _out = (null == caller) ? new StringBuilder() : null;
     }
     
     private void p_(Object o) {
         String s = toString(o);
-        if (null != out) out.append(s);
+        if (null != _out) _out.append(s);
         else caller.p(s);
     }
     
@@ -87,6 +106,6 @@ public class TextBuilder {
     
     @Override
     public String toString() {
-        return null != out ? out.toString() : caller.toString();
+        return null != _out ? _out.toString() : caller.toString();
     }
 }

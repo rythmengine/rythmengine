@@ -3,7 +3,9 @@ package com.greenlaw110.rythm.util;
 import com.greenlaw110.rythm.Rythm;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,5 +62,38 @@ public class RythmProperties extends Properties {
         Rythm.Mode mode = Rythm.Mode.valueOf(s);
         put(key, mode);
         return mode;
+    }
+    
+    public FileFilter getAsFileFilter(String key, FileFilter defVal) {
+        Object o = get(key);
+        if (null == o) return defVal;
+        if (o instanceof FileFilter) return (FileFilter)o;
+        String s = o.toString();
+        final Pattern p = Pattern.compile(s);
+        return new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return p.matcher(pathname.getPath()).matches();
+            }
+        };
+    }
+    
+    public Pattern getAsPattern(String key, Pattern defVal) {
+        Object o = get(key);
+        if (null == o) return defVal;
+        if (o instanceof Pattern) return (Pattern)o;
+        String s = o.toString();
+        Pattern p = Pattern.compile(s);
+        put(key, p);
+        return p;
+    }
+
+    public <T> T getAs(String key, T defVal, Class<T> tc) {
+        Object o = get(key);
+        if (null == o) return defVal;
+        if (tc.isAssignableFrom(o.getClass())) {
+            return (T)o;
+        }
+        return null;
     }
 }

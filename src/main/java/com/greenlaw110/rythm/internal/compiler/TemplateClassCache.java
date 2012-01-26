@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -64,26 +65,64 @@ public class TemplateClassCache {
      * @return The TemplateClass or null
      */
     public TemplateClass getByClassName(String name) {
-        return clsNameIdx.get(name);
+        TemplateClass tc = clsNameIdx.get(name);
+        checkUpdate(tc);
+        return tc;
     }
     
     public TemplateClass getByTemplate(String name) {
-        return tmplIdx.get(name);
+        TemplateClass tc = tmplIdx.get(name);
+        checkUpdate(tc);
+        return tc;
+    }
+
+    private void checkUpdate(TemplateClass tc) {
+        if (null == tc) return;
+        if (null != tc && engine.mode == Rythm.Mode.dev) {
+            engine.classLoader.detectChange(tc);
+        }
+    }
+    
+    List<TemplateClass> getEmbeddedClasses(String name) {
+        List<TemplateClass> l = new ArrayList<TemplateClass>();
+        for (String cn: clsNameIdx.keySet()) {
+            if (cn.startsWith(name + "$")) {
+                l.add(clsNameIdx.get(cn));
+            }
+        }
+        return l;
     }
 
     public void add(TemplateClass templateClass) {
-        clsNameIdx.put(templateClass.name, templateClass);
+        clsNameIdx.put(templateClass.name0(), templateClass);
+        clsNameIdx.put(templateClass.name(), templateClass);
         if (!templateClass.isInner()) {
             tmplIdx.put(templateClass.templateResource.getKey(), templateClass);
         }
     }
 
     public void remove(TemplateClass templateClass) {
-        clsNameIdx.remove(templateClass.name);
+        if (null == templateClass) return;
+        if (templateClass.isInner()) {
+            clsNameIdx.remove(templateClass.name());
+            return;
+        }
+        // remove versioned link
+        clsNameIdx.remove(templateClass.name());
+        // remove unversioned link
+        String name0 = templateClass.name0();
+        clsNameIdx.remove(name0);
+        List<String> embedded = new ArrayList<String>();
+        for (String cn: clsNameIdx.keySet()) {
+            if (cn.matches(name0 + "v[0-9]+\\$.*")) embedded.add(cn);
+        }
+        for (String cn: embedded) clsNameIdx.remove(cn);
+        if (null != templateClass && null != templateClass.templateResource) tmplIdx.remove(templateClass.getKey());
     }
 
     public void remove(String name) {
-        clsNameIdx.remove(name);
+        TemplateClass templateClass = clsNameIdx.get(name);
+        remove(templateClass);
     }
 
     public boolean hasClass(String name) {

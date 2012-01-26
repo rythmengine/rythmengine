@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm.exception;
 
-public class ParseException extends Exception {
+public class ParseException extends RuntimeException {
 
     /**
      * 

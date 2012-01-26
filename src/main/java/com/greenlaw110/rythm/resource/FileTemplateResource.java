@@ -1,9 +1,13 @@
 package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.util.IO;
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,8 +18,10 @@ import java.io.File;
  */
 public class FileTemplateResource extends TemplateResourceBase implements ITemplateResource {
     
+    private ILogger logger = Logger.get(FileTemplateResource.class);
     private File file;
     private String key;
+    private String tagName;
 
     @Override
     protected long defCheckInterval() {
@@ -29,15 +35,52 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public FileTemplateResource(String path, RythmEngine engine) {
         super(engine);
         File home = engine().templateHome;
+        File tagHome = engine().tagHome;
         File f = null;
         if (null != home) {
             f = new File(home, path);
+        }
+        if (null == f || !f.canRead()) {
+            // try tag home
+            if (null != tagHome) f = new File(tagHome, path);
         }
         if (null == f || !f.canRead()) {
             f = new File(path);
         }
         file = f;
         key = path;
+        
+        if (null != tagHome && isValid()) {
+            // set tag name if this file is found under tag home
+            String tagPath = tagHome.getAbsolutePath();
+            String filePath = f.getAbsolutePath();
+            if (filePath.startsWith(tagPath)) {
+                this.tagName = retrieveTagName(tagHome, f);
+            }
+        }
+    }
+    
+    private static String retrieveTagName(File tagHome, File tagFile) {
+        String tagPath = tagHome.getAbsolutePath();
+        String filePath = tagFile.getAbsolutePath();
+        String tagName = null;
+        if (filePath.startsWith(tagPath)) {
+            tagName = filePath.substring(tagPath.length());
+            while (tagName.startsWith("/") || tagName.startsWith("\\")) {
+                tagName = tagName.substring(1);
+            }
+            tagName = tagName.replace('\\', '.');
+            tagName = tagName.replace('/', '.');
+            int dot = tagName.lastIndexOf(".");
+            tagName = tagName.substring(0, dot);
+        }
+        return tagName;
+    }
+    
+    public static void main(String[] args) {
+        File tagHome = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\");
+        File tagFile = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\greenscript\\css.html");
+        System.out.println(retrieveTagName(tagHome, tagFile));
     }
     
     public FileTemplateResource(File templateFile) {
@@ -78,4 +121,10 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public String getSuggestedClassName() {
         return path2CN(file.getPath());
     }
+
+    @Override
+    public String tagName() {
+        return tagName;
+    }
+    
 }

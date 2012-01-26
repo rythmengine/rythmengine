@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.IByteCodeHelper;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -151,16 +152,25 @@ public class TemplateCompiler {
                 result.append(typeName);
                 return findType(result.toString());
             }
+            
+            private NameEnvironmentAnswer findStandType(final String name) throws ClassFormatException {
+                RythmEngine engine = engine();
+                IByteCodeHelper helper = engine.byteCodeHelper;
+                byte[] bytes = engine.classLoader.getClassDefinition(name);
+                if (null == bytes && null != helper) {
+                    bytes = helper.findByteCode(name);
+                }
+                if (bytes != null) {
+                    ClassFileReader classFileReader = new ClassFileReader(bytes, name.toCharArray(), true);
+                    return new NameEnvironmentAnswer(classFileReader, null);
+                }
+                return null;
+            }
 
             private NameEnvironmentAnswer findType(final String name) {
                 try {
-                    if (!name.startsWith(TemplateClass.CN_PREFIX)) {
-                        byte[] bytes = engine().classLoader.getClassDefinition(name);
-                        if (bytes != null) {
-                            ClassFileReader classFileReader = new ClassFileReader(bytes, name.toCharArray(), true);
-                            return new NameEnvironmentAnswer(classFileReader, null);
-                        }
-                        return null;
+                    if (!name.contains(TemplateClass.CN_SUFFIX)) {
+                        return findStandType(name);
                     }
 
                     char[] fileName = name.toCharArray();
@@ -179,14 +189,7 @@ public class TemplateCompiler {
                     }
 
                     // So it's a standard class
-                    byte[] bytes = engine().classLoader.getClassDefinition(name);
-                    if (bytes != null) {
-                        ClassFileReader classFileReader = new ClassFileReader(bytes, fileName, true);
-                        return new NameEnvironmentAnswer(classFileReader, null);
-                    }
-
-                    // So it does not exist
-                    return null;
+                    return findStandType(name);
                 } catch (ClassFormatException e) {
                     // Something very very bad
                     throw new RuntimeException(e);
@@ -267,9 +270,11 @@ public class TemplateCompiler {
                     String cn = clazzName.toString();
                     TemplateClass tc = classCache.getByClassName(cn);
                     if (null == tc) {
-                        if (cn.contains("$")) {
+                        int pos = cn.indexOf("$");
+                        if (-1 != pos) {
                             // inner class
-                            tc = TemplateClass.createInnerClass(cn, clazzFile.getBytes());
+                            TemplateClass root = classCache.getByClassName(cn.substring(0, pos));
+                            tc = TemplateClass.createInnerClass(cn, clazzFile.getBytes(), root);
                             classCache.add(tc);
                         } else {
                             throw new RuntimeException("Cannot find class by name: " + cn);

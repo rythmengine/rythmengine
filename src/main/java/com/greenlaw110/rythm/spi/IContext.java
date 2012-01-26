@@ -30,7 +30,7 @@ public interface IContext {
     /**
      * Notify context to enter a block
      * 
-     * @param parser
+     * @param bh the block handler
      */
     void openBlock(IBlockHandler bh);
     

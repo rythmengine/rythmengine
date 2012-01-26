@@ -14,7 +14,7 @@ public class UnitTest extends org.junit.Assert {
     protected MockCodeBuilder b;
     
     protected void setup(String template) {
-        b = new MockCodeBuilder(template, "test");
+        b = new MockCodeBuilder(template, "test", null);
         c = new MockContext(b);
     }
     

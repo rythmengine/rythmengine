@@ -20,7 +20,7 @@ public class ArgsParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
-                Matcher m = ptn(dialect()).matcher(remain());;
+                Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;
                 String s = m.group(1);
                 step(s.length());

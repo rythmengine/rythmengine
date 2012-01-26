@@ -129,8 +129,8 @@ public class Logger {
     }
     
     public static void registerLoggerFactory(ILoggerFactory fact) {
-        userFact = fact;
         reset();
+        userFact = fact;
     }
     
     public static void reset() {

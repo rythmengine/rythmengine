@@ -13,7 +13,7 @@ public class ExtensionManager {
      * process something like @{Controller.actionMethod()} or &{'MSG_ID'} etc to "japid" 
      * and "play-groovy" dialects
      * 
-     * @param regex
+     * @param dialect
      * @param parser
      */
     public void registerSpecialCaseParser(String dialect, IParserFactory parser) {

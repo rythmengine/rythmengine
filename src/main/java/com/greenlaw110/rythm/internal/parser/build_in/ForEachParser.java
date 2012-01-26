@@ -32,7 +32,7 @@ public class ForEachParser extends KeywordParserFactory {
     
     @Override
     protected String patternStr() {
-        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")[\\s\r\n]*).*";
+        return "(%s%s\\s+((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")[\\s\\{\\r\\n]+).*";
     }
     
     public static void main(String[] args) {

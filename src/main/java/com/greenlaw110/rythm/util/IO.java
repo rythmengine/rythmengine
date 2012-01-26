@@ -1,7 +1,5 @@
 package com.greenlaw110.rythm.util;
 
-import sun.security.action.GetPropertyAction;
-
 import java.io.*;
 import java.net.URL;
 import java.security.AccessController;

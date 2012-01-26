@@ -1,14 +1,14 @@
-package com.greenlaw110.rythm.internal;
+package com.greenlaw110.rythm.util;
 
 import com.greenlaw110.rythm.template.ITemplate;
 
 /**
  * Created by IntelliJ IDEA.
  * User: luog
- * Date: 20/01/12
- * Time: 5:30 PM
+ * Date: 25/01/12
+ * Time: 12:36 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface ITemplateClonable extends Cloneable {
-    ITemplate cloneMe();
+public interface IRythmListener {
+    void onRender(ITemplate template);
 }

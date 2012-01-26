@@ -8,5 +8,5 @@ package com.greenlaw110.rythm.spi;
  * To change this template use File | Settings | File Templates.
  */
 public interface ITemplateClassEnhancer {
-    byte[] enhance(byte[] classBytes);
+    byte[] enhance(String className, byte[] classBytes) throws Exception;
 }

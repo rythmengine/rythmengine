@@ -73,14 +73,14 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr() {
-        return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*))*";
+        return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
     
     public static void main(String[] args) {
-        String ps = "^(@(?@())*).*";
+        String ps = "^(@[a-zA-Z][a-zA-Z$_\\.]+\\s*(?@())*).*";
         Regex r = new Regex(ps);
-        //String s = "@(component.left[bar.foo()])px;\n\ttop: @(component.top)px;";
-        String s = "@ is something";
+        String s = "@xyz(bar='c', foo=bar.length(), zee=component[foo], \"hello\");";
+        //String s = "@ is something";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
@@ -89,7 +89,8 @@ public class ExpressionParser extends CaretParserFactoryBase {
         ps = String.format(new ExpressionParser().patternStr(), "@");
         System.out.println(ps);
         r = new Regex(ps);
-        s = "@a.b() is something";
+        //s = "@a.b() is something";
+        s = "@component.left[bar.get(bar[123]).foo(\"hello\")].get(xyz)";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

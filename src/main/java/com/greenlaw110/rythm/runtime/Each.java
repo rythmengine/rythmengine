@@ -15,11 +15,11 @@ public class Each extends TextBuilder {
     public void render(Iterable itr, IBody body) {
         loop(itr, body, -1);
     }
-    
+
     public void render(Collection col, IBody body) {
         loop(col, body, col.size());
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(Object[] items, IBody body) {
         int size = items.length;
@@ -28,7 +28,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(int[] items, IBody body) {
         int size = items.length;
@@ -37,7 +37,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(long[] items, IBody body) {
         int size = items.length;
@@ -46,7 +46,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(float[] items, IBody body) {
         int size = items.length;
@@ -55,7 +55,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(boolean[] items, IBody body) {
         int size = items.length;
@@ -64,7 +64,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(char[] items, IBody body) {
         int size = items.length;
@@ -73,7 +73,7 @@ public class Each extends TextBuilder {
             body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void render(double[] items, IBody body) {
         int size = items.length;

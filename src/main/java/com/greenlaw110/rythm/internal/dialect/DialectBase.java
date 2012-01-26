@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.build_in.KeywordParserFactory;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
@@ -25,13 +26,17 @@ public abstract class DialectBase implements IDialect {
     public void registerParserFactory(IParserFactory parser) {
         if (parser instanceof KeywordParserFactory) {
             KeywordParserFactory kp = (KeywordParserFactory)parser;
-            keywords.put(kp.keyword().toString(), kp);
+            Keyword kw = kp.keyword();
+            if (kw.isRegexp()) keywords2.put(kw.toString(), kp);
+            else keywords.put(kw.toString(), kp);
         } else {
             if (!freeParsers.contains(parser)) freeParsers.add(parser);
         }
     }
 
     private final Map<String, KeywordParserFactory> keywords = new HashMap<String,KeywordParserFactory>();
+    // - for keyword is regexp
+    private final Map<String, KeywordParserFactory> keywords2 = new HashMap<String, KeywordParserFactory>();
     private void registerBuildInParsers() {
         for (Class<?> c: buildInParserClasses()) {
             if (!Modifier.isAbstract(c.getModifiers())) {
@@ -52,6 +57,14 @@ public abstract class DialectBase implements IDialect {
     
     public IParser createBuildInParser(String keyword, IContext context) {
         KeywordParserFactory f = keywords.get(keyword);
+        if (null == f) {
+            for (String r: keywords2.keySet()) {
+                if (keyword.matches(r)) {
+                    f= keywords2.get(r);
+                    break;
+                }
+            }
+        }
         return null == f ? null : f.create(context);
     }
     

@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.CodeGenerator;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -11,27 +12,39 @@ import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Define the data structure hold template class/template src/generated java src
  */
 public class TemplateClass {
-    
+    private static AtomicLong nextVersion = new AtomicLong();    
     private static final ILogger logger = Logger.get(TemplateClass.class);
+
+    /**
+     * Store root level template class, e.g. the one that is not an embedded class
+     */
+    private TemplateClass root;
+    public TemplateClass root() {
+        return root;
+    }
 
     private TemplateClass() {}
     private boolean inner = false;
-    public static TemplateClass createInnerClass(String className, byte[] byteCode) {
+    public static TemplateClass createInnerClass(String className, byte[] byteCode, TemplateClass parent) {
         TemplateClass tc = new TemplateClass();
         tc.name = className;
         tc.javaByteCode = byteCode;
         tc.inner = true;
+        tc.root = parent.root();
+        tc.version = parent.version();
         return tc;
     }
     public boolean isInner() {return inner;}
     
-    private RythmEngine engine;
+    private RythmEngine engine = null;
     private RythmEngine engine() {
         return null == engine ? Rythm.engine : engine;
     }
@@ -39,7 +52,22 @@ public class TemplateClass {
     /**
      * The fully qualified class name
      */
-    public String name;
+    private String name;
+    public String name0() {
+        return name;
+    }
+    public String name() {
+        return isInner() ? name : name + "v" + version;
+    }
+    private long version;
+    public long version() {
+        return root().version;
+    }
+    public TemplateClass extendedTemplateClass;
+    /**
+     * If not null then this template is a tag
+     */
+    public String tagName;
     /**
      * the template resource
      */
@@ -108,53 +136,99 @@ public class TemplateClass {
      * @return
      */
     public String getKey() {
-        return templateResource.getKey();
+        return null == templateResource ? name() : templateResource.getKey();
+    }
+    
+    private Class<?> getJavaClass() throws Exception {
+        return engine().classLoader.loadClass(name(), true);
     }
 
-    public ITemplate asTemplate() {
+    private ITemplate templateInstance_() {
         if (null == templateInstance) {
             try {
-                Class<?> clz = engine().classLoader.loadClass(name, true);
+                Class<?> clz = getJavaClass();
                 templateInstance = (TemplateBase) clz.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        return templateInstance.cloneMe();
+        // check parent class change
+        Class<?> c = templateInstance.getClass();
+        Class<?> pc = c.getSuperclass();
+        if (null != pc && !TemplateBase.class.equals(pc)) {
+            engine().classes.getByClassName(pc.getName());
+        }
+        return templateInstance;
     }
     
+    public ITemplate asTemplate(StringBuilder out) {
+        return templateInstance_().cloneMe(engine, out);
+    }
+
+    public ITemplate asTemplate() {
+        return templateInstance_().cloneMe(engine, null);
+    }
+    
+    private boolean refreshing = false;
+    private boolean compiling = false;
+    private boolean refreshing() {
+        return refreshing || compiling;
+    }
+    
+    private void addVersion() {
+        TemplateClassCache tcc = engine().classes;
+        tcc.clsNameIdx.remove(name());
+        //List<TemplateClass> allEmbedded = tcc.getEmbeddedClasses(name0());
+        version = nextVersion.getAndIncrement();
+        tcc.clsNameIdx.put(name(), this);
+    }
+
     /**
-     * Need to refresh this class !
+     * Need to refresh this class?
      */
-    public boolean refresh() {
-        if (null == name) {
-            name = templateResource.getSuggestedClassName();
-            engine().classes.add(this);
-        }
+    public boolean  refresh() {
+        if (refreshing()) return false;
+        try {
+            refreshing = true;
+            if (null == name) {
+                // this is the root level template class
+                root = this;
+                name = templateResource.getSuggestedClassName() + CN_SUFFIX;
+                version = nextVersion.getAndIncrement();
+                engine().classes.add(this);
+            }
 
-        boolean modified = templateResource.refresh();
-        if (!modified && compiled) return false;
+            if (null == templateResource) {
+                return false; // it must be inner class
+            }
 
-        long start = System.currentTimeMillis();
-        javaSource = codeGen.generate(templateResource.asTemplateContent(), name);
-        //System.err.println(javaSource);
-        if (logger.isTraceEnabled()) {
-            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
+            boolean extendedTemplateModified = false;
+            if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh();
+            boolean modified = extendedTemplateModified || templateResource.refresh();
+            if (!modified) return false;
+            addVersion();
+            long start = System.currentTimeMillis();
+            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, engine);
+            javaSource = cb.build().toString();
+            extendedTemplateClass = cb.getExtendedTemplateClass();
+            //if (logger.isTraceEnabled()) logger.trace(javaSource);
+            logger.info(javaSource);
+            //System.err.println(javaSource);
+            if (logger.isTraceEnabled()) {
+                logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
+            }
+            javaByteCode = null;
+            enhancedByteCode = null;
+            templateInstance = null;
+            javaClass = null;
+            compiled = false;
+            return true;
+        } finally {
+            refreshing = false;
         }
-        javaByteCode = null;
-        enhancedByteCode = null;
-        
-        compiled = false;
-        return modified;
     }
 
-    private CodeGenerator codeGen = new CodeGenerator();
-
-    public static final String CN_PREFIX = "__R";
-
-    public static String uniqueClassName() {
-        return CN_PREFIX + UUID.randomUUID().toString().replace('-', '_');
-    }
+    public static final String CN_SUFFIX = "__R_T_C__";
 
     /**
      * Is this class already compiled but not defined ?
@@ -170,13 +244,15 @@ public class TemplateClass {
      */
     public byte[] compile() {
         if (null != javaByteCode) return javaByteCode;
-        
+        compiling = true;
         long start = System.currentTimeMillis();
         try {
-            engine().classes.compiler.compile(new String[]{name});
+            engine().classes.compiler.compile(new String[]{name()});
         } catch (RuntimeException e) {
-            //logger.info(javaSource);
+            logger.error(javaSource);
             throw e;
+        } finally {
+            compiling = false;
         }
 
         if (logger.isTraceEnabled()) logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey());
@@ -184,18 +260,30 @@ public class TemplateClass {
         return javaByteCode;
     }
 
+    private boolean enhancing = false;
     public byte[] enhance() {
-        byte[] bytes = enhancedByteCode;
-        if (null == bytes) {
-            bytes = compile();
+        if (enhancing) throw new IllegalStateException("reenter enhance() call");
+        enhancing = true;
+        try {
+            byte[] bytes = enhancedByteCode;
+            if (null == bytes) { bytes = compile(); }
             long start = System.currentTimeMillis();
             for (ITemplateClassEnhancer en: engine().templateClassEnhancers) {
-                bytes = en.enhance(bytes);
+                try {
+                    bytes = en.enhance(name(), bytes);
+                } catch (Exception e) {
+                    logger.warn(e, "Error enhancing template class: %s", getKey());
+                }
             }
-            if (logger.isTraceEnabled()) logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+            if (logger.isTraceEnabled()) {
+                String id = (null == templateResource) ? name(): getKey();
+                logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, id);
+            }
             enhancedByteCode = bytes;
+            return bytes;
+        } finally {
+            enhancing = false;
         }
-        return bytes;
     }
 
     /**
@@ -206,12 +294,12 @@ public class TemplateClass {
     }
 
     public boolean isClass() {
-        return !name.endsWith("package-info");
+        return !name().endsWith("package-info");
     }
 
     public String getPackage() {
-        int dot = name.lastIndexOf('.');
-        return dot > -1 ? name.substring(0, dot) : "";
+        int dot = name().lastIndexOf('.');
+        return dot > -1 ? name().substring(0, dot) : "";
     }
 
     /**
@@ -226,6 +314,6 @@ public class TemplateClass {
 
     @Override
     public String toString() {
-        return "(compiled:" + compiled + ") " + name;
+        return "(compiled:" + compiled + ") " + name();
     }
 }

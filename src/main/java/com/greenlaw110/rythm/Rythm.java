@@ -1,14 +1,16 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
+import com.greenlaw110.rythm.logger.ILoggerFactory;
+import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
+import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.util.IRythmListener;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Rythm {
 
@@ -16,15 +18,52 @@ public class Rythm {
         dev, prod;
     }
     
-    public static final RythmEngine engine = new RythmEngine(); static {
-        init();
-    }
+    public static RythmEngine engine = new RythmEngine();
 
     public static final String version = engine.version;
 
-
+    public static void init(Properties conf) {
+        engine.init(conf);
+    }
+    
     public static void init() {
         engine.init();
+    }
+    
+    public static void registerLoggerFactory(ILoggerFactory fact) {
+        Logger.registerLoggerFactory(fact);
+    }
+
+    public static void registerListener(IRythmListener listener) {
+        engine.registerListener(listener);
+    }
+
+    public static void unregisterListener(IRythmListener listener) {
+        engine.unregisterListener(listener);
+    }
+
+    public static void clearListener() {
+        engine.clearListener();
+    }
+
+    public static void registerTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
+        engine.registerTemplateClassEnhancer(enhancer);
+    }
+
+    public static void unregisterTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
+        engine.unregisterTemplateClassEnhancer(enhancer);
+    }
+
+    public static void clearTemplateClassEnhancer() {
+        engine.clearTemplateClassEnhancer();
+    }
+
+    public static boolean registerTag(ITag tag) {
+        return engine.registerTag(tag);
+    }
+
+    public boolean isProdMode() {
+        return engine.isProdMode();
     }
 
     public static String render(String template, Object... args) {
@@ -35,14 +74,27 @@ public class Rythm {
         return engine.render(file, args);
     }
 
-    public static void main2(String[] args) {
-        String template = "@args java.util.List users; @each String u: users @u @ ";
+    public static void main(String[] args) {
+        String template = "@args java.util.List<String> users, String title, String name; @each String u: users @u @ title: @title name: @name ";
         List<String> l = new ArrayList<String>();
         l.add("green");l.add("cherry");
-        System.out.println(render(template, l));
+        ITemplate t = engine.getTemplate(template);
+        t.setRenderArg("users", l);
+        t.setRenderArg(2, "Green");
+        t.setRenderArg(1, "Mr.");
+        System.out.println(t.render());
+    }
+    
+    public static void main2(String[] args) {
+        String s = "@args java.util.Properties component; <input type='checkbox' @if (Boolean.valueOf(String.valueOf(component.get(\"checked\")))) checked @ >";
+        Properties p = new Properties();
+        p.put("checked", "true");
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("component", p);
+        System.out.println(render(s, m));
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         String template = "@args String who1, String who2; Hello @who1 and @who2!";
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("who1", "uni");
@@ -69,13 +121,11 @@ public class Rythm {
     }
 
     // --- SPI interfaces ---
-    private static DialectManager dm_ = new DialectManager();
     public static DialectManager getDialectManager() {
-        return dm_;
+        return engine.getDialectManager();
     }
     
-    private static ExtensionManager em_ = new ExtensionManager();
     public static ExtensionManager getExtensionManager() {
-        return em_;
+        return engine.getExtensionManager();
     }
 }
