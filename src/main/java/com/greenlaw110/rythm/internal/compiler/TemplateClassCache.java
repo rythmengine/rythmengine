@@ -1,13 +1,11 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.logger.ILogger;
-import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.resource.ITemplateResource;
-import com.greenlaw110.rythm.resource.TemplateResourceManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.util.*;
+import com.greenlaw110.rythm.RythmEngine;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +16,7 @@ import java.util.*;
  */
 public class TemplateClassCache {
     
-    private static final ILogger logger = Logger.get(TemplateClassCache.class);
+    //private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
     public RythmEngine engine = null;
 
@@ -38,10 +36,6 @@ public class TemplateClassCache {
     public TemplateClassCache(RythmEngine engine) {
         if (null == engine) throw new NullPointerException();
         this.engine = engine;
-    }
-
-    private TemplateResourceManager resourceManager() {
-        return engine.resourceManager;
     }
 
     /**
@@ -78,7 +72,7 @@ public class TemplateClassCache {
 
     private void checkUpdate(TemplateClass tc) {
         if (null == tc) return;
-        if (null != tc && engine.mode == Rythm.Mode.dev) {
+        if (null != tc && engine.refreshOnRender()) {
             engine.classLoader.detectChange(tc);
         }
     }

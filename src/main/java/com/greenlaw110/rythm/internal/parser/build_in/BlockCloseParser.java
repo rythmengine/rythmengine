@@ -12,7 +12,7 @@ import com.greenlaw110.rythm.spi.Token;
 
 public class BlockCloseParser extends ParserBase {
 
-    private static final String PTN = "(%s[\\}\\s\\n]).*";
+    private static final String PTN = "([\\}]?%s[\\}\\s\\n]).*";
     
     public BlockCloseParser(IContext context) {
         super(context);
@@ -22,10 +22,16 @@ public class BlockCloseParser extends ParserBase {
     public Token go() {
         IContext ctx = ctx();
         if (ctx.currentBlock() == null) return null;
-        Pattern p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);
-        Matcher m = p.matcher(ctx.getRemain());
-        if (!m.matches()) return null;
-        String s = m.group(1);
+        String remain = remain();
+        String s;
+        if ("@".equals(remain)) {
+            s = remain;
+        } else {
+            Pattern p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);
+            Matcher m = p.matcher(ctx.getRemain());
+            if (!m.matches()) return null;
+            s = m.group(1);
+        }
         ctx.step(s.length());
         try {
             s = ctx.closeBlock();
@@ -36,8 +42,8 @@ public class BlockCloseParser extends ParserBase {
     }
     
     public static void main(String[] args) {
-        String s = "@}@else{Bye@} @name\n@}";
-        Pattern p = Pattern.compile(String.format(PTN, "@", "}"), Pattern.DOTALL);
+        String s = "@";
+        Pattern p = Pattern.compile(String.format(PTN, "@"), Pattern.DOTALL);
         Matcher m = p.matcher(s);
         if (m.matches()) {
             System.out.println(m.group(1));

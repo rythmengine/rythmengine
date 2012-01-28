@@ -16,11 +16,13 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.FileTemplateResource;
+import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.util.IO;
 import com.greenlaw110.rythm.util.IRythmListener;
 import com.greenlaw110.rythm.util.RythmProperties;
@@ -45,6 +47,14 @@ public class RythmEngine {
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
     public Map<String, ?> defaultRenderArgs = null;
+    /**
+     * Enable refresh resource on render. This could be turned off
+     * if the resource reload service is managed by container, e.g. Play!framework
+     */
+    private boolean refreshOnRender = true;
+    public boolean refreshOnRender() {
+        return refreshOnRender && !isProdMode();
+    }
 
     public File tmpDir;
     public File templateHome;
@@ -88,8 +98,7 @@ public class RythmEngine {
     }
     
     public RythmEngine(Properties userConfiguration) {
-        init();
-        configuration.putAll(userConfiguration);
+        init(userConfiguration);
     }
     
     public RythmEngine() {
@@ -116,7 +125,7 @@ public class RythmEngine {
     public void init() {
         init(null);
     }
-
+    
     public void init(Properties conf) {
         loadDefConf();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -143,6 +152,7 @@ public class RythmEngine {
         ILoggerFactory fact = configuration.getAs("rythm.logger.factory", null, ILoggerFactory.class);
         if (null != fact) Logger.registerLoggerFactory(fact);
 
+        refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);
@@ -161,17 +171,30 @@ public class RythmEngine {
         byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
         hotswapAgent = configuration.getAs("rythm.classLoader.hotswapAgent", null, IHotswapAgent.class);
 
+        Object o = configuration.get("rythm.resource.loader");
+        if (o instanceof ITemplateResourceLoader) {
+            resourceManager.resourceLoader = (ITemplateResourceLoader) o;
+        } else if (o instanceof String) {
+            try {
+                resourceManager.resourceLoader = (ITemplateResourceLoader)Class.forName(((String) o)).newInstance();
+            } catch (Exception e) {
+                logger.warn("invalid resource loader class");
+            }
+        }
 
-        if (null != tagHome) {
+        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
             loadTags();
         }
     }
-    
-    private void loadTags() {
+
+    public void loadTags(File tagHome) {
+        tags.clear();
         // code come from http://vafer.org/blog/20071112204524/
         class FileTraversal {
             public final void traverse( final File f )  {
                 if (f.isDirectory()) {
+                    // aha, we don't want to traverse .svn
+                    if (".svn".equals(f.getName())) return;
                     onDirectory(f);
                     final File[] childs = f.listFiles();
                     for( File child : childs ) {
@@ -184,25 +207,27 @@ public class RythmEngine {
             public void onDirectory( final File d ) {
             }
             public void onFile( final File f ) {
-            }
-        }
-        new FileTraversal(){
-            @Override
-            public void onFile(File f) {
                 if (tagFileFilter.accept(f)) {
                     ITag tag = (ITag)getTemplate(f);
                     if (null != tag) registerTag(tag);
                 }
             }
-        }.traverse(tagHome);
+        }
+        new FileTraversal().traverse(tagHome);
+        logger.info("tags loaded from %s", tagHome);
+    }
+    
+    private void loadTags() {
+        loadTags(tagHome);
     }
 
-    ITemplate getTemplate(File template, Object... args) {
+    public ITemplate getTemplate(File template, Object... args) {
         TemplateClass tc = classes.getByTemplate(resourceManager.get(template).getKey());
         if (null == tc) {
             tc = new TemplateClass(template, this);
         }
         ITemplate t = tc.asTemplate();
+        if (null == t) return null;
         if (1 == args.length && args[0] instanceof Map) {
             t.setRenderArgs((Map<String, Object>)args[0]);
         } else {
@@ -211,7 +236,7 @@ public class RythmEngine {
         return t;
     }
     
-    ITemplate getTemplate(StringBuilder out, String template, Object... args) {
+    public ITemplate getTemplate(StringBuilder out, String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
             tc = new TemplateClass(template, this);
@@ -225,11 +250,12 @@ public class RythmEngine {
         return t;
     }
 
-    ITemplate getTemplate(String template, Object... args) {
+    public ITemplate getTemplate(String template, Object... args) {
         return getTemplate(null, template, args);
     }
     
     private String renderTemplate(ITemplate t) {
+        if (null == t) return "This is not rythm template";
         for (IRythmListener l: listeners) {
             l.onRender(t);
         }
@@ -249,6 +275,17 @@ public class RythmEngine {
     // -- tag relevant codes
     
     public final Map<String, ITag> tags = new HashMap<String, ITag>();
+    
+    public boolean isTag(String name) {
+        boolean isTag = tags.containsKey(name);
+        if (!isTag) {
+            // try to ask resource manager
+            resourceManager.tryLoadTag(name);
+            // let's check again
+            isTag = tags.containsKey(name);
+        }
+        return isTag;
+    }
 
     /**
      * Register a tag class. If there is name collision then registration
@@ -261,23 +298,40 @@ public class RythmEngine {
             return false;
         }
         tags.put(name, tag);
+        logger.trace("tag %s registered", name);
         return true;
     }
-
-    public void invokeTag(String name, StringBuilder out, Object ... args) {
+    
+    public void invokeTag(String name, StringBuilder out, ITag.ParameterList params, ITag.Body body) {
         // try tag registry first
         ITemplate tmpl = tags.get(name);
         if (null == tmpl) {
-            // try tmpl file
-            tmpl = getTemplate(out, name, args);
-        } else {
-            tmpl = tmpl.cloneMe(this, out);
-            if (1 == args.length && args[0] instanceof Map) {
-                tmpl.setRenderArgs((Map<String, Object>)args[0]);
+            // try load the tag
+            resourceManager.tryLoadTag(name);
+            tmpl = tags.get(name);
+            if (null == tmpl) throw new NullPointerException("cannot find tag: " + name);
+        } else if (mode == Rythm.Mode.dev && !(tmpl instanceof JavaTagBase)) {
+            // try refresh the tag loaded from template file under tag root
+            // not Java source tags are not reloaded here
+            String cn = tmpl.getClass().getName();
+            int pos = cn.lastIndexOf("v");
+            if (-1 < pos) cn = cn.substring(0, pos);
+            TemplateClass tc = classes.getByClassName(cn);
+            tmpl = tc.asTemplate();
+        } 
+        tmpl = tmpl.cloneMe(this, out);
+        if (null != params) {
+            if (tmpl instanceof JavaTagBase) {
+                ((JavaTagBase) tmpl).setRenderArgs(params);
             } else {
-                tmpl.setRenderArgs(args);
+                for (int i = 0; i < params.size(); ++i) {
+                    ITag.Parameter param = params.get(i);
+                    if (null != param.name) tmpl.setRenderArg(name, param.value);
+                    else tmpl.setRenderArg(i, param.value);
+                }
             }
         }
+        if (null != body) tmpl.setRenderArg("_body", body);
         tmpl.render();
     }
 

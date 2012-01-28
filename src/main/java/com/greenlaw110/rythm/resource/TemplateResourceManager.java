@@ -18,7 +18,9 @@ public class TemplateResourceManager {
     private RythmEngine engine;
     
     private Map<String, ITemplateResource> cache = new HashMap<String, ITemplateResource>();
-    
+
+    public ITemplateResourceLoader resourceLoader = null;
+
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
     }
@@ -28,24 +30,25 @@ public class TemplateResourceManager {
         return resource;
     }
     
+    public void tryLoadTag(String tagName) {
+        if (null != resourceLoader) resourceLoader.tryLoadTag(tagName);
+        else FileTemplateResource.tryLoadTag(tagName, engine);
+    }
+    
     public ITemplateResource get(File file) {
         return cache(new FileTemplateResource(file, engine));
     }
     
     public ITemplateResource get(String str) {
-
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
         
-        String loader = engine.configuration.getProperty("rythm.loader");
-        if ("file".equalsIgnoreCase(loader)) {
-            resource = new FileTemplateResource(str, engine);
-            if (!resource.isValid()) resource = new ClasspathTemplateResource(str);
-        } else {
-            resource = new ClasspathTemplateResource(str, engine);
-            if (!resource.isValid()) resource = new FileTemplateResource(str);
-        }
+        if (null != resourceLoader) resource = resourceLoader.load(str);
+        if (null != resource) return resource;
 
+        // try build-in loader
+        resource = new FileTemplateResource(str, engine);
+        if (!resource.isValid()) resource = new ClasspathTemplateResource(str);
         if (!resource.isValid()) resource = new StringTemplateResource(str, engine);
         return cache(resource);
     }

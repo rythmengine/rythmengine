@@ -48,4 +48,5 @@ public interface ITemplateResource extends Serializable {
      * @return
      */
     String tagName();
+
 }

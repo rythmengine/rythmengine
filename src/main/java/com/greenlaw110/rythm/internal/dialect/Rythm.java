@@ -13,8 +13,9 @@ public class Rythm extends DialectBase {
     }
 
     protected Class<?>[] buildInParserClasses() {
+        // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         return new Class<?>[]{ArgsParser.class, CommentParser.class, DefTagParser.class, ElseIfParser.class,
-                ExpressionParser.class, ExtendsParser.class, ForEachParser.class, IfParser.class,
+                InvokeTagParser.class, ExpressionParser.class, ExtendsParser.class, ForEachParser.class, IfParser.class,
                 ImportParser.class, RenderBodyParser.class, RenderSectionParser.class, SectionParser.class};
     }
 

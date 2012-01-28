@@ -27,6 +27,10 @@ public class TextBuilder {
     }
 
     protected StringBuilder _out;
+
+    public StringBuilder out() {
+        return null == _out ? caller.out() : _out;
+    }
     
     protected TextBuilder caller;
     

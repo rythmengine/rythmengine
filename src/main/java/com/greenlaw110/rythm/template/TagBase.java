@@ -10,4 +10,9 @@ import com.greenlaw110.rythm.runtime.ITag;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class TagBase extends TemplateBase implements ITag {
+    @Override
+    public String render() {
+        // tag render should not reset output buffer
+        return build().toString();
+    }
 }

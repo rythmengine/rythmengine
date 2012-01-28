@@ -1,8 +1,11 @@
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.util.IO;
 
 import java.io.File;
@@ -126,5 +129,33 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public String tagName() {
         return tagName;
     }
-    
+
+    public static void tryLoadTag(String tagName, RythmEngine engine) {
+        if (null == engine) engine = Rythm.engine;
+        if (engine.tags.containsKey(tagName)) return;
+        tagName = tagName.replace('.', '/');
+        final String[] suffixes = {
+                ".html",
+                ".json",
+                ".tag"
+        };
+        File tagFile = null;
+        for (String suffix: suffixes) {
+            String name = tagName + suffix;
+            tagFile = new File(engine.tagHome, name);
+            if (tagFile.canRead()) {
+                try {
+                    FileTemplateResource tr = new FileTemplateResource(tagFile);
+                    TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
+                    if (null == tc) {
+                        tc = new TemplateClass(tr, engine);
+                        ITag tag = (ITag)tc.asTemplate();
+                        if (null != tag) engine.registerTag(tag);
+                    }
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
+        }
+    }
 }

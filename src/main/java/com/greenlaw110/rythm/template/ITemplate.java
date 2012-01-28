@@ -22,6 +22,10 @@ public interface ITemplate extends Cloneable {
      * @param arg
      */
     void setRenderArg(String name, Object arg);
+    
+    Map<String, Object> getRenderArgs();
+    
+    Object getRenderArg(String name);
 
     /**
      * Set a render arg at position
@@ -35,7 +39,7 @@ public interface ITemplate extends Cloneable {
      * @return
      */
     String render();
-
+    
     /**
      * Get a copy of this template instance and pass in the engine and caller
      *

@@ -9,13 +9,13 @@ import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.util.TextBuilder;
 
-class TemplateParser implements IContext {
+public class TemplateParser implements IContext {
     private final CodeBuilder cb;
     private IDialect dialect = new Rythm();
     private String template;
-    private int cursor = 0;
+    int cursor = 0;
     
-    TemplateParser(CodeBuilder cb) {
+    public TemplateParser(CodeBuilder cb) {
         this.template = cb.template();
         this.cb = cb;
     }

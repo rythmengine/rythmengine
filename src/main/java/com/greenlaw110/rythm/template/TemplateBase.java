@@ -6,15 +6,28 @@ import java.util.Map;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.util.TextBuilder;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
-    private transient RythmEngine engine = null;
+    protected transient RythmEngine engine = null;
 
     protected RythmEngine _engine() {
         return null == engine ? Rythm.engine : engine;
+    }
+    
+    protected void _invokeTag(String name) {
+        _engine().invokeTag(name, out(), null, null);
+    }
+
+    protected void _invokeTag(String name, ITag.ParameterList params) {
+        _engine().invokeTag(name, out(), params, null);
+    }
+    
+    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body) {
+        _engine().invokeTag(name, out(), params, body);
     }
 
     /* to be used by dynamic generated sub classes */
@@ -74,16 +87,20 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         renderSections.putAll(sections);
     }
 
+    protected TemplateBase internalClone() {
+        try {
+            return (TemplateBase)super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException();
+        }
+    }
+
     @Override
     public ITemplate cloneMe(RythmEngine engine, StringBuilder out) {
-        try {
-            TemplateBase tmpl = (TemplateBase)super.clone();
-            tmpl.engine = engine;
-            if (null != out) tmpl._out = out;
-            return tmpl;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        TemplateBase tmpl = internalClone();
+        tmpl.engine = engine;
+        if (null != out) tmpl._out = out;
+        return tmpl;
     }
 
     @Override
@@ -100,5 +117,33 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         }
     }
     
-    public abstract TextBuilder build();
+    public TextBuilder build() {
+        return this;
+    }
+
+    @Override
+    public void setRenderArgs(Map<String, Object> args) {
+    }
+
+    @Override
+    public void setRenderArgs(Object... args) {
+    }
+
+    @Override
+    public void setRenderArg(String name, Object arg) {
+    }
+    
+    @Override
+    public Object getRenderArg(String name) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getRenderArgs() {
+        return null;
+    }
+
+    @Override
+    public void setRenderArg(int position, Object arg) {
+    }
 }

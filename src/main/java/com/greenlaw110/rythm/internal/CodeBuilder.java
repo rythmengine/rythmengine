@@ -11,6 +11,7 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.util.S;
@@ -54,20 +55,27 @@ public class CodeBuilder extends TextBuilder {
         }
     }
     
+    private boolean isNotRythmTemplate = false;
+    public boolean isRythmTemplate() {
+        return !isNotRythmTemplate;
+    }
     private String tmpl;
     private String cName;
     private String pName;
     private String tagName;
+    private boolean isTag() {
+        return null != tagName;
+    }
     private String extended; // the cName of the extended template
+    private String extended() {
+        String defClass = isTag() ? TagBase.class.getName() : TemplateBase.class.getName();
+        return null == extended ? defClass : extended;
+    }
     private TemplateClass extendedTemplateClass;
     public TemplateClass getExtendedTemplateClass() {
         return extendedTemplateClass;
     }
-    private String extended() {
-        String defClass = null == tagName ? TemplateBase.class.getName() : TagBase.class.getName();
-        return null == extended ? defClass : extended;
-    }
-    private RythmEngine engine;
+    public RythmEngine engine;
     Set<String> imports = new HashSet<String>();
     // <argName, argClass>
     Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
@@ -127,14 +135,19 @@ public class CodeBuilder extends TextBuilder {
     
     @Override
     public TextBuilder build() {
-        new TemplateParser(this).parse();
+        try {
+            new TemplateParser(this).parse();
+        } catch (NotRythmTemplateException e) {
+            isNotRythmTemplate = true;
+            return this;
+        }
         invokeDirectives();
         addDefaultRenderArgs();
         pPackage();
         pImports();
         pClassOpen();
-        pRenderArgs();
         pTagImpl();
+        pRenderArgs();
         pBuild();
         pClassClose();
         return this;
@@ -166,6 +179,10 @@ public class CodeBuilder extends TextBuilder {
         for (String s: imports) {
             p("\nimport ").p(s).p(';');
         }
+        // common imports
+        p("\nimport java.util.*;");
+        p("\nimport java.io.*;");
+        p("\nimport java.util.regex.*;");
     }
     
     private void pClassOpen() {
@@ -180,36 +197,53 @@ public class CodeBuilder extends TextBuilder {
         // -- output private members
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nprivate ").p(arg.type).p(" ").p(argName).p("=").p(arg.defVal).p(";");
+            p("\n\tprivate ").p(arg.type).p(" ").p(argName).p("=").p(arg.defVal).p(";");
         }
+        p("\n\tprotected java.util.Map<String, Object> _properties = new java.util.HashMap();");
+        if (isTag()) p("\n\tprivate com.greenlaw110.rythm.runtime.ITag.Body _body = null;");
         
         // -- output setRenderArgs method
-        p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
+        p("\n\t@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
+            p("\n\tif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
         }
-        p("\n}");
+        p("\n\t_properties.putAll(args);\n}");
 
         // -- output setRenderArgs method with args passed in positioned order
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
-        p("\nint p = 0, l = args.length;");
+        p("\n\tint p = 0, l = args.length;");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+            p("\n\tif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
                 .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                 .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
         }
         p("\n}");
         
         // -- output setRenderArg by name
-        p("\n@SuppressWarnings(\"unchecked\") public void setRenderArg(String name, Object arg) {");
+        p("\n@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
+            p("\n\tif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
         }
-        p("\n}");
+        if (isTag()) p("\n\tif (\"_body\".equals(name)) this._body = (com.greenlaw110.rythm.runtime.ITag.Body)arg;");
+        p("\n\t_properties.put(name, arg);\n}");
 
+        // -- output getRenderArgs
+        p("\n@SuppressWarnings(\"unchecked\") @Override public java.util.Map<String,Object> getRenderArgs() { \n\treturn _properties;\n}");
+
+
+        // -- output getRenderArg by name
+        p("\n@SuppressWarnings(\"unchecked\") public Object getRenderArg(String name) {");
+        for (String argName: renderArgs.keySet()) {
+            RenderArgDeclaration arg = renderArgs.get(argName);
+            p("\n\tif (\"").p(argName).p("\".equals(name)) return this.").p(argName).p(";");
+        }
+        if (isTag()) p("\n\tif (\"_body\".equals(name)) return this._body;");
+        p("\n\treturn null;");
+        p("\n}");
+        
         // -- output setRenderArg by position
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
         p("\nint p = 0;");
@@ -221,12 +255,12 @@ public class CodeBuilder extends TextBuilder {
         }
         p("\n}");
     }
-    
+
     private void pTagImpl() {
-        if (null == tagName) return;
+        if (!isTag()) return;
         p("\n@Override public java.lang.String getName() {\n\treturn \"").p(tagName).p("\";\n}\n");
     }
-    
+
     private void pBuild() {
         p("\n@Override public com.greenlaw110.rythm.util.TextBuilder build(){");
         for (TextBuilder b: builders) {

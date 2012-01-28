@@ -85,12 +85,12 @@ public class ExpressionParser extends CaretParserFactoryBase {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }
-        
+
         ps = String.format(new ExpressionParser().patternStr(), "@");
         System.out.println(ps);
         r = new Regex(ps);
         //s = "@a.b() is something";
-        s = "@component.left[bar.get(bar[123]).foo(\"hello\")].get(xyz)";
+        s = "@component.left()[3]()[]";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

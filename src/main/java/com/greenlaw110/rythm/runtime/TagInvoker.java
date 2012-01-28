@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.runtime;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.util.TextBuilder;
 
@@ -17,18 +18,29 @@ public class TagInvoker {
     public TagInvoker(RythmEngine engine) {
         if (null != engine) this.engine = engine;
     }
-    
+
     public void invoke(String tagName, ITag.ParameterList parameters, TemplateBase caller) {
-        invoke(tagName, parameters, new TextBuilder() {
-            @Override
-            public TextBuilder build() {
-                p(engine.classes);
-                return this;
+        ITemplate tag = engine.tags.get(tagName);
+        if (null == tag) {
+            tag = engine.getTemplate(tagName);
+        } else {
+            tag = tag.cloneMe(engine, caller.out());
+        }
+        if (null == tag) {
+            throw new RuntimeException("tag not found: " + tagName);
+        }
+        int pos = 0;
+        for (ITag.Parameter param: parameters) {
+            if (param.name != null) {
+                tag.setRenderArg(param.name, param.value);
+            } else {
+                tag.setRenderArg(pos++, param.value);
             }
-        }.build().toString(), caller);
+        }
+        tag.render();
     }
-    
+
     public void invoke(String tagName, ITag.ParameterList parameters, String body, TemplateBase caller) {
-        
-    } 
+
+    }
 }

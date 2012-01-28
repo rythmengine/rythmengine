@@ -3,7 +3,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
@@ -34,9 +33,9 @@ public class StringTokenParser extends ParserBase {
         if (!m.matches())
             return null;
         s = m.group(1);
+        if (s.length() == 0) return null;
         ctx.step(s.length());
-        if ("".equals(s.trim())) s = " ";
-        else s = s.replace(String.format("%s%s", a, a), a);
+        s = s.replace(String.format("%s%s", a, a), a);
         return new Token(s, ctx);
     }
 

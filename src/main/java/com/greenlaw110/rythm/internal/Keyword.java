@@ -56,7 +56,11 @@ public enum Keyword {
     /**
      * Invoke tag (Only used in Japid dialect)
      */
-    TAG;
+    TAG,
+    /**
+     * This Is Not Rythm Template tag
+     */
+    TINRT;
 
     private final String s;
     private Keyword() {

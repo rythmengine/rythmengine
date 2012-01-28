@@ -1,19 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.exception.DialectNotSupportException;
-import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
-import com.greenlaw110.rythm.util.TextBuilder;
-import com.stevesoft.pat.Regex;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Free Java code parser.

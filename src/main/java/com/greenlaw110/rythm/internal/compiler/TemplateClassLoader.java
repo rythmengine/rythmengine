@@ -215,7 +215,7 @@ public class TemplateClassLoader extends ClassLoader {
 
     @SuppressWarnings("unchecked")
     private Class<?> loadTemplateClass(String name) {
-        Class maybeAlreadyLoaded = findLoadedClass(name);
+        Class<?> maybeAlreadyLoaded = findLoadedClass(name);
         if(maybeAlreadyLoaded != null) {
             return maybeAlreadyLoaded;
         }

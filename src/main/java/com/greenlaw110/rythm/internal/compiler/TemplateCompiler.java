@@ -102,6 +102,16 @@ public class TemplateCompiler {
         }
 
         public char[] getContents() {
+//            if (null == classCache) {
+//                throw new NullPointerException("classCache is null");
+//            }
+//            TemplateClass tc = classCache.getByClassName(clazzName);
+//            if (null == tc) {
+//                throw new NullPointerException("tc is null");
+//            }
+//            if (null == tc.javaSource) {
+//                throw new NullPointerException("javaSourcee is null");
+//            }
             return classCache.getByClassName(clazzName).javaSource.toCharArray();
         }
 

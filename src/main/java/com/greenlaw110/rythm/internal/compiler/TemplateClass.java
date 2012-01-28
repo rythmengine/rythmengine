@@ -1,20 +1,18 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import java.io.File;
+import java.lang.reflect.Modifier;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.CodeGenerator;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
-
-import java.io.File;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Define the data structure hold template class/template src/generated java src
@@ -67,7 +65,9 @@ public class TemplateClass {
     /**
      * If not null then this template is a tag
      */
-    public String tagName;
+    public String tagName() {
+        return null != templateResource ? templateResource.tagName() : null;
+    }
     /**
      * the template resource
      */
@@ -102,6 +102,11 @@ public class TemplateClass {
     public int sigChecksum;
 
     /**
+     * Mark if this is a valid Rythm Template
+     */
+    public boolean isValid = true;
+
+    /**
      * The ITemplate instance
      */
     public TemplateBase templateInstance;
@@ -116,9 +121,7 @@ public class TemplateClass {
      * @param file the template source file
      */
     public TemplateClass(File file, RythmEngine engine) {
-        this(engine);
-        templateResource = engine.resourceManager.get(file);
-        refresh();
+        this(engine.resourceManager.get(file), engine);
     }
 
     /**
@@ -126,10 +129,16 @@ public class TemplateClass {
      * @param template
      */
     public TemplateClass(String template, RythmEngine engine) {
+        this(engine.resourceManager.get(template), engine);
+    }
+
+    public TemplateClass(ITemplateResource resource, RythmEngine engine) {
         this(engine);
-        templateResource = engine().resourceManager.get(template);
+        if (null == resource) throw new NullPointerException();
+        templateResource = resource;
         refresh();
     }
+
 
     /**
      * Return string representation of the template
@@ -143,7 +152,15 @@ public class TemplateClass {
         return engine().classLoader.loadClass(name(), true);
     }
 
+    private static final ITemplate NULL_TEMPLATE = new TemplateBase() {
+        @Override
+        public ITemplate cloneMe(RythmEngine engine, StringBuilder out) {
+            return null;
+        }
+    };
+
     private ITemplate templateInstance_() {
+        if (!isValid) return  NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
                 Class<?> clz = getJavaClass();
@@ -155,7 +172,7 @@ public class TemplateClass {
         // check parent class change
         Class<?> c = templateInstance.getClass();
         Class<?> pc = c.getSuperclass();
-        if (null != pc && !TemplateBase.class.equals(pc)) {
+        if (null != pc && !Modifier.isAbstract(pc.getModifiers())) {
             engine().classes.getByClassName(pc.getName());
         }
         return templateInstance;
@@ -184,12 +201,19 @@ public class TemplateClass {
     }
 
     /**
-     * Need to refresh this class?
+     * @return true if this class has changes refreshed, otherwise this class has not been changed yet
      */
     public boolean  refresh() {
         if (refreshing()) return false;
+        if (inner) return false;
         try {
             refreshing = true;
+            if (!templateResource.isValid()) {
+                // it is removed?
+                isValid = true;
+                engine().classes.remove(this);
+                return false;
+            }
             if (null == name) {
                 // this is the root level template class
                 root = this;
@@ -198,23 +222,24 @@ public class TemplateClass {
                 engine().classes.add(this);
             }
 
-            if (null == templateResource) {
-                return false; // it must be inner class
-            }
-
             boolean extendedTemplateModified = false;
             if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh();
             boolean modified = extendedTemplateModified || templateResource.refresh();
-            if (!modified) return false;
+            if (!modified && javaSource != null) return false;
             addVersion();
             long start = System.currentTimeMillis();
-            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, engine);
-            javaSource = cb.build().toString();
+            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), engine);
+            cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
-            //if (logger.isTraceEnabled()) logger.trace(javaSource);
-            logger.info(javaSource);
-            //System.err.println(javaSource);
+            javaSource = cb.toString();
+            if (!cb.isRythmTemplate()) {
+                isValid = false;
+                return false;
+            }
+            isValid = true;
+            //if (!engine().isProdMode()) logger.info(javaSource);
             if (logger.isTraceEnabled()) {
+                logger.trace(javaSource);
                 logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
             }
             javaByteCode = null;
