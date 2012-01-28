@@ -238,8 +238,8 @@ public class TemplateClass {
             }
             isValid = true;
             //if (!engine().isProdMode()) logger.info(javaSource);
-            if (logger.isTraceEnabled()) {
-                logger.trace(javaSource);
+            if (logger.isTraceEnabled() || engine().configuration.getAsBoolean("rythm.logJavaSource", false)) {
+                logger.info(javaSource);
                 logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
             }
             javaByteCode = null;

@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.TemplateParser;
-import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IBlockHandler;
@@ -30,6 +29,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         String nameDef;
         String valDef;
         ParameterDeclaration(String name, String val) {
+            if (null != name) {
+                if (name.startsWith("\"") || name.startsWith("'")) name = name.substring(1);
+                if (name.endsWith("\"") || name.endsWith("'")) name = name.substring(0, name.length() - 1);
+            }
             nameDef = name;
             valDef = val;
         }
@@ -71,7 +74,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
-            //System.out.println(params);
+            System.out.println(params);
         }
 
         @Override
@@ -80,7 +83,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (params.pl.size() > 0) {
                 p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
                 for (ParameterDeclaration pd: params.pl) {
-                    p("\n\t_pl.add(").p(pd.nameDef == null ? "null" : pd.nameDef).p(",").p(pd.valDef).p(");");
+                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
                 }
             }
             outputInvokeStatement();
@@ -151,23 +154,26 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
 
     private static String patternStr() {
-        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())*))\\s*";
+        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())*))";
     }
     
     public static void main(String[] args) {
-//        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null));
-//        String ps = String.format(new InvokeTagParser().patternStr(), "@");
-//        Regex r = new Regex(ps);
-//        String s = "@xyz (xyz=zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\") < hello hello";
-//        s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
-//        if (r.search(s)) new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
-//        else System.out.println("not found");
-        
-        String s = " << asdfuisf@";
-        Matcher m = P_HEREDOC_SIMBOL.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group(1));
+        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null));
+        String ps = String.format(new InvokeTagParser().patternStr(), "@");
+        Regex r = new Regex(ps);
+        String s = "@xyz (xyz=zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
+        //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
+        if (r.search(s)) {
+            new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
+            System.out.println(r.stringMatched());
         }
+        else System.out.println("not found");
+        
+//        String s = " << asdfuisf@";
+//        Matcher m = P_HEREDOC_SIMBOL.matcher(s);
+//        if (m.matches()) {
+//            System.out.println(m.group(1));
+//        }
     }
 
 }

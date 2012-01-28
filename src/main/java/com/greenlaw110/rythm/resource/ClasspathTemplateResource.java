@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.resource;
 
+import java.net.URL;
+
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.util.IO;
-
-import java.net.URL;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.resource;
 
+import java.util.UUID;
+
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-
-import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.

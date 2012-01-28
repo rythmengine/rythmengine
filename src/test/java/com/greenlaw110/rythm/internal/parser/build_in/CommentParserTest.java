@@ -1,9 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import org.junit.Test;
+
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.ut.UnitTest;
 import com.greenlaw110.rythm.util.TextBuilder;
-import org.junit.Test;
 
 /**
  * User: luog

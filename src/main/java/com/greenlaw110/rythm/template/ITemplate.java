@@ -1,8 +1,8 @@
 package com.greenlaw110.rythm.template;
 
-import com.greenlaw110.rythm.RythmEngine;
-
 import java.util.Map;
+
+import com.greenlaw110.rythm.RythmEngine;
 
 public interface ITemplate extends Cloneable {
     /**

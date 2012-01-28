@@ -2,11 +2,13 @@ package com.greenlaw110.rythm;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassCache;
@@ -15,8 +17,8 @@ import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.resource.FileTemplateResource;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
+import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
@@ -120,12 +122,14 @@ public class RythmEngine {
     private void loadDefConf() {
         setConf("rythm.mode", Rythm.Mode.dev);
         setConf("rythm.loader", "file");
+        setConf("rythm.logJavaSource", false);
     }
 
     public void init() {
         init(null);
     }
     
+    @SuppressWarnings("unchecked")
     public void init(Properties conf) {
         loadDefConf();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -221,6 +225,7 @@ public class RythmEngine {
         loadTags(tagHome);
     }
 
+    @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File template, Object... args) {
         TemplateClass tc = classes.getByTemplate(resourceManager.get(template).getKey());
         if (null == tc) {
@@ -236,6 +241,7 @@ public class RythmEngine {
         return t;
     }
     
+    @SuppressWarnings("unchecked")
     public ITemplate getTemplate(StringBuilder out, String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
@@ -265,6 +271,25 @@ public class RythmEngine {
     public String render(String template, Object... args) {
         ITemplate t = getTemplate(template, args);
         return renderTemplate(t);
+    }
+    
+    public String renderStr(String template, Object ... args) {
+        return renderString(template, args);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public String renderString(String template, Object... args) {
+        TemplateClass tc = classes.getByTemplate(template);
+        if (null == tc) {
+            tc = new TemplateClass(new StringTemplateResource(template), this);
+        }
+        ITemplate t = tc.asTemplate();
+        if (1 == args.length && args[0] instanceof Map) {
+            t.setRenderArgs((Map<String, Object>)args[0]);
+        } else {
+            t.setRenderArgs(args);
+        }
+        return t.render();
     }
 
     public String render(File file, Object... args) {
@@ -312,7 +337,7 @@ public class RythmEngine {
             if (null == tmpl) throw new NullPointerException("cannot find tag: " + name);
         } else if (mode == Rythm.Mode.dev && !(tmpl instanceof JavaTagBase)) {
             // try refresh the tag loaded from template file under tag root
-            // not Java source tags are not reloaded here
+            // note Java source tags are not reloaded here
             String cn = tmpl.getClass().getName();
             int pos = cn.lastIndexOf("v");
             if (-1 < pos) cn = cn.substring(0, pos);
@@ -326,7 +351,7 @@ public class RythmEngine {
             } else {
                 for (int i = 0; i < params.size(); ++i) {
                     ITag.Parameter param = params.get(i);
-                    if (null != param.name) tmpl.setRenderArg(name, param.value);
+                    if (null != param.name) tmpl.setRenderArg(param.name, param.value);
                     else tmpl.setRenderArg(i, param.value);
                 }
             }

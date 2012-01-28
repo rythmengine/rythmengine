@@ -69,7 +69,7 @@ public class TemplateClassCache {
         checkUpdate(tc);
         return tc;
     }
-
+    
     private void checkUpdate(TemplateClass tc) {
         if (null == tc) return;
         if (null != tc && engine.refreshOnRender()) {

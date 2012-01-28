@@ -1,5 +1,12 @@
 package com.greenlaw110.rythm;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
@@ -8,9 +15,6 @@ import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.util.IRythmListener;
-
-import java.io.File;
-import java.util.*;
 
 public class Rythm {
 
@@ -72,6 +76,14 @@ public class Rythm {
 
     public static String render(File file, Object... args) {
         return engine.render(file, args);
+    }
+    
+    public static String renderStr(String template, Object... args) {
+        return engine.renderString(template, args);
+    }
+    
+    public static String renderString(String template, Object... args) {
+        return engine.renderString(template, args);
     }
 
     public static void main(String[] args) {

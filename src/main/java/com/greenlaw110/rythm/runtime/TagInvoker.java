@@ -4,7 +4,6 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.util.TextBuilder;
 
 /**
  * Created by IntelliJ IDEA.

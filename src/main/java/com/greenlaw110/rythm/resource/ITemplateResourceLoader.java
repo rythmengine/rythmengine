@@ -1,6 +1,5 @@
 package com.greenlaw110.rythm.resource;
 
-import com.greenlaw110.rythm.runtime.ITag;
 
 /**
  * Created by IntelliJ IDEA.

@@ -20,15 +20,19 @@ import com.greenlaw110.rythm.util.TextBuilder;
 
 public class CodeBuilder extends TextBuilder {
     
-    class RenderArgDeclaration {
+    public static class RenderArgDeclaration {
         String name;
         String type;
         String defVal;
         
-        RenderArgDeclaration(String name, String type) {
+        public RenderArgDeclaration(String name, String type) {
+            this(name, type, null);
+        }
+        
+        public RenderArgDeclaration(String name, String type, String defVal) {
             this.name = name;
             this.type = type;
-            this.defVal = defVal(type);
+            this.defVal = null == defVal ? defVal(type) : defVal;
         }
 
         private String defVal(String type) {
@@ -119,6 +123,10 @@ public class CodeBuilder extends TextBuilder {
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
+    }
+
+    public void addRenderArgs(RenderArgDeclaration declaration) {
+        renderArgs.put(declaration.name, declaration);
     }
     
     public void addRenderArgs(String type, String name) {
@@ -237,7 +245,6 @@ public class CodeBuilder extends TextBuilder {
         // -- output getRenderArg by name
         p("\n@SuppressWarnings(\"unchecked\") public Object getRenderArg(String name) {");
         for (String argName: renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
             p("\n\tif (\"").p(argName).p("\".equals(name)) return this.").p(argName).p(";");
         }
         if (isTag()) p("\n\tif (\"_body\".equals(name)) return this._body;");

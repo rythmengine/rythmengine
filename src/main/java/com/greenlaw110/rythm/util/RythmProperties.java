@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.util;
 
-import com.greenlaw110.rythm.Rythm;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import com.greenlaw110.rythm.Rythm;
 
 /**
  * Created by IntelliJ IDEA.

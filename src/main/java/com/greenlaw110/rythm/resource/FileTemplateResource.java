@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.resource;
 
+import java.io.File;
+
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
@@ -7,10 +9,6 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.util.IO;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.

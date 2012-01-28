@@ -1,9 +1,13 @@
 package com.greenlaw110.rythm.runtime;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.util.TextBuilder;
-
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +22,7 @@ public interface ITag extends ITemplate {
         public String name;
         public Object value;
         public Parameter(String name, Object value) {
-            this.name = name;
+            this.name = "".equals(name) ? null : name;
             this.value = value;
         }
     }

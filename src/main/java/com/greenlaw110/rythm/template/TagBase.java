@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.template;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.runtime.ITag;
 
 /**
@@ -14,5 +15,10 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public String render() {
         // tag render should not reset output buffer
         return build().toString();
+    }
+    
+    @Override
+    public String toString() {
+        return Rythm.renderStr("@args com.greenlaw110.rythm.runtime.ITag tag; Tag[tag.getName()|tag.getClass()]", this);
     }
 }
