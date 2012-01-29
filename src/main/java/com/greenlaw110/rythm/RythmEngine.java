@@ -25,9 +25,9 @@ import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
-import com.greenlaw110.rythm.util.IO;
-import com.greenlaw110.rythm.util.IRythmListener;
-import com.greenlaw110.rythm.util.RythmProperties;
+import com.greenlaw110.rythm.utils.IO;
+import com.greenlaw110.rythm.utils.IRythmListener;
+import com.greenlaw110.rythm.utils.RythmProperties;
 
 /**
  * Created by IntelliJ IDEA.

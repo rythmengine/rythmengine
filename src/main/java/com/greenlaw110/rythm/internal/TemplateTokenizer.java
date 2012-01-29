@@ -14,7 +14,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 public class TemplateTokenizer implements Iterable<TextBuilder> {
     ILogger logger = Logger.get(TemplateTokenizer.class);

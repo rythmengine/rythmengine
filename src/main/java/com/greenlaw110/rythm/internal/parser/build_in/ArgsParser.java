@@ -12,7 +12,7 @@ import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 public class ArgsParser extends KeywordParserFactory {
@@ -40,6 +40,7 @@ public class ArgsParser extends KeywordParserFactory {
                     String defVal = r.stringMatched(5);
                     ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
                 }
+                step(step);
                 return new Directive("", ctx()) {
                     @Override
                     public void call() {

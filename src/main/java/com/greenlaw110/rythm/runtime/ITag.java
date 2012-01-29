@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.greenlaw110.rythm.template.ITemplate;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 /**
  * Created by IntelliJ IDEA.

@@ -7,7 +7,7 @@ import java.util.Map;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {

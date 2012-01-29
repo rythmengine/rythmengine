@@ -7,19 +7,19 @@ import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 /**
  * Single line expression parser
- * 
+ *
  * @author luog
  */
 public class ExpressionParser extends CaretParserFactoryBase {
 
     @Override
     public IParser create(IContext ctx) {
-        
+
         Regex r1_ = null, r2_ = null;
         String caret_ = null;
         final IDialect dialect = ctx.getDialect();
@@ -31,9 +31,9 @@ public class ExpressionParser extends CaretParserFactoryBase {
         final Regex r1 = r1_, r2 = r2_;
         final String caret = caret_;
         if (null == r1 || null == r2) {
-            throw new DialectNotSupportException(dialect.id()); 
+            throw new DialectNotSupportException(dialect.id());
         }
-        
+
         return new ParserBase(ctx){
 
             @Override
@@ -48,11 +48,17 @@ public class ExpressionParser extends CaretParserFactoryBase {
                             //TODO support java bean spec
                             @Override
                             protected void output() {
-                                p("\np(").p(s).p(");");
+                                boolean escape = true;
+                                if (s.endsWith("raw()")) {
+                                    escape = false;
+                                    s = s.substring(0, s.length() - 1 - "raw()".length());
+                                }
+                                if (escape) p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
+                                else p("\np(").p(s).p(");");
                             }
                         };
                     }
-                } 
+                }
                 s = remain();
                 if (r2.search(s)) {
                     s = r2.stringMatched(1);
@@ -62,7 +68,13 @@ public class ExpressionParser extends CaretParserFactoryBase {
                             //TODO support java bean spec
                             @Override
                             protected void output() {
-                                p("\np(").p(s).p(");");
+                                boolean escape = true;
+                                if (s.endsWith("raw()")) {
+                                    escape = false;
+                                    s = s.substring(0, s.length() - 1 - "raw()".length());
+                                }
+                                if (escape) p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
+                                else p("\np(").p(s).p(");");
                             }
                         };
                     }
@@ -75,7 +87,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
     protected String patternStr() {
         return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
-    
+
     public static void main(String[] args) {
         String ps = "^(@[a-zA-Z][a-zA-Z$_\\.]+\\s*(?@())*).*";
         Regex r = new Regex(ps);

@@ -14,8 +14,8 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.util.S;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 
 public class CodeBuilder extends TextBuilder {
@@ -269,7 +269,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private void pBuild() {
-        p("\n@Override public com.greenlaw110.rythm.util.TextBuilder build(){");
+        p("\n@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
         for (TextBuilder b: builders) {
             b.build();
         }

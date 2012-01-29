@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.util;
+package com.greenlaw110.rythm.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

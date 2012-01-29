@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 public class Token extends TextBuilder {
     protected String s;

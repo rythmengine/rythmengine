@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.util.S;
+import com.greenlaw110.rythm.utils.S;
 
 public class MockCodeBuilder extends CodeBuilder {
 

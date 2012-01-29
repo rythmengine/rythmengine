@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.util;
+package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.template.ITemplate;
 

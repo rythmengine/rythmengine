@@ -3,11 +3,10 @@ package com.greenlaw110.rythm.internal;
 import java.util.Stack;
 
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 public class TemplateParser implements IContext {
     private final CodeBuilder cb;

@@ -7,7 +7,7 @@ import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.IParserFactory;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 /**
  * BuildInParserDispatcher test remaining template content and try

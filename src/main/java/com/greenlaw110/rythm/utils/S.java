@@ -1,4 +1,6 @@
-package com.greenlaw110.rythm.util;
+package com.greenlaw110.rythm.utils;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class S {
     public static boolean isEmpty(String s) {
@@ -30,5 +32,10 @@ public class S {
         } else {
             return s1.equals(s2);
         }
+    }
+
+    public static String escapeHtml(Object s) {
+        if (null == s) return "";
+        return StringEscapeUtils.escapeHtml4(s.toString());
     }
 }

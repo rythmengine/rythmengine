@@ -5,7 +5,7 @@ import com.greenlaw110.rythm.internal.MockContext;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 public class UnitTest extends org.junit.Assert {
     

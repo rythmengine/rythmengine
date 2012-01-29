@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
-import com.greenlaw110.rythm.util.TextBuilder;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 /**
  * The StringToken probe grab plain texts (no special token at all)

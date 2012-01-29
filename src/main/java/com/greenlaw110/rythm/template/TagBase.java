@@ -14,7 +14,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
     @Override
     public String render() {
         // tag render should not reset output buffer
-        return build().toString();
+        return build().out().toString();
     }
     
     @Override
