@@ -5,10 +5,12 @@ import java.util.regex.Pattern;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.spi.IKeyword;
+import com.greenlaw110.rythm.spi.IKeywordParserFactory;
 import com.stevesoft.pat.Regex;
 
-public abstract class KeywordParserFactory extends CaretParserFactoryBase {
-    public abstract Keyword keyword();
+public abstract class KeywordParserFactory extends CaretParserFactoryBase implements IKeywordParserFactory {
+    public abstract IKeyword keyword();
     public String[] interests() {
         return new String[]{};
     }

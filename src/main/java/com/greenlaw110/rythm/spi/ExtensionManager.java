@@ -1,11 +1,26 @@
 package com.greenlaw110.rythm.spi;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.DialectNotFoundException;
 
 
 public class ExtensionManager {
-    
+
+    private RythmEngine engine;
+
+    public ExtensionManager(RythmEngine engine) {
+        this.engine = engine;
+    }
+
+    RythmEngine engine() {
+        return null == engine ? Rythm.engine : engine;
+    }
+
+    public void registerUserDefinedParsers(IParserFactory... parsers) {
+        registerUserDefinedParsers(null, parsers);
+    }
+
     /**
      * Register a special case parser to a dialect
      * 
@@ -14,11 +29,11 @@ public class ExtensionManager {
      * and "play-groovy" dialects
      * 
      * @param dialect
-     * @param parser
+     * @param parsers
      */
-    public void registerSpecialCaseParser(String dialect, IParserFactory parser) {
-        IDialect d = Rythm.getDialectManager().get(dialect);
+    public void registerUserDefinedParsers(String dialect, IParserFactory... parsers) {
+        IDialect d = engine().getDialectManager().get(dialect);
         if (null == d) throw new DialectNotFoundException(dialect);
-        d.registerParserFactory(parser);
+        for (IParserFactory p: parsers) d.registerParserFactory(p);
     }
 }

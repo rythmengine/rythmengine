@@ -11,7 +11,6 @@ import com.greenlaw110.rythm.util.TextBuilder;
 
 public class TemplateParser implements IContext {
     private final CodeBuilder cb;
-    private IDialect dialect = new Rythm();
     private String template;
     int cursor = 0;
     
@@ -33,7 +32,7 @@ public class TemplateParser implements IContext {
     }
 
     public IDialect getDialect() {
-        return dialect;
+        return cb.engine.getDialectManager().get();
     }
 
     public void setDialect(String dialect) {

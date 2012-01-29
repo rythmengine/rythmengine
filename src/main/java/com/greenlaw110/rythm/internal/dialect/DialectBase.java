@@ -8,25 +8,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.build_in.KeywordParserFactory;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
+import com.greenlaw110.rythm.spi.IKeyword;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.IParserFactory;
 
 public abstract class DialectBase implements IDialect {
-    
+
     public DialectBase() {
         registerBuildInParsers();
     }
-    
+
     private List<IParserFactory> freeParsers = new ArrayList<IParserFactory>();
+
     @Override
     public void registerParserFactory(IParserFactory parser) {
         if (parser instanceof KeywordParserFactory) {
-            KeywordParserFactory kp = (KeywordParserFactory)parser;
-            Keyword kw = kp.keyword();
+            KeywordParserFactory kp = (KeywordParserFactory) parser;
+            IKeyword kw = kp.keyword();
             if (kw.isRegexp()) keywords2.put(kw.toString(), kp);
             else keywords.put(kw.toString(), kp);
         } else {
@@ -34,14 +35,15 @@ public abstract class DialectBase implements IDialect {
         }
     }
 
-    private final Map<String, KeywordParserFactory> keywords = new HashMap<String,KeywordParserFactory>();
+    private final Map<String, KeywordParserFactory> keywords = new HashMap<String, KeywordParserFactory>();
     // - for keyword is regexp
     private final Map<String, KeywordParserFactory> keywords2 = new HashMap<String, KeywordParserFactory>();
+
     private void registerBuildInParsers() {
-        for (Class<?> c: buildInParserClasses()) {
+        for (Class<?> c : buildInParserClasses()) {
             if (!Modifier.isAbstract(c.getModifiers())) {
                 @SuppressWarnings("unchecked")
-                Class<? extends IParserFactory> c0 = (Class<? extends IParserFactory>)c;
+                Class<? extends IParserFactory> c0 = (Class<? extends IParserFactory>) c;
                 try {
                     Constructor<? extends IParserFactory> ct = c0.getConstructor();
                     ct.setAccessible(true);
@@ -54,27 +56,28 @@ public abstract class DialectBase implements IDialect {
             }
         }
     }
-    
+
     public IParser createBuildInParser(String keyword, IContext context) {
         KeywordParserFactory f = keywords.get(keyword);
         if (null == f) {
-            for (String r: keywords2.keySet()) {
+            for (String r : keywords2.keySet()) {
                 if (keyword.matches(r)) {
-                    f= keywords2.get(r);
+                    f = keywords2.get(r);
                     break;
                 }
             }
         }
         return null == f ? null : f.create(context);
     }
-    
+
     public Iterable<IParserFactory> freeParsers() {
         return new Iterable<IParserFactory>() {
             final List<IParserFactory> fs = new ArrayList<IParserFactory>(freeParsers);
+
             @Override
             public Iterator<IParserFactory> iterator() {
                 return new Iterator<IParserFactory>() {
-                    
+
                     private int cursor = 0;
 
                     @Override
@@ -91,14 +94,14 @@ public abstract class DialectBase implements IDialect {
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
-                    
+
                 };
             }
         };
     }
-    
+
     protected abstract Class<?>[] buildInParserClasses();
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -107,12 +110,12 @@ public abstract class DialectBase implements IDialect {
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         return id().hashCode();
     }
-    
+
     @Override
     public String toString() {
         return String.format("%s Dialect", id());

@@ -366,7 +366,7 @@ public class RythmEngine {
         return dm_;
     }
 
-    private ExtensionManager em_ = new ExtensionManager();
+    private ExtensionManager em_ = new ExtensionManager(this);
     public ExtensionManager getExtensionManager() {
         return em_;
     }

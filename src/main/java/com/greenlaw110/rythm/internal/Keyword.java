@@ -1,6 +1,8 @@
 package com.greenlaw110.rythm.internal;
 
-public enum Keyword {
+import com.greenlaw110.rythm.spi.IKeyword;
+
+public enum Keyword implements IKeyword {
     /**
      * Declare arguments used in the template
      */
@@ -74,7 +76,8 @@ public enum Keyword {
     public String toString() {
         return s;
     }
-    
+
+    @Override
     public boolean isRegexp() {
         return !s.equals(name().toLowerCase());
     }
