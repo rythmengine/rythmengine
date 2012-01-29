@@ -36,7 +36,15 @@ public abstract class ParserBase implements IParser {
     protected final String remain() {
         return c_.getRemain();
     }
-    
+
+    protected final char peek() {
+        return c_.peek();
+    }
+
+    protected final char pop() {
+        return c_.pop();
+    }
+
     protected final IContext ctx() {
         return c_;
     }

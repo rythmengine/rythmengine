@@ -49,6 +49,20 @@ public class TemplateParser implements IContext {
     }
 
     @Override
+    public char peek() {
+        if (!hasRemain()) return '\u0000';
+        return template.charAt(cursor);
+    }
+
+    @Override
+    public char pop() {
+        if (!hasRemain()) throw new ArrayIndexOutOfBoundsException();
+        char c = template.charAt(cursor);
+        step(1);
+        return c;
+    }
+
+    @Override
     public void step(int i) {
         cursor += i;
     }

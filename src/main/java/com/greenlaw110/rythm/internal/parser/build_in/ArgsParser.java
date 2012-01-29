@@ -41,6 +41,11 @@ public class ArgsParser extends KeywordParserFactory {
                     ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
                 }
                 step(step);
+                // strip off the following ";" symbol
+                char c = peek();
+                while (' ' == c || ';' == c) {
+                    c = pop();
+                }
                 return new Directive("", ctx()) {
                     @Override
                     public void call() {

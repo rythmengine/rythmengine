@@ -22,6 +22,14 @@ public interface IContext {
      */
     boolean hasRemain();
     /**
+     * return the first remain character without moving cursor
+     */
+    char peek();
+    /**
+     * return the first remain character and move the cursor one step
+     */
+    char pop();
+    /**
      * Move the current cursor i steps ahead
      * @param i
      */
