@@ -40,6 +40,10 @@ public interface ITag extends ITemplate {
             return null;
         }
         
+        public Object getDefault() {
+            return getByPosition(0);
+        }
+        
         public Object getByPosition(int pos) {
             if (pos >= lp.size()) return null;
             return lp.get(pos).value;
