@@ -82,7 +82,7 @@ public class ArgsParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "\\G\\s*,?\\s*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)\\s+([a-zA-Z_][\\w$_]*))(\\s*=\\s*('[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+        return "\\G\\s*,?\\s*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)\\s+([a-zA-Z_][\\w$_]*))(\\s*=\\s*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
     }
     
     protected String patternStr0() {
@@ -90,7 +90,7 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String s = "  java.util.List<String> bar, int foo = bar.hashCode(), Map<String,Object> myBag=null;\n\t@bar";
+        String s = "  java.util.List<String> bar, int foo = 2, Map<String,Object> myBag=null;\n\t@bar";
         ArgsParser ap = new ArgsParser();
         Regex r = ap.reg(new Rythm());
         System.out.println(r);

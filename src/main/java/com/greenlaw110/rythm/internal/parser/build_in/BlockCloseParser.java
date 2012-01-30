@@ -12,7 +12,7 @@ import com.greenlaw110.rythm.spi.Token;
 
 public class BlockCloseParser extends ParserBase {
 
-    private static final String PTN = "([\\}]?%s[\\}\\s\\n]).*";
+    private static final String PTN = "([\\}]?%s[\\}\\s\\n\\>\\]]).*";
     
     public BlockCloseParser(IContext context) {
         super(context);
@@ -32,6 +32,8 @@ public class BlockCloseParser extends ParserBase {
             if (!m.matches()) return null;
             s = m.group(1);
         }
+        // keep ">" or "]" for case like <a id=".." @if (...) class="error" @>
+        if (s.endsWith(">") || s.endsWith("]")) s = s.substring(0, s.length() - 1);
         ctx.step(s.length());
         try {
             s = ctx.closeBlock();

@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,6 +8,7 @@ import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.utils.IO;
 
 /**
  * Free Java code parser.
@@ -18,7 +20,7 @@ import com.greenlaw110.rythm.spi.Token;
 public class ScriptParser extends ParserBase {
 
 
-    private static final String PTN = "(%s\\{(.*)\\}%s).*";
+    private static final String PTN = "(%s\\{(.*?)\\}%s).*";
 
     public ScriptParser(IContext context) {
         super(context);
@@ -27,7 +29,7 @@ public class ScriptParser extends ParserBase {
     @Override
     public Token go() {
         IContext ctx = ctx();
-        if (ctx.currentBlock() == null) return null;
+        //if (ctx.currentBlock() == null) return null;
         Pattern p = Pattern.compile(String.format(PTN, a(), a()), Pattern.DOTALL);
         Matcher m = p.matcher(ctx.getRemain());
         if (!m.matches()) return null;
@@ -38,7 +40,7 @@ public class ScriptParser extends ParserBase {
     }
 
     public static void main(String[] args) {
-        String s = "@{\n\tString s = \"Hello world\";for(String s: ls){sys;}\n}@";
+        String s = IO.readContentAsString(new File("c:\\w\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\rythm\\greenscript\\1"));
         Pattern p = Pattern.compile(String.format(PTN, "@", "@"), Pattern.DOTALL);
         Matcher m = p.matcher(s);
         if (m.matches()) {

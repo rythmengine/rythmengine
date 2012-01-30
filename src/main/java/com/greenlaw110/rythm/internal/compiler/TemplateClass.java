@@ -154,7 +154,7 @@ public class TemplateClass {
 
     private static final ITemplate NULL_TEMPLATE = new TemplateBase() {
         @Override
-        public ITemplate cloneMe(RythmEngine engine, StringBuilder out) {
+        public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
             return null;
         }
     };
@@ -178,10 +178,6 @@ public class TemplateClass {
         return templateInstance;
     }
     
-    public ITemplate asTemplate(StringBuilder out) {
-        return templateInstance_().cloneMe(engine, out);
-    }
-
     public ITemplate asTemplate() {
         return templateInstance_().cloneMe(engine, null);
     }

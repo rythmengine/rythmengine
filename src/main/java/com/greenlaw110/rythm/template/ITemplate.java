@@ -40,12 +40,16 @@ public interface ITemplate extends Cloneable {
      */
     String render();
     
+    StringBuilder getOut();
+    
+    void setOut(StringBuilder sb);
+    
     /**
      * Get a copy of this template instance and pass in the engine and caller
      *
      * @param engine the rythm engine
-     * @param out optional, the output buffer
+     * @param caller the caller template
      * @return a cloned instance of this template class
      */
-    ITemplate cloneMe(RythmEngine engine, StringBuilder out);
+    ITemplate cloneMe(RythmEngine engine, ITemplate caller);
 }

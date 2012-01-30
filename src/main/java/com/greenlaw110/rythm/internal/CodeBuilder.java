@@ -31,27 +31,34 @@ public class CodeBuilder extends TextBuilder {
         
         public RenderArgDeclaration(String name, String type, String defVal) {
             this.name = name;
-            this.type = type;
+            this.type = typeTransform(type);
             this.defVal = null == defVal ? defVal(type) : defVal;
         }
+        
+        private static String typeTransform(String type) {
+            if ("boolean".equals(type)) return "Boolean";
+            else if ("int".equals(type)) return "Integer";
+            else if ("float".equals(type)) return "Float";
+            else if ("double".equals(type)) return "Double";
+            else if ("char".equals(type)) return "Character";
+            else return type;
+        }
 
-        private String defVal(String type) {
-            if (type.equals("String"))
-                return "\"\"";
-            else if (type.equals("boolean"))
+        private static String defVal(String type) {
+            if (type.equals("boolean"))
                 return "false";
+            else if (type.equals("int"))
+                return "0";
+            else if (type.equals("long"))
+                return "0L";
             else if (type.equals("char"))
                 return "(char)0";
             else if (type.equals("byte"))
                 return "(byte)0";
             else if (type.equals("short"))
                 return "(short)0";
-            else if (type.equals("int"))
-                return "0";
             else if (type.equals("float"))
                 return "0f";
-            else if (type.equals("long"))
-                return "0L";
             else if (type.equals("double"))
                 return "0d";
 
@@ -205,11 +212,16 @@ public class CodeBuilder extends TextBuilder {
         // -- output private members
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\tprivate ").p(arg.type).p(" ").p(argName).p("=").p(arg.defVal).p(";");
+            p("\n\t\tprivate ").p(arg.type).p(" ").p(argName);
+            if (null != arg.defVal) {
+                p("=").p(arg.defVal).p(";");
+            } else {
+                p(";");
+            }
         }
-        p("\n\tprotected java.util.Map<String, Object> _properties = new java.util.HashMap();");
-        if (isTag()) p("\n\tprivate com.greenlaw110.rythm.runtime.ITag.Body _body = null;");
-        
+        // - this moved to TemplateBase: p("\n\tprotected java.util.Map<String, Object> _properties = new java.util.HashMap();");
+        // - this moved to TagBase: if (isTag()) p("\n\tprivate com.greenlaw110.rythm.runtime.ITag.Body _body = null;");
+
         // -- output setRenderArgs method
         p("\n\t@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
         for (String argName: renderArgs.keySet()) {
@@ -217,6 +229,7 @@ public class CodeBuilder extends TextBuilder {
             p("\n\tif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
         }
         p("\n\t_properties.putAll(args);\n}");
+        // this moved to TagBase: if (isTag()) p("\n\tif (null == _body) _body = args.get(\"body\");\n}");
 
         // -- output setRenderArgs method with args passed in positioned order
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
@@ -235,22 +248,19 @@ public class CodeBuilder extends TextBuilder {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p("\n\tif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
         }
-        if (isTag()) p("\n\tif (\"_body\".equals(name)) this._body = (com.greenlaw110.rythm.runtime.ITag.Body)arg;");
+        //moved to TagBase: if (isTag()) p("\n\tif (\"_body\".equals(name)) this._body = (com.greenlaw110.rythm.runtime.ITag.Body)arg;");
         p("\n\t_properties.put(name, arg);\n}");
 
         // -- output getRenderArgs
-        p("\n@SuppressWarnings(\"unchecked\") @Override public java.util.Map<String,Object> getRenderArgs() { \n\treturn _properties;\n}");
+        // this is moved to TemplateBase
+        // p("\n@SuppressWarnings(\"unchecked\") @Override public java.util.Map<String,Object> getRenderArgs() { \n\treturn new HashMap<String, Object>(_properties);\n}");
 
+        // -- output getRenderArg by name - moved to TemplateBase
+//        p("\n@SuppressWarnings(\"unchecked\") protected Object internalGetRenderArg(String name) {");
+//        // moved to tag base if (isTag()) p("\n\tif (\"_body\".equals(name)) return this._body;");
+//        p("\n\treturn _properties.get(name);");
+//        p("\n}");
 
-        // -- output getRenderArg by name
-        p("\n@SuppressWarnings(\"unchecked\") public Object getRenderArg(String name) {");
-        for (String argName: renderArgs.keySet()) {
-            p("\n\tif (\"").p(argName).p("\".equals(name)) return this.").p(argName).p(";");
-        }
-        if (isTag()) p("\n\tif (\"_body\".equals(name)) return this._body;");
-        p("\n\treturn null;");
-        p("\n}");
-        
         // -- output setRenderArg by position
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
         p("\nint p = 0;");

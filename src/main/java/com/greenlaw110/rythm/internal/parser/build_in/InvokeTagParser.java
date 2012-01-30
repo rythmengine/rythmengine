@@ -70,7 +70,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (null == line || "".equals(line.trim())) return;
             // strip '(' and ')'
             line = line.substring(1).substring(0, line.length() - 2);
-            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)=)?('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*=\\s*)?('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
@@ -82,7 +82,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null;");
             if (params.pl.size() > 0) {
                 p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
-                for (ParameterDeclaration pd: params.pl) {
+                for (int i = 0; i < params.pl.size(); ++i) {
+                    ParameterDeclaration pd = params.pl.get(i);
+                    if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
                     p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
                 }
             }
@@ -161,7 +163,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null));
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
         Regex r = new Regex(ps);
-        String s = "@xyz (xyz=zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
+        String s = "@xyz (xyz = zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
         //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
         if (r.search(s)) {
             new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);

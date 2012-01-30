@@ -29,17 +29,17 @@ public class TextBuilder {
     protected StringBuilder _out;
 
     public StringBuilder out() {
-        return null == _out ? caller.out() : _out;
+        return null == _out ? _caller.out() : _out;
     }
     
-    protected TextBuilder caller;
+    protected TextBuilder _caller;
     
     /**
      * Construct a root text builder
      */
     public TextBuilder() {
         _out = new StringBuilder();
-        caller = null;
+        _caller = null;
     }
     
     /**
@@ -47,14 +47,14 @@ public class TextBuilder {
      * @param caller
      */
     public TextBuilder(TextBuilder caller) {
-        this.caller = caller;
+        this._caller = caller;
         _out = (null == caller) ? new StringBuilder() : null;
     }
     
     private void p_(Object o) {
         String s = toString(o);
         if (null != _out) _out.append(s);
-        else caller.p(s);
+        else _caller.p(s);
     }
     
     protected String toString(Object o) {
@@ -110,6 +110,6 @@ public class TextBuilder {
     
     @Override
     public String toString() {
-        return null != _out ? _out.toString() : caller.toString();
+        return null != _out ? _out.toString() : _caller.toString();
     }
 }

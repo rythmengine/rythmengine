@@ -12,20 +12,18 @@ public abstract class JavaTagBase extends TagBase{
     protected  ITag.ParameterList _params;
     protected Body _body;
     public void setRenderArgs(ITag.ParameterList params) {
-        this._params = params;
+        _params = params;
+        _properties.putAll(params.asMap());
     }
+    @Override
     public void setRenderArg(String name, Object val) {
         if ("_body".equals(name)) _body = (Body)val;
-    }
-
-    @Override
-    public Map<String, Object> getRenderArgs() {
-        return _params.asMap();
+        super.setRenderArg(name, val);
     }
 
     @Override
     public TextBuilder build() {
-        this.call(_params, _body);
+        call(_params, _body);
         return this;
     }
 

@@ -25,6 +25,7 @@ import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.IRythmListener;
 import com.greenlaw110.rythm.utils.RythmProperties;
@@ -242,12 +243,12 @@ public class RythmEngine {
     }
     
     @SuppressWarnings("unchecked")
-    public ITemplate getTemplate(StringBuilder out, String template, Object... args) {
+    public ITemplate getTemplate(String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
             tc = new TemplateClass(template, this);
         }
-        ITemplate t = tc.asTemplate(out);
+        ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {
             t.setRenderArgs((Map<String, Object>)args[0]);
         } else {
@@ -256,10 +257,6 @@ public class RythmEngine {
         return t;
     }
 
-    public ITemplate getTemplate(String template, Object... args) {
-        return getTemplate(null, template, args);
-    }
-    
     private String renderTemplate(ITemplate t) {
         if (null == t) return "This is not rythm template";
         for (IRythmListener l: listeners) {
@@ -327,7 +324,7 @@ public class RythmEngine {
         return true;
     }
     
-    public void invokeTag(String name, StringBuilder out, ITag.ParameterList params, ITag.Body body) {
+    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body) {
         // try tag registry first
         ITemplate tmpl = tags.get(name);
         if (null == tmpl) {
@@ -344,7 +341,7 @@ public class RythmEngine {
             TemplateClass tc = classes.getByClassName(cn);
             tmpl = tc.asTemplate();
         } 
-        tmpl = tmpl.cloneMe(this, out);
+        tmpl = tmpl.cloneMe(this, caller);
         if (null != params) {
             if (tmpl instanceof JavaTagBase) {
                 ((JavaTagBase) tmpl).setRenderArgs(params);
