@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public abstract class TagBase extends TemplateBase implements ITag {
 
-    protected TemplateBase _body;
+    protected Body _body;
 
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
@@ -27,12 +27,12 @@ public abstract class TagBase extends TemplateBase implements ITag {
     @Override
     public void setRenderArgs(Map<String, Object> args) {
         super.setRenderArgs(args);
-        if (args.containsKey("body")) _body = (TemplateBase)args.get("body");
+        if (args.containsKey("_body")) _body = (Body)args.get("_body");
     }
 
     @Override
     public void setRenderArg(String name, Object arg) {
-        if ("body".equals(name)) _body = (TemplateBase)arg;
+        if ("_body".equals(name)) _body = (Body)arg;
         super.setRenderArg(name, arg);
     }
 

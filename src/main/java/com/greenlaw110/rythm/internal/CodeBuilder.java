@@ -152,20 +152,22 @@ public class CodeBuilder extends TextBuilder {
     public TextBuilder build() {
         try {
             new TemplateParser(this).parse();
+            invokeDirectives();
+            addDefaultRenderArgs();
+            pPackage();
+            pImports();
+            pClassOpen();
+            pTagImpl();
+            pRenderArgs();
+            pBuild();
+            pClassClose();
+            return this;
         } catch (NotRythmTemplateException e) {
             isNotRythmTemplate = true;
             return this;
+        } catch (Exception e) {
+            throw new ParseException(e, "Error parse template for class: %s", className());
         }
-        invokeDirectives();
-        addDefaultRenderArgs();
-        pPackage();
-        pImports();
-        pClassOpen();
-        pTagImpl();
-        pRenderArgs();
-        pBuild();
-        pClassClose();
-        return this;
     }
     
     private void invokeDirectives() {
@@ -228,19 +230,29 @@ public class CodeBuilder extends TextBuilder {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p("\n\tif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
         }
-        p("\n\t_properties.putAll(args);\n}");
-        // this moved to TagBase: if (isTag()) p("\n\tif (null == _body) _body = args.get(\"body\");\n}");
+        p("\n\tsuper.setRenderArgs(args);\n}");
+        // this moved to TagBase: if (isTag()) p("\n\tif (null == _body) _body = args.get(\"_body\");\n}");
 
         // -- output setRenderArgs method with args passed in positioned order
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
-        p("\n\tint p = 0, l = args.length;");
-        for (String argName: renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\tif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
-                .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+        {
+            int userDefinedArgNumber = renderArgs.size() - engine.defaultRenderArgs.size();
+            if (0 == userDefinedArgNumber) {
+                // set by position only applies to user defined args 
+                p("\n};");
+            } else {
+                p("\n\tint p = 0, l = args.length;");
+                int i = userDefinedArgNumber;
+                for (String argName: renderArgs.keySet()) {
+                    RenderArgDeclaration arg = renderArgs.get(argName);
+                    p("\n\tif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                        .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
+                        .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                    if (--i == 0) break;
+                }
+                p("\n}");
+            }
         }
-        p("\n}");
         
         // -- output setRenderArg by name
         p("\n@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
@@ -249,7 +261,7 @@ public class CodeBuilder extends TextBuilder {
             p("\n\tif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
         }
         //moved to TagBase: if (isTag()) p("\n\tif (\"_body\".equals(name)) this._body = (com.greenlaw110.rythm.runtime.ITag.Body)arg;");
-        p("\n\t_properties.put(name, arg);\n}");
+        p("\n\tsuper.setRenderArg(name, arg);\n}");
 
         // -- output getRenderArgs
         // this is moved to TemplateBase

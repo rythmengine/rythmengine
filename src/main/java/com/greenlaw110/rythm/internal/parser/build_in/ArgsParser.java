@@ -22,7 +22,7 @@ public class ArgsParser extends KeywordParserFactory {
         return Keyword.ARGS;
     }
 
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 String remain = remain();
@@ -43,7 +43,7 @@ public class ArgsParser extends KeywordParserFactory {
                 step(step);
                 // strip off the following ";" symbol
                 char c = peek();
-                while (' ' == c || ';' == c) {
+                while ((' ' == c || ';' == c) && ctx.hasRemain()) {
                     c = pop();
                 }
                 return new Directive("", ctx()) {

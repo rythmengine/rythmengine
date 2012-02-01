@@ -38,4 +38,9 @@ public class S {
         if (null == s) return "";
         return StringEscapeUtils.escapeHtml4(s.toString());
     }
+    
+    public static String shrinkSpace(Object s) {
+        if (null == s) return  "";
+        return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
+    }
 }

@@ -134,6 +134,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     @Override
     public void setRenderArgs(Map<String, Object> args) {
+        _properties.putAll(args);
     }
 
     @Override
@@ -142,6 +143,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     @Override
     public void setRenderArg(String name, Object arg) {
+        _properties.put(name, arg);
     }
     
     protected final void _set(String name, Object arg) {
