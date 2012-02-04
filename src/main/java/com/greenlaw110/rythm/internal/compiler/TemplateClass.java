@@ -206,7 +206,7 @@ public class TemplateClass {
             refreshing = true;
             if (!templateResource.isValid()) {
                 // it is removed?
-                isValid = true;
+                isValid = false;
                 engine().classes.remove(this);
                 return false;
             }

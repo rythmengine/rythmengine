@@ -45,7 +45,7 @@ public class ExtendsParser extends KeywordParserFactory {
     
     public static void main(String[] args) {
         Pattern p = Pattern.compile("(@extends([\\s]+[a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+)\\s*(;|\\r?\\n)+).*");
-        Matcher m = p.matcher("@extends ab.cd.foo;abc");
+        Matcher m = p.matcher("@extends 'ab.cd.foo';abc");
         if (m.find()) {
             System.out.println(m.group(1));
             System.out.println(m.group(2));

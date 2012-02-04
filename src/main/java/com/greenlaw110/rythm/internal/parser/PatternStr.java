@@ -6,7 +6,7 @@ public enum PatternStr {
      */
     Expression("(?@())*"),
     Expression2("[a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.\\=]*)*(?@[])*(?@())*)*"),
-    VarName("[a-zA-Z][a-zA-Z0-9_]*"),
+    VarName("[_a-zA-Z][a-zA-Z0-9_]*"),
     Blank("([\\s\\r\\n]+)"),
     NewLine("([\r\n]+)"),
     Type("[a-zA-Z0-9_\\.\\[\\]]+");

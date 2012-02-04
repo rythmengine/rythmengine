@@ -25,7 +25,7 @@ import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
-import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.IRythmListener;
 import com.greenlaw110.rythm.utils.RythmProperties;
@@ -49,7 +49,7 @@ public class RythmEngine {
     public TemplateClassLoader classLoader = null;
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
-    public Map<String, ?> defaultRenderArgs = null;
+    public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     /**
      * Enable refresh resource on render. This could be turned off
      * if the resource reload service is managed by container, e.g. Play!framework
@@ -172,7 +172,8 @@ public class RythmEngine {
         
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
-        defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
+        //defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
+        implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
         byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
         hotswapAgent = configuration.getAs("rythm.classLoader.hotswapAgent", null, IHotswapAgent.class);
 
@@ -259,6 +260,9 @@ public class RythmEngine {
 
     private String renderTemplate(ITemplate t) {
         if (null == t) return "This is not rythm template";
+        // inject implicity render args
+        IImplicitRenderArgProvider p = implicitRenderArgProvider;
+        if (null != p) p.setRenderArgs(t);
         for (IRythmListener l: listeners) {
             l.onRender(t);
         }

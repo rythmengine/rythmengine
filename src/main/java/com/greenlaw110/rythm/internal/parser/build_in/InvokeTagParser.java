@@ -74,7 +74,6 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
-            System.out.println(params);
         }
 
         @Override

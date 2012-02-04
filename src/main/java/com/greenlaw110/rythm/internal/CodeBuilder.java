@@ -14,6 +14,7 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -179,7 +180,9 @@ public class CodeBuilder extends TextBuilder {
     }
     
     private void addDefaultRenderArgs() {
-        Map<String, ?> defArgs = engine.defaultRenderArgs;
+        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
+        if (null == p) return;
+        Map<String, ?> defArgs = p.getRenderArgDescriptions();
         for (String name: defArgs.keySet()) {
             Object o = defArgs.get(name);
             String type = (o instanceof Class<?>) ? ((Class<?>)o).getName() : o.toString();
@@ -196,10 +199,15 @@ public class CodeBuilder extends TextBuilder {
         for (String s: imports) {
             p("\nimport ").p(s).p(';');
         }
+        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
+        if (null != p) {
+            for (String s: p.getImplicitImportStatements()) {
+                p("\nimport ").p(s).p(';');
+            }
+        }
         // common imports
         p("\nimport java.util.*;");
         p("\nimport java.io.*;");
-        p("\nimport java.util.regex.*;");
     }
     
     private void pClassOpen() {
@@ -236,7 +244,8 @@ public class CodeBuilder extends TextBuilder {
         // -- output setRenderArgs method with args passed in positioned order
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
         {
-            int userDefinedArgNumber = renderArgs.size() - engine.defaultRenderArgs.size();
+            IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
+            int userDefinedArgNumber = renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size());
             if (0 == userDefinedArgNumber) {
                 // set by position only applies to user defined args 
                 p("\n};");
