@@ -60,4 +60,10 @@ public interface IContext {
     
     void setDialect(String dialect);
     IDialect getDialect();
+
+    /**
+     * Return current line number
+     * @return
+     */
+    int currentLine();
 }

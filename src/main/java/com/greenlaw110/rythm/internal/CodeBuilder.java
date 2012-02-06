@@ -119,7 +119,7 @@ public class CodeBuilder extends TextBuilder {
     }
     
     public void setExtended(String extended) {
-        if (null != this.extended) throw new ParseException("extended already set for this page");
+        if (null != this.extended) throw new IllegalStateException("extended already set for this page");
         TemplateClass tc = engine.classes.getByTemplate(extended);
         String origin = extended;
         if (null == tc) {
@@ -166,8 +166,6 @@ public class CodeBuilder extends TextBuilder {
         } catch (NotRythmTemplateException e) {
             isNotRythmTemplate = true;
             return this;
-        } catch (Exception e) {
-            throw new ParseException(e, "Error parse template for class: %s", className());
         }
     }
     

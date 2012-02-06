@@ -7,14 +7,17 @@ import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 public class TemplateParser implements IContext {
     private final CodeBuilder cb;
     private String template;
+    private int totalLines;
     int cursor = 0;
     
     public TemplateParser(CodeBuilder cb) {
         this.template = cb.template();
+        totalLines = StringUtils.countMatches(template, "\n") + 1;
         this.cb = cb;
     }
     
@@ -82,8 +85,35 @@ public class TemplateParser implements IContext {
 
     @Override
     public String closeBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException("No open block found"); 
+        if (blocks.isEmpty()) throw new ParseException(currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return bh.closeBlock();
+    }
+
+    @Override
+    public int currentLine() {
+        if (cursor >= template.length()) return totalLines;
+        //return template.substring(0, cursor).split("(\\r\\n|\\n|\\r)").length;
+        return StringUtils.countMatches(template.substring(0, cursor), "\n") + 1;
+    }
+    
+    /* this constructor is just for testing purpose */
+    private TemplateParser(String s) {
+        template = s;
+        totalLines = template.split("(\\r\\n|\\n|\\r)").length + 1;
+        cb = null;
+    }
+    public static void main(String[] args) {
+        TemplateParser tp = new TemplateParser("\nHello \n\r\nworld!");
+        System.out.println(tp.totalLines);
+        System.out.println(tp.currentLine());
+        tp.step(5);
+        System.out.println("5 steps ahead");
+        System.out.println(tp.currentLine());
+        System.out.println(tp.getRemain());
+        tp.step(4);
+        System.out.println("4 steps ahead");
+        System.out.println(tp.currentLine());
+        System.out.println(tp.getRemain());
     }
 }

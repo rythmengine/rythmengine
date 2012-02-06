@@ -62,7 +62,12 @@ public enum Keyword implements IKeyword {
     /**
      * This Is Not Rythm Template tag
      */
-    TINRT;
+    TINRT,
+    /**
+     * Verbatim tag mark a block of template source shall
+     * not be parsed
+     */
+    VERBATIM;
 
     private final String s;
     private Keyword() {

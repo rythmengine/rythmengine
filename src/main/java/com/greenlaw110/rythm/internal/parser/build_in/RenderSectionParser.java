@@ -42,7 +42,7 @@ public class RenderSectionParser extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = String.format(new RenderSectionParser().patternStr(), "@", Keyword.RENDER_SECTION);
         Pattern p = Pattern.compile(s);
-        Matcher m = p.matcher("@render abc Hello world");
+        Matcher m = p.matcher("@render(abc) Hello world");
         if (m.find()) {
             System.out.println(m.group(1));
             System.out.println(m.group(4));
