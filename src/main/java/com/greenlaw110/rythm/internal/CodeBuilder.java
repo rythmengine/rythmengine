@@ -95,7 +95,7 @@ public class CodeBuilder extends TextBuilder {
     
     public CodeBuilder(String template, String className, String tagName, RythmEngine engine) {
         tmpl = template;
-        this.tagName = tagName;
+        this.tagName = (null == tagName) ? className : tagName;
         className = className.replace('/', '.');
         cName = className;
         int i = className.lastIndexOf('.');
@@ -289,6 +289,8 @@ public class CodeBuilder extends TextBuilder {
                     .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                     .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
         }
+        // the first argument has a default name "arg"
+        p("\n\tif(0 == pos) setRenderArg(\"arg\", arg);");
         p("\n}");
     }
 

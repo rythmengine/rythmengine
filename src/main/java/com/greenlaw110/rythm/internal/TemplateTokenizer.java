@@ -20,6 +20,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     ILogger logger = Logger.get(TemplateTokenizer.class);
     private IContext ctx;
     private List<IParser> parsers = new ArrayList<IParser>();
+    private int lastCursor = 0;
     public TemplateTokenizer(String template, IContext context) {
         ctx = context;
         parsers.add(new ParserDispatcher(ctx));
@@ -28,7 +29,6 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         parsers.add(new StringTokenParser(ctx));
         // add a fail through parser to prevent unlimited loop
         parsers.add(new ParserBase(ctx) {
-            private int lastCursor = 0;
             @Override
             public TextBuilder go() {
                 TemplateParser p = (TemplateParser)ctx();
@@ -36,7 +36,6 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
                 logger.warn("fail-through parser reached. is there anything wrong in your template?");
                 String oneStep = p.getRemain().substring(0, 1);
                 p.step(1);
-                lastCursor = p.cursor;
                 return new Token(oneStep, p);
             }
         });
@@ -64,12 +63,14 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
                 for (IParser p: parsers) {
                     TextBuilder t = p.go();
                     if (null != t) {
+                        lastCursor = ((TemplateParser)ctx).cursor;
                         return t;
                     }
                 }
-                String s = ctx.getRemain();
-                ctx.step(s.length());
-                return new Token(s, ctx);
+                throw new RuntimeException("Internal error");
+//                String s = ctx.getRemain();
+//                ctx.step(s.length());
+//                return new Token(s, ctx);
             }
 
             @Override

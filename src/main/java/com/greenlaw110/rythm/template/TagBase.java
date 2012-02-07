@@ -36,6 +36,11 @@ public abstract class TagBase extends TemplateBase implements ITag {
         super.setRenderArg(name, arg);
     }
 
+    @Override
+    public String getName() {
+        return null;
+    }
+
     public String str() {
         return Rythm.renderStr("@args com.greenlaw110.rythm.runtime.ITag tag; Tag[tag.getName()|tag.getClass()]", this);
     }

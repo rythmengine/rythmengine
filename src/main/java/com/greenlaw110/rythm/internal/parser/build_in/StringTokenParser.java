@@ -20,14 +20,14 @@ public class StringTokenParser extends ParserBase {
     /*
      * ([^@]+((@[^@]+?)
      */
-    private static final String PTN = "(%s%s.*?|.*?)(%s.*|$)";
+    private static final String PTN = "(%s%s.*?|.*?)([@#$&].*|$)";
 
     @Override
     public TextBuilder go() {
         IContext ctx = ctx();
         String s = ctx.getRemain();
         String a = a();
-        Pattern p = Pattern.compile(String.format(PTN, a, a, a, a),
+        Pattern p = Pattern.compile(String.format(PTN, a, a, a),
                 Pattern.DOTALL);
         Matcher m = p.matcher(s);
         if (!m.matches())
@@ -40,7 +40,7 @@ public class StringTokenParser extends ParserBase {
     }
 
     public static void main(String[] args) {
-        String s = "@@163.com @{for xb}@";
+        String s = "@@163.com#{verbatim} @{for xb}@";
         String sp = String.format(PTN, "@", "@", "@");
         System.out.println(sp);
         Pattern p = Pattern.compile(sp, Pattern.DOTALL);

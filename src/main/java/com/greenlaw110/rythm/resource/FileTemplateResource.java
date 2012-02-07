@@ -138,20 +138,27 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ".tag"
         };
         File tagFile = null;
+        File[] roots = {engine.tagHome, engine.templateHome};
         for (String suffix: suffixes) {
             String name = tagName + suffix;
-            tagFile = new File(engine.tagHome, name);
-            if (tagFile.canRead()) {
-                try {
-                    FileTemplateResource tr = new FileTemplateResource(tagFile);
-                    TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
-                    if (null == tc) {
-                        tc = new TemplateClass(tr, engine);
-                        ITag tag = (ITag)tc.asTemplate();
-                        if (null != tag) engine.registerTag(tag);
+            
+            for (File root: roots) {
+                tagFile = new File(root, name);
+                if (tagFile.canRead()) {
+                    try {
+                        FileTemplateResource tr = new FileTemplateResource(tagFile);
+                        TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
+                        if (null == tc) {
+                            tc = new TemplateClass(tr, engine);
+                            ITag tag = (ITag)tc.asTemplate();
+                            if (null != tag) {
+                                engine.registerTag(tagName, tag);
+                                return;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // ignore
                     }
-                } catch (Exception e) {
-                    // ignore
                 }
             }
         }

@@ -320,6 +320,16 @@ public class RythmEngine {
      */
     public boolean registerTag(ITag tag) {
         String name = tag.getName();
+        return registerTag(name, tag);
+    }
+
+    /**
+     * Register a tag using the given name
+     * @param name
+     * @param tag
+     * @return
+     */
+    public boolean registerTag(String name, ITag tag) {
         if (tags.containsKey(name)) {
             return false;
         }

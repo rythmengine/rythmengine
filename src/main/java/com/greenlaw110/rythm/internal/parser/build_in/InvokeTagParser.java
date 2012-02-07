@@ -83,7 +83,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
-                    if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
+                    //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
                     p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
                 }
             }
