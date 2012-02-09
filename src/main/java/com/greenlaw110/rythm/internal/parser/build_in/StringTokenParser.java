@@ -20,7 +20,7 @@ public class StringTokenParser extends ParserBase {
     /*
      * ([^@]+((@[^@]+?)
      */
-    private static final String PTN = "(%s%s.*?|.*?)([@#$&].*|$)";
+    private static final String PTN = "(%s%s.*?|.*?)([@#$&\\{\\}].*|$)";
 
     @Override
     public TextBuilder go() {

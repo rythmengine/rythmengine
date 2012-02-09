@@ -71,33 +71,39 @@ public interface ITag extends ITemplate {
         }
     }
     
-    public abstract static class Body {
+    public abstract static class Body extends TextBuilder {
         protected ITemplate _context;
         public Body(ITemplate context) {
             _context = context;
         }
         public StringBuilder getOut() {
-            return _context.getOut();
+            //return _context.getOut();
+            return _out;
         }
         public ITemplate getContext() {
             return _context;
         }
         public void setOut(StringBuilder out) {
-            _context.setOut(out);
+            //_context.setOut(out);
         }
         public abstract void call();
         public abstract void setProperty(String name, Object val);
         public abstract Object getProperty(String name);
         @Override
         public String toString() {
-            StringBuilder old = getOut();
-            setOut(new StringBuilder());
+//            StringBuilder old = getOut();
+//            setOut(new StringBuilder());
+//            call();
+//            String s = getOut().toString();
+//            setOut(old);
+//            return s;
+            _out.setLength(0);
             call();
-            String s = getOut().toString();
-            setOut(old);
-            return s;
+            return _out.toString();
         }
     }
 
     String getName();
+
+    void call();
 }

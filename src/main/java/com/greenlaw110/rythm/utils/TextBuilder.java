@@ -41,7 +41,7 @@ public class TextBuilder {
         _out = new StringBuilder();
         _caller = null;
     }
-    
+
     /**
      * Construct a chained text builder 
      * @param caller

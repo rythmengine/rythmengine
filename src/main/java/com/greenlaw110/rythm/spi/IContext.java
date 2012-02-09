@@ -66,4 +66,6 @@ public interface IContext {
      * @return
      */
     int currentLine();
+    
+    int cursor();
 }

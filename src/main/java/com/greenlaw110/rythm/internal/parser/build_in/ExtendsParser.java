@@ -38,7 +38,7 @@ public class ExtendsParser extends KeywordParserFactory {
                     s = r.stringMatched(2);
                 }
                 s = s.trim();
-                Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
+                Pattern p = Pattern.compile("('([_a-zA-Z\\/][\\w_\\.\\/]*)'|([_a-zA-Z\\/][\\w_\\.\\/]*)|\"([_a-zA-Z\\/][\\w_\\.\\/]*)\")");
                 Matcher m = p.matcher(s);
                 if (!m.matches()) {
                     throw new ParseException(currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\"), found: %s", s);
@@ -67,23 +67,23 @@ public class ExtendsParser extends KeywordParserFactory {
     
     public static void main(String[] args) {
         Regex r = new ExtendsParser().reg(new Rythm());
-        String s = "@extends(\"ab.cd.foo\"); acd";
-//        if (r.search(s)) {
-//            System.out.println(r.stringMatched());
-//            System.out.println(r.stringMatched(1));
-//            System.out.println(r.stringMatched(2));
-//            System.out.println(r.stringMatched(3));
-//        }
-        
-        s = "main.rythm.html";
-
-        //Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
-        Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
-        Matcher m = p.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group(1));
-            System.out.println(m.group(4));
+        String s = "@extends(\"ab/cd.foo\"); acd";
+        if (r.search(s)) {
+            System.out.println(r.stringMatched());
+            System.out.println(r.stringMatched(1));
+            System.out.println(r.stringMatched(2));
+            System.out.println(r.stringMatched(3));
         }
+        
+//        //s = "main/rythm.html";
+//
+//        //Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
+//        Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
+//        Matcher m = p.matcher(s);
+//        if (m.matches()) {
+//            System.out.println(m.group(1));
+//            System.out.println(m.group(4));
+//        }
     }
 
 }

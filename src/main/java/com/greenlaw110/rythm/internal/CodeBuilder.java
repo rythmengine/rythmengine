@@ -301,6 +301,7 @@ public class CodeBuilder extends TextBuilder {
 
     private void pBuild() {
         p("\n@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
+        p("\n\tout().ensureCapacity(").p(tmpl.length()).p(");");
         for (TextBuilder b: builders) {
             b.build();
         }

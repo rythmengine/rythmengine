@@ -41,6 +41,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     private TemplateBase parent = null;
     
     public TemplateBase() {
+        super();
         Class<? extends TemplateBase> c = getClass();
         Class<?> pc = c.getSuperclass();
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
@@ -62,20 +63,25 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     
     private StringBuilder tmpOut = null;
     private String section = null;
+    private TextBuilder tmpCaller = null;
     
     protected void _startSection(String name) {
         if (null == name) throw new NullPointerException("section name cannot be null");
         if (null != tmpOut) throw new IllegalStateException("section cannot be nested");
+        tmpCaller = _caller;
+        _caller = null;
         tmpOut = _out;
         _out = new StringBuilder();
         section = name;
     }
     
     protected void _endSection() {
-        if (null == tmpOut) throw new IllegalStateException("section has not been started");
+        if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
         addRenderSection(section, _out.toString());
         _out = tmpOut;
+        _caller = tmpCaller;
         tmpOut = null;
+        tmpCaller = null;
     }
     
     protected void _pSection(String name) {
@@ -107,11 +113,9 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         tmpl.engine = engine;
         //if (null != out) tmpl._out = out;
         if (null != caller) {
-            tmpl._out = null;
             tmpl._caller = (TextBuilder)caller;
-        } else {
-            tmpl._out = new StringBuilder();
         }
+        if (null != _out) tmpl._out = new StringBuilder();
         return tmpl;
     }
 

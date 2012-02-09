@@ -45,7 +45,12 @@ public class TemplateParser implements IContext {
     public String getRemain() {
         return cursor < template.length() ? template.substring(cursor) : "";
     }
-    
+
+    @Override
+    public int cursor() {
+        return cursor;
+    }
+
     @Override
     public boolean hasRemain() {
         return cursor < template.length();
@@ -87,7 +92,7 @@ public class TemplateParser implements IContext {
     public String closeBlock() throws ParseException {
         if (blocks.isEmpty()) throw new ParseException(currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
-        return bh.closeBlock();
+        return null == bh ? "" : bh.closeBlock();
     }
 
     @Override

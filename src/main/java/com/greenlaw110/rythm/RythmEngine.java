@@ -340,35 +340,35 @@ public class RythmEngine {
     
     public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body) {
         // try tag registry first
-        ITemplate tmpl = tags.get(name);
-        if (null == tmpl) {
+        ITag tag = tags.get(name);
+        if (null == tag) {
             // try load the tag
             resourceManager.tryLoadTag(name);
-            tmpl = tags.get(name);
-            if (null == tmpl) throw new NullPointerException("cannot find tag: " + name);
-        } else if (mode == Rythm.Mode.dev && !(tmpl instanceof JavaTagBase)) {
+            tag = tags.get(name);
+            if (null == tag) throw new NullPointerException("cannot find tag: " + name);
+            tag = (ITag)tag.cloneMe(this, caller);
+        } else if (mode == Rythm.Mode.dev && !(tag instanceof JavaTagBase)) {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
-            String cn = tmpl.getClass().getName();
+            String cn = tag.getClass().getName();
             int pos = cn.lastIndexOf("v");
             if (-1 < pos) cn = cn.substring(0, pos);
             TemplateClass tc = classes.getByClassName(cn);
-            tmpl = tc.asTemplate();
+            tag = (ITag)tc.asTemplate(caller);
         } 
-        tmpl = tmpl.cloneMe(this, caller);
         if (null != params) {
-            if (tmpl instanceof JavaTagBase) {
-                ((JavaTagBase) tmpl).setRenderArgs(params);
+            if (tag instanceof JavaTagBase) {
+                ((JavaTagBase) tag).setRenderArgs(params);
             } else {
                 for (int i = 0; i < params.size(); ++i) {
                     ITag.Parameter param = params.get(i);
-                    if (null != param.name) tmpl.setRenderArg(param.name, param.value);
-                    else tmpl.setRenderArg(i, param.value);
+                    if (null != param.name) tag.setRenderArg(param.name, param.value);
+                    else tag.setRenderArg(i, param.value);
                 }
             }
         }
-        if (null != body) tmpl.setRenderArg("_body", body);
-        tmpl.render();
+        if (null != body) tag.setRenderArg("_body", body);
+        tag.call();
     }
 
     // -- SPI interface

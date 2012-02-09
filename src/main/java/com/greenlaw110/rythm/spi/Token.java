@@ -39,6 +39,22 @@ public class Token extends TextBuilder {
     protected void output() {
         pp(s);
     }
+
+    protected final void outputExpression() {
+        if (s.endsWith("escape()")) {
+            s = s.substring(0, s.length() - 1 - "escape()".length());
+            p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
+        } else if (s.endsWith("escapeHtml()")) {
+            s = s.substring(0, s.length() - 1 - "escapeHtml()".length());
+            p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
+        } else if (s.endsWith("escapeJavaScript()")) {
+            s = s.substring(0, s.length() - 1 - "escapeJavaScript()".length());
+            p("\np(com.greenlaw110.rythm.utils.S.escapeJavaScript(").p(s).p("));");
+        } else if (s.endsWith("escapeCsv()")) {
+            s = s.substring(0, s.length() - 1 - "escapeCsv()".length());
+            p("\np(com.greenlaw110.rythm.utils.S.escapeCsv(").p(s).p("));");
+        } else p("\np(").p(s).p(");");
+    }
     
     private void pp(String s) {
         s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");

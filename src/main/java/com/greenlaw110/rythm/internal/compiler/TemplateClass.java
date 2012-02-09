@@ -169,17 +169,23 @@ public class TemplateClass {
                 throw new RuntimeException(e);
             }
         }
-        // check parent class change
-        Class<?> c = templateInstance.getClass();
-        Class<?> pc = c.getSuperclass();
-        if (null != pc && !Modifier.isAbstract(pc.getModifiers())) {
-            engine().classes.getByClassName(pc.getName());
+        if (!engine().isProdMode()) {
+            // check parent class change
+            Class<?> c = templateInstance.getClass();
+            Class<?> pc = c.getSuperclass();
+            if (null != pc && !Modifier.isAbstract(pc.getModifiers())) {
+                engine().classes.getByClassName(pc.getName());
+            }
         }
         return templateInstance;
     }
     
     public ITemplate asTemplate() {
         return templateInstance_().cloneMe(engine, null);
+    }
+    
+    public ITemplate asTemplate(ITemplate caller) {
+        return templateInstance_().cloneMe(engine, caller);
     }
     
     private boolean refreshing = false;
@@ -228,6 +234,7 @@ public class TemplateClass {
             cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
             javaSource = cb.toString();
+            System.out.println(javaSource);
             if (!cb.isRythmTemplate()) {
                 isValid = false;
                 return false;

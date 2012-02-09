@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
@@ -35,7 +36,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         }
 
         return new ParserBase(ctx){
-
+            
             @Override
             public TextBuilder go() {
                 String s = remain();
@@ -44,17 +45,11 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
                         s = s.replaceFirst(caret, "");
-                        return new Token(s, ctx()) {
-                            //TODO support java bean spec
+                        return new CodeToken(s, ctx()) {
+                            //TODO support java bean spec and JavaExtension
                             @Override
-                            protected void output() {
-                                boolean escape = true;
-                                if (s.endsWith("raw()")) {
-                                    escape = false;
-                                    s = s.substring(0, s.length() - 1 - "raw()".length());
-                                }
-                                if (escape) p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
-                                else p("\np(").p(s).p(");");
+                            public void output() {
+                                outputExpression();
                             }
                         };
                     }
@@ -64,17 +59,11 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     s = r2.stringMatched(1);
                     if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
-                        return new Token(s.replaceFirst(caret, ""), ctx()) {
-                            //TODO support java bean spec
+                        return new CodeToken(s.replaceFirst(caret, ""), ctx()) {
+                            //TODO support java bean spec and JavaExtension
                             @Override
-                            protected void output() {
-                                boolean escape = true;
-                                if (s.endsWith("raw()")) {
-                                    escape = false;
-                                    s = s.substring(0, s.length() - 1 - "raw()".length());
-                                }
-                                if (escape) p("\np(com.greenlaw110.rythm.utils.S.escapeHtml(").p(s).p("));");
-                                else p("\np(").p(s).p(");");
+                            public void output() {
+                                outputExpression();
                             }
                         };
                     }

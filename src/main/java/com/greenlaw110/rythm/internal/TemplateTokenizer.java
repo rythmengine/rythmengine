@@ -33,7 +33,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             public TextBuilder go() {
                 TemplateParser p = (TemplateParser)ctx();
                 if (lastCursor < p.cursor) return null;
-                logger.warn("fail-through parser reached. is there anything wrong in your template?");
+                //logger.warn("fail-through parser reached. is there anything wrong in your template? line: %s", ctx.currentLine());
                 String oneStep = p.getRemain().substring(0, 1);
                 p.step(1);
                 return new Token(oneStep, p);

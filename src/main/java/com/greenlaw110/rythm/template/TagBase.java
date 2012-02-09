@@ -21,6 +21,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         TagBase newTag = (TagBase)super.cloneMe(engine, caller);
         newTag._body = null;
+        //newTag._out = new StringBuilder();
         return newTag;
     }
 
@@ -34,6 +35,14 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public void setRenderArg(String name, Object arg) {
         if ("_body".equals(name)) _body = (Body)arg;
         super.setRenderArg(name, arg);
+    }
+
+    @Override
+    public void call() {
+        if (null != _caller && null != _out)
+            _caller.p(render()); // a real tag
+        else
+            render(); // an normal template
     }
 
     @Override
