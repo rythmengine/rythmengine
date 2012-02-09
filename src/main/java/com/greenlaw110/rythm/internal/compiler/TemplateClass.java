@@ -234,7 +234,6 @@ public class TemplateClass {
             cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
             javaSource = cb.toString();
-            System.out.println(javaSource);
             if (!cb.isRythmTemplate()) {
                 isValid = false;
                 return false;
