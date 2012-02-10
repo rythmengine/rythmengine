@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -72,6 +74,8 @@ public interface ITag extends ITemplate {
     }
     
     public abstract static class Body extends TextBuilder {
+        protected ILogger logger = Logger.get(ITag.class);
+    
         protected ITemplate _context;
         public Body(ITemplate context) {
             _context = context;

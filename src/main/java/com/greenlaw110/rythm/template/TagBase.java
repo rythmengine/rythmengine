@@ -2,6 +2,8 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class TagBase extends TemplateBase implements ITag {
+    protected ILogger logger = Logger.get(TagBase.class);
 
     protected Body _body;
 

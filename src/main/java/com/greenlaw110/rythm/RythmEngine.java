@@ -347,7 +347,7 @@ public class RythmEngine {
             tag = tags.get(name);
             if (null == tag) throw new NullPointerException("cannot find tag: " + name);
             tag = (ITag)tag.cloneMe(this, caller);
-        } else if (mode == Rythm.Mode.dev && !(tag instanceof JavaTagBase)) {
+        } else if (!(tag instanceof JavaTagBase)) {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
             String cn = tag.getClass().getName();
