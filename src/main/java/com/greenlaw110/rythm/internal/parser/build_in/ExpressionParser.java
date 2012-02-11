@@ -91,7 +91,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         System.out.println(ps);
         r = new Regex(ps);
         //s = "@a.b() is something";
-        s = "@component.left()[3]()[]";
+        s = "@component.left()[3]()[] + 'c'";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

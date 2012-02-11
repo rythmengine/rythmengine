@@ -11,7 +11,7 @@ public class ParseException extends RuntimeException {
     }
 
     public ParseException(int line, String message, Object... args) {
-        super(String.format(message, args));
+        super(format(line, message, args));
         this.line = line;
     }
 
@@ -21,8 +21,12 @@ public class ParseException extends RuntimeException {
     }
 
     public ParseException(Throwable cause, int line, String message, Object... args) {
-        super(String.format(message, args), cause);
+        super(format(line, message, args), cause);
         this.line = line;
     }
 
+    private static String format(int line, String message, Object... args) {
+        message = String.format(message, args);
+        return String.format("%s, line: %s", message, line);
+    }
 }

@@ -11,6 +11,12 @@ import com.stevesoft.pat.Regex;
 
 public class IfParser extends KeywordParserFactory {
 
+    public static class IfBlockCodeToken extends BlockCodeToken {
+        public IfBlockCodeToken(String s, IContext context) {
+            super(s, context);
+        }
+    }
+
     @Override
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
@@ -21,8 +27,8 @@ public class IfParser extends KeywordParserFactory {
                 String s = r.stringMatched(1);
                 ctx.step(s.length());
                 s = r.stringMatched(2);
-                if (!s.endsWith("{")) s = s + " {";
-                return new BlockCodeToken(s, ctx);
+                if (!s.endsWith("{")) s = "\n" + s + " {";
+                return new IfBlockCodeToken(s, ctx);
             }
         };
     }
@@ -35,7 +41,7 @@ public class IfParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
-        return "(%s(%s\\s*" + PatternStr.Expression + "(\\s*\\{)?)).*";
+        return "(%s(%s\\s*" + PatternStr.Expression + "(\\s*\\n*\\s*\\{)?)).*";
     }
     
     public static void main(String[] args) {

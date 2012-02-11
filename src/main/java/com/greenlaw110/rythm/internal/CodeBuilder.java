@@ -1,12 +1,5 @@
 package com.greenlaw110.rythm.internal;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
@@ -17,6 +10,8 @@ import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.*;
 
 
 public class CodeBuilder extends TextBuilder {
@@ -66,7 +61,8 @@ public class CodeBuilder extends TextBuilder {
             return "null";
         }
     }
-    
+
+    public RythmEngine engine;
     private boolean isNotRythmTemplate = false;
     public boolean isRythmTemplate() {
         return !isNotRythmTemplate;
@@ -87,11 +83,11 @@ public class CodeBuilder extends TextBuilder {
     public TemplateClass getExtendedTemplateClass() {
         return extendedTemplateClass;
     }
-    public RythmEngine engine;
     Set<String> imports = new HashSet<String>();
     // <argName, argClass>
     Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<TextBuilder> builders = new ArrayList<TextBuilder>();
+    private TemplateParser parser;
     
     public CodeBuilder(String template, String className, String tagName, RythmEngine engine) {
         tmpl = template;
@@ -104,6 +100,7 @@ public class CodeBuilder extends TextBuilder {
             pName = className.substring(0, i);
         }
         this.engine = null == engine ? Rythm.engine : engine;
+        this.parser = new TemplateParser(this);
     }
     
     public String className() {
@@ -114,8 +111,29 @@ public class CodeBuilder extends TextBuilder {
         imports.add(imprt);
     }
     
-    public void defTag(String tagName) {
-        this.tagName = tagName;
+    private static class InlineTag {
+        String tagName;
+        String signature;
+        List<TextBuilder> builders = new ArrayList<TextBuilder>();
+        InlineTag(String name, String sig) {
+            tagName = name;
+            signature = sig;
+        }
+    }
+    private Map<String, InlineTag> inlineTags = new HashMap<String, InlineTag>();
+    private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
+    public void defTag(String tagName, String signature) {
+        if (inlineTags.containsKey(tagName)) {
+            throw new ParseException(parser.currentLine(), "inline tag already defined: %s", tagName);
+        }
+        InlineTag tag = new InlineTag(tagName, signature);
+        inlineTags.put(tagName, tag);
+        inlineTagBodies.push(builders);
+        builders = tag.builders;
+    }
+    public void endTag() {
+        if (inlineTagBodies.empty()) throw new ParseException(parser.currentLine(), "Unexpected tag definition close");
+        builders = inlineTagBodies.pop();
     }
     
     public void setExtended(String extended) {
@@ -152,7 +170,7 @@ public class CodeBuilder extends TextBuilder {
     @Override
     public TextBuilder build() {
         try {
-            new TemplateParser(this).parse();
+            parser.parse();
             invokeDirectives();
             addDefaultRenderArgs();
             pPackage();
@@ -160,6 +178,7 @@ public class CodeBuilder extends TextBuilder {
             pClassOpen();
             pTagImpl();
             pRenderArgs();
+            pInlineTags();
             pBuild();
             pClassClose();
             return this;
@@ -297,6 +316,16 @@ public class CodeBuilder extends TextBuilder {
     private void pTagImpl() {
         if (!isTag()) return;
         p("\n@Override public java.lang.String getName() {\n\treturn \"").p(tagName).p("\";\n}\n");
+    }
+    
+    private void pInlineTags() {
+        for (InlineTag tag: inlineTags.values()) {
+            p("\nprivate String ").p(tag.tagName).p(tag.signature).p("{\n");
+            for (TextBuilder b: tag.builders) {
+                b.build();
+            }
+            p("\nreturn \"\";\n}\n");
+        }
     }
 
     private void pBuild() {

@@ -8,21 +8,13 @@ public enum Keyword implements IKeyword {
      */
     ARGS,
     /**
-     * Declare this template is a tag
-     */
-    DEFTAG,
-    /**
      * Foreach loop
      */
-    EACH,
+    EACH("(for|forEach|each)"),
     /**
      * Declare parent template for this template 
      */
     EXTENDS,
-    /**
-     * plain java For loop
-     */
-    FOR,
     /**
      * plain java if else block
      */
@@ -32,7 +24,7 @@ public enum Keyword implements IKeyword {
      */
     IMPORT,
     /**
-     * Fetch named content from sub template
+     * Fetch named content from this or sub template
      */
     GET,
     /**
@@ -42,13 +34,13 @@ public enum Keyword implements IKeyword {
     /**
      * Output sub template section content in place
      */
-    RENDER_SECTION("(render(Section)?|get)"),
+    RENDER_SECTION("(render(Section)?)"),
     /**
      * Declare a section start
      */
-    SECTION("(section|set)"),
+    SECTION,
     /**
-     * Declare named content to be used in parent template
+     * Declare named content to be used in this or parent template
      */
     SET,
     /**

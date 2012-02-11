@@ -27,12 +27,12 @@ public class JDKLogger implements ILogger{
 
     @Override
     public void trace(String msg, Object... arg) {
-        log(Level.FINEST, String.format(msg, arg));
+        log(Level.FINEST, msg, arg);
     }
 
     @Override
     public void trace(Throwable t, String msg, Object ... arg) {
-        log(Level.FINEST, t, String.format(msg, arg));
+        log(Level.FINEST, t, msg, arg);
     }
 
     @Override
@@ -42,12 +42,12 @@ public class JDKLogger implements ILogger{
 
     @Override
     public void debug(String msg, Object... arg) {
-        log(Level.FINE, String.format(msg, arg));
+        log(Level.FINE, msg, arg);
     }
 
     @Override
     public void debug(Throwable t, String msg, Object ... arg) {
-        log(Level.FINE, t, String.format(msg, arg));
+        log(Level.FINE, t, msg, arg);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class JDKLogger implements ILogger{
 
     @Override
     public void info(String msg, Object... arg) {
-        log(Level.INFO, String.format(msg, arg));
+        log(Level.INFO, msg, arg);
     }
 
     @Override
     public void info(Throwable t, String msg, Object ... arg) {
-        log(Level.INFO, t, String.format(msg, arg));
+        log(Level.INFO, t, msg, arg);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class JDKLogger implements ILogger{
 
     @Override
     public void warn(String msg, Object... arg) {
-        log(Level.WARNING, String.format(msg, arg));
+        log(Level.WARNING, msg, arg);
     }
 
     @Override
-    public void warn(Throwable t, String msg, Object... arg) {
-        log(Level.WARNING, t,String.format(msg, arg));
+    public void warn(Throwable t, String format, Object... arg) {
+        log(Level.WARNING, t, format, arg);
     }
 
     @Override
@@ -87,24 +87,33 @@ public class JDKLogger implements ILogger{
 
     @Override
     public void error(String format, Object... arg) {
-        log(Level.SEVERE, String.format(format, arg));
-
+        log(Level.SEVERE, format, arg);
     }
 
     @Override
     public void error(Throwable t, String msg, Object... arg) {
-        log(Level.SEVERE, t, String.format(msg, arg), arg);
+        log(Level.SEVERE, t, msg, arg);
     }
 
     protected void log(Level l, Throwable t, String m, Object... a) {
         if (logger.isLoggable(l)) {
-            logger.logp(l, className, null, String.format(m, a), t);
+            try {
+                m = String.format(m, a);
+            } catch (Exception e) {
+                // ignore 
+            }
+            logger.logp(l, className, null, m, t);
         }
     }
 
-    protected void log(Level l, String f, Object... a) {
+    protected void log(Level l, String m, Object... a) {
         if (logger.isLoggable(l)) {
-            logger.logp(l, className, null, String.format(f, a));
+            try {
+                m = String.format(m, a);
+            } catch (Exception e) {
+                // ignore 
+            }
+            logger.logp(l, className, null, m);
         }
     }
 

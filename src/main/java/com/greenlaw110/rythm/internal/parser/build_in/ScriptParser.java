@@ -35,7 +35,7 @@ public class ScriptParser extends ParserBase {
         if (!m.matches()) return null;
         String s = m.group(1);
         ctx.step(s.length());
-        s = m.group(2);
+        s = m.group(2) + ";";
         return new CodeToken(s, ctx);
     }
 

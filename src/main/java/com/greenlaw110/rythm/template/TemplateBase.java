@@ -10,6 +10,7 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import sun.rmi.transport.ObjectTable;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
@@ -37,6 +38,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     /* to be used by dynamic generated sub classes */
     private String renderBody = "";
     private Map<String, String> renderSections = new HashMap<String, String>();
+    private Map<String, Object> renderProperties = new HashMap<String, Object>();
     
     private TemplateBase parent = null;
     
@@ -93,7 +95,11 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     }
 
     private void addAllRenderSections(Map<String, String> sections) {
-        renderSections.putAll(sections);
+        if (null != sections) renderSections.putAll(sections);
+    }
+    
+    private void addAllRenderProperties(Map<String, Object> properties) {
+        if (null != properties) renderProperties.putAll(properties);
     }
 
     protected TemplateBase internalClone() {
@@ -126,6 +132,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (null != parent) {
             parent.setRenderBody(toString());
             parent.addAllRenderSections(renderSections);
+            parent.addAllRenderProperties(renderProperties);
             return parent.render();
         } else {
             return toString();
@@ -167,11 +174,25 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected final Object _get(String name) {
         return getRenderArg(name);
     }
-    
+
     protected final <T> T _getAs(String name, Class<T> c) {
         Object o = getRenderArg(name);
         if (null == o) return null;
         return (T)o;
+    }
+
+    protected final Object _getRenderProperty(String name) {
+        return renderProperties.get(name);
+    }
+    
+    protected final <T> T _getRenderPropertyAs(String name, Class<T> c) {
+        Object o = _getRenderProperty(name);
+        if (null == o) return null;
+        return (T)o;
+    }
+    
+    protected final void _setRenderProperty(String name, Object val) {
+        renderProperties.put(name, val);
     }
     
     @Override

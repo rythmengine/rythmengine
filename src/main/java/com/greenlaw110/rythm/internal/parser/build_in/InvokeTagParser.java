@@ -35,6 +35,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             }
             nameDef = name;
             valDef = val;
+            //System.out.println(String.format("%s : %s", name, val));
         }
         @Override
         public String toString() {
@@ -70,7 +71,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (null == line || "".equals(line.trim())) return;
             // strip '(' and ')'
             line = line.substring(1).substring(0, line.length() - 2);
-            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*=\\s*)?('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
@@ -162,7 +163,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null));
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
         Regex r = new Regex(ps);
-        String s = "@xyz (xyz = zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
+        String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
         //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
         if (r.search(s)) {
             new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);

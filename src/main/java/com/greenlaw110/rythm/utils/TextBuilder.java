@@ -72,6 +72,42 @@ public class TextBuilder {
         return this;
     }
     
+    public final TextBuilder p(char c) {
+        if (null != _out) _out.append(c);
+        else _caller.p(c);
+        return this;
+    }
+
+    public final TextBuilder p(int i) {
+        if (null != _out) _out.append(i);
+        else _caller.p(i);
+        return this;
+    }
+
+    public final TextBuilder p(long l) {
+        if (null != _out) _out.append(l);
+        else _caller.p(l);
+        return this;
+    }
+
+    public final TextBuilder p(float f) {
+        if (null != _out) _out.append(f);
+        else _caller.p(f);
+        return this;
+    }
+
+    public final TextBuilder p(double d) {
+        if (null != _out) _out.append(d);
+        else _caller.p(d);
+        return this;
+    }
+
+    public final TextBuilder p(boolean b) {
+        if (null != _out) _out.append(b);
+        else _caller.p(b);
+        return this;
+    }
+
     /**
      * Append to object specified to the string buffer and then append
      * an new line character
