@@ -30,7 +30,10 @@ public class VerbatimParser extends KeywordParserFactory {
                 Regex r = reg(dialect());
                 if (r.search(remain())) {
                     step(r.stringMatched().length());
-                    final String s = r.stringMatched(2);
+                    String s0 = r.stringMatched(2);
+                    s0 = s0.substring(1); // strip '{'
+                    s0 = s0.substring(0, s0.length() - 1); // strip '}'
+                    final String s = s0;
                     return new Token(s, ctx());
                 }
                 return null;
@@ -47,8 +50,11 @@ public class VerbatimParser extends KeywordParserFactory {
         Regex r = new VerbatimParser().reg(new Rythm());
         String s = "@verbatim {\n\tHello world!\n@each X {abc;} \n} xyz";
         if (r.search(s)) {
+            String s0 = r.stringMatched(2);
+            s0 = s0.substring(1); // strip '{'
+            s0 = s0.substring(0, s0.length() - 1); // strip '}'
             System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(2));
+            System.out.println(s0);
         }
     }
 }

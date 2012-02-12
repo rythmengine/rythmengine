@@ -33,6 +33,10 @@ public class S {
             return s1.equals(s2);
         }
     }
+    
+    public static String escape(Object s) {
+        return escapeHtml(s);
+    }
 
     public static String escapeHtml(Object s) {
         if (null == s) return "";
@@ -49,8 +53,37 @@ public class S {
         return StringEscapeUtils.escapeEcmaScript(s.toString());
     }
     
+    public static String escapeXml(Object s) {
+        if (null == s) return "";
+        return StringEscapeUtils.escapeXml(s.toString());
+    }
+    
     public static String shrinkSpace(Object s) {
         if (null == s) return  "";
         return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
     }
+
+    public static String pad(String str, Integer size) {
+        int t = size - str.length();
+        for (int i = 0; i < t; i++) {
+            str += "&nbsp;";
+        }
+        return str;
+    }
+
+    public static String capitalizeWords(String source) {
+        char prevc = ' '; // first char of source is capitalized
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < source.length(); i++) {
+            char c = source.charAt(i);
+            if (c != ' ' && prevc == ' ') {
+                sb.append(Character.toUpperCase(c));
+            } else {
+                sb.append(c);
+            }
+            prevc = c;
+        }
+        return sb.toString();
+    }
+
 }

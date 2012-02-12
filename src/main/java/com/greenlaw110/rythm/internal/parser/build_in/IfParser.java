@@ -49,7 +49,7 @@ public class IfParser extends KeywordParserFactory {
         System.out.println(p);
         
         Regex r = new Regex(p);
-        String s = "@if (item.getChange() < 0.0) \n\t<td class=\"minus\">@item.getChange()</td>";
+        String s = "@if (item) \n\t<td class=\"minus\">@item.getChange()</td>";
         if (r.search(s)) {
             System.out.println(r.stringMatched(1));
             System.out.println(r.stringMatched(2));

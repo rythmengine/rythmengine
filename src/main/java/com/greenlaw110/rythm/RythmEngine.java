@@ -59,6 +59,16 @@ public class RythmEngine {
         return refreshOnRender && !isProdMode();
     }
 
+    /**
+     * enable java extensions to expressions, e.g. @myvar.escapeHtml() or @myvar.pad(5) etc.
+     *
+     * disable java extension can improve parse performance
+     */
+    private boolean enableJavaExtensions = false;
+    public boolean enableJavaExtensions() {
+        return enableJavaExtensions;
+    }
+
     public File tmpDir;
     public File templateHome;
     public File tagHome;
@@ -158,6 +168,7 @@ public class RythmEngine {
         if (null != fact) Logger.registerLoggerFactory(fact);
 
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
+        enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
         tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);
