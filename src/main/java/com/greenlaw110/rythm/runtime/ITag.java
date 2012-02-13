@@ -1,15 +1,11 @@
 package com.greenlaw110.rythm.runtime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,9 +1,5 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import java.io.File;
-import java.lang.reflect.Modifier;
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.CodeBuilder;
@@ -13,6 +9,10 @@ import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
+
+import java.io.File;
+import java.lang.reflect.Modifier;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Define the data structure hold template class/template src/generated java src
@@ -230,7 +230,7 @@ public class TemplateClass {
             if (!modified && javaSource != null) return false;
             addVersion();
             long start = System.currentTimeMillis();
-            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), engine);
+            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
             cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
             javaSource = cb.toString();

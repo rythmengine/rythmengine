@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The StringToken probe grab plain texts (no special token at all)

@@ -68,4 +68,6 @@ public interface IContext {
     int currentLine();
     
     int cursor();
+    
+    String getTemplateName();
 }

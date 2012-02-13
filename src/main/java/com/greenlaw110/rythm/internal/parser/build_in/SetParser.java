@@ -1,22 +1,13 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
-import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.PatternStr;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parse @set("name":val())
@@ -45,7 +36,7 @@ public class SetParser extends KeywordParserFactory {
                 s = s.substring(1); // s: name: val)
                 s = s.substring(0, s.length() - 1); // s: "name": val
                 r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
-                if (!r.search(s)) throw new ParseException(ctx().currentLine(), "Error parsing @set tag. Correct usage: @set(\"name\": val)");
+                if (!r.search(s)) throw new ParseException(ctx().getTemplateName(), ctx().currentLine(), "Error parsing @set tag. Correct usage: @set(\"name\": val)");
                 s = r.stringMatched(1); // propName: "name"
                 if (s.startsWith("\"") || s.startsWith("'")) {
                     s = s.substring(1);

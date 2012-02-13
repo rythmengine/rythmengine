@@ -1,7 +1,5 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import java.util.regex.Matcher;
-
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.Directive;
@@ -9,6 +7,8 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.regex.Matcher;
 
 public class ImportParser extends KeywordParserFactory {
     

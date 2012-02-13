@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.RythmEngine;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.greenlaw110.rythm.RythmEngine;
 
 /**
  * Created by IntelliJ IDEA.

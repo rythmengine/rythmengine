@@ -1,13 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import java.util.regex.Pattern;
-
-import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IKeyword;
 import com.greenlaw110.rythm.spi.IKeywordParserFactory;
 import com.stevesoft.pat.Regex;
+
+import java.util.regex.Pattern;
 
 public abstract class KeywordParserFactory extends CaretParserFactoryBase implements IKeywordParserFactory {
     public abstract IKeyword keyword();

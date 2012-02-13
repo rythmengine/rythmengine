@@ -3,8 +3,6 @@ package com.greenlaw110.rythm.template;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
-import java.util.Map;
-
 /**
  * classes extends JavaTagBase are not template based, it's kind of like FastTag in Play
  */

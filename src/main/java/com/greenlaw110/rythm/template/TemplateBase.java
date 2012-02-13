@@ -1,16 +1,15 @@
 package com.greenlaw110.rythm.template;
 
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.TextBuilder;
-import sun.rmi.transport.ObjectTable;
+
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
@@ -180,15 +179,19 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (null == o) return null;
         return (T)o;
     }
+    
+    protected final Object _getRenderProperty(String name, Object def) {
+        Object o = renderProperties.get(name);
+        return null == o ? def : o;
+    }
 
     protected final Object _getRenderProperty(String name) {
-        return renderProperties.get(name);
+        return _getRenderProperty(name, null);
     }
     
-    protected final <T> T _getRenderPropertyAs(String name, Class<T> c) {
-        Object o = _getRenderProperty(name);
-        if (null == o) return null;
-        return (T)o;
+    protected final <T> T _getRenderPropertyAs(String name, T def) {
+        Object o = _getRenderProperty(name, def);
+        return null == o ? def : (T)o;
     }
     
     protected final void _setRenderProperty(String name, Object val) {

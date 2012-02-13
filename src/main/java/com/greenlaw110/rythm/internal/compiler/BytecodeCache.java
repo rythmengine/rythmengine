@@ -1,14 +1,14 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.security.MessageDigest;
-
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.MessageDigest;
 
 /**
  * Used to speed up compilation time

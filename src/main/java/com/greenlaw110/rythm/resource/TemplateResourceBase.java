@@ -1,9 +1,9 @@
 package com.greenlaw110.rythm.resource;
 
-import java.util.UUID;
-
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -132,7 +132,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         //    in the end
         //int lastDotPos = path.lastIndexOf(".");
         //path = path.substring(0, lastDotPos);
-        return path.replace('/', '_').replace('\\', '_').replace('.', '_');
+        return path.replace('/', '_').replace('\\', '_').replace('.', '_').replace('-', '_');
     }
     
     public static void main(String[] args) {

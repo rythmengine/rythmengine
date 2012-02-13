@@ -1,9 +1,9 @@
 package com.greenlaw110.rythm.logger;
 
+import com.greenlaw110.rythm.Rythm;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import com.greenlaw110.rythm.Rythm;
 
 /**
  * Created by IntelliJ IDEA.

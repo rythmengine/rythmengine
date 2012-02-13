@@ -1,19 +1,11 @@
 package com.greenlaw110.rythm.internal.dialect;
 
+import com.greenlaw110.rythm.internal.parser.build_in.KeywordParserFactory;
+import com.greenlaw110.rythm.spi.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import com.greenlaw110.rythm.internal.parser.build_in.KeywordParserFactory;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IKeyword;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.spi.IParserFactory;
+import java.util.*;
 
 public abstract class DialectBase implements IDialect {
 

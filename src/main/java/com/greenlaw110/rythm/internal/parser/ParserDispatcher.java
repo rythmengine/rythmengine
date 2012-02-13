@@ -1,13 +1,13 @@
 package com.greenlaw110.rythm.internal.parser;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.IParserFactory;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * BuildInParserDispatcher test remaining template content and try

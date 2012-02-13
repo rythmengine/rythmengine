@@ -1,9 +1,5 @@
 package com.greenlaw110.rythm.internal;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockCloseParser;
@@ -15,6 +11,10 @@ import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class TemplateTokenizer implements Iterable<TextBuilder> {
     ILogger logger = Logger.get(TemplateTokenizer.class);

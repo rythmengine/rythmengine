@@ -9,9 +9,15 @@ public class ParseException extends RuntimeException {
     public int getLine() {
         return line;
     }
+    
+    private String templateName;
+    
+    public String getTemplateName() {
+        return templateName;
+    }
 
-    public ParseException(int line, String message, Object... args) {
-        super(format(line, message, args));
+    public ParseException(String templateName, int line, String message, Object... args) {
+        super(format(templateName, line, message, args));
         this.line = line;
     }
 
@@ -20,13 +26,13 @@ public class ParseException extends RuntimeException {
         this.line = line;
     }
 
-    public ParseException(Throwable cause, int line, String message, Object... args) {
-        super(format(line, message, args), cause);
+    public ParseException(Throwable cause, String templateName, int line, String message, Object... args) {
+        super(format(templateName, line, message, args), cause);
         this.line = line;
     }
 
-    private static String format(int line, String message, Object... args) {
+    private static String format(String templateName, int line, String message, Object... args) {
         message = String.format(message, args);
-        return String.format("%s, line: %s", message, line);
+        return String.format("%s, line: %s, template: %s", message, line, templateName);
     }
 }

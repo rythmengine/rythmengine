@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser;
 
-import java.util.regex.Pattern;
-
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+
+import java.util.regex.Pattern;
 
 public abstract class ParserBase implements IParser {
     

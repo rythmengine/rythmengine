@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.runtime;
 
+import com.greenlaw110.rythm.utils.TextBuilder;
+
 import java.util.Collection;
 import java.util.Iterator;
-
-import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.utils.TextBuilder;
 
 @SuppressWarnings("rawtypes") 
 public class Each {

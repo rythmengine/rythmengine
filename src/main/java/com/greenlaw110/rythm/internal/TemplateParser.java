@@ -1,13 +1,13 @@
 package com.greenlaw110.rythm.internal;
 
-import java.util.Stack;
-
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Stack;
 
 public class TemplateParser implements IContext {
     private final CodeBuilder cb;
@@ -26,6 +26,10 @@ public class TemplateParser implements IContext {
         for (TextBuilder builder: tt) {
             cb.addBuilder(builder);
         }
+    }
+    
+    public String getTemplateName() {
+        return cb.getTemplateClass().name();
     }
     
     @Override 
@@ -81,7 +85,6 @@ public class TemplateParser implements IContext {
     public void openBlock(IBlockHandler bh) {
         blocks.push(bh);
     }
-    
 
     @Override
     public IBlockHandler currentBlock() {
@@ -90,7 +93,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public String closeBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException(currentLine(), "No open block found");
+        if (blocks.isEmpty()) throw new ParseException(getTemplateName(), currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return null == bh ? "" : bh.closeBlock();
     }
