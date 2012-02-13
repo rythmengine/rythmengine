@@ -2,8 +2,10 @@ package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.IByteCodeHelper;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.*;
 import org.eclipse.jdt.internal.compiler.Compiler;
@@ -257,10 +259,9 @@ public class TemplateCompiler {
                             // Non sense !
                             message = problem.getArguments()[0] + " cannot be resolved";
                         }
-                        //TODO support error line reporting throw new RuntimeException(Rythm2.cache.getByClassName(className).getKey(), message, problem.getSourceLineNumber(), problem.getSourceStart(), problem.getSourceEnd());
-                        logger.error(result.toString());
-                        logger.error(result.compilationUnit.toString());
-                        throw new RuntimeException("Error compile template class: " + getTemplateByClassName(className));
+                        int line = problem.getSourceLineNumber();
+                        logger.error(">>> java line number: %s", line);
+                        throw new CompileException(getTemplateByClassName(className), line, problem.getMessage());
                     }
                 }
                 // Something has been compiled

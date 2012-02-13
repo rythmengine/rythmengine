@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class Token extends TextBuilder {
     protected String s;
     protected IContext ctx;
+    protected int line;
     /*
      * Indicate whether token parse is good
      */
@@ -25,6 +26,7 @@ public class Token extends TextBuilder {
         super(null == context ? null : context.getCodeBuilder());
         this.s = s;
         ctx = context;
+        line = context.currentLine() - 1;
     }
 
     public boolean test(String line) {
@@ -170,7 +172,7 @@ public class Token extends TextBuilder {
 
     private void pp(String s) {
         s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
-        p("\np(\"").p(s).p("\");");
+        p("p(\"").p(s).p("\"); //line: ").p(line).p("\n");
     }
 
     public static void main(String[] args) {

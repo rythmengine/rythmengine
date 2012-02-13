@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -133,10 +134,14 @@ public class TemplateClass {
     }
 
     public TemplateClass(ITemplateResource resource, RythmEngine engine) {
+        this(resource, engine, false);
+    }
+
+    public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh) {
         this(engine);
         if (null == resource) throw new NullPointerException();
         templateResource = resource;
-        refresh();
+        if (!noRefresh) refresh();
     }
 
 
@@ -236,6 +241,7 @@ public class TemplateClass {
             javaSource = cb.toString();
             if (!cb.isRythmTemplate()) {
                 isValid = false;
+                engine().classes.remove(this);
                 return false;
             }
             isValid = true;
@@ -275,8 +281,8 @@ public class TemplateClass {
         long start = System.currentTimeMillis();
         try {
             engine().classes.compiler.compile(new String[]{name()});
-        } catch (RuntimeException e) {
-            logger.error(javaSource);
+        } catch (CompileException e) {
+            e.setTemplateClass(this);
             throw e;
         } finally {
             compiling = false;
