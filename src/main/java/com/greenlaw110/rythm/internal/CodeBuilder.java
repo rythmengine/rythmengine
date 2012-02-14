@@ -129,7 +129,7 @@ public class CodeBuilder extends TextBuilder {
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
     public void defTag(String tagName, String signature) {
         if (inlineTags.containsKey(tagName)) {
-            throw new ParseException(templateClass.name(), parser.currentLine(), "inline tag already defined: %s", tagName);
+            throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
         InlineTag tag = new InlineTag(tagName, signature);
         inlineTags.put(tagName, tag);
@@ -137,7 +137,7 @@ public class CodeBuilder extends TextBuilder {
         builders = tag.builders;
     }
     public void endTag() {
-        if (inlineTagBodies.empty()) throw new ParseException(templateClass.name(), parser.currentLine(), "Unexpected tag definition close");
+        if (inlineTagBodies.empty()) throw new ParseException(templateClass, parser.currentLine(), "Unexpected tag definition close");
         builders = inlineTagBodies.pop();
     }
     

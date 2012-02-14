@@ -28,7 +28,7 @@ public class ExtendsParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateName(), currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\")");
+                    throw new ParseException(ctx().getTemplateClass(), currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\")");
                 }
                 step(r.stringMatched().length());
                 // try to match @extends(...)
@@ -41,7 +41,7 @@ public class ExtendsParser extends KeywordParserFactory {
                 Pattern p = Pattern.compile("('([_a-zA-Z\\/][\\w_\\.\\/]*)'|([_a-zA-Z\\/][\\w_\\.\\/]*)|\"([_a-zA-Z\\/][\\w_\\.\\/]*)\")");
                 Matcher m = p.matcher(s);
                 if (!m.matches()) {
-                    throw new ParseException(ctx().getTemplateName(), currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\"), found: %s", s);
+                    throw new ParseException(ctx().getTemplateClass(), currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\"), found: %s", s);
                 }
                 if (s.startsWith("\"")) {
                     s = m.group(4);

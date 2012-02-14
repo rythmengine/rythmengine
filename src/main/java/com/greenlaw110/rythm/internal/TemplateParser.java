@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
@@ -27,9 +28,10 @@ public class TemplateParser implements IContext {
             cb.addBuilder(builder);
         }
     }
-    
-    public String getTemplateName() {
-        return cb.getTemplateClass().name();
+
+    @Override
+    public TemplateClass getTemplateClass() {
+        return cb.getTemplateClass();
     }
     
     @Override 
@@ -93,7 +95,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public String closeBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException(getTemplateName(), currentLine(), "No open block found");
+        if (blocks.isEmpty()) throw new ParseException(cb.getTemplateClass(), currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return null == bh ? "" : bh.closeBlock();
     }

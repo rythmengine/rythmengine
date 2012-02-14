@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.compiler;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
+import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -10,6 +11,7 @@ import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -170,6 +172,8 @@ public class TemplateClass {
             try {
                 Class<?> clz = getJavaClass();
                 templateInstance = (TemplateBase) clz.newInstance();
+            } catch (RythmException e) {
+                throw e;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -186,11 +190,11 @@ public class TemplateClass {
     }
     
     public ITemplate asTemplate() {
-        return templateInstance_().cloneMe(engine, null);
+        return templateInstance_().cloneMe(engine(), null);
     }
     
     public ITemplate asTemplate(ITemplate caller) {
-        return templateInstance_().cloneMe(engine, caller);
+        return templateInstance_().cloneMe(engine(), caller);
     }
     
     private boolean refreshing = false;
@@ -281,9 +285,11 @@ public class TemplateClass {
         long start = System.currentTimeMillis();
         try {
             engine().classes.compiler.compile(new String[]{name()});
-        } catch (CompileException e) {
-            e.setTemplateClass(this);
-            throw e;
+        } catch (CompileException.CompilerException e) {
+            String cn = e.className;
+            TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes.getByClassName(cn);
+            if (null == tc) tc = this;
+            throw new CompileException(tc, e.javaLineNumber, e.message);
         } finally {
             compiling = false;
         }

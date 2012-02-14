@@ -36,7 +36,7 @@ public class SetParser extends KeywordParserFactory {
                 s = s.substring(1); // s: name: val)
                 s = s.substring(0, s.length() - 1); // s: "name": val
                 r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
-                if (!r.search(s)) throw new ParseException(ctx().getTemplateName(), ctx().currentLine(), "Error parsing @set tag. Correct usage: @set(\"name\": val)");
+                if (!r.search(s)) throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @set tag. Correct usage: @set(\"name\": val)");
                 s = r.stringMatched(1); // propName: "name"
                 if (s.startsWith("\"") || s.startsWith("'")) {
                     s = s.substring(1);

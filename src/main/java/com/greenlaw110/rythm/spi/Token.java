@@ -23,6 +23,7 @@ public class Token extends TextBuilder {
     }
 
     public Token(String s, IContext context) {
+
         super(null == context ? null : context.getCodeBuilder());
         this.s = s;
         ctx = context;

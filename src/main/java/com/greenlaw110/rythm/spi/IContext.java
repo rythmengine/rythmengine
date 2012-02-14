@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.spi;
 
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 public interface IContext {
     
@@ -69,5 +70,5 @@ public interface IContext {
     
     int cursor();
     
-    String getTemplateName();
+    TemplateClass getTemplateClass();
 }

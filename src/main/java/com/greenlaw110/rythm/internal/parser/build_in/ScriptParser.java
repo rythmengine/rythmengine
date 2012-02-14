@@ -34,9 +34,17 @@ public class ScriptParser extends ParserBase {
         Matcher m = p.matcher(ctx.getRemain());
         if (!m.matches()) return null;
         String s = m.group(1);
+        int curLine = ctx.currentLine();
         ctx.step(s.length());
-        s = m.group(2) + ";";
-        return new CodeToken(s, ctx);
+        s = m.group(2);
+        String[] lines = s.split("\\n");
+        int len = lines.length;
+        StringBuilder sb = new StringBuilder(s.length() * 2);
+        for (int i = 0; i < len; ++i) {
+            sb.append(lines[i]).append(" //line: ").append(curLine++).append("\n");
+        }
+        sb.append(";");
+        return new CodeToken(sb.toString(), ctx);
     }
 
     public static void main(String[] args) {

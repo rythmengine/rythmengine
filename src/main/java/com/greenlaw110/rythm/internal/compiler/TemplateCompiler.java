@@ -252,16 +252,9 @@ public class TemplateCompiler {
                 // If error
                 if (result.hasErrors()) {
                     for (IProblem problem: result.getErrors()) {
-                        String className = new String(problem.getOriginatingFileName()).replace("/", ".");
-                        className = className.substring(0, className.length() - 5);
-                        String message = problem.getMessage();
-                        if (problem.getID() == IProblem.CannotImportPackage) {
-                            // Non sense !
-                            message = problem.getArguments()[0] + " cannot be resolved";
-                        }
                         int line = problem.getSourceLineNumber();
-                        logger.error(">>> java line number: %s", line);
-                        throw new CompileException(getTemplateByClassName(className), line, problem.getMessage());
+                        String message = problem.getMessage();
+                        throw CompileException.compilerException(String.valueOf(result.compilationUnit.getMainTypeName()), line, message);
                     }
                 }
                 // Something has been compiled

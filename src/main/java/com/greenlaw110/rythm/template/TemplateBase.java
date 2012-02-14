@@ -2,6 +2,8 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
@@ -10,6 +12,8 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
@@ -124,10 +128,35 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         return tmpl;
     }
 
+    private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
     @Override
     public String render() {
         //_out.setLength(0);
-        build();
+        if (engine.isProdMode()) {
+            build();
+        } else {
+            try {
+                build();
+            } catch (Exception e) {
+                StackTraceElement[] stackTrace = e.getStackTrace();
+                for (StackTraceElement se : stackTrace){
+                    String cName = se.getClassName();
+                    if (cName.contains(TemplateClass.CN_SUFFIX)) {
+                        TemplateClass tc = engine.classes.getByClassName(cName);
+                        if (null == tc) continue;
+                        RythmException re = new RythmException(tc, se.getLineNumber(), e.getMessage());
+                        if (re.templatelineNumber != -1) {
+                            StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
+                            newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templatelineNumber);
+                            System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
+                            re.setStackTrace(newStack);
+                            throw re;
+                        }
+                    }
+                }
+                throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
+            }
+        }
         if (null != parent) {
             parent.setRenderBody(toString());
             parent.addAllRenderSections(renderSections);
@@ -220,4 +249,16 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     
     // --- debugging interface
     protected static ILogger _logger = Logger.get(TemplateBase.class);
+    protected static void _debug(String msg, Object... args) {
+        _logger.debug(msg, args);
+    }
+    protected static void _info(String msg, Object... args) {
+        _logger.info(msg, args);
+    }
+    protected static void _error(String msg, Object... args) {
+        _logger.error(msg, args);
+    }
+    protected static void _error(Throwable t, String msg, Object... args) {
+        _logger.error(t, msg, args);
+    }
 }

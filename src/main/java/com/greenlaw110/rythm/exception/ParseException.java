@@ -1,46 +1,16 @@
 package com.greenlaw110.rythm.exception;
 
-public class ParseException extends RuntimeException {
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
-    private static final long serialVersionUID = 1L;
-    
-    private String origMessage = null; 
-    
-    private int line;
-    
-    public int getLine() {
-        return line;
-    }
-    
-    private String templateName;
-    
-    public String getTemplateName() {
-        return templateName;
-    }
-    
-    public String getOriginalMessage() {
-        return origMessage;
+public class ParseException extends RythmException {
+
+    public ParseException(TemplateClass tc, int line, String message, Object... args) {
+        this(null, tc, line, message, args);
     }
 
-    public ParseException(String templateName, int line, String message, Object... args) {
-        super(format(templateName, line, message, args));
-        this.line = line;
-        this.origMessage = String.format(message, args);
+    public ParseException(Throwable cause, TemplateClass tc, int line, String message, Object... args) {
+        super(cause, tc, -1, line, String.format(message, args));
+        errorMessage = String.format("Error parsing template[%s], line: %s, error: %s", tc.name(), line, originalMessage);
     }
 
-    public ParseException(Throwable cause, int line) {
-        super(cause);
-        this.line = line;
-    }
-
-    public ParseException(Throwable cause, String templateName, int line, String message, Object... args) {
-        super(format(templateName, line, message, args), cause);
-        this.line = line;
-        this.origMessage = String.format(message, args);
-    }
-
-    private static String format(String templateName, int line, String message, Object... args) {
-        message = String.format(message, args);
-        return String.format("%s, line: %s, template: %s", message, line, templateName);
-    }
 }
