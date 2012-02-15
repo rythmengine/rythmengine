@@ -211,10 +211,14 @@ public class TemplateClass {
         tcc.clsNameIdx.put(name(), this);
     }
 
+    public boolean refresh() {
+        return refresh(false);
+    }
+
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
      */
-    public boolean  refresh() {
+    public boolean  refresh(boolean forceRefresh) {
         if (refreshing()) return false;
         if (inner) return false;
         try {
@@ -234,9 +238,9 @@ public class TemplateClass {
             }
 
             boolean extendedTemplateModified = false;
-            if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh();
-            boolean modified = extendedTemplateModified || templateResource.refresh();
-            if (!modified && javaSource != null) return false;
+            if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh(forceRefresh);
+            boolean refresh = forceRefresh || (null == javaSource) || extendedTemplateModified || templateResource.refresh();
+            if (!refresh) return false;
             addVersion();
             long start = System.currentTimeMillis();
             CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
@@ -251,7 +255,7 @@ public class TemplateClass {
             isValid = true;
             //if (!engine().isProdMode()) logger.info(javaSource);
             if (logger.isTraceEnabled() || engine().configuration.getAsBoolean("rythm.logJavaSource", false)) {
-                logger.info(javaSource);
+                logger.debug(javaSource);
                 logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
             }
             javaByteCode = null;

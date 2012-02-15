@@ -40,16 +40,21 @@ public class TemplateResourceManager {
     }
     
     public ITemplateResource get(String str) {
+        ITemplateResource resource = getFileResource(str);
+        if (!resource.isValid()) resource = new StringTemplateResource(str, engine);
+        return cache(resource);
+    }
+
+    public ITemplateResource getFileResource(String str) {
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
-        
+
         if (null != resourceLoader) resource = resourceLoader.load(str);
         if (null != resource) return resource;
 
         // try build-in loader
         resource = new FileTemplateResource(str, engine);
         if (!resource.isValid()) resource = new ClasspathTemplateResource(str);
-        if (!resource.isValid()) resource = new StringTemplateResource(str, engine);
         return cache(resource);
     }
 }

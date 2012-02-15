@@ -1,6 +1,8 @@
 package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class TemplateClassCache {
+    protected final ILogger logger = Logger.get(TemplateClassCache.class);
     
     //private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
@@ -73,6 +76,9 @@ public class TemplateClassCache {
     private void checkUpdate(TemplateClass tc) {
         if (null == tc) return;
         if (null != tc && engine.refreshOnRender()) {
+            if (logger.isTraceEnabled()) {
+                logger.trace("checkUpdate for template: %s", tc.getKey());
+            }
             engine.classLoader.detectChange(tc);
         }
     }

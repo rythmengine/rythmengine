@@ -5,6 +5,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
+import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
@@ -143,14 +144,33 @@ public class CodeBuilder extends TextBuilder {
     
     public void setExtended(String extended) {
         if (null != this.extended) throw new IllegalStateException("extended already set for this page");
-        TemplateClass tc = engine.classes.getByTemplate(extended);
+        TemplateClass tc = null;
         String origin = extended;
-        if (null == tc) {
+        if (!extended.startsWith("/")) {
+            // relative path ?
+            String me = templateClass.getKey();
+            int pos = me.lastIndexOf("/");
+            extended = me.substring(0, pos) + "/" + extended;
+            tc = engine.classes.getByTemplate(extended);
+            if (null == tc) {
+                ITemplateResource resource = engine.resourceManager.getFileResource(extended);
+                if (resource.isValid()) tc = new TemplateClass(resource, engine);
+            }
+        }
+        if (null == tc && !extended.startsWith("/")) {
+            // it's in class name style ?
             if (!extended.endsWith(TemplateClass.CN_SUFFIX)) extended = extended + TemplateClass.CN_SUFFIX;
             tc = engine.classes.getByClassName(extended);
         }
         if (null == tc) {
-            tc = new TemplateClass(origin, engine);
+            tc = engine.classes.getByTemplate(origin);
+            if (null == tc) {
+                ITemplateResource resource = engine.resourceManager.getFileResource(origin);
+                if (resource.isValid()) tc = new TemplateClass(resource, engine);
+            }
+        }
+        if (null == tc) {
+            throw new ParseException(templateClass, parser.currentLine(), "Cannot find extend template: %s", origin);
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
