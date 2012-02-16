@@ -5,6 +5,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
+import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -89,7 +90,9 @@ public class CodeBuilder extends TextBuilder {
     public TemplateClass getExtendedTemplateClass() {
         return extendedTemplateClass;
     }
+    private InvokeTagParser.ParameterDeclarationList extendArgs = null;
     Set<String> imports = new HashSet<String>();
+    private int extendDeclareLineNo = -1;
     // <argName, argClass>
     Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<TextBuilder> builders = new ArrayList<TextBuilder>();
@@ -147,7 +150,7 @@ public class CodeBuilder extends TextBuilder {
         builders = inlineTagBodies.pop();
     }
     
-    public void setExtended(String extended) {
+    public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
         if (null != this.extended) throw new IllegalStateException("extended already set for this page");
         TemplateClass tc = null;
         String origin = extended;
@@ -179,6 +182,7 @@ public class CodeBuilder extends TextBuilder {
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
+        this.extendArgs = args;
     }
 
     public void addRenderArgs(RenderArgDeclaration declaration) {
@@ -208,6 +212,7 @@ public class CodeBuilder extends TextBuilder {
             pClassOpen();
             pTagImpl();
             pInitCode();
+            pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
             pBuild();
@@ -290,27 +295,24 @@ public class CodeBuilder extends TextBuilder {
         // this moved to TagBase: if (isTag()) p("\n\tif (null == _body) _body = args.get(\"_body\");\n}");
 
         // -- output setRenderArgs method with args passed in positioned order
-        p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
-        {
-            IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
-            int userDefinedArgNumber = renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size());
-            if (0 == userDefinedArgNumber) {
-                // set by position only applies to user defined args 
-                p("\n};");
-            } else {
+        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
+        int userDefinedArgNumber = renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size());
+        if (0 < userDefinedArgNumber) {
+            p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
+            {
                 p("\n\tint p = 0, l = args.length;");
                 int i = userDefinedArgNumber;
                 for (String argName: renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
                     p("\n\tif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
-                        .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                        .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                            .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
+                            .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
                 }
                 p("\n}");
             }
         }
-        
+
         // -- output setRenderArg by name
         p("\n@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
         for (String argName: renderArgs.keySet()) {
@@ -342,6 +344,23 @@ public class CodeBuilder extends TextBuilder {
         // the first argument has a default name "arg"
         p("\n\tif(0 == pos) setRenderArg(\"arg\", arg);");
         p("\n}");
+    }
+
+    private void pExtendInitArgCode() {
+        if (null == extendArgs || extendArgs.pl.size() < 1) return;
+        p("\n@Override protected void loadExtendingArgs() {");
+        for (int i = 0; i < extendArgs.pl.size(); ++i) {
+            InvokeTagParser.ParameterDeclaration pd = extendArgs.pl.get(i);
+            if (S.isEmpty(pd.nameDef)) {
+                p("\n\t__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
+            } else {
+                p("\n\t__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).p(");");
+            }
+            if (extendDeclareLineNo != -1) {
+                p(" //line: ").p(extendDeclareLineNo);
+            }
+        }
+        p("\n}\n");
     }
     
     private void pInitCode() {

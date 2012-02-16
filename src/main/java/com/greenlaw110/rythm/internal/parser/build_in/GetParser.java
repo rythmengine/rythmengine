@@ -30,7 +30,9 @@ public class GetParser extends KeywordParserFactory {
             @Override
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain())) return null;
+                if (!r.search(remain())) {
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @get call. Correct usage: @get(\"myVal\")");
+                }
                 step(r.stringMatched().length()); // remain: @get("name")...
                 String s = r.stringMatched(2); // s: ("name")
                 s = s.substring(1); // s: "name")

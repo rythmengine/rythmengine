@@ -12,7 +12,6 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -43,7 +42,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     private Map<String, String> renderSections = new HashMap<String, String>();
     private Map<String, Object> renderProperties = new HashMap<String, Object>();
     
-    private TemplateBase parent = null;
+    protected TemplateBase __parent = null;
     
     public TemplateBase() {
         super();
@@ -51,7 +50,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         Class<?> pc = c.getSuperclass();
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
-                parent = (TemplateBase) pc.newInstance();
+                __parent = (TemplateBase) pc.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -116,8 +115,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         TemplateBase tmpl = internalClone();
-        if (tmpl.parent != null) {
-            tmpl.parent = (TemplateBase) tmpl.parent.cloneMe(engine, caller);
+        if (tmpl.__parent != null) {
+            tmpl.__parent = (TemplateBase) tmpl.__parent.cloneMe(engine, caller);
         }
         tmpl.engine = engine;
         //if (null != out) tmpl._out = out;
@@ -126,6 +125,14 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         }
         if (null != _out) tmpl._out = new StringBuilder();
         return tmpl;
+    }
+    
+    protected void internalInit() {
+        loadExtendingArgs();
+        init();
+    }
+
+    protected void loadExtendingArgs() {
     }
 
     @Override
@@ -136,10 +143,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     @Override
     public String render() {
         //_out.setLength(0);
-        if (null != parent) {
-            parent.init();
-        }
-        init();
+        internalInit();
         if (engine.isProdMode()) {
             build();
         } else {
@@ -165,11 +169,11 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
             }
         }
-        if (null != parent) {
-            parent.setRenderBody(toString());
-            parent.addAllRenderSections(renderSections);
-            parent.addAllRenderProperties(renderProperties);
-            return parent.render();
+        if (null != __parent) {
+            __parent.setRenderBody(toString());
+            __parent.addAllRenderSections(renderSections);
+            __parent.addAllRenderProperties(renderProperties);
+            return __parent.render();
         } else {
             return toString();
         }
@@ -182,6 +186,14 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     @Override
     public void setRenderArgs(Map<String, Object> args) {
         _properties.putAll(args);
+    }
+
+    protected void setRenderArgs(ITag.ParameterList params) {
+        for (int i = 0; i < params.size(); ++i) {
+            ITag.Parameter param = params.get(i);
+            if (null != param.name) setRenderArg(param.name, param.value);
+            else setRenderArg(i, param.value);
+        }
     }
 
     @Override

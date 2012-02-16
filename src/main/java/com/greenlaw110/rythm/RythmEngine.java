@@ -56,6 +56,14 @@ public class RythmEngine {
     }
 
     /**
+     * When compactMode is true, then by default redundant spaces/line breaks are removed
+     */
+    private boolean compactMode = true;
+    public boolean compactMode() {
+        return compactMode;
+    }
+
+    /**
      * enable java extensions to expressions, e.g. @myvar.escapeHtml() or @myvar.pad(5) etc.
      *
      * disable java extension can improve parse performance
@@ -165,6 +173,7 @@ public class RythmEngine {
 
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
+        compactMode = configuration.getAsBoolean("rythm.compactOutput", true);
         tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);

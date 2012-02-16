@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.spi.IBlockHandler;
@@ -102,11 +103,17 @@ public class TemplateParser implements IContext {
 
     @Override
     public int currentLine() {
+        if (null == template) return -1; // for testing purpose only
         if (cursor >= template.length()) return totalLines;
         //return template.substring(0, cursor).split("(\\r\\n|\\n|\\r)").length;
         return StringUtils.countMatches(template.substring(0, cursor), "\n") + 1;
     }
-    
+
+    @Override
+    public RythmEngine getEngine() {
+        return cb.engine;
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;
