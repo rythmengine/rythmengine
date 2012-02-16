@@ -24,6 +24,11 @@ public enum Keyword implements IKeyword {
      */
     IMPORT,
     /**
+     * Mark a section init code. There can be
+     * at most one @init{} section per template
+     */
+    INIT,
+    /**
      * Fetch named content from this or sub template
      */
     GET,

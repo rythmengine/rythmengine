@@ -39,6 +39,13 @@ public interface ITemplate extends Cloneable {
      * @return
      */
     String render();
+
+    /**
+     * Must be called before real render() happened.
+     * Also if the template extends a parent template, then
+     * the parent template's init() must be called before this template's init()
+     */
+    void init();
     
     StringBuilder getOut();
     

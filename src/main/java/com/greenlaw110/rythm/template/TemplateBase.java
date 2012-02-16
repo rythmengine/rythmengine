@@ -128,10 +128,18 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         return tmpl;
     }
 
+    @Override
+    public void init() {
+    }
+
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
     @Override
     public String render() {
         //_out.setLength(0);
+        if (null != parent) {
+            parent.init();
+        }
+        init();
         if (engine.isProdMode()) {
             build();
         } else {

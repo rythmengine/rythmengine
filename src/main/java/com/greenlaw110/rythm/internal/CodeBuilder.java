@@ -75,6 +75,11 @@ public class CodeBuilder extends TextBuilder {
     private boolean isTag() {
         return null != tagName;
     }
+    private String initCode = null;
+    public void setInitCode(String code) {
+        if (null != initCode) throw new ParseException(templateClass, parser.currentLine(), "@init section already declared.");
+        initCode = code;
+    }
     private String extended; // the cName of the extended template
     private String extended() {
         String defClass = isTag() ? TagBase.class.getName() : TemplateBase.class.getName();
@@ -202,6 +207,7 @@ public class CodeBuilder extends TextBuilder {
             pImports();
             pClassOpen();
             pTagImpl();
+            pInitCode();
             pRenderArgs();
             pInlineTags();
             pBuild();
@@ -264,7 +270,7 @@ public class CodeBuilder extends TextBuilder {
         // -- output private members
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\t\tprivate ").p(arg.type).p(" ").p(argName);
+            p("\n\t\tprotected ").p(arg.type).p(" ").p(argName);
             if (null != arg.defVal) {
                 p("=").p(arg.defVal).p(";");
             } else {
@@ -336,6 +342,11 @@ public class CodeBuilder extends TextBuilder {
         // the first argument has a default name "arg"
         p("\n\tif(0 == pos) setRenderArg(\"arg\", arg);");
         p("\n}");
+    }
+    
+    private void pInitCode() {
+        if (null == initCode) return;
+        p("\n@Override public void init() {").p(initCode).p(";").p("}\n");
     }
 
     private void pTagImpl() {
