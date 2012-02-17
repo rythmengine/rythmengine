@@ -8,6 +8,7 @@ import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
+import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -16,6 +17,8 @@ import com.greenlaw110.rythm.utils.S;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Define the data structure hold template class/template src/generated java src
@@ -58,11 +61,18 @@ public class TemplateClass {
         return name;
     }
     public String name() {
-        return isInner() ? name : name + "v" + version;
+        //return isInner() ? name : name + "v" + version;
+        RythmEngine e = engine();
+        String n =  (e.isProdMode() || isInner() || e.hotswapAgent != null) ? name : name + "v" + version;
+        //System.out.println(">>>> name is: " + n);
+        return n;
     }
     private long version;
     public long version() {
         return root().version;
+    }
+    public void setVersion(int v) {
+        version = (long)v;
     }
     public TemplateClass extendedTemplateClass;
     /**
@@ -75,6 +85,18 @@ public class TemplateClass {
      * the template resource
      */
     public ITemplateResource templateResource;
+    /**
+     * The template source
+     */
+    public String getTemplateSource() {
+        return templateResource.asTemplateContent();
+    }
+    /**
+     * Is this template resource coming from a literal String or from a loaded resource like file
+     */
+    public boolean isStringTemplate() {
+        return templateResource instanceof StringTemplateResource;
+    }
     /**
      * The Java source
      */
@@ -204,7 +226,9 @@ public class TemplateClass {
     }
     
     private void addVersion() {
-        TemplateClassCache tcc = engine().classes;
+        RythmEngine e = engine();
+        if (e.isProdMode() || e.hotswapAgent != null) return;
+        TemplateClassManager tcc = engine().classes;
         tcc.clsNameIdx.remove(name());
         //List<TemplateClass> allEmbedded = tcc.getEmbeddedClasses(name0());
         version = nextVersion.getAndIncrement();
@@ -222,6 +246,7 @@ public class TemplateClass {
         if (refreshing()) return false;
         if (inner) return false;
         try {
+            RythmEngine e = engine();
             refreshing = true;
             if (!templateResource.isValid()) {
                 // it is removed?
@@ -233,14 +258,37 @@ public class TemplateClass {
                 // this is the root level template class
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
-                version = nextVersion.getAndIncrement();
+                if (e.isDevMode() && e.hotswapAgent == null) version = nextVersion.getAndIncrement();
                 engine().classes.add(this);
+            }
+            
+            if (null == javaSource) {
+                engine().cache.loadTemplateClass(this);
+                if (null != javaSource) {
+                    // try refresh extended template class if there is
+                    Pattern p = Pattern.compile(".*extends\\s+([a-zA-Z0-9_]+)\\s*\\{\\s*\\/\\/<extended_resource_key\\>(.*)\\<\\/extended_resource_key\\>.*", Pattern.DOTALL);
+                    Matcher m = p.matcher(javaSource);
+                    if (m.matches()) {
+                        String extended = m.group(1);
+                        TemplateClassManager tcm = engine().classes;
+                        extendedTemplateClass = tcm.getByClassName(extended);
+                        if (null == extendedTemplateClass) {
+                            String extendedResourceKey = m.group(2);
+                            extendedTemplateClass = tcm.getByTemplate(extendedResourceKey);
+                            if (null == extendedTemplateClass) {
+                                extendedTemplateClass = new TemplateClass(extendedResourceKey, engine());
+                            }
+                        }
+                    }
+                }
             }
 
             boolean extendedTemplateModified = false;
             if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh(forceRefresh);
             boolean refresh = forceRefresh || (null == javaSource) || extendedTemplateModified || templateResource.refresh();
             if (!refresh) return false;
+            
+            // now start generate source and compile source to byte code
             addVersion();
             long start = System.currentTimeMillis();
             CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
@@ -261,7 +309,7 @@ public class TemplateClass {
             javaByteCode = null;
             enhancedByteCode = null;
             templateInstance = null;
-            javaClass = null;
+            if (e.isDevMode() && e.hotswapAgent == null) javaClass = null;
             compiled = false;
             return true;
         } finally {

@@ -3,134 +3,169 @@ package com.greenlaw110.rythm.internal.compiler;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.security.MessageDigest;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 18/01/12
- * Time: 8:58 PM
- * To change this template use File | Settings | File Templates.
+ * Used to speed up compilation time
  */
 public class TemplateClassCache {
-    protected final ILogger logger = Logger.get(TemplateClassCache.class);
-    
-    //private static final ILogger logger = Logger.get(TemplateClassCache.class);
+    private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
-    public RythmEngine engine = null;
-
-    /**
-     * Reference to the eclipse compiler.
-     */
-    TemplateCompiler compiler = new TemplateCompiler(this);
-    /**
-     * Index template class with class name
-     */
-    Map<String, TemplateClass> clsNameIdx = new HashMap<String, TemplateClass>();
-    /**
-     * Index template class with inline template content or template file name
-     */
-    Map<String, TemplateClass> tmplIdx = new HashMap<String, TemplateClass>();
+    private RythmEngine engine = null;
 
     public TemplateClassCache(RythmEngine engine) {
-        if (null == engine) throw new NullPointerException();
         this.engine = engine;
     }
 
     /**
-     * Clear the classCache cache
+     * Delete the bytecode
+     * @param tc The template class
      */
-    public void clear() {
-        clsNameIdx = new HashMap<String, TemplateClass>();
+    public void deleteCache(TemplateClass tc) {
+        try {
+            File f = getCacheFile(tc);
+            if (f.exists()) {
+                f.delete();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * All loaded classes.
-     * @return All loaded classes
+     * Retrieve java source and bytecode if template content has not changed
+     * @param tc
      */
-    public List<TemplateClass> all() {
-        return new ArrayList<TemplateClass>(clsNameIdx.values());
-    }
-
-    /**
-     * Get a class by name
-     * @param name The fully qualified class name
-     * @return The TemplateClass or null
-     */
-    public TemplateClass getByClassName(String name) {
-        TemplateClass tc = clsNameIdx.get(name);
-        checkUpdate(tc);
-        return tc;
-    }
-    
-    public TemplateClass getByTemplate(String name) {
-        TemplateClass tc = tmplIdx.get(name);
-        checkUpdate(tc);
-        return tc;
-    }
-    
-    private void checkUpdate(TemplateClass tc) {
-        if (null == tc) return;
-        if (null != tc && engine.refreshOnRender()) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("checkUpdate for template: %s", tc.getKey());
-            }
-            engine.classLoader.detectChange(tc);
-        }
-    }
-    
-    List<TemplateClass> getEmbeddedClasses(String name) {
-        List<TemplateClass> l = new ArrayList<TemplateClass>();
-        for (String cn: clsNameIdx.keySet()) {
-            if (cn.startsWith(name + "$")) {
-                l.add(clsNameIdx.get(cn));
-            }
-        }
-        return l;
-    }
-
-    public void add(TemplateClass templateClass) {
-        clsNameIdx.put(templateClass.name0(), templateClass);
-        clsNameIdx.put(templateClass.name(), templateClass);
-        if (!templateClass.isInner()) {
-            tmplIdx.put(templateClass.templateResource.getKey(), templateClass);
-        }
-    }
-
-    public void remove(TemplateClass templateClass) {
-        if (null == templateClass) return;
-        if (templateClass.isInner()) {
-            clsNameIdx.remove(templateClass.name());
+    public void loadTemplateClass(TemplateClass tc) {
+        if (engine.isDevMode() && engine.hotswapAgent == null) {
+            // cannot handle the v version scheme
             return;
         }
-        // remove versioned link
-        clsNameIdx.remove(templateClass.name());
-        // remove unversioned link
-        String name0 = templateClass.name0();
-        clsNameIdx.remove(name0);
-        List<String> embedded = new ArrayList<String>();
-        for (String cn: clsNameIdx.keySet()) {
-            if (cn.matches(name0 + "v[0-9]+\\$.*")) embedded.add(cn);
+        try {
+            File f = getCacheFile(tc);
+            if (!f.exists() || !f.canRead()) return;
+            InputStream is = new BufferedInputStream(new FileInputStream(f));
+
+            // --- check hash
+            int offset = 0;
+            int read = -1;
+            StringBuilder hash = new StringBuilder();
+            while ((read = is.read()) != 0) {
+                hash.append((char) read);
+                offset++;
+            }
+            String curHash = hash(tc);
+            if (!curHash.equals(hash.toString())) {
+                if (logger.isTraceEnabled()) logger.trace("Bytecode too old (%s != %s)", hash, curHash);
+                return;
+            }
+            
+            // --- load java source
+            read = -1;
+            StringBuilder source = new StringBuilder();
+            while ((read = is.read()) != 0) {
+                source.append((char)read);
+                offset++;
+            }
+            tc.javaSource = source.toString();
+
+            // --- load version info
+            while ((read = is.read()) != 0) {
+                if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
+                    tc.setVersion(read);
+                }
+                offset++;
+            }
+
+            // --- load byte code
+            byte[] byteCode = new byte[(int) f.length() - (offset + 3)];
+            is.read(byteCode);
+            tc.compiled(byteCode);
+
+            is.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        for (String cn: embedded) clsNameIdx.remove(cn);
-        if (null != templateClass && null != templateClass.templateResource) tmplIdx.remove(templateClass.getKey());
+    }
+    
+    public void cacheTemplateClass(TemplateClass tc) {
+        if (engine.isDevMode() && engine.hotswapAgent == null) {
+            // cannot handle the v version scheme
+            return;
+        }
+        String hash = hash(tc);
+        try {
+            File f = getCacheFile(tc);
+            // --- write hash value
+            OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+            os.write(hash.getBytes("utf-8"));
+
+            // --- cache java source
+            os.write(0);
+            os.write(tc.javaSource.getBytes("utf-8"));
+
+            // --- cache class version
+            os.write(0);
+            if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
+                // find out version number
+                final String sep = TemplateClass.CN_SUFFIX + "v";
+                String cn = tc.name();
+                int pos = cn.lastIndexOf(sep);
+                String sv = cn.substring(pos + sep.length());
+                int nv = Integer.valueOf(sv);
+                os.write(nv);
+            }
+
+            // --- cache byte code
+            os.write(0);
+            os.write(tc.enhancedByteCode);
+            os.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void remove(String name) {
-        TemplateClass templateClass = clsNameIdx.get(name);
-        remove(templateClass);
+    /**
+     * Build a hash of the source code.
+     * To efficiently track source code modifications.
+     */
+    String hash(TemplateClass tc) {
+        try {
+            StringBuffer enhancers = new StringBuffer();
+            for(ITemplateClassEnhancer plugin : engine.templateClassEnhancers) {
+                enhancers.append(plugin.getClass().getName());
+            }
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.reset();
+            messageDigest.update((RythmEngine.version + enhancers.toString() + tc.getTemplateSource()).getBytes("utf-8"));
+            byte[] digest = messageDigest.digest();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < digest.length; ++i) {
+                int value = digest[i];
+                if (value < 0) {
+                    value += 256;
+                }
+                builder.append(Integer.toHexString(value));
+            }
+            return builder.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    public boolean hasClass(String name) {
-        return clsNameIdx.containsKey(name);
+    
+    String cacheFileName(TemplateClass tc, String suffix) {
+        return tc.name0() + suffix;
     }
-
-    @Override
-    public String toString() {
-        return clsNameIdx.toString();
+    
+    /**
+     * Retrieve the real file that will be used as cache.
+     */
+    File getCacheFile(TemplateClass tc) {
+        String id = cacheFileName(tc, ".rythm");
+        return new File(engine.tmpDir, id);
     }
+    
 }

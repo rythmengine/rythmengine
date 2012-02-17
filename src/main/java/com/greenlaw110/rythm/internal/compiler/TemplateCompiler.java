@@ -5,7 +5,6 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.internal.compiler.*;
 import org.eclipse.jdt.internal.compiler.Compiler;
@@ -45,13 +44,13 @@ public class TemplateCompiler {
     }
 
     // -- the following code comes from PlayFramework 1.2
-    TemplateClassCache classCache;
+    TemplateClassManager classCache;
     Map<String, String> settings;
 
     /**
      * Try to guess the magic configuration options
      */
-    public TemplateCompiler(TemplateClassCache classCache) {
+    public TemplateCompiler(TemplateClassManager classCache) {
         this.classCache = classCache;
         this.settings = new HashMap<String, String>();
         this.settings.put(CompilerOptions.OPTION_ReportMissingSerialVersion, CompilerOptions.IGNORE);

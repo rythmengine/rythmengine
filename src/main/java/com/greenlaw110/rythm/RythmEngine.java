@@ -2,6 +2,7 @@ package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassCache;
+import com.greenlaw110.rythm.internal.compiler.TemplateClassManager;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -41,8 +42,9 @@ public class RythmEngine {
     public Rythm.Mode mode;
     public final RythmProperties configuration = new RythmProperties();
     public final TemplateResourceManager resourceManager = new TemplateResourceManager(this);
-    public final TemplateClassCache classes = new TemplateClassCache(this);
+    public final TemplateClassManager classes = new TemplateClassManager(this);
     public TemplateClassLoader classLoader = null;
+    public TemplateClassCache cache = new TemplateClassCache(this);
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
@@ -128,6 +130,10 @@ public class RythmEngine {
 
     public boolean isProdMode() {
         return mode == Rythm.Mode.prod;
+    }
+
+    public boolean isDevMode() {
+        return mode != Rythm.Mode.prod;
     }
     
     private void setConf(String key, Object val) {
@@ -367,9 +373,17 @@ public class RythmEngine {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
             String cn = tag.getClass().getName();
-            int pos = cn.lastIndexOf("v");
-            if (-1 < pos) cn = cn.substring(0, pos);
+            if (isDevMode() && hotswapAgent == null && -1 == cn.indexOf("$")) {
+                int pos = cn.lastIndexOf("v");
+                if (-1 < pos) cn = cn.substring(0, pos);
+            }
             TemplateClass tc = classes.getByClassName(cn);
+            if (null == tc) {
+                System.out.println(tag.getClass());
+                System.out.println(name);
+                System.out.println(cn);
+                System.out.println(caller.getClass());
+            }
             tag = (ITag)tc.asTemplate(caller);
         } 
         if (null != params) {

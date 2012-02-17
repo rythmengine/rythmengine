@@ -158,8 +158,6 @@ public class TemplateClassLoader extends ClassLoader {
 
     public RythmEngine engine;
 
-    private BytecodeCache bCache;
-    
     private static ClassLoader getDefParent() {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         return null == cl ? RythmEngine.class.getClassLoader() : cl;
@@ -172,7 +170,6 @@ public class TemplateClassLoader extends ClassLoader {
     public TemplateClassLoader(ClassLoader parent, RythmEngine engine) {
         super(parent);
         this.engine = engine;
-        this.bCache = new BytecodeCache(this);
         for (TemplateClass tc: engine.classes.all()) {
             tc.uncompile();
         }
@@ -245,7 +242,6 @@ public class TemplateClassLoader extends ClassLoader {
             if (templateClass.javaByteCode != null || templateClass.compile() != null) {
                 templateClass.enhance();
                 templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
-                bCache.cacheBytecode(templateClass.enhancedByteCode, name, templateClass.javaSource);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
@@ -309,6 +305,7 @@ public class TemplateClassLoader extends ClassLoader {
     }
     
     public void detectChange(TemplateClass tc) {
+        if (!engine.refreshOnRender() && null != tc.name()) return;
         if (!tc.refresh()) return;
         if (tc.compile() == null) {
             engine.classes.remove(tc);
@@ -319,25 +316,30 @@ public class TemplateClassLoader extends ClassLoader {
             if (sigChecksum != tc.sigChecksum) {
                 throw new RuntimeException("Signature change !");
             }
+            engine.cache.cacheTemplateClass(tc);
 //            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
-//            List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
-//            newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
-//            List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
-//            for (TemplateClass ec: allEmbedded) {
-//                newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
-//            }
-//            currentState = new TemplateClassloaderState();//show others that we have changed..
-//            IHotswapAgent agent = engine.hotswapAgent;
-//            if (null != agent) {
-//                try {
-//                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
-//                } catch (Throwable e) {
-//                    engine.classes.remove(tc);
-//                    throw new RuntimeException("Need reload", e);
-//                }
-//            } else {
-//                throw new RuntimeException("Need reload");
-//            }
+            IHotswapAgent agent = engine.hotswapAgent;
+            if (null != agent) {
+                List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
+                if (null == tc.javaClass) {
+                    tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), tc.enhancedByteCode, 0, tc.enhancedByteCode.length, protectionDomain);
+                    resolveClass(tc.javaClass);
+                }
+                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
+                List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
+                for (TemplateClass ec: allEmbedded) {
+                    newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
+                }
+                currentState = new TemplateClassloaderState();//show others that we have changed..
+                try {
+                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
+                } catch (Throwable e) {
+                    engine.classes.remove(tc);
+                    throw new RuntimeException("Need reload", e);
+                }
+            } else {
+                // we have v version scheme to handle class hotswap now #throw new RuntimeException("Need reload");
+            }
         }
 //        // Now check if there is new classCache or removed classCache
 //        int hash = computePathHash();
@@ -357,7 +359,7 @@ public class TemplateClassLoader extends ClassLoader {
      * Detect Template changes
      */
     public void detectChanges() {
-        if (engine.isProdMode()) return;
+        if (engine.refreshOnRender()) return;
         // Now check for file modification
         List<TemplateClass> modifieds = new ArrayList<TemplateClass>();
         for (TemplateClass tc : engine.classes.all()) {
@@ -377,7 +379,6 @@ public class TemplateClassLoader extends ClassLoader {
                 if (sigChecksum != tc.sigChecksum) {
                     dirtySig = true;
                 }
-                bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
                 newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             }

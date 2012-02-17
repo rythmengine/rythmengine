@@ -86,6 +86,10 @@ public class CodeBuilder extends TextBuilder {
         String defClass = isTag() ? TagBase.class.getName() : TemplateBase.class.getName();
         return null == extended ? defClass : extended;
     }
+    private String extendedResourceMark() {
+        TemplateClass tc = extendedTemplateClass;
+        return (null == tc) ? "" : String.format("//<extended_resource_key>%s</extended_resource_key>", tc.templateResource.getKey());
+    }
     private TemplateClass extendedTemplateClass;
     public TemplateClass getExtendedTemplateClass() {
         return extendedTemplateClass;
@@ -264,7 +268,7 @@ public class CodeBuilder extends TextBuilder {
     }
     
     private void pClassOpen() {
-        p("\npublic class ").p(cName).p(" extends ").p(extended()).p(" {");
+        p("\npublic class ").p(cName).p(" extends ").p(extended()).p(" {").p(extendedResourceMark());
     }
     
     private void pClassClose() {

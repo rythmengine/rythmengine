@@ -2,6 +2,9 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.RythmEngine;
 
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
+
 /**
  * Created by IntelliJ IDEA.
  * User: luog
@@ -55,6 +58,15 @@ public class StringTemplateResource extends TemplateResourceBase implements ITem
     @Override
     protected String reload() {
         return content;
+    }
+
+    @Override
+    public String getSuggestedClassName() {
+        try {
+            return "C" + UUID.nameUUIDFromBytes(content.getBytes("utf-8")).toString().replace('-', '_');
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
