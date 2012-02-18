@@ -190,7 +190,6 @@ public class RythmEngine {
 
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
-        compactMode = configuration.getAsBoolean("rythm.compactOutput", true);
         tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);
@@ -202,6 +201,7 @@ public class RythmEngine {
             }
         });
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.dev);
+        compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");

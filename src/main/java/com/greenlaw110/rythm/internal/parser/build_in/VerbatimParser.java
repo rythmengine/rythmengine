@@ -30,7 +30,7 @@ public class VerbatimParser extends KeywordParserFactory {
                     s0 = s0.substring(1); // strip '{'
                     s0 = s0.substring(0, s0.length() - 1); // strip '}'
                     final String s = s0;
-                    return new Token(s, ctx());
+                    return new Token(s, ctx(), true);
                 }
                 return null;
             }
