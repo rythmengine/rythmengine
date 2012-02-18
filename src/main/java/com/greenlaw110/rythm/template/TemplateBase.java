@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.template;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.internal.compiler.ClassReloadException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -141,7 +142,19 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
     @Override
-    public String render() {
+    public final String render() {
+        try {
+            return internalRender();
+        } catch (ClassReloadException e) {
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("Cannot hotswap class, try to restart engine...");
+            }
+            engine.restart();
+            return render();
+        }
+    }
+    
+    protected String internalRender() {
         //_out.setLength(0);
         internalInit();
         if (engine.isProdMode()) {

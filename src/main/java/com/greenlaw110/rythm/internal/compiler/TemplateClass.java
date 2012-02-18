@@ -41,6 +41,7 @@ public class TemplateClass {
         TemplateClass tc = new TemplateClass();
         tc.name = className;
         tc.javaByteCode = byteCode;
+        tc.enhancedByteCode = byteCode;
         tc.inner = true;
         tc.root = parent.root();
         tc.version = parent.version();
@@ -63,8 +64,7 @@ public class TemplateClass {
     public String name() {
         //return isInner() ? name : name + "v" + version;
         RythmEngine e = engine();
-        String n =  (e.isProdMode() || isInner() || e.hotswapAgent != null) ? name : name + "v" + version;
-        //System.out.println(">>>> name is: " + n);
+        String n =  (!e.reloadByIncClassVersion() || isInner()) ? name : name + "v" + version;
         return n;
     }
     private long version;
@@ -89,7 +89,16 @@ public class TemplateClass {
      * The template source
      */
     public String getTemplateSource() {
-        return templateResource.asTemplateContent();
+        return getTemplateSource(false);
+    }
+    public String getTemplateSource(boolean includeRoot) {
+        if (null != templateResource) return templateResource.asTemplateContent();
+        if (!includeRoot) return "";
+        TemplateClass parent = root;
+        while ((null != parent) && parent.isInner()) {
+            parent = parent.root;
+        }
+        return null == parent ? "" : parent.getTemplateSource();
     }
     /**
      * Is this template resource coming from a literal String or from a loaded resource like file
@@ -197,7 +206,7 @@ public class TemplateClass {
             } catch (RythmException e) {
                 throw e;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
         if (!engine().isProdMode()) {
@@ -212,6 +221,7 @@ public class TemplateClass {
     }
     
     public ITemplate asTemplate() {
+        if (null == name) refresh();
         return templateInstance_().cloneMe(engine(), null);
     }
     
@@ -227,7 +237,7 @@ public class TemplateClass {
     
     private void addVersion() {
         RythmEngine e = engine();
-        if (e.isProdMode() || e.hotswapAgent != null) return;
+        if (!e.reloadByIncClassVersion()) return;
         TemplateClassManager tcc = engine().classes;
         tcc.clsNameIdx.remove(name());
         //List<TemplateClass> allEmbedded = tcc.getEmbeddedClasses(name0());
@@ -258,7 +268,7 @@ public class TemplateClass {
                 // this is the root level template class
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
-                if (e.isDevMode() && e.hotswapAgent == null) version = nextVersion.getAndIncrement();
+                if (e.reloadByIncClassVersion()) version = nextVersion.getAndIncrement();
                 engine().classes.add(this);
             }
             
@@ -309,7 +319,7 @@ public class TemplateClass {
             javaByteCode = null;
             enhancedByteCode = null;
             templateInstance = null;
-            if (e.isDevMode() && e.hotswapAgent == null) javaClass = null;
+            if (e.reloadByIncClassVersion()) javaClass = null;
             compiled = false;
             return true;
         } finally {
@@ -325,6 +335,16 @@ public class TemplateClass {
      */
     public boolean isDefinable() {
         return compiled && javaClass != null;
+    }
+
+    /**
+     * Remove all java source/ byte code and cache
+     */
+    public void reset() {
+        javaByteCode = null;
+        enhancedByteCode = null;
+        javaSource = null;
+        engine().cache.deleteCache(this);
     }
 
     /**
@@ -401,6 +421,7 @@ public class TemplateClass {
         javaByteCode = code;
         enhancedByteCode = code;
         compiled = true;
+        engine().cache.cacheTemplateClass(this);
     }
 
     @Override

@@ -64,6 +64,16 @@ public class RythmProperties extends Properties {
         return mode;
     }
     
+    public Rythm.ReloadMethod getAsReloadMethod(String key, Rythm.ReloadMethod defMethod) {
+        Object o = get(key);
+        if (null == o) return defMethod;
+        if (o instanceof Rythm.ReloadMethod) return (Rythm.ReloadMethod)o;
+        String s = o.toString();
+        Rythm.ReloadMethod method = Rythm.ReloadMethod.valueOf(s);
+        put(key, method);
+        return method;
+    }
+
     public FileFilter getAsFileFilter(String key, FileFilter defVal) {
         Object o = get(key);
         if (null == o) return defVal;

@@ -17,7 +17,11 @@ public class Rythm {
     public static enum Mode {
         dev, prod;
     }
-    
+
+    public static enum ReloadMethod {
+        V_VERSION,
+        RESTART
+    }
     public static RythmEngine engine = new RythmEngine();
 
     public static final String version = engine.version;

@@ -35,8 +35,19 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class RythmEngine {
+
+    Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
+    public boolean reloadByRestart() {
+        return reloadMethod == Rythm.ReloadMethod.RESTART;
+    }
+    public boolean reloadByIncClassVersion() {
+        return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
+    }
+    public boolean cacheEnabled() {
+        return isDevMode() && reloadByRestart();
+    }
     
-    public static final String version = "0.1";
+    public static final String version = "0.9";
     
     private final ILogger logger = Logger.get(RythmEngine.class);
     public Rythm.Mode mode;
@@ -191,6 +202,10 @@ public class RythmEngine {
             }
         });
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.dev);
+        reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
+        if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
+            logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
+        }
         
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
@@ -213,6 +228,13 @@ public class RythmEngine {
         if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
             loadTags();
         }
+    }
+
+    public void restart() {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
+        classLoader = new TemplateClassLoader(cl, this);
+        tags.clear();
     }
 
     public void loadTags(File tagHome) {
@@ -373,7 +395,7 @@ public class RythmEngine {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
             String cn = tag.getClass().getName();
-            if (isDevMode() && hotswapAgent == null && -1 == cn.indexOf("$")) {
+            if (reloadByIncClassVersion() && -1 == cn.indexOf("$")) {
                 int pos = cn.lastIndexOf("v");
                 if (-1 < pos) cn = cn.substring(0, pos);
             }

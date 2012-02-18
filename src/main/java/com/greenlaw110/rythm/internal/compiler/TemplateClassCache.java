@@ -40,7 +40,7 @@ public class TemplateClassCache {
      * @param tc
      */
     public void loadTemplateClass(TemplateClass tc) {
-        if (engine.isDevMode() && engine.hotswapAgent == null) {
+        if (!engine.cacheEnabled()) {
             // cannot handle the v version scheme
             return;
         }
@@ -70,18 +70,20 @@ public class TemplateClassCache {
                 source.append((char)read);
                 offset++;
             }
-            tc.javaSource = source.toString();
+            if (source.length() != 0) {
+                tc.javaSource = source.toString();
+            } // else it must be an inner class
 
-            // --- load version info
-            while ((read = is.read()) != 0) {
-                if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
-                    tc.setVersion(read);
-                }
-                offset++;
-            }
+//            // --- load version info
+//            while ((read = is.read()) != 0) {
+//                if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
+//                    tc.setVersion(read);
+//                }
+//                offset++;
+//            }
 
             // --- load byte code
-            byte[] byteCode = new byte[(int) f.length() - (offset + 3)];
+            byte[] byteCode = new byte[(int) f.length() - (offset + 2)];
             is.read(byteCode);
             tc.compiled(byteCode);
 
@@ -92,7 +94,7 @@ public class TemplateClassCache {
     }
     
     public void cacheTemplateClass(TemplateClass tc) {
-        if (engine.isDevMode() && engine.hotswapAgent == null) {
+        if (!engine.cacheEnabled()) {
             // cannot handle the v version scheme
             return;
         }
@@ -105,19 +107,21 @@ public class TemplateClassCache {
 
             // --- cache java source
             os.write(0);
-            os.write(tc.javaSource.getBytes("utf-8"));
+            if (null != tc.javaSource) {
+                os.write(tc.javaSource.getBytes("utf-8"));
+            } // else the tc is an inner class thus we don't have javaSource at all
 
-            // --- cache class version
-            os.write(0);
-            if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
-                // find out version number
-                final String sep = TemplateClass.CN_SUFFIX + "v";
-                String cn = tc.name();
-                int pos = cn.lastIndexOf(sep);
-                String sv = cn.substring(pos + sep.length());
-                int nv = Integer.valueOf(sv);
-                os.write(nv);
-            }
+//            // --- cache class version
+//            os.write(0);
+//            if (engine.reloadByIncClassVersion() && !tc.isInner()) {
+//                // find out version number
+//                final String sep = TemplateClass.CN_SUFFIX + "v";
+//                String cn = tc.name();
+//                int pos = cn.lastIndexOf(sep);
+//                String sv = cn.substring(pos + sep.length());
+//                int nv = Integer.valueOf(sv);
+//                os.write(nv);
+//            }
 
             // --- cache byte code
             os.write(0);
@@ -140,7 +144,7 @@ public class TemplateClassCache {
             }
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((RythmEngine.version + enhancers.toString() + tc.getTemplateSource()).getBytes("utf-8"));
+            messageDigest.update((RythmEngine.version + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {

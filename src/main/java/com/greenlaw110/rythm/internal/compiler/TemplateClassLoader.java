@@ -250,6 +250,44 @@ public class TemplateClassLoader extends ClassLoader {
                 return templateClass.javaClass;
             }
             engine.classes.remove(name);
+        } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
+            return null;
+        } else {
+            int pos = name.lastIndexOf("$");
+            if (-1 != pos) {
+                // should be an inner class, let's try to create it load it from cache
+                // 1. find the root class
+                String parentCN = name.substring(0, pos);
+                TemplateClass parent = engine.classes.getByClassName(parentCN);
+                if (null == parent) {
+                    throw new RuntimeException("Cannot find inner class def: " + name);
+                }
+                TemplateClass tc = TemplateClass.createInnerClass(name, null, parent);
+                engine.cache.loadTemplateClass(tc);
+                byte[] bc = tc.enhancedByteCode;
+                if (null == bc) {
+                    // inner class byte code cache missed some how, let's try to recover it
+                    while ((null != parent) && parent.isInner()) {
+                        parent = parent.root();
+                    }
+                    if (null == parent) {
+                        throw new RuntimeException("Unexpected: cannot find the root class of inner class: " + name);
+                    }
+                    parent.reset();
+                    parent.refresh(true);
+                    parent.compile();
+                    // now try again and see if we can find the class definition
+                    tc = engine.classes.getByClassName(name);
+                    Class<?> c = tc.javaClass;
+                    if (null != c) return c;
+                    bc = tc.enhancedByteCode;
+                    if (null == bc) {
+                        throw new RuntimeException("Cannot find bytecode cache for inner class: " + name);
+                    }
+                }
+                tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), bc, 0, bc.length, protectionDomain);
+                return tc.javaClass;
+            }
         }
         return null;
     }
@@ -316,7 +354,6 @@ public class TemplateClassLoader extends ClassLoader {
             if (sigChecksum != tc.sigChecksum) {
                 throw new RuntimeException("Signature change !");
             }
-            engine.cache.cacheTemplateClass(tc);
 //            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
             IHotswapAgent agent = engine.hotswapAgent;
             if (null != agent) {
@@ -335,7 +372,7 @@ public class TemplateClassLoader extends ClassLoader {
                     agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
                 } catch (Throwable e) {
                     engine.classes.remove(tc);
-                    throw new RuntimeException("Need reload", e);
+                    throw new ClassReloadException("Need reload", e);
                 }
             } else {
                 // we have v version scheme to handle class hotswap now #throw new RuntimeException("Need reload");
@@ -389,15 +426,15 @@ public class TemplateClassLoader extends ClassLoader {
                 try {
                     agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
                 } catch (Throwable e) {
-                    throw new RuntimeException("Need reload");
+                    throw new ClassReloadException("Need Reload");
                 }
             } else {
-                throw new RuntimeException("Need reload");
+                throw new ClassReloadException("Need Reload");
             }
         }
         // Check signature (variable name & annotations aware !)
         if (dirtySig) {
-            throw new RuntimeException("Signature change !");
+            throw new ClassReloadException("Signature change !");
         }
 
         // Now check if there is new classCache or removed classCache
@@ -410,7 +447,7 @@ public class TemplateClassLoader extends ClassLoader {
                     currentState = new TemplateClassloaderState();//show others that we have changed..
                 }
             }
-            throw new RuntimeException("Path has changed");
+            throw new ClassReloadException("Path has changed");
         }
     }
 
