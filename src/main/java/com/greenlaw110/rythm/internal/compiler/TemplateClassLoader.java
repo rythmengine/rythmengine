@@ -375,7 +375,7 @@ public class TemplateClassLoader extends ClassLoader {
                     throw new ClassReloadException("Need reload", e);
                 }
             } else {
-                // we have v version scheme to handle class hotswap now #throw new RuntimeException("Need reload");
+                if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
             }
         }
 //        // Now check if there is new classCache or removed classCache
