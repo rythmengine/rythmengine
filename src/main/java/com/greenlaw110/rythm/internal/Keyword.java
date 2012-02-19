@@ -8,6 +8,10 @@ public enum Keyword implements IKeyword {
      */
     ARGS,
     /**
+     * template Debug
+     */
+    DEBUG,
+    /**
      * Foreach loop
      */
     EACH("(for|forEach|each)"),

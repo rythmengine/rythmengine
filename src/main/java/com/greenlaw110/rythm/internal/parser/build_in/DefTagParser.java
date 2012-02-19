@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -43,7 +44,9 @@ public class DefTagParser extends KeywordParserFactory {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain())) return null;
+                if (!r.search(remain())) {
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @tag, correct usage: @tag([arguments...])");
+                }
                 step(r.stringMatched().length());
                 String tagName = r.stringMatched(1);
                 String signature = r.stringMatched(2);

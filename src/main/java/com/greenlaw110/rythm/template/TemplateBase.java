@@ -152,6 +152,14 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             }
             engine.restart();
             return render();
+        } catch (ClassCastException e) {
+            if (_logger.isDebugEnabled()) {
+                _logger.debug("ClassCastException found, force refresh template and try again...");
+            }
+            TemplateClass tc = engine.classes.getByClassName(getClass().getName());
+            tc.refresh(true);
+            ITemplate t = tc.asTemplate();
+            return t.render();
         }
     }
     

@@ -52,7 +52,7 @@ public class RythmException extends RuntimeException {
     }
 
     public String getJavaSource() {
-        return templateClass.javaSource;
+        return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
     }
 
     public String getTemplateSource() {
