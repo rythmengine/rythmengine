@@ -93,9 +93,22 @@ public class TemplateClassCache {
         }
     }
     
+    public void cacheTemplateClassSource(TemplateClass tc) {
+        if (!engine.cacheEnabled()) {
+            return;
+        }
+        try {
+            File f = getCacheSourceFile(tc);
+            OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
+            os.write(tc.javaSource.getBytes("utf-8"));
+            os.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public void cacheTemplateClass(TemplateClass tc) {
         if (!engine.cacheEnabled()) {
-            // cannot handle the v version scheme
             return;
         }
         String hash = hash(tc);
@@ -125,7 +138,9 @@ public class TemplateClassCache {
 
             // --- cache byte code
             os.write(0);
-            os.write(tc.enhancedByteCode);
+            //if (null != tc.enhancedByteCode) {
+                os.write(tc.enhancedByteCode);
+            //}
             os.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -169,6 +184,11 @@ public class TemplateClassCache {
      */
     File getCacheFile(TemplateClass tc) {
         String id = cacheFileName(tc, ".rythm");
+        return new File(engine.tmpDir, id);
+    }
+    
+    File getCacheSourceFile(TemplateClass tc) {
+        String id = cacheFileName(tc, ".java");
         return new File(engine.tmpDir, id);
     }
     

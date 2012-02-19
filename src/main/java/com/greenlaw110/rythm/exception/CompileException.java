@@ -31,7 +31,7 @@ public class CompileException extends RythmException {
 
     public CompileException(TemplateClass tc, int javaLineNumber, String message) {
         super(tc, javaLineNumber, -1, message);
-        errorMessage = String.format("Error compile template[%s]. Java code line: %s; Template code line:%s; Error: %s", tc.name(), javaLineNumber, templatelineNumber, originalMessage);
+        errorMessage = String.format("Error compile template[%s]. Java code line: %s; Template code line:%s; Error: %s", tc.getKey(), javaLineNumber, templatelineNumber, originalMessage);
     }
     
 }

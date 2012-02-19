@@ -231,10 +231,22 @@ public class RythmEngine {
     }
 
     public void restart() {
+        if (isProdMode()) throw new IllegalStateException("restart rythm engine cannot be call in product mode");
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
-        tags.clear();
+
+        // clear all template tags which is managed by TemplateClassManager
+        List<String> templateTags = new ArrayList<String>();
+        for (String name: tags.keySet()) {
+            ITag tag = tags.get(name);
+            if (!(tag instanceof JavaTagBase)) {
+                templateTags.add(name);
+            }
+        }
+        for (String name: templateTags) {
+            tags.remove(name);
+        }
     }
 
     public void loadTags(File tagHome) {

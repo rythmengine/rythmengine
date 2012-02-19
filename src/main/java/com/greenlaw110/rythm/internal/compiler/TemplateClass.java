@@ -295,7 +295,8 @@ public class TemplateClass {
 
             boolean extendedTemplateModified = false;
             if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh(forceRefresh);
-            boolean refresh = forceRefresh || (null == javaSource) || extendedTemplateModified || templateResource.refresh();
+            // templateResource.refresh() must be put at first so we make sure resource get refreshed
+            boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || extendedTemplateModified;
             if (!refresh) return false;
             
             // now start generate source and compile source to byte code
@@ -305,6 +306,7 @@ public class TemplateClass {
             cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
             javaSource = cb.toString();
+            engine().cache.cacheTemplateClassSource(this); // cache source code for debugging purpose
             if (!cb.isRythmTemplate()) {
                 isValid = false;
                 engine().classes.remove(this);

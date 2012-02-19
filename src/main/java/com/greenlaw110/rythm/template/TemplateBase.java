@@ -115,6 +115,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
+        if (null == engine) throw new NullPointerException();
         TemplateBase tmpl = internalClone();
         if (tmpl.__parent != null) {
             tmpl.__parent = (TemplateBase) tmpl.__parent.cloneMe(engine, caller);
@@ -154,8 +155,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         }
     }
     
-    protected String internalRender() {
-        //_out.setLength(0);
+    protected void internalBuild() {
         internalInit();
         if (engine.isProdMode()) {
             build();
@@ -182,6 +182,10 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
             }
         }
+    }
+    
+    protected String internalRender() {
+        internalBuild();
         if (null != __parent) {
             __parent.setRenderBody(toString());
             __parent.addAllRenderSections(renderSections);

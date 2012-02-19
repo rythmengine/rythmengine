@@ -1,11 +1,13 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -21,6 +23,9 @@ public class ForEachParser extends KeywordParserFactory {
                 String type = r.stringMatched(5);
                 String varname = r.stringMatched(6);
                 String iterable = r.stringMatched(8);
+                if (S.isEmpty(iterable)) {
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                }
                 return new ForEachCodeToken(type, varname, iterable, ctx());
             }
         };
@@ -39,7 +44,7 @@ public class ForEachParser extends KeywordParserFactory {
     public static void main(String[] args) {
         Regex r = new ForEachParser().reg(new Rythm());
 
-        String s = "@for (models.User[] u: users.foo()[x]) {\nHello world";
+        String s = "@for (models.User[] u: user.getRoles()) {\nHello world";
         if (r.search(s)) {
             //System.out.println(r.stringMatched());
             System.out.println(1 + r.stringMatched(1));

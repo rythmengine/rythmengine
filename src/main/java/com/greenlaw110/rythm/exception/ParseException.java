@@ -10,7 +10,7 @@ public class ParseException extends RythmException {
 
     public ParseException(Throwable cause, TemplateClass tc, int line, String message, Object... args) {
         super(cause, tc, -1, line, String.format(message, args));
-        errorMessage = String.format("Error parsing template[%s], line: %s, error: %s", tc.name(), line, originalMessage);
+        errorMessage = String.format("Error parsing template[%s], line: %s, error: %s", tc.getKey(), line, originalMessage);
     }
 
 }

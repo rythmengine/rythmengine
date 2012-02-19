@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.template;
 
+import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -23,6 +25,11 @@ public abstract class JavaTagBase extends TagBase{
     public TextBuilder build() {
         call(_params, _body);
         return this;
+    }
+
+    @Override
+    protected void internalBuild() {
+        build();
     }
 
     /**
