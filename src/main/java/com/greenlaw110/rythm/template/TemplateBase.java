@@ -8,6 +8,7 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.lang.reflect.Modifier;
@@ -145,12 +146,13 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     @Override
     public final String render() {
         try {
+            engine.preprocess(this);
             return internalRender();
         } catch (ClassReloadException e) {
             if (_logger.isDebugEnabled()) {
                 _logger.debug("Cannot hotswap class, try to restart engine...");
             }
-            engine.restart();
+            engine.restart(e);
             return render();
         } catch (ClassCastException e) {
             if (_logger.isDebugEnabled()) {
@@ -172,19 +174,27 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 build();
             } catch (Exception e) {
                 StackTraceElement[] stackTrace = e.getStackTrace();
+                String msg = null;
                 for (StackTraceElement se : stackTrace){
                     String cName = se.getClassName();
                     if (cName.contains(TemplateClass.CN_SUFFIX)) {
                         TemplateClass tc = engine.classes.getByClassName(cName);
                         if (null == tc) continue;
-                        RythmException re = new RythmException(tc, se.getLineNumber(), e.getMessage());
+                        if (null == msg) {
+                            msg = e.getMessage();
+                            if (S.isEmpty(msg)) {
+                                msg = "caused by " + e.getClass().getName();
+                                //System.out.println("<<<<<" + msg);
+                            }
+                        }
+                        RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
                         if (re.templatelineNumber != -1) {
                             StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
                             newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templatelineNumber);
                             System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
                             re.setStackTrace(newStack);
-                            throw re;
                         }
+                        throw re;
                     }
                 }
                 throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));

@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.utils.IJavaExtension;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -60,87 +61,18 @@ public class Token extends TextBuilder {
         pp(s);
     }
 
-    static interface IExtension {
-        String extend(String s, String signature);
-        Pattern pattern1();
-        Pattern pattern2();
-    }
-    
-    private static class VoidSignatureExtension implements IExtension {
-        private String methodName = null;
-        private String fullMethodName = null;
-        private Pattern pattern1 = null;
-        private Pattern pattern2 = null;
-        public VoidSignatureExtension(String name) {
-            this(name, String.format("com.greenlaw110.rythm.utils.S.%s", name));
-        }
-        public VoidSignatureExtension(String name, String fullName) {
-            methodName = name;
-            fullMethodName = fullName;
-            pattern1 = Pattern.compile(String.format(".*\\.%s\\s*\\(\\s*\\)\\s*$", methodName));
-            pattern2 = Pattern.compile(String.format("\\.%s\\s*\\(\\s*\\)\\s*$", methodName));
-        }
-
-        @Override
-        public Pattern pattern1() {
-            return pattern1;
-        }
-        
-        public Pattern pattern2() {
-            return pattern2;
-        }
-
-        @Override
-        public String extend(String s, String signature) {
-            return String.format("%s(%s)", fullMethodName, s);
-        }
-    }
-    
-    private static class SignatureExtension implements IExtension {
-        private String methodName = null;
-        private String signature = null;
-        private String fullMethodName = null;
-        private Pattern pattern1 = null;
-        private Pattern pattern2 = null;
-        public SignatureExtension(String name, String signature) {
-            this(name, signature, String.format("com.greenlaw110.rythm.utils.S.%s", name));
-        }
-        public SignatureExtension(String name, String signature, String fullName) {
-            methodName = name;
-            this.signature = signature;
-            fullMethodName = fullName;
-            pattern1 = Pattern.compile(String.format(".*\\.%s\\s*\\((\\s*%s\\s*)\\)\\s*$", methodName, signature));
-            pattern2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s\\s*)\\)\\s*$", methodName, signature));
-        }
-
-        @Override
-        public Pattern pattern1() {
-            return pattern1;
-        }
-
-        @Override
-        public Pattern pattern2() {
-            return pattern2;
-        }
-
-        @Override
-        public String extend(String s, String signature) {
-            return String.format("%s(%s, %s)", fullMethodName, s, signature);
-        }
-    }
-    
-    static final List<IExtension> extensions = new ArrayList<IExtension>();
-    static final void addExtension(IExtension extension) {
+    static final List<IJavaExtension> extensions = new ArrayList<IJavaExtension>();
+    public static final void addExtension(IJavaExtension extension) {
         extensions.add(extension);
     }
     static {
         String[] sa = {
-            "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "capitalizeWords", "shrinkSpace"
+            "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "shrinkSpace"
         };
         for (String s: sa) {
-            addExtension(new VoidSignatureExtension(s));
+            addExtension(new IJavaExtension.VoidParameterExtension("S", s));
         }
-        addExtension(new SignatureExtension("pad",  "[0-9]+"));
+        //addExtension(new IJavaExtension.ParameterExtension("pad",  "[0-9]+"));
     }
 
     private static final Regex R_ = new Regex("^\\s*(?@())\\s*$");
@@ -188,9 +120,9 @@ public class Token extends TextBuilder {
         s = stripOuterBrackets(s);
         outerBracketsStripped = s != s0;
         class Pair {
-            IExtension extension;
+            IJavaExtension extension;
             String signature;
-            Pair(IExtension e, String s) {
+            Pair(IJavaExtension e, String s) {
                 extension = e;
                 signature = s;
             }
@@ -199,12 +131,12 @@ public class Token extends TextBuilder {
         // try parse java extension first
         while(true) {
             boolean matched = false;
-            for(IExtension e: extensions) {
+            for(IJavaExtension e: extensions) {
                 Pattern p = e.pattern1();
                 Matcher m = p.matcher(s);
                 if (m.matches()) {
                     matched = true;
-                    String signature = (e instanceof VoidSignatureExtension) ? null : m.group(1);
+                    String signature = (e instanceof IJavaExtension.VoidParameterExtension) ? null : m.group(1);
                     m = e.pattern2().matcher(s);
                     s = m.replaceAll("");
                     allMatched.push(new Pair(e, signature));
@@ -215,9 +147,7 @@ public class Token extends TextBuilder {
         boolean hasJavaExtension = !allMatched.empty();
         if (hasJavaExtension) {
             // process inner elvis expression
-            System.out.println(s);
             s = processElvis(s);
-            System.out.println(s);
             while (!allMatched.empty()){
                 Pair p = allMatched.pop();
                 s = p.extension.extend(s, p.signature);
@@ -229,12 +159,12 @@ public class Token extends TextBuilder {
             String elvis = sa[1];
             while(true) {
                 boolean matched = false;
-                for(IExtension e: extensions) {
+                for(IJavaExtension e: extensions) {
                     Pattern p = e.pattern1();
                     Matcher m = p.matcher(s);
                     if (m.matches()) {
                         matched = true;
-                        String signature = (e instanceof VoidSignatureExtension) ? null : m.group(1);
+                        String signature = (e instanceof IJavaExtension.VoidParameterExtension) ? null : m.group(1);
                         m = e.pattern2().matcher(s);
                         s = m.replaceAll("");
                         allMatched.push(new Pair(e, signature));
@@ -272,8 +202,43 @@ public class Token extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        Token t = new Token("((a.b?:far).escape())", null);
-        t.outputExpression();
-        System.out.println(t.out());
+//        Token t = new Token("(S?.escape())", null);
+//        t.outputExpression();
+//        System.out.println(t.out());
+        
+//        Pattern p = Pattern.compile(String.format(".*\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
+//        Pattern p2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
+//        String s = "((a.b?:far).format(\"EEEE',' MMMM dd',' yyyy\", 10, true))";
+//        Matcher m = p.matcher(s);
+//        if (m.matches()) {
+//            String signature = m.group(1);
+//            m = p2.matcher(s);
+//            s = m.replaceAll("");
+//            System.out.println("s: " + s + ", signature: " + signature);
+//        }
+
+//        Pattern p = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "JavaExtensions", "format", ".*"));
+//        String s = "JavaExtensions.format(abc, \"EEE\")";
+//        Matcher m = p.matcher(s);
+//        if (m.matches()) {
+//            System.out.println(m.group());
+//            System.out.println(m.group(1));
+//            //System.out.println(m.group(2));
+//        }
+//
+//        TextBuilder tb = new TextBuilder();
+//        tb.p(com.greenlaw110.rythm.utils.S.escape("<abcd>"));
+//        System.out.println(tb.toString());
+        String waiveName = "S";
+        String methodName = "format";
+        String s = "abc?.format()";
+        Pattern pattern1 = Pattern.compile(String.format(".*(?<!%s)(\\?\\.%s|\\.%s)\\s*\\(\\s*\\)\\s*$", waiveName, methodName, methodName));
+        Matcher m = pattern1.matcher(s);
+        if (m.matches()) {
+            System.out.println(m.group());
+            System.out.println(m.group(1));
+            //System.out.println(m.group(2));
+            //System.out.println(m.group(3));
+        }
     }
 }

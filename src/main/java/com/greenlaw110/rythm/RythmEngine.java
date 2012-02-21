@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassCache;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassManager;
@@ -14,12 +15,10 @@ import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
-import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
-import com.greenlaw110.rythm.utils.IO;
-import com.greenlaw110.rythm.utils.IRythmListener;
-import com.greenlaw110.rythm.utils.RythmProperties;
+import com.greenlaw110.rythm.utils.*;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -38,13 +37,13 @@ public class RythmEngine {
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
     public boolean reloadByRestart() {
-        return reloadMethod == Rythm.ReloadMethod.RESTART;
+        return isDevMode() && reloadMethod == Rythm.ReloadMethod.RESTART;
     }
     public boolean reloadByIncClassVersion() {
         return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
     }
     public boolean cacheEnabled() {
-        return isDevMode() && reloadByRestart();
+        return reloadByRestart();
     }
     
     public static final String version = "0.9";
@@ -230,8 +229,13 @@ public class RythmEngine {
         }
     }
 
-    public void restart() {
-        if (isProdMode()) throw new IllegalStateException("restart rythm engine cannot be call in product mode");
+    public void restart(RuntimeException cause) {
+        if (isProdMode()) throw cause;
+        restart();
+    }
+
+    private void restart() {
+        if (isProdMode()) return;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
@@ -313,15 +317,18 @@ public class RythmEngine {
         }
         return t;
     }
-
-    private String renderTemplate(ITemplate t) {
-        if (null == t) return "This is not rythm template";
-        // inject implicity render args
+    
+    public void preprocess(ITemplate t) {
         IImplicitRenderArgProvider p = implicitRenderArgProvider;
         if (null != p) p.setRenderArgs(t);
         for (IRythmListener l: listeners) {
             l.onRender(t);
         }
+    }
+
+    private String renderTemplate(ITemplate t) {
+        if (null == t) return "This is not rythm template";
+        // inject implicity render args
         return t.render();
     }
 
@@ -352,6 +359,15 @@ public class RythmEngine {
     public String render(File file, Object... args) {
         ITemplate t = getTemplate(file, args);
         return renderTemplate(t);
+    }
+
+    // -- register java extension
+    public static void registerJavaExtension(IJavaExtension extension) {
+        Token.addExtension(extension);
+    }
+    
+    public static void registerGlobalImports(String imports) {
+        CodeBuilder.registerImports(imports);
     }
     
     // -- tag relevant codes
@@ -419,7 +435,9 @@ public class RythmEngine {
                 System.out.println(caller.getClass());
             }
             tag = (ITag)tc.asTemplate(caller);
-        } 
+        } else {
+            tag = (ITag)tag.cloneMe(this, caller);
+        }
         if (null != params) {
             if (tag instanceof JavaTagBase) {
                 ((JavaTagBase) tag).setRenderArgs(params);

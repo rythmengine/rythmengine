@@ -125,8 +125,14 @@ public class CodeBuilder extends TextBuilder {
         return cName;
     }
     
+    private static Set<String > globalImports = new HashSet<String>();
+    
+    public static void registerImports(String imports) {
+        globalImports.addAll(Arrays.asList(imports.split(",")));
+    }
+
     public void addImport(String imprt) {
-        imports.add(imprt);
+        if (!globalImports.contains(imprt)) imports.add(imprt);
     }
     
     private static class InlineTag {
@@ -254,6 +260,9 @@ public class CodeBuilder extends TextBuilder {
     // print imports
     private void pImports() {
         for (String s: imports) {
+            p("\nimport ").p(s).p(';');
+        }
+        for (String s: globalImports) {
             p("\nimport ").p(s).p(';');
         }
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;

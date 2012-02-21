@@ -57,11 +57,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     private static class InvokeTagToken extends CodeToken {
         String tagName;
         ParameterDeclarationList params = new ParameterDeclarationList();
+        int line;
 
         InvokeTagToken(String tagName, String paramLine, IContext context) {
             super(null, context);
             this.tagName = tagName;
             parse(paramLine);
+            line = context.currentLine();
         }
 
         /*
@@ -79,20 +81,20 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public void output() {
-            p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null;");
+            p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; //line: ").p(line);
             if (params.pl.size() > 0) {
-                p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
+                p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList(); //line: ").p(line);
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
-                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
+                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p("); //").p(line);
                 }
             }
             outputInvokeStatement();
         }
         
         protected void outputInvokeStatement() {
-            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl);\n}");
+            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl); //line:").p(line).p("\n}");
         }
 
     }
@@ -111,10 +113,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         protected void outputInvokeStatement() {
             String curClassName = ctx.getCodeBuilder().className();
-            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
-            p("\n\t\t@Override public void setProperty(String name, Object val) {\n\t\t\tsetRenderArg(name, val);\n\t}");
-            p("\n\t\t@Override public Object getProperty(String name) {\n\t\t\treturn getRenderArg(name);}");
-            p("\n\t\t@Override public void call() {");
+            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) { //line:").p(line);
+            p("\n\t\t@Override public void setProperty(String name, Object val) {\n\t\t\tsetRenderArg(name, val);\n\t} //line: ").p(line);
+            p("\n\t\t@Override public Object getProperty(String name) {\n\t\t\treturn getRenderArg(name);} //line: ").p(line);
+            p("\n\t\t@Override public void call() { //line: ").p(line);
         }
 
         @Override

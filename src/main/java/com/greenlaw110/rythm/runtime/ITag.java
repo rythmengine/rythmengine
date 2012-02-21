@@ -38,6 +38,13 @@ public interface ITag extends ITemplate {
             return null;
         }
         
+        public <T> T getByName(String name, T defVal) {
+            for (Parameter para: lp) {
+                if (name.equals(para.name)) return (T) para.value;
+            }
+            return defVal;
+        }
+        
         public Object getDefault() {
             return getByPosition(0);
         }
