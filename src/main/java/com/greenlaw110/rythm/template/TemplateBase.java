@@ -167,11 +167,14 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     
     protected void internalBuild() {
         internalInit();
+
         if (engine.isProdMode()) {
             build();
         } else {
             try {
                 build();
+            } catch (RythmException e) {
+                throw e;
             } catch (Exception e) {
                 StackTraceElement[] stackTrace = e.getStackTrace();
                 String msg = null;

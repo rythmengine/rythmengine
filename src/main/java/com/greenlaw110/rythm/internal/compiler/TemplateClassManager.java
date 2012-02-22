@@ -79,7 +79,11 @@ public class TemplateClassManager {
             if (logger.isTraceEnabled()) {
                 logger.trace("checkUpdate for template: %s", tc.getKey());
             }
-            engine.classLoader.detectChange(tc);
+            try {
+                engine.classLoader.detectChange(tc);
+            } catch (ClassReloadException e) {
+                engine.restart(e);
+            }
         }
     }
     

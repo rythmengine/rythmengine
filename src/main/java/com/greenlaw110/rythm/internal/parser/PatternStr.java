@@ -9,7 +9,7 @@ public enum PatternStr {
     VarName("[_a-zA-Z][a-zA-Z0-9_]*"),
     Blank("([\\s\\r\\n]+)"),
     NewLine("([\r\n]+)"),
-    Type("[a-zA-Z0-9_\\.\\[\\]]+");
+    Type("[a-zA-Z0-9_\\.\\[\\]\\<\\>,]+");
     
     private String s_;
     private PatternStr(String pattern) {

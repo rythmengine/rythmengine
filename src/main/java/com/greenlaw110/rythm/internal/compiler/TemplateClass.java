@@ -295,10 +295,20 @@ public class TemplateClass {
 
             boolean extendedTemplateModified = false;
             if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh(forceRefresh);
+            if (extendedTemplateModified && engine().reloadByRestart()) {
+                javaByteCode = null;
+                enhancedByteCode = null;
+                templateInstance = null;
+                if (e.reloadByIncClassVersion()) javaClass = null;
+                compiled = false;
+                engine().cache.deleteCache(this);
+                engine().restart(new ClassReloadException("extended class changed"));
+                return refresh(forceRefresh);
+            }
             // templateResource.refresh() must be put at first so we make sure resource get refreshed
             boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || extendedTemplateModified;
             if (!refresh) return false;
-            
+
             // now start generate source and compile source to byte code
             addVersion();
             long start = System.currentTimeMillis();

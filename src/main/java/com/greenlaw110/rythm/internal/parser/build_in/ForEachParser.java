@@ -44,7 +44,7 @@ public class ForEachParser extends KeywordParserFactory {
     public static void main(String[] args) {
         Regex r = new ForEachParser().reg(new Rythm());
 
-        String s = "@for (models.User[] u: user.getRoles()) {\nHello world";
+        String s = "@for (Map.Entry<String, String> category: otherCategories.entrySet()) {\nHello world";
         if (r.search(s)) {
             //System.out.println(r.stringMatched());
             System.out.println(1 + r.stringMatched(1));

@@ -81,13 +81,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public void output() {
-            p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; //line: ").p(line);
+            p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; //line: ").pn(line);
             if (params.pl.size() > 0) {
-                p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList(); //line: ").p(line);
+                p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList(); //line: ").pn(line);
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
-                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p("); //").p(line);
+                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p("); //").pn(line);
                 }
             }
             outputInvokeStatement();
@@ -114,9 +114,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         protected void outputInvokeStatement() {
             String curClassName = ctx.getCodeBuilder().className();
             p("\n\t_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) { //line:").p(line);
-            p("\n\t\t@Override public void setProperty(String name, Object val) {\n\t\t\tsetRenderArg(name, val);\n\t} //line: ").p(line);
-            p("\n\t\t@Override public Object getProperty(String name) {\n\t\t\treturn getRenderArg(name);} //line: ").p(line);
-            p("\n\t\t@Override public void call() { //line: ").p(line);
+            p("\n\t\t@Override public void setProperty(String name, Object val) {\n\t\t\tsetRenderArg(name, val); //line: ").p(line).p("\n\t}");
+            p("\n\t\t@Override public Object getProperty(String name) {\n\t\t\treturn getRenderArg(name); //line: ").p(line).p("\n\t}");
+            p("\n\t\t@Override public void call() { //line: ").pn(line);
         }
 
         @Override

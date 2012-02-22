@@ -115,7 +115,7 @@ public class TextBuilder {
      * @param o
      * @return
      */
-    protected final TextBuilder pn(Object o) {
+    public final TextBuilder pn(Object o) {
         if (null != o) p_(o);
         p_('\n');
         return this;
@@ -128,7 +128,7 @@ public class TextBuilder {
      * @param o
      * @return
      */
-    protected final TextBuilder np(Object o) {
+    public final TextBuilder np(Object o) {
         p_('\n');
         if (null != o) p_(o);
         return this;
