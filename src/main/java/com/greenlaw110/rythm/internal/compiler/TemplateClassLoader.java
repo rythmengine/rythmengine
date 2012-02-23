@@ -365,6 +365,11 @@ public class TemplateClassLoader extends ClassLoader {
                 newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
                 List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
                 for (TemplateClass ec: allEmbedded) {
+                    if (null == ec.javaSource || null == ec.enhancedByteCode) {
+                        // strange , how come we reach this block?
+                        if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
+                        else throw new RuntimeException("Unexpected");
+                    }
                     newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
                 }
                 currentState = new TemplateClassloaderState();//show others that we have changed..
