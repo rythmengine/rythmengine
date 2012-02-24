@@ -158,7 +158,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
 
     private static String patternStr() {
-        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())*))";
+        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())))";
     }
     
     public static void main(String[] args) {
@@ -166,7 +166,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
         Regex r = new Regex(ps);
         //String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
-        String s = "@xyz (\"a\": 1, 2l, 3)";
+        String s = "@xyz()";
         //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

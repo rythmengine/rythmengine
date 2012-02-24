@@ -42,7 +42,7 @@ public class ForEachCodeToken extends BlockCodeToken {
             .p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(").p(curClassName).p(".this, ").p(bodySize).p(") {\n\tpublic void render(final ")
             .p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ")
             .p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ")
-            .p(prefix).p("_first, final boolean ").p(prefix).p("_last) {");
+            .p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast) {");
     }
 
     @Override

@@ -45,7 +45,7 @@ public class SectionParser extends KeywordParserFactory {
                 if (!m.matches()) return null;
                 String s = m.group(1);
                 step(s.length());
-                String section = m.group(3);
+                String section = m.group(2);
                 return new SectionToken(section, ctx());
             }
         };
@@ -62,7 +62,7 @@ public class SectionParser extends KeywordParserFactory {
         Matcher m = p.matcher("@section abc_xyz {Hello world}@");
         if (m.find()) {
             System.out.println(m.group(1));
-            System.out.println(m.group(3));
+            System.out.println(m.group(2));
         }
     }
 

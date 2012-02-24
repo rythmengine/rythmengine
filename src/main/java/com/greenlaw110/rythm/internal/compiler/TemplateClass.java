@@ -287,6 +287,7 @@ public class TemplateClass {
                             extendedTemplateClass = tcm.getByTemplate(extendedResourceKey);
                             if (null == extendedTemplateClass) {
                                 extendedTemplateClass = new TemplateClass(extendedResourceKey, engine());
+                                extendedTemplateClass.refresh();
                             }
                         }
                     }
