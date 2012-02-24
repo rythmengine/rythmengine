@@ -5,17 +5,19 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.greenscriptool</groupId>
-    <artifactId>greenscript-core</artifactId>
+
+    <groupId>com.github.greenlaw110.rythm</groupId>
+    <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <name>GreenScript Core</name>
-    <version>1.2.6m</version>
-    <description>A Java package to manage and process Web Resources (Javascript/CSS)</description>
-    <url>http://github.com/greenlaw110/greenscript</url>
+    <version>0.9-SNAPSHOT</version>
+
+    <name>...</name>
+    <description>...</description>
+    <url>http://github.com/greenlaw110/Rythm</url>
     
     <scm>
-        <url>http://github.com/greenlaw110/greenscript</url>
-        <connection>scm:git:git://github.com/greenlaw110/greenscript.git</connection>
+        <url>http://github.com/greenlaw110/Rythm</url>
+        <connection>scm:git:git://github.com/greenlaw110/Rythm.git</connection>
     </scm>
     
     <licenses>
@@ -26,71 +28,57 @@
         </license>
     </licenses>
     
-    <distributionManagement>
+    <repositories>  
         <repository>
-            <id>com.greenscriptool</id>
-            <name>GreenScript Releases Repository</name>
-            <url>http://greenscriptool.com/repositories/releases</url>
+            <id>com.google.code.maven-play-plugin</id>
+            <name>Maven Play Plugin - releases</name>
+            <url>http://maven-play-plugin.googlecode.com/svn/mavenrepo/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
-    </distributionManagement>
-    
+        <repository>  
+            <id>com.asual.maven.public</id>  
+            <name>Asual Public Repository</name>  
+            <url>http://www.asual.com/maven/content/groups/public</url>  
+        </repository>  
+    </repositories>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     
     <dependencies>
-        <!--
+        <!-- TODO - maybe change to ecj (and deploy it) -->
         <dependency>
-            <groupId>com.yahoo.platform.yui</groupId>
-            <artifactId>yuicompressor</artifactId>
-            <version>2.4.2</version>
+            <groupId>com.google.code.maven-play-plugin.org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.core</artifactId>
+            <version>3.8.0.v_C03</version>
         </dependency>
-        -->
+
+        <!-- TODO: deploy -->
         <dependency>
-            <groupId>com.yahoo.platform.yui</groupId>
-            <artifactId>yuicompressor</artifactId>
-            <version>2.4.6</version>
+            <groupId>com.javaregex</groupId>
+            <artifactId>pat</artifactId>
+            <version>1.5.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/yuicompressor-2.4.6.jar</systemPath>
+            <systemPath>${basedir}/lib/patbinfree153.jar</systemPath>
         </dependency>
+
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>com.asual.lesscss</groupId>
-            <artifactId>lesscss</artifactId>
-            <version>1.1.4</version>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>com.asual.lesscss</groupId>
-            <artifactId>lesscss</artifactId>
-            <version>1.1.4</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/lesscss-engine-1.1.4.jar</systemPath>
-        </dependency>
-        
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
-        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>com.google.javascript</groupId>
-			<artifactId>closure-compiler</artifactId>
-			<version>r606</version>
-		</dependency>
-  </dependencies>
+    </dependencies>
     
     <build>
         <plugins>
@@ -117,52 +105,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.0.4</version>
-                <configuration>
-                    <attach>true</attach>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
                 <version>2.2</version>
             </plugin>
-			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/lib</outputDirectory>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>false</overWriteSnapshots>
-              <overWriteIfNewer>true</overWriteIfNewer>
-            </configuration>
-          </execution>
-        </executions>
-            </plugin>
         </plugins>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*.properties</include>
-                    <include>**/*.css</include>
-                    <include>**/*.js</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
     
 </project>
