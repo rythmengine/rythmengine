@@ -388,7 +388,7 @@ public class CodeBuilder extends TextBuilder {
     
     private void pInlineTags() {
         for (InlineTag tag: inlineTags.values()) {
-            p("\nprivate String ").p(tag.tagName).p(tag.signature).p("{\n");
+            p("\nprotected String ").p(tag.tagName).p(tag.signature).p("{\n");
             for (TextBuilder b: tag.builders) {
                 b.build();
             }

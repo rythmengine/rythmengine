@@ -55,7 +55,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
-                return new BlockCodeToken(s1, ctx);
+                return new IfParser.IfBlockCodeToken(s1, ctx);
             }
             
         };
