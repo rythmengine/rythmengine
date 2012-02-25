@@ -35,6 +35,8 @@ import java.util.*;
  */
 public class RythmEngine {
 
+    
+
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
     public boolean reloadByRestart() {
         return isDevMode() && reloadMethod == Rythm.ReloadMethod.RESTART;
@@ -151,7 +153,7 @@ public class RythmEngine {
     }
     
     private void loadDefConf() {
-        setConf("rythm.mode", Rythm.Mode.dev);
+        setConf("rythm.mode", Rythm.Mode.prod);
         setConf("rythm.loader", "file");
         setConf("rythm.logJavaSource", false);
     }
@@ -199,7 +201,7 @@ public class RythmEngine {
                 return true; // by default accept all files
             }
         });
-        mode = configuration.getAsMode("rythm.mode", Rythm.Mode.dev);
+        mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
