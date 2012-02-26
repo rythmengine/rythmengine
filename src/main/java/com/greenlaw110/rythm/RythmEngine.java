@@ -203,6 +203,7 @@ public class RythmEngine {
         });
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
+        System.out.println("compactMode set to " + compactMode);        
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="rythm_samples" default="all" basedir=".">
+
+  <property name="src_hello_world"     location="HelloWorld" />
+  <property name="classes" location="classes" />
+  <property name="lib"     location="../lib" />
+  <property environment="env" />
+
+  <path id="project.class.path">
+    <pathelement location="${lib}/patbinfree153.jar" />
+    <pathelement location="${lib}/ecj-3.7.1.jar" />
+    <pathelement location="${lib}/commons-lang3-3.1.jar" />
+    <pathelement location="${lib}/rythm-0.9.jar" />
+  </path>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${classes}" />
+  </target>
+
+  <target name="compile_hello_world" depends="init">
+    <javac srcdir="${src_hello_world}" destdir="${classes}" includeantruntime="true">
+      <classpath refid="project.class.path" />
+    </javac>
+    <copy file="${src_hello_world}/hello.txt" todir="${classes}" />
+  </target>
+
+  <target name="hello_world" depends="compile_hello_world">
+    <java classname="HelloWorld" logError="true" fork="true">
+      <classpath location="classes" />
+      <classpath refid="project.class.path" />
+    </java>
+  </target>
+  
+  <target name="all" depends="hello_world">
+  </target>
+
+  <target name="clean">
+    <delete dir="${classes}" />
+    <delete>
+      <fileset dir="." includes="output.*" />
+    </delete>
+  </target>
+
+</project>
