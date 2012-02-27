@@ -6,14 +6,14 @@
     
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.greenlaw110.rythm</groupId>
+    <groupId>com.rythmengine</groupId>
     <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9.1-SNAPSHOT</version>
 
-    <name>...</name>
-    <description>...</description>
-    <url>http://github.com/greenlaw110/Rythm</url>
+    <name>Rythm Template Engine</name>
+    <description>Rythm Template Engine</description>
+    <url>http://rythmengine.com/</url>
     
     <scm>
         <url>http://github.com/greenlaw110/Rythm</url>
@@ -37,11 +37,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <repository>  
-            <id>com.asual.maven.public</id>  
-            <name>Asual Public Repository</name>  
-            <url>http://www.asual.com/maven/content/groups/public</url>  
-        </repository>  
     </repositories>
 
     <properties>
@@ -92,5 +87,34 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>${basedir}/assembly-dist.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     
 </project>
