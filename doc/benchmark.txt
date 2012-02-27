@@ -1,5 +1,0 @@
-template file: stocks.rythm.html
-
-23/11/2011
-generate source: 3884ms for 1000 times
-generate template after cached: 826ms for 10000 times
