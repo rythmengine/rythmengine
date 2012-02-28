@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.compiler;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.resource.ITemplateResource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class TemplateClassManager {
     /**
      * Index template class with inline template content or template file name
      */
-    Map<String, TemplateClass> tmplIdx = new HashMap<String, TemplateClass>();
+    public Map<String, TemplateClass> tmplIdx = new HashMap<String, TemplateClass>();
 
     public TemplateClassManager(RythmEngine engine) {
         if (null == engine) throw new NullPointerException();
@@ -69,6 +70,12 @@ public class TemplateClassManager {
     
     public TemplateClass getByTemplate(String name) {
         TemplateClass tc = tmplIdx.get(name);
+        if (null == tc) {
+            // try to see if resourceLoader has some kind of name transform
+            ITemplateResource r = engine.resourceManager.getFileResource(name);
+            if (null == r) return null;
+            tc = tmplIdx.get(r.getKey());
+        }
         checkUpdate(tc);
         return tc;
     }

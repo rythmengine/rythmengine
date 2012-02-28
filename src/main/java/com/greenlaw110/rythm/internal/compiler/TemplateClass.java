@@ -186,8 +186,11 @@ public class TemplateClass {
         return null == templateResource ? name() : templateResource.getKey();
     }
     
+    @SuppressWarnings("unchecked")
     private Class<?> getJavaClass() throws Exception {
-        return engine().classLoader.loadClass(name(), true);
+        Class<?> c = engine().classLoader.loadClass(name(), true);
+        if (null == javaClass) javaClass = (Class<ITemplate>)c;
+        return c;
     }
 
     private static final ITemplate NULL_TEMPLATE = new TemplateBase() {
