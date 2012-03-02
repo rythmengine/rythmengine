@@ -47,6 +47,7 @@ public class TemplateClassManager {
      */
     public void clear() {
         clsNameIdx = new HashMap<String, TemplateClass>();
+        tmplIdx = new HashMap<String, TemplateClass>();
     }
 
     /**

@@ -210,6 +210,8 @@ public class RythmEngine {
         
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
+        classes.clear();
+        tags.clear();
         //defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
         implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
         byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
@@ -233,6 +235,7 @@ public class RythmEngine {
 
     public void restart(RuntimeException cause) {
         if (isProdMode()) throw cause;
+        logger.warn(cause, "restarting rythm engine due to %s", cause.getMessage());
         restart();
     }
 

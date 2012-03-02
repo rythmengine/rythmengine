@@ -171,9 +171,11 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (engine.isProdMode()) {
             build();
         } else {
+            RuntimeException theRE = null;
             try {
                 build();
             } catch (RythmException e) {
+                theRE = e;
                 throw e;
             } catch (Exception e) {
                 StackTraceElement[] stackTrace = e.getStackTrace();
@@ -197,10 +199,19 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                             System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
                             re.setStackTrace(newStack);
                         }
+                        theRE = re;
                         throw re;
                     }
                 }
-                throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
+                theRE = (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e)); 
+                throw theRE;
+            } finally {
+                // try to restart engine
+                try {
+                    engine.restart(theRE);
+                } catch (RuntimeException e) {
+                    // ignore it because we already thrown it out
+                }
             }
         }
     }
