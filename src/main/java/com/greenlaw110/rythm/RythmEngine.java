@@ -162,7 +162,6 @@ public class RythmEngine {
         init(null);
     }
     
-    @SuppressWarnings("unchecked")
     public void init(Properties conf) {
         loadDefConf();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -379,13 +378,23 @@ public class RythmEngine {
     
     public final Map<String, ITag> tags = new HashMap<String, ITag>();
     
-    public boolean isTag(String name) {
+    public boolean isTag(String name, TemplateClass tc) {
         boolean isTag = tags.containsKey(name);
         if (!isTag) {
-            // try to ask resource manager
-            resourceManager.tryLoadTag(name);
-            // let's check again
-            isTag = tags.containsKey(name);
+            try {
+                // try to ask resource manager
+                TemplateClass tagTC = resourceManager.tryLoadTag(name);
+                // let's check again
+                isTag = tags.containsKey(name);
+                if (!isTag) {
+                    // if we are calling tag from the tag itself
+                    isTag = tc.equals(tagTC);
+                }
+                return isTag;
+            } catch (Exception e) {
+                logger.error(e, "error trying load tag[%s]", name);
+                // see if the 
+            }
         }
         return isTag;
     }

@@ -133,7 +133,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
             
             boolean isTag(String name) {
-                return ctx().getCodeBuilder().engine.isTag(name);
+                return ctx().getCodeBuilder().engine.isTag(name, ctx().getTemplateClass());
             }
             
             @Override

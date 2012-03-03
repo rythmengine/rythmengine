@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,5 +12,5 @@ package com.greenlaw110.rythm.resource;
  */
 public interface ITemplateResourceLoader {
     ITemplateResource load(String key);
-    void tryLoadTag(String tagName);
+    TemplateClass tryLoadTag(String tagName);
 }

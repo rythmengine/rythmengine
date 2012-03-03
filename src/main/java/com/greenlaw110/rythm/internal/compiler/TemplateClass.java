@@ -444,4 +444,14 @@ public class TemplateClass {
     public String toString() {
         return "(compiled:" + compiled + ") " + name();
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o instanceof TemplateClass) {
+            TemplateClass that = (TemplateClass)o;
+            return that.getKey().equals(getKey());
+        }
+        return false;
+    }
 }

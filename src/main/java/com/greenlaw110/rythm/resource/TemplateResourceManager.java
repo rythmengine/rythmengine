@@ -1,10 +1,11 @@
 package com.greenlaw110.rythm.resource;
 
-import com.greenlaw110.rythm.RythmEngine;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,9 +31,9 @@ public class TemplateResourceManager {
         return resource;
     }
     
-    public void tryLoadTag(String tagName) {
-        if (null != resourceLoader) resourceLoader.tryLoadTag(tagName);
-        else FileTemplateResource.tryLoadTag(tagName, engine);
+    public TemplateClass tryLoadTag(String tagName) {
+        if (null != resourceLoader) return resourceLoader.tryLoadTag(tagName);
+        else return FileTemplateResource.tryLoadTag(tagName, engine);
     }
     
     public ITemplateResource get(File file) {
