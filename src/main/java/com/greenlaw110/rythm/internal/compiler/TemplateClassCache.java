@@ -54,6 +54,10 @@ public class TemplateClassCache {
             int read = -1;
             StringBuilder hash = new StringBuilder();
             while ((read = is.read()) != 0) {
+                if (read == -1) {
+                    logger.error("Failed to read cache file for template class: %s", tc);
+                    return;
+                }
                 hash.append((char) read);
                 offset++;
             }
@@ -85,7 +89,7 @@ public class TemplateClassCache {
             // --- load byte code
             byte[] byteCode = new byte[(int) f.length() - (offset + 2)];
             is.read(byteCode);
-            tc.compiled(byteCode);
+            tc.compiled(byteCode, true);
 
             is.close();
         } catch (Exception e) {

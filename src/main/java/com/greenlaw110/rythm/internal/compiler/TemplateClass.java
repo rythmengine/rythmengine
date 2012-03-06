@@ -428,16 +428,20 @@ public class TemplateClass {
         int dot = name().lastIndexOf('.');
         return dot > -1 ? name().substring(0, dot) : "";
     }
+    
+    public void compiled(byte[] code, boolean noCache) {
+        javaByteCode = code;
+        enhancedByteCode = code;
+        compiled = true;
+        if (!noCache) engine().cache.cacheTemplateClass(this);
+    }
 
     /**
      * Call back when a class is compiled.
      * @param code The bytecode.
      */
     public void compiled(byte[] code) {
-        javaByteCode = code;
-        enhancedByteCode = code;
-        compiled = true;
-        engine().cache.cacheTemplateClass(this);
+        compiled(code, false);
     }
 
     @Override
