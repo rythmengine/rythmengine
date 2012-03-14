@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class TemplateClassLoader extends ClassLoader {
-    
+
     private static final ILogger logger = Logger.get(TemplateClass.class);
 
     public static class ClassStateHashCreator {
@@ -222,7 +222,6 @@ public class TemplateClassLoader extends ClassLoader {
                 return templateClass.javaClass;
             }
             byte[] bc = null;//bCache.getBytecode(name, templateClass.javaSource);
-            logger.trace("Compiling code for %s", name);
             if (!templateClass.isClass()) {
                 definePackage(templateClass.getPackage(), null, null, null, null, null, null, null);
             } else {
@@ -235,7 +234,9 @@ public class TemplateClassLoader extends ClassLoader {
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
                 }
-                logger.trace("%sms to load class %s from clsNameIdx", System.currentTimeMillis() - start, name);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("%sms to load class %s from clsNameIdx", System.currentTimeMillis() - start, name);
+                }
                 return templateClass.javaClass;
             }
 
@@ -246,7 +247,9 @@ public class TemplateClassLoader extends ClassLoader {
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
                 }
-                logger.trace("%sms to load class %s", System.currentTimeMillis() - start, name);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("%sms to load class %s", System.currentTimeMillis() - start, name);
+                }
                 return templateClass.javaClass;
             }
             engine.classes.remove(name);
@@ -341,7 +344,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
     }
-    
+
     public void detectChange(TemplateClass tc) {
         if (!engine.refreshOnRender() && null != tc.name()) return;
         if (!tc.refresh()) return;

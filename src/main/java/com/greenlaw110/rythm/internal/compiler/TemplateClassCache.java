@@ -63,10 +63,12 @@ public class TemplateClassCache {
             }
             String curHash = hash(tc);
             if (!curHash.equals(hash.toString())) {
-                if (logger.isTraceEnabled()) logger.trace("Bytecode too old (%s != %s)", hash, curHash);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Bytecode too old (%s != %s)", hash, curHash);
+                }
                 return;
             }
-            
+
             // --- load java source
             read = -1;
             StringBuilder source = new StringBuilder();
@@ -96,7 +98,7 @@ public class TemplateClassCache {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void cacheTemplateClassSource(TemplateClass tc) {
         if (!engine.cacheEnabled()) {
             return;
@@ -110,7 +112,7 @@ public class TemplateClassCache {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void cacheTemplateClass(TemplateClass tc) {
         if (!engine.cacheEnabled()) {
             return;
@@ -163,7 +165,7 @@ public class TemplateClassCache {
             }
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((RythmEngine.version + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
+            messageDigest.update((RythmEngine.versionSignature() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {
@@ -178,11 +180,11 @@ public class TemplateClassCache {
             throw new RuntimeException(e);
         }
     }
-    
+
     String cacheFileName(TemplateClass tc, String suffix) {
         return tc.name0() + suffix;
     }
-    
+
     /**
      * Retrieve the real file that will be used as cache.
      */
@@ -190,10 +192,10 @@ public class TemplateClassCache {
         String id = cacheFileName(tc, ".rythm");
         return new File(engine.tmpDir, id);
     }
-    
+
     File getCacheSourceFile(TemplateClass tc) {
         String id = cacheFileName(tc, ".java");
         return new File(engine.tmpDir, id);
     }
-    
+
 }

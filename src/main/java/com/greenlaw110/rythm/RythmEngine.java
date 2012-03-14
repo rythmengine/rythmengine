@@ -35,8 +35,6 @@ import java.util.*;
  */
 public class RythmEngine {
 
-    
-
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
     public boolean reloadByRestart() {
         return isDevMode() && reloadMethod == Rythm.ReloadMethod.RESTART;
@@ -47,9 +45,13 @@ public class RythmEngine {
     public boolean cacheEnabled() {
         return reloadByRestart();
     }
-    
-    public static final String version = "0.9";
-    
+
+    public static final String version = "0.9.1b";
+    public static String pluginVersion = "";
+    public static String versionSignature() {
+        return version + "-" + pluginVersion;
+    }
+
     private final ILogger logger = Logger.get(RythmEngine.class);
     public Rythm.Mode mode;
     public final RythmProperties configuration = new RythmProperties();
@@ -91,7 +93,7 @@ public class RythmEngine {
     public File templateHome;
     public File tagHome;
     public FileFilter tagFileFilter;
-    
+
     public final List<IRythmListener> listeners = new ArrayList<IRythmListener>();
     public void registerListener(IRythmListener listener) {
         if (null == listener) throw new NullPointerException();
@@ -117,25 +119,25 @@ public class RythmEngine {
     public void clearTemplateClassEnhancer() {
         templateClassEnhancers.clear();
     }
-    
+
     public RythmEngine(File templateHome) {
         this(templateHome, null);
     }
-    
+
     public RythmEngine(File templateHome, File tagHome) {
         init();
         this.templateHome = templateHome;
         this.tagHome = tagHome;
     }
-    
+
     public RythmEngine(Properties userConfiguration) {
         init(userConfiguration);
     }
-    
+
     public RythmEngine() {
         init();
     }
-    
+
     public boolean isSingleton() {
         return Rythm.engine == this;
     }
@@ -147,11 +149,11 @@ public class RythmEngine {
     public boolean isDevMode() {
         return mode != Rythm.Mode.prod;
     }
-    
+
     private void setConf(String key, Object val) {
         configuration.put(key, val);
     }
-    
+
     private void loadDefConf() {
         setConf("rythm.mode", Rythm.Mode.prod);
         setConf("rythm.loader", "file");
@@ -161,14 +163,14 @@ public class RythmEngine {
     public void init() {
         init(null);
     }
-    
+
     public void init(Properties conf) {
         loadDefConf();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (null == cl) cl = Rythm.class.getClassLoader();
         URL url = cl.getResource("rythm.conf");
         if (null != url) {
-            InputStream is = null;            
+            InputStream is = null;
             try {
                 is = url.openStream();
                 configuration.load(is);
@@ -182,12 +184,13 @@ public class RythmEngine {
                 }
             }
         }
-        
+
         if (null != conf) configuration.putAll(conf);
 
         ILoggerFactory fact = configuration.getAs("rythm.logger.factory", null, ILoggerFactory.class);
         if (null != fact) Logger.registerLoggerFactory(fact);
 
+        pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
         tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
@@ -206,7 +209,7 @@ public class RythmEngine {
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
         }
-        
+
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
         classes.clear();
@@ -286,7 +289,7 @@ public class RythmEngine {
         new FileTraversal().traverse(tagHome);
         logger.info("tags loaded from %s", tagHome);
     }
-    
+
     private void loadTags() {
         loadTags(tagHome);
     }
@@ -306,7 +309,7 @@ public class RythmEngine {
         }
         return t;
     }
-    
+
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
@@ -321,7 +324,7 @@ public class RythmEngine {
         }
         return t;
     }
-    
+
     public void preprocess(ITemplate t) {
         IImplicitRenderArgProvider p = implicitRenderArgProvider;
         if (null != p) p.setRenderArgs(t);
@@ -340,11 +343,11 @@ public class RythmEngine {
         ITemplate t = getTemplate(template, args);
         return renderTemplate(t);
     }
-    
+
     public String renderStr(String template, Object ... args) {
         return renderString(template, args);
     }
-    
+
     @SuppressWarnings("unchecked")
     public String renderString(String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
@@ -369,15 +372,15 @@ public class RythmEngine {
     public static void registerJavaExtension(IJavaExtension extension) {
         Token.addExtension(extension);
     }
-    
+
     public static void registerGlobalImports(String imports) {
         CodeBuilder.registerImports(imports);
     }
-    
+
     // -- tag relevant codes
-    
+
     public final Map<String, ITag> tags = new HashMap<String, ITag>();
-    
+
     public boolean isTag(String name, TemplateClass tc) {
         boolean isTag = tags.containsKey(name);
         if (!isTag) {
@@ -393,7 +396,7 @@ public class RythmEngine {
                 return isTag;
             } catch (Exception e) {
                 logger.error(e, "error trying load tag[%s]", name);
-                // see if the 
+                // see if the
             }
         }
         return isTag;
@@ -423,7 +426,7 @@ public class RythmEngine {
         logger.trace("tag %s registered", name);
         return true;
     }
-    
+
     public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body) {
         // try tag registry first
         ITag tag = tags.get(name);

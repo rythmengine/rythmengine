@@ -106,17 +106,18 @@ public class TemplateCompiler {
         }
 
         public char[] getContents() {
-//            if (null == classCache) {
-//                throw new NullPointerException("classCache is null");
-//            }
-//            TemplateClass tc = classCache.getByClassName(clazzName);
-//            if (null == tc) {
-//                throw new NullPointerException("tc is null");
-//            }
-//            if (null == tc.javaSource) {
-//                throw new NullPointerException("javaSourcee is null");
-//            }
-            return classCache.getByClassName(clazzName).javaSource.toCharArray();
+            if (null == classCache) {
+                throw new NullPointerException("classCache is null");
+            }
+            TemplateClass tc = classCache.getByClassName(clazzName);
+            if (null == tc) {
+                throw new NullPointerException("Error get java source content for " + clazzName + ": template class is null");
+            }
+            if (null == tc.javaSource) {
+                throw new NullPointerException("Error get java source content for " + clazzName + ": java source is null");
+            }
+            return tc.javaSource.toCharArray();
+            //return classCache.getByClassName(clazzName).javaSource.toCharArray();
         }
 
         public char[] getMainTypeName() {
@@ -166,7 +167,7 @@ public class TemplateCompiler {
                 result.append(typeName);
                 return findType(result.toString());
             }
-            
+
             private NameEnvironmentAnswer findStandType(final String name) throws ClassFormatException {
                 RythmEngine engine = engine();
                 IByteCodeHelper helper = engine.byteCodeHelper;

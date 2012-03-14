@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class TemplateClassManager {
     protected final ILogger logger = Logger.get(TemplateClassManager.class);
-    
+
     //private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
     public RythmEngine engine = null;
@@ -68,7 +68,7 @@ public class TemplateClassManager {
         checkUpdate(tc);
         return tc;
     }
-    
+
     public TemplateClass getByTemplate(String name) {
         TemplateClass tc = tmplIdx.get(name);
         if (null == tc) {
@@ -80,7 +80,7 @@ public class TemplateClassManager {
         checkUpdate(tc);
         return tc;
     }
-    
+
     private void checkUpdate(TemplateClass tc) {
         if (null == tc) return;
         if (null != tc && engine.refreshOnRender()) {
@@ -94,7 +94,7 @@ public class TemplateClassManager {
             }
         }
     }
-    
+
     List<TemplateClass> getEmbeddedClasses(String name) {
         List<TemplateClass> l = new ArrayList<TemplateClass>();
         for (String cn: clsNameIdx.keySet()) {

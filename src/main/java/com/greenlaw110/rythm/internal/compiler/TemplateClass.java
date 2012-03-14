@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
  * Define the data structure hold template class/template src/generated java src
  */
 public class TemplateClass {
-    private static AtomicLong nextVersion = new AtomicLong();    
+    private static AtomicLong nextVersion = new AtomicLong();
     private static final ILogger logger = Logger.get(TemplateClass.class);
 
     /**
@@ -48,7 +48,7 @@ public class TemplateClass {
         return tc;
     }
     public boolean isInner() {return inner;}
-    
+
     private RythmEngine engine = null;
     private RythmEngine engine() {
         return null == engine ? Rythm.engine : engine;
@@ -148,7 +148,7 @@ public class TemplateClass {
     private TemplateClass(RythmEngine engine) {
         this.engine = null == engine ? null : engine.isSingleton() ? null : engine;
     }
-    
+
     /**
      * Construct a TemplateClass instance using template source file
      *
@@ -185,7 +185,7 @@ public class TemplateClass {
     public String getKey() {
         return null == templateResource ? name() : templateResource.getKey();
     }
-    
+
     @SuppressWarnings("unchecked")
     private Class<?> getJavaClass() throws Exception {
         Class<?> c = engine().classLoader.loadClass(name(), true);
@@ -222,22 +222,22 @@ public class TemplateClass {
         }
         return templateInstance;
     }
-    
+
     public ITemplate asTemplate() {
         if (null == name) refresh();
         return templateInstance_().cloneMe(engine(), null);
     }
-    
+
     public ITemplate asTemplate(ITemplate caller) {
         return templateInstance_().cloneMe(engine(), caller);
     }
-    
+
     private boolean refreshing = false;
     private boolean compiling = false;
     private boolean refreshing() {
         return refreshing || compiling;
     }
-    
+
     private void addVersion() {
         RythmEngine e = engine();
         if (!e.reloadByIncClassVersion()) return;
@@ -274,7 +274,7 @@ public class TemplateClass {
                 if (e.reloadByIncClassVersion()) version = nextVersion.getAndIncrement();
                 engine().classes.add(this);
             }
-            
+
             if (null == javaSource) {
                 engine().cache.loadTemplateClass(this);
                 if (null != javaSource) {
@@ -328,8 +328,7 @@ public class TemplateClass {
             }
             isValid = true;
             //if (!engine().isProdMode()) logger.info(javaSource);
-            if (logger.isTraceEnabled() || engine().configuration.getAsBoolean("rythm.logJavaSource", false)) {
-                logger.debug(javaSource);
+            if (logger.isTraceEnabled()) {
                 logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
             }
             javaByteCode = null;
@@ -369,20 +368,38 @@ public class TemplateClass {
      */
     public byte[] compile() {
         if (null != javaByteCode) return javaByteCode;
+        if (null == javaSource) throw new IllegalStateException("Cannot find java source when compiling");
         compiling = true;
         long start = System.currentTimeMillis();
         try {
             engine().classes.compiler.compile(new String[]{name()});
+            if (logger.isTraceEnabled()) {
+                logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey());
+            }
         } catch (CompileException.CompilerException e) {
             String cn = e.className;
             TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes.getByClassName(cn);
             if (null == tc) tc = this;
+            javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
             throw new CompileException(tc, e.javaLineNumber, e.message);
+        } catch (NullPointerException e) {
+            String clazzName = name();
+            TemplateClass tc = engine().classes.getByClassName(clazzName);
+            if (this != tc) {
+                logger.error("tc is not this");
+            }
+            if (!this.equals(tc)) {
+                logger.error("tc not match this");
+            }
+            logger.error("NPE encountered when compiling template class:" + name());
+            throw e;
         } finally {
             compiling = false;
         }
 
-        if (logger.isTraceEnabled()) logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey());
+        if (logger.isTraceEnabled()) {
+            logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey());
+        }
 
         return javaByteCode;
     }
@@ -403,8 +420,7 @@ public class TemplateClass {
                 }
             }
             if (logger.isTraceEnabled()) {
-                String id = (null == templateResource) ? name(): getKey();
-                logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, id);
+                logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
             }
             enhancedByteCode = bytes;
             return bytes;
@@ -428,7 +444,7 @@ public class TemplateClass {
         int dot = name().lastIndexOf('.');
         return dot > -1 ? name().substring(0, dot) : "";
     }
-    
+
     public void compiled(byte[] code, boolean noCache) {
         javaByteCode = code;
         enhancedByteCode = code;
@@ -448,7 +464,7 @@ public class TemplateClass {
     public String toString() {
         return "(compiled:" + compiled + ") " + name();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
