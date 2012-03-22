@@ -33,7 +33,7 @@ public class S {
             return s1.equals(s2);
         }
     }
-    
+
     public static String escape(Object s) {
         return escapeHtml(s);
     }
@@ -42,22 +42,22 @@ public class S {
         if (null == s) return "";
         return StringEscapeUtils.escapeHtml4(s.toString());
     }
-    
+
     public static String escapeCsv(Object s) {
         if (null == s) return "";
         return StringEscapeUtils.escapeCsv(s.toString());
     }
-    
+
     public static String escapeJavaScript(Object s) {
         if (null == s) return "";
         return StringEscapeUtils.escapeEcmaScript(s.toString());
     }
-    
+
     public static String escapeXml(Object s) {
         if (null == s) return "";
         return StringEscapeUtils.escapeXml(s.toString());
     }
-    
+
     public static String shrinkSpace(Object s) {
         if (null == s) return  "";
         return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
@@ -84,6 +84,10 @@ public class S {
             prevc = c;
         }
         return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(S.escape("<h1>Hello</h1>"));
     }
 
 }

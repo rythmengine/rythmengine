@@ -9,7 +9,7 @@
     <groupId>com.rythmengine</groupId>
     <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.1-SNAPSHOT</version>
+    <version>0.9.1b</version>
 
     <name>Rythm Template Engine</name>
     <description>Rythm Template Engine</description>

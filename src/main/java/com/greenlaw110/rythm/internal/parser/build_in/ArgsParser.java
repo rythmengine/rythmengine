@@ -34,7 +34,15 @@ public class ArgsParser extends KeywordParserFactory {
                 int step = 0;
                 final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
                 while (r.search(remain)) {
-                    step += r.stringMatched().length();
+                    String matched = r.stringMatched();
+                    if (matched.startsWith("\n") || matched.startsWith("\r")) {
+                        step++;
+                        while (matched.startsWith("\n") || matched.startsWith("\r")) {
+                            step++;
+                        }
+                        break;
+                    }
+                    step += matched.length();
                     String name = r.stringMatched(3);
                     String type = r.stringMatched(2);
                     String defVal = r.stringMatched(5);
@@ -56,46 +64,30 @@ public class ArgsParser extends KeywordParserFactory {
                 };
             }
 
-            public TextBuilder go1() {
-                
-                Matcher m = ptn(dialect()).matcher(remain());
-                if (!m.matches()) return null;
-                String s = m.group(1);
-                step(s.length());
-                String declares = s.replaceFirst(String.format("%s%s[\\s]+", a(), keyword()), "");
-                return new Directive(declares, ctx()) {
-                    Pattern p = Pattern.compile("[\\s,]*([a-zA-Z][a-zA-Z0-9_\\.]*(\\<[a-zA-Z][a-zA-Z0-9_\\.,]*\\>)?[\\s]+[a-zA-Z][a-zA-Z0-9_\\.]*([\\s]*=([^\\n\\$]+))?)");
-                    @Override
-                    public void call() {
-                        Matcher m = p.matcher(s);
-                        while (m.find()) {
-                            String declare = m.group();
-                            declare = declare.replaceFirst("[\\s,]*", "");
-                            String[] sa = declare.split("[\\s]+");
-                            builder().addRenderArgs(sa[0], sa[1]);
-                        }
-                    }
-                };
-            }
         };
     }
 
     @Override
     protected String patternStr() {
-        return "\\G\\s*,?\\s*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)\\s+([a-zA-Z_][\\w$_]*))(\\s*=\\s*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+        return "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
     }
-    
+
     protected String patternStr0() {
         return "(%s%s([\\s,]+[a-zA-Z][a-zA-Z0-9_\\.]*(\\<[a-zA-Z][a-zA-Z0-9_\\.,]*\\>)?[\\s]+[a-zA-Z][a-zA-Z0-9_\\.]*)+(;|\\r?\\n)+).*";
     }
 
     public static void main(String[] args) {
-        String s = "  java.util.List<String> bar, int foo = 2, Map<String,Object> myBag=null;\n\t@bar";
+        String s = "Page page, FBApp app\n\tString s@agd";
         ArgsParser ap = new ArgsParser();
         Regex r = ap.reg(new Rythm());
         System.out.println(r);
         while (r.search(s)) {
-            System.out.println("m: " + r.stringMatched());
+            String m = r.stringMatched();
+            if (m.contains("\n") || m.contains("\r")) {
+                break;
+            } else {
+                System.out.println("m: " + (int)m.toCharArray()[0]);
+            }
             System.out.println("1: " + r.stringMatched(1));
             System.out.println("2: " + r.stringMatched(2));
             System.out.println("3: " + r.stringMatched(3));

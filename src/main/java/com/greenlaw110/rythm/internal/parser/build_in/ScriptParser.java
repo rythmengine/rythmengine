@@ -1,10 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.IO;
+import com.stevesoft.pat.Regex;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -14,13 +16,13 @@ import java.util.regex.Pattern;
  * Free Java code parser.
  *
  * All code between @{ and }@ will be copied literally into target java source
- * 
+ *
  * @author luog
  */
 public class ScriptParser extends ParserBase {
 
 
-    private static final String PTN = "(%s\\{(.*?)\\}%s).*";
+    private static final String PTN = "^(%s((?@{}))%s?[\\r\\n]*)";
 
     public ScriptParser(IContext context) {
         super(context);
@@ -30,14 +32,15 @@ public class ScriptParser extends ParserBase {
     public Token go() {
         IContext ctx = ctx();
         //if (ctx.currentBlock() == null) return null;
-        Pattern p = Pattern.compile(String.format(PTN, a(), a()), Pattern.DOTALL);
-        Matcher m = p.matcher(ctx.getRemain());
-        if (!m.matches()) return null;
-        String s = m.group(1);
+        Regex r = new Regex(String.format(PTN, a(), a()));
+        if (!r.search(ctx.getRemain())) return null;
+        String s = r.stringMatched(1);
         int curLine = ctx.currentLine();
         ctx.step(s.length());
-        s = m.group(2);
-        String[] lines = s.split("\\n");
+        s = r.stringMatched(2);
+        s = s.substring(1); // strip left "{"
+        s = s.substring(0, s.length() - 1); // strip right "}"
+        String[] lines = s.split("[\\n\\r]+");
         int len = lines.length;
         StringBuilder sb = new StringBuilder(s.length() * 2);
         for (int i = 0; i < len; ++i) {
@@ -48,12 +51,16 @@ public class ScriptParser extends ParserBase {
     }
 
     public static void main(String[] args) {
-        String s = IO.readContentAsString(new File("c:\\w\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\rythm\\greenscript\\1"));
-        Pattern p = Pattern.compile(String.format(PTN, "@", "@"), Pattern.DOTALL);
-        Matcher m = p.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group(1));
-            System.out.println(m.group(2));
+        String s = "xd@{for() { xb\n\r;}}@\nabc";
+        Regex r = new Regex(String.format(PTN, "@", "@"));
+        if (r.search(s)) {
+            //System.out.println(r.stringMatched());
+            System.out.println(1 + r.stringMatched(1));
+            System.out.println(2 + r.stringMatched(2));
+            s = r.stringMatched(2);
+            s = s.substring(1); // strip left "{"
+            s = s.substring(0, s.length() - 1); // strip right "}"
+            System.out.println(s);
         }
     }
 }

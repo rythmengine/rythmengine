@@ -40,19 +40,19 @@ public class IfParser extends KeywordParserFactory {
     public Keyword keyword() {
         return Keyword.IF;
     }
-    
+
     @Override
     protected String patternStr() {
         //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
         return "(^%s(%s\\s*((?@()))(\\s*\\n*\\s*\\{)?)).*";
     }
-    
+
     public static void main(String[] args) {
         String p = String.format(new IfParser().patternStr(), "@", "if");
         System.out.println(p);
-        
+
         Regex r = new Regex(p);
-        String s = "@if (hello) \n\t<td class=\"minus\">@item.getChange()</td>";
+        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

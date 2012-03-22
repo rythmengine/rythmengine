@@ -40,11 +40,11 @@ public class DebugParser  extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "%s%s\\s*((?@()))";
+        return "%s%s\\s*((?@()))[\\r\\n]*";
     }
 
     public static void main(String[] args) {
-        String s = "@debug (\"sss\", 1)";
+        String s = "@debug (\"sss\", 1)\naba";
         DebugParser ap = new DebugParser();
         Regex r = ap.reg(new Rythm());
         if (r.search(s)) {

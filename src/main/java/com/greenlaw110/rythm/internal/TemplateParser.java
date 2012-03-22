@@ -16,17 +16,24 @@ public class TemplateParser implements IContext {
     private String template;
     private int totalLines;
     int cursor = 0;
-    
+
     public TemplateParser(CodeBuilder cb) {
         this.template = cb.template();
         totalLines = StringUtils.countMatches(template, "\n") + 1;
         this.cb = cb;
     }
-    
+
+    public static class ExitInstruction extends RuntimeException {
+    }
+
     void parse() {
         TemplateTokenizer tt = new TemplateTokenizer(template, this);
-        for (TextBuilder builder: tt) {
-            cb.addBuilder(builder);
+        try {
+            for (TextBuilder builder: tt) {
+                cb.addBuilder(builder);
+            }
+        } catch (ExitInstruction e) {
+            // ignore, just break the parsing process
         }
     }
 
@@ -34,8 +41,8 @@ public class TemplateParser implements IContext {
     public TemplateClass getTemplateClass() {
         return cb.getTemplateClass();
     }
-    
-    @Override 
+
+    @Override
     public CodeBuilder getCodeBuilder() {
         return cb;
     }
@@ -81,7 +88,7 @@ public class TemplateParser implements IContext {
     public void step(int i) {
         cursor += i;
     }
-    
+
     private Stack<IBlockHandler> blocks = new Stack<IBlockHandler>();
 
     @Override

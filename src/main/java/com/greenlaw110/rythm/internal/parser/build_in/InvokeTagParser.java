@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
  * Parse tag invocation:
  *
  * @myApp.myTag(...)
- * 
- * Note since this is also a pattern for expression parser, InvokeTagParser must 
+ *
+ * Note since this is also a pattern for expression parser, InvokeTagParser must
  * be put in front of expression parser
  */
 public class InvokeTagParser extends CaretParserFactoryBase {
@@ -92,7 +92,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             }
             outputInvokeStatement();
         }
-        
+
         protected void outputInvokeStatement() {
             p("\n\t_invokeTag(\"").p(tagName).p("\", _pl); //line:").p(line).p("\n}");
         }
@@ -114,8 +114,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         protected void outputInvokeStatement() {
             String curClassName = ctx.getCodeBuilder().className();
             p("\n\t_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) { //line:").p(line);
-            p("\n\t\t@Override public void setProperty(String name, Object val) {\n\t\t\tsetRenderArg(name, val); //line: ").p(line).p("\n\t}");
-            p("\n\t\t@Override public Object getProperty(String name) {\n\t\t\treturn getRenderArg(name); //line: ").p(line).p("\n\t}");
+            p("\n\t\t@Override public void setProperty(String name, Object val) {").p("//line: ").p(line).p("\n\t\t\tsetRenderArg(name, val); //line: ").p(line).p("\n\t}").p("//line: ").pn(line);
+            p("\n\t\t@Override public Object getProperty(String name) {").p("//line: ").p(line).p("\n\t\t\treturn getRenderArg(name); //line: ").p(line).p("\n\t}").p("//line: ").pn(line);
             p("\n\t\t@Override public void call() { //line: ").pn(line);
         }
 
@@ -127,15 +127,16 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     }
 
     private static final Pattern P_HEREDOC_SIMBOL = Pattern.compile("(\\s*<<).*", Pattern.DOTALL);
+    private static final Pattern P_STANDARD_BLOCK = Pattern.compile("(\\s*\\{).*", Pattern.DOTALL);
 
     @Override
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
-            
+
             boolean isTag(String name) {
                 return ctx().getCodeBuilder().engine.isTag(name, ctx().getTemplateClass());
             }
-            
+
             @Override
             public TextBuilder go() {
                 Regex r = new Regex(String.format(patternStr(), dialect().a()));
@@ -145,9 +146,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 String s = r.stringMatched();
                 ctx().step(s.length());
                 s = remain();
-                Matcher m = P_HEREDOC_SIMBOL.matcher(s);
-                if (m.matches()) {
-                    ctx().step(m.group(1).length());
+                Matcher m0 = P_HEREDOC_SIMBOL.matcher(s);
+                Matcher m1 = P_STANDARD_BLOCK.matcher(s);
+                if (m0.matches()) {
+                    ctx().step(m0.group(1).length());
+                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), ctx());
+                } else if (m1.matches()) {
+                    ctx().step(m1.group(1).length());
                     return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), ctx());
                 } else {
                     return new InvokeTagToken(tagName, r.stringMatched(3), ctx());
@@ -160,7 +165,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     private static String patternStr() {
         return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())))";
     }
-    
+
     public static void main(String[] args) {
         IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null));
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
@@ -174,7 +179,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             System.out.println(t.params);
         }
         else System.out.println("not found");
-        
+
 //        String s = " << asdfuisf@";
 //        Matcher m = P_HEREDOC_SIMBOL.matcher(s);
 //        if (m.matches()) {

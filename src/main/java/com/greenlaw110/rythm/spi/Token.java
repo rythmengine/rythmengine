@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.IJavaExtension;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -12,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Token extends TextBuilder {
+    protected static final ILogger logger = Logger.get(Token.class);
     protected String s;
     protected IContext ctx;
     protected int line;
@@ -33,9 +36,9 @@ public class Token extends TextBuilder {
         super(null == context ? null : context.getCodeBuilder());
         this.s = s;
         ctx = context;
-        line = (null == context) ? -1 : context.currentLine() - 1;
+        line = (null == context) ? -1 : context.currentLine();
     }
-    
+
     public Token(String s, IContext context, boolean disableCompactMode) {
         this(s, context);
         this.disableCompactMode = disableCompactMode;
@@ -187,25 +190,43 @@ public class Token extends TextBuilder {
         if (outerBracketsStripped) {
             s = String.format("(%s)", s);
         }
-        if (compactMode()) {
-            s = s.replaceAll("[\\s\\r\\n\\t]+", " ");
-        }
-        p("\np(").p(s).p(");");
+        s = compact(s);
+        p("\np(").p(s).p("); //line: ").p(line).p("\n");
     }
 
     private void pp(String s) {
-        if (compactMode()) {
-            s = s.replaceAll("[\\s\\r\\n\\t]+", " ");
-        }
+        s = compact(s);
         s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
         p("p(\"").p(s).p("\"); //line: ").p(line).p("\n");
     }
 
+    private static String compact_(String s) {
+        String[] lines = s.split("[\\r\\n]+");
+        TextBuilder tb = new TextBuilder();
+        int i = 0;
+        for (String line: lines) {
+            if (i++ > 0) tb.p(" ");
+            line = line.replaceAll("[ \t]+", " ");
+            tb.p(line);
+            if (line.contains("//")) tb.p("\n");
+        }
+        return tb.toString();
+    }
+
+    private String compact(String s) {
+        return compactMode() ? compact_(s) : s;
+    }
+
     public static void main(String[] args) {
+        String s = "try {_.bindModel(_.campaign.designer.componentPanel.data, \n$('#panDesigner .design-panel.component')[0]);}";
+        System.out.println(compact_(s));
+    }
+
+    public static void main1(String[] args) {
 //        Token t = new Token("(S?.escape())", null);
 //        t.outputExpression();
 //        System.out.println(t.out());
-        
+
 //        Pattern p = Pattern.compile(String.format(".*\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
 //        Pattern p2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
 //        String s = "((a.b?:far).format(\"EEEE',' MMMM dd',' yyyy\", 10, true))";
@@ -229,16 +250,16 @@ public class Token extends TextBuilder {
 //        TextBuilder tb = new TextBuilder();
 //        tb.p(com.greenlaw110.rythm.utils.S.escape("<abcd>"));
 //        System.out.println(tb.toString());
-        String waiveName = "S";
-        String methodName = "format";
-        String s = "abc?.format()";
-        Pattern pattern1 = Pattern.compile(String.format(".*(?<!%s)(\\?\\.%s|\\.%s)\\s*\\(\\s*\\)\\s*$", waiveName, methodName, methodName));
-        Matcher m = pattern1.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group());
-            System.out.println(m.group(1));
+//        String waiveName = "S";
+//        String methodName = "format";
+//        String s = "abc?.format()";
+//        Pattern pattern1 = Pattern.compile(String.format(".*(?<!%s)(\\?\\.%s|\\.%s)\\s*\\(\\s*\\)\\s*$", waiveName, methodName, methodName));
+//        Matcher m = pattern1.matcher(s);
+//        if (m.matches()) {
+//            System.out.println(m.group());
+//            System.out.println(m.group(1));
             //System.out.println(m.group(2));
             //System.out.println(m.group(3));
-        }
+//        }
     }
 }

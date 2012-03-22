@@ -20,13 +20,13 @@ import java.util.regex.Pattern;
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     protected transient RythmEngine engine = null;
-    
+
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
     protected RythmEngine _engine() {
         return null == engine ? Rythm.engine : engine;
     }
-    
+
     protected void _invokeTag(String name) {
         _engine().invokeTag(name, this, null, null);
     }
@@ -34,7 +34,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected void _invokeTag(String name, ITag.ParameterList params) {
         _engine().invokeTag(name, this, params, null);
     }
-    
+
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body) {
         _engine().invokeTag(name, this, params, body);
     }
@@ -43,9 +43,9 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     private String renderBody = "";
     private Map<String, String> renderSections = new HashMap<String, String>();
     private Map<String, Object> renderProperties = new HashMap<String, Object>();
-    
+
     protected TemplateBase __parent = null;
-    
+
     public TemplateBase() {
         super();
         Class<? extends TemplateBase> c = getClass();
@@ -58,19 +58,19 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             }
         }
     }
-    
+
     protected final void setRenderBody(String body) {
         renderBody = body;
     }
-    
+
     private void addRenderSection(String name, String section) {
         renderSections.put(name, section);
     }
-    
+
     private StringBuilder tmpOut = null;
     private String section = null;
     private TextBuilder tmpCaller = null;
-    
+
     protected void _startSection(String name) {
         if (null == name) throw new NullPointerException("section name cannot be null");
         if (null != tmpOut) throw new IllegalStateException("section cannot be nested");
@@ -80,7 +80,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         _out = new StringBuilder();
         section = name;
     }
-    
+
     protected void _endSection() {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
         addRenderSection(section, _out.toString());
@@ -89,7 +89,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         tmpOut = null;
         tmpCaller = null;
     }
-    
+
     protected void _pSection(String name) {
         p(renderSections.get(name));
     }
@@ -101,7 +101,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     private void addAllRenderSections(Map<String, String> sections) {
         if (null != sections) renderSections.putAll(sections);
     }
-    
+
     private void addAllRenderProperties(Map<String, Object> properties) {
         if (null != properties) renderProperties.putAll(properties);
     }
@@ -129,7 +129,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (null != _out) tmpl._out = new StringBuilder();
         return tmpl;
     }
-    
+
     protected void internalInit() {
         loadExtendingArgs();
         init();
@@ -164,7 +164,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             return t.render();
         }
     }
-    
+
     protected void internalBuild() {
         internalInit();
 
@@ -183,8 +183,14 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 for (StackTraceElement se : stackTrace){
                     String cName = se.getClassName();
                     if (cName.contains(TemplateClass.CN_SUFFIX)) {
+                        // is it the embedded class?
+                        if (cName.indexOf("$") != -1) {
+                            cName = cName.substring(0, cName.lastIndexOf("$"));
+                        }
                         TemplateClass tc = engine.classes.getByClassName(cName);
-                        if (null == tc) continue;
+                        if (null == tc) {
+                            continue;
+                        }
                         if (null == msg) {
                             msg = e.getMessage();
                             if (S.isEmpty(msg)) {
@@ -203,7 +209,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                         throw re;
                     }
                 }
-                theRE = (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e)); 
+                theRE = (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
                 throw theRE;
             } finally {
                 // try to restart engine
@@ -215,7 +221,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             }
         }
     }
-    
+
     protected String internalRender() {
         internalBuild();
         if (null != __parent) {
@@ -227,7 +233,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             return toString();
         }
     }
-    
+
     public TextBuilder build() {
         return this;
     }
@@ -253,21 +259,21 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     public void setRenderArg(String name, Object arg) {
         _properties.put(name, arg);
     }
-    
+
     protected final void _set(String name, Object arg) {
         setRenderArg(name, arg);
     }
-    
+
     protected final TemplateBase caller() {
         return null == _caller ? null : (TemplateBase)_caller;
     }
-    
+
     @Override
     public Object getRenderArg(String name) {
         Object val = _properties.get(name);
         return null != val ? val : (null != _caller ? caller().getRenderArg(name) : null);
     }
-    
+
     protected final Object _get(String name) {
         return getRenderArg(name);
     }
@@ -277,7 +283,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (null == o) return null;
         return (T)o;
     }
-    
+
     protected final Object _getRenderProperty(String name, Object def) {
         Object o = renderProperties.get(name);
         return null == o ? def : o;
@@ -286,16 +292,16 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected final Object _getRenderProperty(String name) {
         return _getRenderProperty(name, null);
     }
-    
+
     protected final <T> T _getRenderPropertyAs(String name, T def) {
         Object o = _getRenderProperty(name, def);
         return null == o ? def : (T)o;
     }
-    
+
     protected final void _setRenderProperty(String name, Object val) {
         renderProperties.put(name, val);
     }
-    
+
     @Override
     public Map<String, Object> getRenderArgs() {
         return new HashMap<String, Object>(_properties);
@@ -304,18 +310,18 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     @Override
     public void setRenderArg(int position, Object arg) {
     }
-    
+
     @Override
     public StringBuilder getOut() {
         return out();
     }
-    
+
     @Override
     public void setOut(StringBuilder out) {
         if (null != _caller) ((ITemplate)_caller).setOut(out);
         else _out = out;
     }
-    
+
     // --- debugging interface
     protected static ILogger _logger = Logger.get(TemplateBase.class);
     protected static void _debug(String msg, Object... args) {

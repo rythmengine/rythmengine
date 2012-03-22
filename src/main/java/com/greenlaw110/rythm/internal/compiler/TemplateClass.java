@@ -307,7 +307,8 @@ public class TemplateClass {
                 compiled = false;
                 engine().cache.deleteCache(this);
                 engine().restart(new ClassReloadException("extended class changed"));
-                return refresh(forceRefresh);
+                refresh(forceRefresh);
+                return true; // pass refresh state to sub template
             }
             // templateResource.refresh() must be put at first so we make sure resource get refreshed
             boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || extendedTemplateModified;
@@ -380,8 +381,12 @@ public class TemplateClass {
             String cn = e.className;
             TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes.getByClassName(cn);
             if (null == tc) tc = this;
+            CompileException ce = new CompileException(tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
+            if (engine().isProdMode()) {
+                logger.error("error compiling java source:\n%s", javaSource);
+            }
             javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
-            throw new CompileException(tc, e.javaLineNumber, e.message);
+            throw ce;
         } catch (NullPointerException e) {
             String clazzName = name();
             TemplateClass tc = engine().classes.getByClassName(clazzName);

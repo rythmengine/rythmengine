@@ -26,9 +26,10 @@ public class RythmException extends RuntimeException {
         this.templateClass = tc;
         this.templatelineNumber = templateLineNumber;
         this.originalMessage = message;
+        this.errorMessage = message;
         resolveTemplateLineNumber();
     }
-    
+
     public RythmException(TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
         this(null, tc, javaLineNumber, templateLineNumber, message);
     }
@@ -58,7 +59,7 @@ public class RythmException extends RuntimeException {
     public String getTemplateSource() {
         return templateClass.templateResource.asTemplateContent();
     }
-    
+
     public String getTemplateName() {
         return templateClass.getKey();
     }
@@ -67,5 +68,5 @@ public class RythmException extends RuntimeException {
     public String getMessage() {
         return errorMessage;
     }
-    
+
 }

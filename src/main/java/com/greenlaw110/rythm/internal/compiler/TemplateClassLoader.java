@@ -77,10 +77,15 @@ public class TemplateClassLoader extends ClassLoader {
                 if (current.getName().endsWith(".java")) {
                     buf.append( getClassDefsForFile(current));
                 }
+
             } else if (!current.getName().startsWith(".")) {
                 // TODO: we could later optimizie it further if we check if the entire folder is unchanged
-                for (File file : current.listFiles()) {
-                    scan(buf, file);
+
+                File[] fa = current.listFiles();
+                if (null != fa) {
+                    for (File file : current.listFiles()) {
+                        scan(buf, file);
+                    }
                 }
             }
         }
@@ -352,39 +357,42 @@ public class TemplateClassLoader extends ClassLoader {
             engine.classes.remove(tc);
             currentState = new TemplateClassloaderState();
         } else {
-            int sigChecksum = tc.sigChecksum;
-            tc.enhance();
-            if (sigChecksum != tc.sigChecksum) {
-                throw new RuntimeException("Signature change !");
-            }
-//            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
-            IHotswapAgent agent = engine.hotswapAgent;
-            if (null != agent) {
-                List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
-                if (null == tc.javaClass) {
-                    tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), tc.enhancedByteCode, 0, tc.enhancedByteCode.length, protectionDomain);
-                    resolveClass(tc.javaClass);
-                }
-                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
-                List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
-                for (TemplateClass ec: allEmbedded) {
-                    if (null == ec.javaSource || null == ec.enhancedByteCode) {
-                        // strange , how come we reach this block?
-                        if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
-                        else throw new RuntimeException("Unexpected");
-                    }
-                    newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
-                }
-                currentState = new TemplateClassloaderState();//show others that we have changed..
-                try {
-                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
-                } catch (Throwable e) {
-                    engine.classes.remove(tc);
-                    throw new ClassReloadException("Need reload", e);
-                }
-            } else {
-                if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
-            }
+            if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
+//            int sigChecksum = tc.sigChecksum;
+//            tc.enhance();
+//            if (sigChecksum != tc.sigChecksum) {
+//                throw new RuntimeException("Signature change !");
+//            }
+////            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
+//            IHotswapAgent agent = engine.hotswapAgent;
+//            if (null != agent) {
+//                List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
+//                if (null == tc.javaClass) {
+//                    tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), tc.enhancedByteCode, 0, tc.enhancedByteCode.length, protectionDomain);
+//                    resolveClass(tc.javaClass);
+//                }
+//                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
+//                /*
+//                List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
+//                for (TemplateClass ec: allEmbedded) {
+//                    if (null == ec.javaSource || null == ec.enhancedByteCode) {
+//                        // strange , how come we reach this block?
+//                        if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
+//                        else throw new RuntimeException(String.format("Unexpected: template class[%s] not valid", ec.getKey()));
+//                    }
+//                    newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
+//                }
+//                */
+//                currentState = new TemplateClassloaderState();//show others that we have changed..
+//                try {
+//                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
+//                } catch (Throwable e) {
+//                    engine.classes.remove(tc);
+//                    throw new ClassReloadException("Need reload", e);
+//                }
+//            } else {
+//                if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
+//            }
         }
 //        // Now check if there is new classCache or removed classCache
 //        int hash = computePathHash();

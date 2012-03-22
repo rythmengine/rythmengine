@@ -16,7 +16,11 @@ public enum Keyword implements IKeyword {
      */
     EACH("(for|forEach|each)"),
     /**
-     * Declare parent template for this template 
+     * Exit parsign process if no class loaded in current class loader
+     */
+    EXIT_IF_NOCLASS("__exitIfNoClass__"),
+    /**
+     * Declare parent template for this template
      */
     EXTENDS,
     /**
@@ -77,7 +81,7 @@ public enum Keyword implements IKeyword {
     private Keyword(String s) {
         this.s = (null == s) ? name().toLowerCase() : s;
     }
-    
+
     @Override
     public String toString() {
         return s;

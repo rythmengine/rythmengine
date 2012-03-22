@@ -5,13 +5,14 @@ import com.greenlaw110.rythm.spi.Token;
 
 
 public class CodeToken extends Token {
-    
+    private int line;
     public CodeToken(String s, IContext context) {
         super(s, context);
+        line = context.currentLine();
     }
-    
+
     @Override
     public void output() {
-        p(s);
+        p(s).p(" //line: ").pn(line);
     }
 }
