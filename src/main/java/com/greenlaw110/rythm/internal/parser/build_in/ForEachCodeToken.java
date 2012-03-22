@@ -10,14 +10,14 @@ public class ForEachCodeToken extends BlockCodeToken {
     private String iterable;
     private int openPos;
     private int closePos;
-    
+
     /**
-     * 
+     *
      * @each String [str]: myStrList @
      *         ^     ^       ^        ^
      *         |     |       |        |
      *        type varname  iterable endloop
-     * 
+     *
      * @param type
      * @param varname
      * @param iterable
@@ -39,15 +39,15 @@ public class ForEachCodeToken extends BlockCodeToken {
         int bodySize = closePos - openPos;
         //p("\nnew com.greenlaw110.rythm.runtime.Each(").p(curClassName).p(".this).render(").p(iterable)
         p("\ncom.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(iterable)
-            .p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(").p(curClassName).p(".this, ").p(bodySize).p(") {\n\tpublic void render(final ")
+            .p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(").p(curClassName).p(".this, ").p(bodySize).p(") { //lines:").p(ctx.currentLine()).p("\n\tpublic void render(final ")
             .p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ")
             .p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ")
-            .p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast) {");
+            .p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast) { //lines: ").pn(ctx.currentLine());
     }
 
     @Override
     public String closeBlock() {
         closePos = ctx.cursor();
-        return "\n\t}\n});";
+        return "\n\t}});";
     }
 }
