@@ -14,10 +14,10 @@ import java.net.URL;
  * To change this template use File | Settings | File Templates.
  */
 public class ClasspathTemplateResource extends TemplateResourceBase implements ITemplateResource {
-    
+
     private URL url;
     private String key;
-    
+
     public ClasspathTemplateResource(String path) {
         this(path, null);
     }
@@ -77,5 +77,10 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     @Override
     public String getSuggestedClassName() {
         return path2CN(url.getPath());
+    }
+
+    public static void main(String[] args) {
+        ClasspathTemplateResource cr = new ClasspathTemplateResource("abc23.x");
+        System.out.println(cr.isValid());
     }
 }

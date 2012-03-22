@@ -368,6 +368,20 @@ public class RythmEngine {
         return renderTemplate(t);
     }
 
+    public String renderIfTemplateExists(String template, Object... args) {
+        TemplateClass tc = classes.getByTemplate(template);
+        if (null == tc) {
+            return "";
+        }
+        ITemplate t = tc.asTemplate();
+        if (1 == args.length && args[0] instanceof Map) {
+            t.setRenderArgs((Map<String, Object>)args[0]);
+        } else {
+            t.setRenderArgs(args);
+        }
+        return t.render();
+    }
+
     // -- register java extension
     public static void registerJavaExtension(IJavaExtension extension) {
         Token.addExtension(extension);
