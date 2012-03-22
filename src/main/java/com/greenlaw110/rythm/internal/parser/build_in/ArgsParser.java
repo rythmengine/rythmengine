@@ -36,10 +36,6 @@ public class ArgsParser extends KeywordParserFactory {
                 while (r.search(remain)) {
                     String matched = r.stringMatched();
                     if (matched.startsWith("\n") || matched.startsWith("\r")) {
-                        step++;
-                        while (matched.startsWith("\n") || matched.startsWith("\r")) {
-                            step++;
-                        }
                         break;
                     }
                     step += matched.length();
@@ -49,10 +45,15 @@ public class ArgsParser extends KeywordParserFactory {
                     ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
                 }
                 step(step);
-                // strip off the following ";" symbol
+                // strip off the following ";" symbol and line breaks
                 char c = peek();
-                while ((' ' == c || ';' == c) && ctx.hasRemain()) {
-                    c = pop();
+                while (true) {
+                    c = peek();
+                    if ((' ' == c || ';' == c || '\r' == c || '\n' == c) && ctx.hasRemain()) {
+                        step(1);
+                    } else {
+                        break;
+                    }
                 }
                 return new Directive("", ctx()) {
                     @Override

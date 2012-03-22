@@ -3,12 +3,13 @@ package com.greenlaw110.rythm;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassCache;
-import com.greenlaw110.rythm.internal.compiler.TemplateClassManager;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
+import com.greenlaw110.rythm.internal.compiler.TemplateClassManager;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.resource.TemplateResourceManager;
@@ -371,7 +372,12 @@ public class RythmEngine {
     public String renderIfTemplateExists(String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
-            return "";
+            ITemplateResource rsrc = resourceManager.getFileResource(template);
+            if (rsrc.isValid()) {
+                tc = new TemplateClass(rsrc, this);
+            } else {
+                return "";
+            }
         }
         ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {

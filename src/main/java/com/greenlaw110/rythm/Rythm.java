@@ -29,11 +29,11 @@ public class Rythm {
     public static void init(Properties conf) {
         engine.init(conf);
     }
-    
+
     public static void init() {
         engine.init();
     }
-    
+
     public static void registerLoggerFactory(ILoggerFactory fact) {
         Logger.registerLoggerFactory(fact);
     }
@@ -77,13 +77,17 @@ public class Rythm {
     public static String render(File file, Object... args) {
         return engine.render(file, args);
     }
-    
+
     public static String renderStr(String template, Object... args) {
         return engine.renderString(template, args);
     }
-    
+
     public static String renderString(String template, Object... args) {
         return engine.renderString(template, args);
+    }
+
+    public static String renderIfTemplateExists(String template, Object... args) {
+        return engine.renderIfTemplateExists(template, args);
     }
 
     public static void main(String[] args) {
@@ -96,7 +100,7 @@ public class Rythm {
         t.setRenderArg(1, "Mr.");
         System.out.println(t.render());
     }
-    
+
     public static void main2(String[] args) {
         String s = "@args java.util.Properties component; <input type='checkbox' @if (Boolean.valueOf(String.valueOf(component.get(\"checked\")))) checked @ >";
         Properties p = new Properties();
@@ -136,7 +140,7 @@ public class Rythm {
     public static DialectManager getDialectManager() {
         return engine.getDialectManager();
     }
-    
+
     public static ExtensionManager getExtensionManager() {
         return engine.getExtensionManager();
     }
