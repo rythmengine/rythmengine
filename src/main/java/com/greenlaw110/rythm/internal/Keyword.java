@@ -24,6 +24,10 @@ public enum Keyword implements IKeyword {
      */
     EXTENDS,
     /**
+     * Fetch named content from this or sub template
+     */
+    GET,
+    /**
      * plain java if else block
      */
     IF,
@@ -37,9 +41,9 @@ public enum Keyword implements IKeyword {
      */
     INIT,
     /**
-     * Fetch named content from this or sub template
+     * Instruct that this template needs to log execution time
      */
-    GET,
+    LOG_TIME("__logTime__"),
     /**
      * Output sub template render content in place
      */

@@ -62,6 +62,7 @@ public class RythmEngine {
     public TemplateClassCache cache = new TemplateClassCache(this);
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
+    public boolean logRenderTime = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     /**
      * Enable refresh resource on render. This could be turned off
@@ -207,6 +208,7 @@ public class RythmEngine {
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
+        logRenderTime = configuration.getAsBoolean("rythm.logRenderTime", isDevMode());
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
         }

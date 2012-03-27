@@ -135,6 +135,9 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         init();
     }
 
+    protected void setup() {
+    }
+
     protected void loadExtendingArgs() {
     }
 
@@ -142,12 +145,29 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     public void init() {
     }
 
-    private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
+    private boolean _logTime() {
+        return _logTime || engine.logRenderTime;
+    }
+
     @Override
     public final String render() {
+        setup();
         try {
+            long l = 0l;
+            if (_logTime()) {
+                l = System.currentTimeMillis();
+                _logger.debug(">>>>>>>>>>>> [%s]", getClass().getName());
+            }
             engine.preprocess(this);
-            return internalRender();
+            if (_logTime()) {
+                _logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
+                l = System.currentTimeMillis();
+            }
+            String s = internalRender();
+            if (_logTime()) {
+                _logger.debug("<<<<<<<<<<<< [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
+            }
+            return s;
         } catch (ClassReloadException e) {
             if (_logger.isDebugEnabled()) {
                 _logger.debug("Cannot hotswap class, try to restart engine...");
@@ -171,53 +191,52 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (engine.isProdMode()) {
             build();
         } else {
-            RuntimeException theRE = null;
             try {
-                build();
-            } catch (RythmException e) {
-                theRE = e;
-                throw e;
-            } catch (Exception e) {
-                StackTraceElement[] stackTrace = e.getStackTrace();
-                String msg = null;
-                for (StackTraceElement se : stackTrace){
-                    String cName = se.getClassName();
-                    if (cName.contains(TemplateClass.CN_SUFFIX)) {
-                        // is it the embedded class?
-                        if (cName.indexOf("$") != -1) {
-                            cName = cName.substring(0, cName.lastIndexOf("$"));
-                        }
-                        TemplateClass tc = engine.classes.getByClassName(cName);
-                        if (null == tc) {
-                            continue;
-                        }
-                        if (null == msg) {
-                            msg = e.getMessage();
-                            if (S.isEmpty(msg)) {
-                                msg = "caused by " + e.getClass().getName();
-                                //System.out.println("<<<<<" + msg);
+                try {
+                    build();
+                } catch (RythmException e) {
+                    throw e;
+                } catch (Exception e) {
+                    StackTraceElement[] stackTrace = e.getStackTrace();
+                    String msg = null;
+                    for (StackTraceElement se : stackTrace){
+                        String cName = se.getClassName();
+                        if (cName.contains(TemplateClass.CN_SUFFIX)) {
+                            // is it the embedded class?
+                            if (cName.indexOf("$") != -1) {
+                                cName = cName.substring(0, cName.lastIndexOf("$"));
                             }
+                            TemplateClass tc = engine.classes.getByClassName(cName);
+                            if (null == tc) {
+                                continue;
+                            }
+                            if (null == msg) {
+                                msg = e.getMessage();
+                                if (S.isEmpty(msg)) {
+                                    msg = "caused by " + e.getClass().getName();
+                                    //System.out.println("<<<<<" + msg);
+                                }
+                            }
+                            RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
+                            if (re.templatelineNumber != -1) {
+                                StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
+                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templatelineNumber);
+                                System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
+                                re.setStackTrace(newStack);
+                            }
+                            throw re;
                         }
-                        RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
-                        if (re.templatelineNumber != -1) {
-                            StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                            newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templatelineNumber);
-                            System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
-                            re.setStackTrace(newStack);
-                        }
-                        theRE = re;
-                        throw re;
                     }
+                    throw (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
                 }
-                theRE = (e instanceof RuntimeException ? (RuntimeException)e : new RuntimeException(e));
-                throw theRE;
-            } finally {
+            } catch (RuntimeException e) {
                 // try to restart engine
                 try {
-                    engine.restart(theRE);
-                } catch (RuntimeException e) {
+                    engine.restart(e);
+                } catch (RuntimeException e0) {
                     // ignore it because we already thrown it out
                 }
+                throw e;
             }
         }
     }
@@ -336,4 +355,5 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected static void _error(Throwable t, String msg, Object... args) {
         _logger.error(t, msg, args);
     }
+    protected boolean _logTime = false;
 }

@@ -17,22 +17,22 @@ import java.util.*;
 
 
 public class CodeBuilder extends TextBuilder {
-    
+
     public static class RenderArgDeclaration {
         String name;
         String type;
         String defVal;
-        
+
         public RenderArgDeclaration(String name, String type) {
             this(name, type, null);
         }
-        
+
         public RenderArgDeclaration(String name, String type, String defVal) {
             this.name = name;
             this.type = typeTransform(type);
             this.defVal = null == defVal ? defVal(type) : defVal;
         }
-        
+
         private static String typeTransform(String type) {
             if ("boolean".equals(type)) return "Boolean";
             else if ("int".equals(type)) return "Integer";
@@ -105,7 +105,7 @@ public class CodeBuilder extends TextBuilder {
     public TemplateClass getTemplateClass() {
         return templateClass;
     }
-    
+
     public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine) {
         tmpl = template;
         this.tagName = (null == tagName) ? className : tagName;
@@ -120,13 +120,13 @@ public class CodeBuilder extends TextBuilder {
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
     }
-    
+
     public String className() {
         return cName;
     }
-    
+
     private static Set<String > globalImports = new HashSet<String>();
-    
+
     public static void registerImports(String imports) {
         globalImports.addAll(Arrays.asList(imports.split(",")));
     }
@@ -134,7 +134,7 @@ public class CodeBuilder extends TextBuilder {
     public void addImport(String imprt) {
         if (!globalImports.contains(imprt)) imports.add(imprt);
     }
-    
+
     private static class InlineTag {
         String tagName;
         String signature;
@@ -159,7 +159,7 @@ public class CodeBuilder extends TextBuilder {
         if (inlineTagBodies.empty()) throw new ParseException(templateClass, parser.currentLine(), "Unexpected tag definition close");
         builders = inlineTagBodies.pop();
     }
-    
+
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
         if (null != this.extended) throw new IllegalStateException("extended already set for this page");
         TemplateClass tc = null;
@@ -195,22 +195,27 @@ public class CodeBuilder extends TextBuilder {
         this.extendArgs = args;
     }
 
+    private boolean logTime = false;
+    public void setLogTime() {
+        logTime = true;
+    }
+
     public void addRenderArgs(RenderArgDeclaration declaration) {
         renderArgs.put(declaration.name, declaration);
     }
-    
+
     public void addRenderArgs(String type, String name) {
         renderArgs.put(name, new RenderArgDeclaration(name, type));
     }
-    
+
     public void addBuilder(TextBuilder builder) {
         builders.add(builder);
     }
-    
+
     String template() {
         return tmpl;
     }
-    
+
     @Override
     public TextBuilder build() {
         try {
@@ -222,6 +227,7 @@ public class CodeBuilder extends TextBuilder {
             pClassOpen();
             pTagImpl();
             pInitCode();
+            pSetup();
             pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
@@ -233,7 +239,7 @@ public class CodeBuilder extends TextBuilder {
             return this;
         }
     }
-    
+
     private void invokeDirectives() {
         for (TextBuilder b: builders) {
             if (b instanceof IDirective) {
@@ -241,7 +247,7 @@ public class CodeBuilder extends TextBuilder {
             }
         }
     }
-    
+
     private void addDefaultRenderArgs() {
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         if (null == p) return;
@@ -252,11 +258,11 @@ public class CodeBuilder extends TextBuilder {
             addRenderArgs(type, name);
         }
     }
-    
+
     private void pPackage() {
         if (!S.isEmpty(pName)) p("\npackage ").p(pName).p(";");
     }
-    
+
     // print imports
     private void pImports() {
         for (String s: imports) {
@@ -275,15 +281,15 @@ public class CodeBuilder extends TextBuilder {
         p("\nimport java.util.*;");
         p("\nimport java.io.*;");
     }
-    
+
     private void pClassOpen() {
         p("\npublic class ").p(cName).p(" extends ").p(extended()).p(" {").p(extendedResourceMark());
     }
-    
+
     private void pClassClose() {
         p("\n}");
     }
-    
+
     private void pRenderArgs() {
         // -- output private members
         for (String argName: renderArgs.keySet()) {
@@ -375,7 +381,17 @@ public class CodeBuilder extends TextBuilder {
         }
         p("\n}\n");
     }
-    
+
+    private void pSetup() {
+        if (logTime) {
+            p("\n@Override protected void setup() {");
+                if (logTime) {
+                    p("\n\t_logTime = true;");
+                }
+            p("\n}\n");
+        }
+    }
+
     private void pInitCode() {
         if (null == initCode) return;
         p("\n@Override public void init() {").p(initCode).p(";").p("}\n");
@@ -385,7 +401,7 @@ public class CodeBuilder extends TextBuilder {
         if (!isTag()) return;
         p("\n@Override public java.lang.String getName() {\n\treturn \"").p(tagName).p("\";\n}\n");
     }
-    
+
     private void pInlineTags() {
         for (InlineTag tag: inlineTags.values()) {
             p("\nprotected String ").p(tag.tagName).p(tag.signature).p("{\n");
@@ -404,5 +420,5 @@ public class CodeBuilder extends TextBuilder {
         }
         p("\nreturn this;\n}");
     }
-    
+
 }
