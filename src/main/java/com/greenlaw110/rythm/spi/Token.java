@@ -191,13 +191,40 @@ public class Token extends TextBuilder {
             s = String.format("(%s)", s);
         }
         s = compact(s);
-        p("\np(").p(s).p("); //line: ").p(line).p("\n");
+        boolean processed = false;
+        for (IExpressionProcessor p: ctx.getEngine().getExtensionManager().expressionProcessors()) {
+            if (p.process(s, this)) {
+                processed = true;
+                break;
+            }
+        }
+        if (!processed) {
+            p("\ntry{p(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            pline();
+        }
+//        //TODO make the following logic plugable
+//        if (s.indexOf("(") > 0 && s.startsWith("controllers.")) {
+//            // invoking a controller method ?
+//            String action = s.replaceFirst("controllers.", "");
+//            int pos = action.indexOf("(");
+//            action = action.substring(0, pos);
+//            p("play.mvc.Http.Request.current().action=\"").p(action).p("\";\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);}");
+//            pline();
+//        } else {
+//            p("\ntry{p(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+//            pline();
+//        }
+    }
+
+    public void pline() {
+        p(" //line: ").pn(line);
     }
 
     private void pp(String s) {
         s = compact(s);
         s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
-        p("p(\"").p(s).p("\"); //line: ").p(line).p("\n");
+        p("p(\"").p(s).p("\");");
+        pline();
     }
 
     private static String compact_(String s) {

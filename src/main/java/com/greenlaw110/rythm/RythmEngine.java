@@ -16,9 +16,11 @@ import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.spi.ITemplateExecutionExceptionHandler;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.*;
 
 import java.io.File;
@@ -47,7 +49,7 @@ public class RythmEngine {
         return reloadByRestart();
     }
 
-    public static final String version = "0.9.1b";
+    public static final String version = "0.9.2c";
     public static String pluginVersion = "";
     public static String versionSignature() {
         return version + "-" + pluginVersion;
@@ -490,6 +492,14 @@ public class RythmEngine {
         }
         if (null != body) tag.setRenderArg("_body", body);
         tag.call();
+    }
+
+
+    public void handleTemplateExecutionException(Exception e, TemplateBase template) throws Exception {
+        for (ITemplateExecutionExceptionHandler h: em_.exceptionHandlers()) {
+            if (h.handleTemplateExecutionException(e, template)) return;
+        }
+        throw e;
     }
 
     // -- SPI interface

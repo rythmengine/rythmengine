@@ -7,6 +7,7 @@ import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.IRythmListener;
 
 import java.io.File;

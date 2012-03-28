@@ -127,6 +127,10 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             tmpl._caller = (TextBuilder)caller;
         }
         if (null != _out) tmpl._out = new StringBuilder();
+        _properties = new HashMap<String, Object>(_properties.size());
+        renderBody = "";
+        renderSections = new HashMap<String, String>();
+        renderProperties = new HashMap<String, Object>();
         return tmpl;
     }
 
@@ -151,7 +155,6 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     @Override
     public final String render() {
-        setup();
         try {
             long l = 0l;
             if (_logTime()) {
@@ -159,6 +162,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 _logger.debug(">>>>>>>>>>>> [%s]", getClass().getName());
             }
             engine.preprocess(this);
+            setup();
             if (_logTime()) {
                 _logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 l = System.currentTimeMillis();
@@ -319,6 +323,16 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     protected final void _setRenderProperty(String name, Object val) {
         renderProperties.put(name, val);
+    }
+
+    protected final void handleTemplateExecutionException(Exception e) {
+        try {
+            _engine().handleTemplateExecutionException(e, this);
+        } catch (RuntimeException e0) {
+            throw e0;
+        } catch (Exception e1) {
+            throw new RuntimeException(e1);
+        }
     }
 
     @Override

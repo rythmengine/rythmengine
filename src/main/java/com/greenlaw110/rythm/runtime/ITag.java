@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.runtime;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
@@ -15,7 +16,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public interface ITag extends ITemplate {
-    
+
     public static class Parameter {
         public String name;
         public Object value;
@@ -23,32 +24,37 @@ public interface ITag extends ITemplate {
             this.name = "".equals(name) ? null : name;
             this.value = value;
         }
+
+        @Override
+        public String toString() {
+            return Rythm.render("@args String name, Object value;@name=@value", name, value);
+        }
     }
-    
+
     public static class ParameterList implements Iterable<Parameter> {
         private List<Parameter> lp = new ArrayList<Parameter>();
         public void add(String name, Object value) {
             lp.add(new Parameter(name, value));
         }
-        
+
         public Object getByName(String name) {
             for (Parameter para: lp) {
                 if (name.equals(para.name)) return para.value;
             }
             return null;
         }
-        
+
         public <T> T getByName(String name, T defVal) {
             for (Parameter para: lp) {
                 if (name.equals(para.name)) return (T) para.value;
             }
             return defVal;
         }
-        
+
         public Object getDefault() {
             return getByPosition(0);
         }
-        
+
         public Object getByPosition(int pos) {
             if (pos >= lp.size()) return null;
             return lp.get(pos).value;
@@ -58,7 +64,7 @@ public interface ITag extends ITemplate {
         public Iterator<Parameter> iterator() {
             return lp.iterator();
         }
-        
+
         public int size() {
             return lp.size();
         }
@@ -66,7 +72,7 @@ public interface ITag extends ITemplate {
         public Parameter get(int i) {
             return lp.get(i);
         }
-        
+
         public Map<String, Object> asMap() {
             Map<String, Object> m = new HashMap<String, Object>();
             for (Parameter p: lp) {
@@ -75,10 +81,10 @@ public interface ITag extends ITemplate {
             return m;
         }
     }
-    
+
     public abstract static class Body extends TextBuilder {
         protected ILogger logger = Logger.get(ITag.class);
-    
+
         protected ITemplate _context;
         public Body(ITemplate context) {
             _context = context;

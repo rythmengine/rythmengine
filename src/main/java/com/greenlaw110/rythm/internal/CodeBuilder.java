@@ -383,13 +383,16 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private void pSetup() {
-        if (logTime) {
-            p("\n@Override protected void setup() {");
-                if (logTime) {
-                    p("\n\t_logTime = true;");
-                }
-            p("\n}\n");
-        }
+        p("\n@Override protected void setup() {");
+            if (logTime) {
+                p("\n\t_logTime = true;");
+            }
+            for (String argName: renderArgs.keySet()) {
+                RenderArgDeclaration arg = renderArgs.get(argName);
+                p("\n\tif (").p(argName).p(" == null) {");
+                p("\n\t\t").p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");\n\t}");
+            }
+        p("\n}\n");
     }
 
     private void pInitCode() {
