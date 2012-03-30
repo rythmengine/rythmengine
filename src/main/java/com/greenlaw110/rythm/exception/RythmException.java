@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * Time: 11:29 AM
  * To change this template use File | Settings | File Templates.
  */
-public class RythmException extends RuntimeException {
+public class RythmException extends FastRuntimeException {
 
     public int javaLineNumber = 0;
     public int templatelineNumber = -1;

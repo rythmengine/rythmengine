@@ -1,10 +1,7 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-import com.greenlaw110.rythm.internal.compiler.TemplateClassCache;
-import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
-import com.greenlaw110.rythm.internal.compiler.TemplateClassManager;
+import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
@@ -49,7 +46,7 @@ public class RythmEngine {
         return reloadByRestart();
     }
 
-    public static final String version = "0.9.2c";
+    public static final String version = "0.9.2d";
     public static String pluginVersion = "";
     public static String versionSignature() {
         return version + "-" + pluginVersion;
@@ -242,7 +239,9 @@ public class RythmEngine {
 
     public void restart(RuntimeException cause) {
         if (isProdMode()) throw cause;
-        logger.warn(cause, "restarting rythm engine due to %s", cause.getMessage());
+        if (!(cause instanceof ClassReloadException)) {
+            logger.warn(cause, "restarting rythm engine due to %s", cause.getMessage());
+        }
         restart();
     }
 

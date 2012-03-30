@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.exception.FastRuntimeException;
+
 /**
  * Created by IntelliJ IDEA.
  * User: luog
@@ -7,7 +9,7 @@ package com.greenlaw110.rythm.internal.compiler;
  * Time: 2:58 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ClassReloadException extends RuntimeException {
+public class ClassReloadException extends FastRuntimeException {
     public ClassReloadException(String msg) {
         super(msg);
     }
