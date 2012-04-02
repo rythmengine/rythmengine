@@ -13,6 +13,7 @@ public class CodeToken extends Token {
 
     @Override
     public void output() {
-        p(s).p(" //line: ").pn(line);
+        p(s);
+        pline();
     }
 }

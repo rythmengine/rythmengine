@@ -53,6 +53,10 @@ public enum Keyword implements IKeyword {
      */
     RENDER_SECTION("(render(Section)?)"),
     /**
+     * break the current template execution process and return to caller
+     */
+    RETURN,
+    /**
      * Declare a section start
      */
     SECTION,
