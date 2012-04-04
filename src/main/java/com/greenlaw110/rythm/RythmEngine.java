@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
@@ -417,6 +419,10 @@ public class RythmEngine {
                     isTag = tc.equals(tagTC);
                 }
                 return isTag;
+            } catch (TagLoadException e) {
+                throw e;
+            } catch (RythmException e) {
+                throw e;
             } catch (Exception e) {
                 logger.error(e, "error trying load tag[%s]", name);
                 // see if the
