@@ -22,6 +22,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
+        Map<String, String> m = null;
         TagBase newTag = (TagBase)super.cloneMe(engine, caller);
         newTag._body = null;
         //newTag._out = new StringBuilder();
