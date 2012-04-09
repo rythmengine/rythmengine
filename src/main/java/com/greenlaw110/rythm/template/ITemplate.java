@@ -1,8 +1,11 @@
 package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Stack;
 
 public interface ITemplate extends Cloneable {
     /**
@@ -22,9 +25,9 @@ public interface ITemplate extends Cloneable {
      * @param arg
      */
     void setRenderArg(String name, Object arg);
-    
+
     Map<String, Object> getRenderArgs();
-    
+
     Object getRenderArg(String name);
 
     /**
@@ -46,11 +49,11 @@ public interface ITemplate extends Cloneable {
      * the parent template's init() must be called before this template's init()
      */
     void init();
-    
+
     StringBuilder getOut();
-    
+
     void setOut(StringBuilder sb);
-    
+
     /**
      * Get a copy of this template instance and pass in the engine and caller
      *
@@ -59,4 +62,65 @@ public interface ITemplate extends Cloneable {
      * @return a cloned instance of this template class
      */
     ITemplate cloneMe(RythmEngine engine, ITemplate caller);
+
+    public static class Context {
+        public Stack<Escape> escapeStack;
+        public Context() {
+            escapeStack = new Stack<Escape>();
+        }
+        public void init(TemplateClass templateClass) {
+            if (templateClass.name().contains("html" + TemplateClass.CN_SUFFIX)) {
+                escapeStack.push(Escape.HTML);
+            } else {
+                escapeStack.push(Escape.RAW);
+            }
+        }
+        public Escape currentEscape() {
+            return escapeStack.peek();
+        }
+        public void pushEscape(Escape escape) {
+            escapeStack.push(escape);
+        }
+        public Escape popEscape() {
+            return escapeStack.pop();
+        }
+    }
+
+    public static enum Escape {
+        RAW,
+        CSV,
+        HTML,
+        JS,
+        JAVA,
+        XML;
+        private static String[] sa_ = null;
+        public static String[] stringValues() {
+            if (null == sa_) {
+                Escape[] ea = values();
+                String[] sa = new String[ea.length];
+                for (int i = 0; i < ea.length; ++i){
+                    sa[i] = ea[i].toString();
+                }
+                Arrays.sort(sa);
+                sa_ = sa;
+            }
+            return sa_.clone();
+        }
+    }
+
+    public static class RawData {
+        public String data;
+        public RawData(Object val) {
+            if (val == null) {
+                data = "";
+            } else {
+                data = val.toString();
+            }
+        }
+        @Override
+        public String toString() {
+            return data;
+        }
+        public static final RawData NULL = new RawData(null);
+    }
 }

@@ -220,6 +220,7 @@ public class TemplateClass {
                 engine().classes.getByClassName(pc.getName());
             }
         }
+        templateInstance.setTemplateClass(this);
         return templateInstance;
     }
 
@@ -271,6 +272,7 @@ public class TemplateClass {
                 // this is the root level template class
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
+                //name = templateResource.getSuggestedClassName();
                 if (e.reloadByIncClassVersion()) version = nextVersion.getAndIncrement();
                 engine().classes.add(this);
             }

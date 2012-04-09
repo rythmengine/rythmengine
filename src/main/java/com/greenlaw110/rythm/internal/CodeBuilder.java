@@ -177,7 +177,7 @@ public class CodeBuilder extends TextBuilder {
         }
         if (null == tc && !extended.startsWith("/")) {
             // it's in class name style ?
-            if (!extended.endsWith(TemplateClass.CN_SUFFIX)) extended = extended + TemplateClass.CN_SUFFIX;
+            //if (!extended.endsWith(TemplateClass.CN_SUFFIX)) extended = extended + TemplateClass.CN_SUFFIX;
             tc = engine.classes.getByClassName(extended);
         }
         if (null == tc) {

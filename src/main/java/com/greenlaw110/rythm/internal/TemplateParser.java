@@ -93,6 +93,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public void openBlock(IBlockHandler bh) {
+        bh.openBlock();
         blocks.push(bh);
     }
 

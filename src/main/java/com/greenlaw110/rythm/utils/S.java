@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.utils;
 
+import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class S {
@@ -34,28 +35,37 @@ public class S {
         }
     }
 
-    public static String escape(Object s) {
+    public static ITemplate.RawData raw(Object s) {
+        return new ITemplate.RawData(s);
+    }
+
+    public static ITemplate.RawData escape(Object s) {
         return escapeHtml(s);
     }
 
-    public static String escapeHtml(Object s) {
-        if (null == s) return "";
-        return StringEscapeUtils.escapeHtml4(s.toString());
+    public static ITemplate.RawData escapeHtml(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        return new ITemplate.RawData(StringEscapeUtils.escapeHtml4(s.toString()));
     }
 
-    public static String escapeCsv(Object s) {
-        if (null == s) return "";
-        return StringEscapeUtils.escapeCsv(s.toString());
+    public static ITemplate.RawData escapeCsv(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        return new ITemplate.RawData(StringEscapeUtils.escapeCsv(s.toString()));
     }
 
-    public static String escapeJavaScript(Object s) {
-        if (null == s) return "";
-        return StringEscapeUtils.escapeEcmaScript(s.toString());
+    public static ITemplate.RawData escapeJava(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        return new ITemplate.RawData(StringEscapeUtils.escapeJava(s.toString()));
     }
 
-    public static String escapeXml(Object s) {
-        if (null == s) return "";
-        return StringEscapeUtils.escapeXml(s.toString());
+    public static ITemplate.RawData escapeJavaScript(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        return new ITemplate.RawData(StringEscapeUtils.escapeEcmaScript(s.toString()));
+    }
+
+    public static ITemplate.RawData escapeXml(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        return new ITemplate.RawData(StringEscapeUtils.escapeXml(s.toString()));
     }
 
     public static String shrinkSpace(Object s) {

@@ -20,27 +20,27 @@ public abstract class TemplateResourceBase implements ITemplateResource {
      * This field should be set to null if needs to serialize the template resource to some where, e.g. Cache
      */
     private RythmEngine engine;
-    
+
     public TemplateResourceBase() {}
-    
+
     public TemplateResourceBase(RythmEngine engine) {
         if (null == engine) return;
         this.engine = engine.isSingleton() ? null : engine;
     }
-    
+
     protected RythmEngine engine() {
         return null == engine ? Rythm.engine : engine;
     }
-    
+
     @Override
     public int hashCode() {
         return getKey().hashCode();
     }
-    
+
     protected String cache;
 
     private long timestamp;
-    
+
     protected long nextCheckPoint;
 
     public boolean equals(Object obj) {
@@ -133,8 +133,9 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         //int lastDotPos = path.lastIndexOf(".");
         //path = path.substring(0, lastDotPos);
         return path.replace('/', '_').replace('\\', '_').replace('.', '_').replace('-', '_');
+        //return path.replace('/', '.').replace('\\', '.').replace('-', '_');
     }
-    
+
     public static void main(String[] args) {
         System.out.println(path2CN("http://abc.1.a/Black/jack/k.html"));
         System.out.println(path2CN("W:\\tmp\\a.b.a.html"));

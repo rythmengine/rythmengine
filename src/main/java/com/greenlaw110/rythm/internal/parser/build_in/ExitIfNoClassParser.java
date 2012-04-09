@@ -49,7 +49,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "%s%s\\s*((?@()))[\\r\\n]+";
+        return "%s%s\\s*((?@()))[\\s]+";
     }
 
     public static void main(String[] args) {

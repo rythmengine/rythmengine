@@ -14,12 +14,18 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     protected transient RythmEngine engine = null;
+    private transient TemplateClass templateClass = null;
+    public void setTemplateClass(TemplateClass templateClass) {
+        this.templateClass = templateClass;
+        __ctx.init(templateClass);
+    }
 
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
@@ -122,6 +128,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             tmpl.__parent = (TemplateBase) tmpl.__parent.cloneMe(engine, caller);
         }
         tmpl.engine = engine;
+        tmpl.templateClass = templateClass;
         //if (null != out) tmpl._out = out;
         if (null != caller) {
             tmpl._caller = (TextBuilder)caller;
@@ -131,6 +138,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         renderBody = "";
         renderSections = new HashMap<String, String>();
         renderProperties = new HashMap<String, Object>();
+        __ctx = new Context();
+        __ctx.init(templateClass);
         return tmpl;
     }
 
@@ -344,6 +353,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     public void setRenderArg(int position, Object arg) {
     }
 
+    public Context __ctx = new Context();
+
     @Override
     public StringBuilder getOut() {
         return out();
@@ -353,6 +364,90 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     public void setOut(StringBuilder out) {
         if (null != _caller) ((ITemplate)_caller).setOut(out);
         else _out = out;
+    }
+
+    // --- print expression interface
+    public final TextBuilder pe(Object o) {
+        if (null != o) {
+            if (o instanceof RawData) {
+                return p(o);
+            }
+            Escape escape = __ctx.currentEscape();
+            return pe(o, escape);
+        }
+        return this;
+    }
+
+    public final TextBuilder pe(char c) {
+        return p(c);
+    }
+
+    public final TextBuilder pe(int i) {
+        return p(i);
+    }
+
+    public final TextBuilder pe(long l) {
+        return p(l);
+    }
+
+    public final TextBuilder pe(float f) {
+        return p(f);
+    }
+
+    public final TextBuilder pe(double d) {
+        return p(d);
+    }
+
+    public final TextBuilder pe(boolean b) {
+        return p(b);
+    }
+
+    public final TextBuilder pe(Object o, Escape escape) {
+        if (null != o) {
+            if (o instanceof RawData) {
+                return p(o);
+            }
+            if (null == escape) escape = __ctx.currentEscape();
+            switch (escape) {
+                case HTML:
+                    return p(S.escapeHtml(o));
+                case JS:
+                    return p(S.escapeJavaScript(o));
+                case JAVA:
+                    return p(S.escapeJava(o));
+                case CSV:
+                    return p(S.escapeCsv(o));
+                case XML:
+                    return p(S.escapeXml(o));
+            }
+            return p(o);
+        }
+        return this;
+    }
+
+    public final TextBuilder pe(char c, Escape escape) {
+        return p(c);
+    }
+
+    public final TextBuilder pe(int i, Escape escape) {
+        return p(i);
+    }
+
+    public final TextBuilder pe(long l, Escape escape) {
+        return p(l);
+    }
+
+    public final TextBuilder pe(float f, Escape escape) {
+        return p(f);
+    }
+
+    public final TextBuilder pe(double d, Escape escape) {
+        __ctx.pushEscape(com.greenlaw110.rythm.template.ITemplate.Escape.RAW);
+        return p(d);
+    }
+
+    public final TextBuilder pe(boolean b, Escape escape) {
+        return p(b);
     }
 
     // --- debugging interface
@@ -370,4 +465,5 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         _logger.error(t, msg, args);
     }
     protected boolean _logTime = false;
+
 }

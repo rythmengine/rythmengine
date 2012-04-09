@@ -16,6 +16,10 @@ public enum Keyword implements IKeyword {
      */
     EACH("(for|forEach|each)"),
     /**
+     * Mark a section that expression should be output after excaped
+     */
+    ESCAPE,
+    /**
      * Exit parsign process if no class loaded in current class loader
      */
     EXIT_IF_NOCLASS("__exitIfNoClass__"),
@@ -44,6 +48,10 @@ public enum Keyword implements IKeyword {
      * Instruct that this template needs to log execution time
      */
     LOG_TIME("__logTime__"),
+    /**
+     * Mark a section that expression should be output as raw data
+     */
+    RAW,
     /**
      * Output sub template render content in place
      */

@@ -70,7 +70,7 @@ public class Token extends TextBuilder {
     }
     static {
         String[] sa = {
-            "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "shrinkSpace"
+            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "escapeJava", "shrinkSpace"
         };
         for (String s: sa) {
             addExtension(new IJavaExtension.VoidParameterExtension("S", s));
@@ -115,7 +115,7 @@ public class Token extends TextBuilder {
     protected final void outputExpression() {
         if (S.isEmpty(s)) return;
         if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
-            p("\np(").p(s).p(");");
+            p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             return;
         }
         String s0 = s;
@@ -199,21 +199,9 @@ public class Token extends TextBuilder {
             }
         }
         if (!processed) {
-            p("\ntry{p(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             pline();
         }
-//        //TODO make the following logic plugable
-//        if (s.indexOf("(") > 0 && s.startsWith("controllers.")) {
-//            // invoking a controller method ?
-//            String action = s.replaceFirst("controllers.", "");
-//            int pos = action.indexOf("(");
-//            action = action.substring(0, pos);
-//            p("play.mvc.Http.Request.current().action=\"").p(action).p("\";\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);}");
-//            pline();
-//        } else {
-//            p("\ntry{p(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-//            pline();
-//        }
     }
 
     public void pline() {

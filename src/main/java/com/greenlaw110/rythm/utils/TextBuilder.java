@@ -61,12 +61,6 @@ public class TextBuilder {
         return null == o ? "" : o.toString();
     }
 
-    /**
-     * Append the object specified to the string buffer
-     *
-     * @param o
-     * @return
-     */
     public final TextBuilder p(Object o) {
         if (null != o) p_(o);
         return this;
