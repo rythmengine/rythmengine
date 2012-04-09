@@ -59,6 +59,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
                 __parent = (TemplateBase) pc.newInstance();
+                __parent.setTemplateClass(_engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

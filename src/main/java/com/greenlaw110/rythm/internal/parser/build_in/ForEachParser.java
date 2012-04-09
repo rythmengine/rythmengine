@@ -3,6 +3,8 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
 import com.greenlaw110.rythm.spi.IContext;
@@ -16,17 +18,27 @@ public class ForEachParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
-                Regex r = new Regex(String.format(patternStr(), dialect().a(), keyword()));
-                if (!r.search(remain())) return null;
-                String s = r.stringMatched(1);
-                step(s.length());
-                String type = r.stringMatched(5);
-                String varname = r.stringMatched(6);
-                String iterable = r.stringMatched(8);
-                if (S.isEmpty(iterable)) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                Regex r = reg(dialect());
+                String remain = remain();
+                if (!r.search(remain)) {
+                    r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
+                    if (!r.search(remain)) {
+                        throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                    }
+                    String s = r.stringMatched(2);
+                    step(r.stringMatched().length());
+                    return new BlockCodeToken("for " + s + "{\n\t", ctx());
+                } else {
+                    String s = r.stringMatched(1);
+                    step(s.length());
+                    String type = r.stringMatched(5);
+                    String varname = r.stringMatched(6);
+                    String iterable = r.stringMatched(8);
+                    if (S.isEmpty(iterable)) {
+                        throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                    }
+                    return new ForEachCodeToken(type, varname, iterable, ctx());
                 }
-                return new ForEachCodeToken(type, varname, iterable, ctx());
             }
         };
     }
@@ -35,18 +47,24 @@ public class ForEachParser extends KeywordParserFactory {
     public Keyword keyword() {
         return Keyword.EACH;
     }
-    
+
+    // match for(int i=0; i<100;++i) {
+    protected String patternStr2() {
+        return "^%s%s\\s*((?@()))\\s*\\{?\\s*";
+    }
+
     @Override
     protected String patternStr() {
-        return "(%s%s(\\s+|\\s*\\(\\s*)((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
+        return "^(%s%s(\\s+|\\s*\\(\\s*)((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
     }
-    
-    public static void main(String[] args) {
-        Regex r = new ForEachParser().reg(new Rythm());
 
-        String s = "@for(Client client: clients) {\nHello world";
+    public static void main(String[] args) {
+
+        Regex r = new Regex(String.format(new ForEachParser().patternStr2(), "@", "for"));
+
+        String s = "@for(int i = 0; i < 100; ++i){\nHello world}";
         if (r.search(s)) {
-            //System.out.println(r.stringMatched());
+            System.out.println(r.stringMatched());
             System.out.println(1 + r.stringMatched(1));
             System.out.println(2 + r.stringMatched(2));
             System.out.println(3 + r.stringMatched(3));
