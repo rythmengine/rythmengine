@@ -68,6 +68,24 @@ public class S {
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(s.toString()));
     }
 
+    public static final String stripBrace(String s) {
+        if (s.startsWith("(")) s = s.substring(1);
+        if (s.endsWith(")")) s = s.substring(0, s.length() - 1);
+        return s;
+    }
+
+    public static final String stripQuotation(String s) {
+        if (s.startsWith("\"") || s.startsWith("'")) s = s.substring(1);
+        if (s.endsWith("\"") || s.endsWith("'")) s = s.substring(0, s.length() - 1);
+        return s;
+    }
+
+    public static final String stripBraceAndQuotation(String s) {
+        s = stripBrace(s);
+        s = stripQuotation(s);
+        return s;
+    }
+
     public static String shrinkSpace(Object s) {
         if (null == s) return  "";
         return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");

@@ -1,7 +1,9 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IKeyword;
 import com.greenlaw110.rythm.spi.IKeywordParserFactory;
 import com.stevesoft.pat.Regex;
@@ -13,9 +15,9 @@ public abstract class KeywordParserFactory extends CaretParserFactoryBase implem
     public String[] interests() {
         return new String[]{};
     }
-    
+
     protected abstract String patternStr();
-    
+
     private Pattern p = null;
     protected Pattern ptn(DialectBase d) {
         if (null == p) {
@@ -23,7 +25,7 @@ public abstract class KeywordParserFactory extends CaretParserFactoryBase implem
         }
         return p;
     }
-    
+
     private Regex r = null;
     protected Regex reg(DialectBase d) {
         if (null == r) {
@@ -31,4 +33,5 @@ public abstract class KeywordParserFactory extends CaretParserFactoryBase implem
         }
         return r;
     }
+
 }

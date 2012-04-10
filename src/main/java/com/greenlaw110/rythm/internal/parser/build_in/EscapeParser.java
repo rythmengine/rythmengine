@@ -34,19 +34,12 @@ public class EscapeParser extends KeywordParserFactory {
                 int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);
-                s = s.substring(1);
-                s = s.substring(0, s.length() - 1);
-                if (s.startsWith("\"") || s.startsWith("'")) {
-                    s = s.substring(1);
-                }
-                if (s.endsWith("\"") || s.endsWith("'")) {
-                    s = s.substring(0, s.length() - 1);
-                }
+                s = S.stripBraceAndQuotation(s);
                 if (S.isEmpty(s)) s = "HTML";
                 else if ("JavaScript".equalsIgnoreCase(s)) s = "JS";
                 else s = s.toUpperCase();
                 if (Arrays.binarySearch(ITemplate.Escape.stringValues(), s) < 0) {
-                    throw new ParseException(ctx().getTemplateClass(), curLine, "Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(ITemplate.Escape.stringValues()), s);
+                     raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(ITemplate.Escape.stringValues()), s);
                 }
                 s = String.format("__ctx.pushEscape(com.greenlaw110.rythm.template.ITemplate.Escape.%s);", s);
                 return new BlockCodeToken(s, ctx()) {

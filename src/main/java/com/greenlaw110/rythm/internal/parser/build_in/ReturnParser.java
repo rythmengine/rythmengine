@@ -35,11 +35,11 @@ public class ReturnParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(%s%s[\\t ]*\\([\\t ]*\\)[\\s]*)";
+        return "^(%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
     }
 
     public static void main(String[] args) {
-        String s = "@return () \naba";
+        String s = "@return \naba";
         ReturnParser ap = new ReturnParser();
         Regex r = ap.reg(new Rythm());
         if (r.search(s)) {
