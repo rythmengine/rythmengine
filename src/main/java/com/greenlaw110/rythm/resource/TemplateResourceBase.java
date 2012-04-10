@@ -132,8 +132,9 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         //    in the end
         //int lastDotPos = path.lastIndexOf(".");
         //path = path.substring(0, lastDotPos);
-        return path.replace('/', '_').replace('\\', '_').replace('.', '_').replace('-', '_');
-        //return path.replace('/', '.').replace('\\', '.').replace('-', '_');
+        
+        // replace characters that are invalid in a java identifier with '_'
+        return path.replaceAll("[.\\\\/ -]", "_");
     }
 
     public static void main(String[] args) {
