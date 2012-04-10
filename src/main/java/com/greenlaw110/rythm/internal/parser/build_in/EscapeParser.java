@@ -65,16 +65,15 @@ public class EscapeParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "%s%s\\s*((?@()))[\\s]+\\{\\s*";
+        return "%s%s\\s*((?@()))[\\s]+\\{?\\s*";
     }
 
     public static void main(String[] args) {
         Regex r = new EscapeParser().reg(new Rythm());
-        if (r.search("@escape(JS) {\n")) {
+        if (r.search("@escape(JS) \nab")) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }
-        System.out.println(Arrays.binarySearch(ITemplate.Escape.stringValues(), "Bxd01"));
     }
 
 }
