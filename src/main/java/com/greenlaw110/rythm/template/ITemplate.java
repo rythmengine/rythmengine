@@ -65,9 +65,6 @@ public interface ITemplate extends Cloneable {
 
     public static class Context {
         public Stack<Escape> escapeStack;
-        public Context() {
-            escapeStack = new Stack<Escape>();
-        }
         public void init(TemplateClass templateClass) {
             if (templateClass.name().contains("html" + TemplateClass.CN_SUFFIX)) {
                 escapeStack.push(Escape.HTML);
@@ -83,6 +80,10 @@ public interface ITemplate extends Cloneable {
         }
         public Escape popEscape() {
             return escapeStack.pop();
+        }
+
+        public Context() {
+            escapeStack = new Stack<Escape>();
         }
     }
 

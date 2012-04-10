@@ -7,6 +7,8 @@ import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.S;
@@ -14,6 +16,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 public class ForEachParser extends KeywordParserFactory {
+    private static final ILogger logger = Logger.get(ForEachParser.class);
 
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
@@ -27,7 +30,25 @@ public class ForEachParser extends KeywordParserFactory {
                     }
                     String s = r.stringMatched(2);
                     step(r.stringMatched().length());
-                    return new BlockCodeToken("for " + s + "{\n\t", ctx());
+                    return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
+                        @Override
+                        public void openBlock() {
+                            logger.error(">>>>>> push break");
+                            ctx().pushBreak(IContext.Break.BREAK);
+                        }
+
+                        @Override
+                        public void output() {
+                            super.output();
+                        }
+
+                        @Override
+                        public String closeBlock() {
+                            logger.error("<<<<<< pop break");
+                            ctx().popBreak();
+                            return super.closeBlock();
+                        }
+                    };
                 } else {
                     String s = r.stringMatched(1);
                     step(s.length());

@@ -30,6 +30,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         this.varname = null == varname ? "_" : varname;
         this.iterable = iterable;
         openPos = context.cursor();
+        ctx.pushBreak(IContext.Break.RETURN);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         int bodySize = closePos - openPos;
         //p("\nnew com.greenlaw110.rythm.runtime.Each(").p(curClassName).p(".this).render(").p(iterable)
         p("\ncom.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(iterable)
-            .p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(").p(curClassName).p(".this, ").p(bodySize).p(") { //lines:").p(ctx.currentLine()).p("\n\tpublic void render(final ")
+            .p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(").p(curClassName).p(".this, ").p(bodySize).p(") { //lines:").p(ctx.currentLine()).p("\n\tpublic boolean render(final ")
             .p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ")
             .p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ")
             .p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast) { //lines: ").pn(ctx.currentLine());
@@ -47,7 +48,8 @@ public class ForEachCodeToken extends BlockCodeToken {
 
     @Override
     public String closeBlock() {
+        ctx.popBreak();
         closePos = ctx.cursor();
-        return "\n\t}});";
+        return "\n\t return true;\n\t}});";
     }
 }

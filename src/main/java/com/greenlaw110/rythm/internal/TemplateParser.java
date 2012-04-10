@@ -122,6 +122,25 @@ public class TemplateParser implements IContext {
         return cb.engine;
     }
 
+    private Stack<Break> breakStack = new Stack<Break>();
+
+    @Override
+    public void pushBreak(Break b) {
+        breakStack.push(b);
+    }
+
+    @Override
+    public Break peekBreak() {
+        if (breakStack.empty()) return null;
+        return breakStack.peek();
+    }
+
+    @Override
+    public Break popBreak() {
+        if (breakStack.empty()) return null;
+        return breakStack.pop();
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;

@@ -8,6 +8,10 @@ public enum Keyword implements IKeyword {
      */
     ARGS,
     /**
+     * break current loop
+     */
+    BREAK,
+    /**
      * template Debug
      */
     DEBUG,

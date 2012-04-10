@@ -6,13 +6,13 @@ import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 public interface IContext {
-    
+
     /**
      * Return the root source code builder
      * @return
      */
     CodeBuilder getCodeBuilder();
-    
+
     /**
      * Return the remaining template string that has not parsed yet
      * @return
@@ -36,30 +36,30 @@ public interface IContext {
      * @param i
      */
     void step(int i);
-    
+
     /**
      * Notify context to enter a block
-     * 
+     *
      * @param bh the block handler
      */
     void openBlock(IBlockHandler bh);
-    
+
     /**
      * Return current block handleer
-     * 
+     *
      * @return
-     * @throws ParseException 
+     * @throws ParseException
      */
     IBlockHandler currentBlock();
-    
+
     /**
-     * Notify context to close current block and return 
+     * Notify context to close current block and return
      * the block close carets
-     * 
-     * @throws ParseException 
+     *
+     * @throws ParseException
      */
     String closeBlock() throws ParseException;
-    
+
     void setDialect(String dialect);
     IDialect getDialect();
 
@@ -68,10 +68,27 @@ public interface IContext {
      * @return
      */
     int currentLine();
-    
+
     int cursor();
-    
+
     TemplateClass getTemplateClass();
 
     RythmEngine getEngine();
+
+    public static enum Break {
+        BREAK("break;"), RETURN("return false;");
+        private String statement;
+        private Break(String statement) {
+            this.statement = statement;
+        }
+        public String getStatement() {
+            return statement;
+        }
+    }
+
+    void pushBreak(Break b);
+
+    Break peekBreak();
+
+    Break popBreak();
 }

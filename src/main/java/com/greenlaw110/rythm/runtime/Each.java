@@ -5,11 +5,11 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import java.util.Collection;
 import java.util.Iterator;
 
-@SuppressWarnings("rawtypes") 
+@SuppressWarnings("rawtypes")
 public class Each {
-    
+
     public static final Each INSTANCE = new Each();
-    
+
     public Each() {
         //super();
     }
@@ -28,7 +28,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -38,7 +38,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -48,7 +48,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -58,7 +58,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -68,7 +68,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -78,7 +78,7 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
 
@@ -88,10 +88,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length);
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public void loop(Iterable itr, IBody body, int size) {
         Iterator it = itr.iterator();
@@ -102,16 +102,16 @@ public class Each {
             i++;
             Object o = it.next();
             boolean isOdd = i % 2 == 1;
-            body.render(o, size, i, isOdd, isOdd ? "odd" : "even", i == start + 1, !it.hasNext());
+            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", i == start + 1, !it.hasNext())) break;
         }
         //p(body.toString());
     }
-    
+
     public static interface IBody<E>  {
-        void render(final E e, final int size, final int index, final boolean isOdd, final String parity, final boolean isFirst, final boolean isLast);
+        boolean render(final E e, final int size, final int index, final boolean isOdd, final String parity, final boolean isFirst, final boolean isLast);
         void ensureCapacity(int loopCnt);
     }
-    
+
     public static abstract class Looper<E> implements IBody<E> {
         private StringBuilder out = null;
         private int bodySize = 16;
@@ -150,7 +150,7 @@ public class Each {
             if (null != o) out.append(o);
             return this;
         }
-        
+
         public final Looper p(String s) {
             if (null != s && !s.isEmpty()) out.append(s);
             return this;
@@ -168,7 +168,7 @@ public class Each {
             out.append('\n');
             return this;
         }
-        
+
         protected final Looper pn(String s) {
             if (null != s && !s.isEmpty()) out.append(s);
             out.append("\n");
@@ -187,7 +187,7 @@ public class Each {
             if (null != o) p_(o);
             return this;
         }
-        
+
         protected final Looper np(String s) {
             out.append("\n");
             if (null != s && !s.isEmpty()) out.append(s);
