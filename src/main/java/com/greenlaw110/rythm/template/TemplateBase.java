@@ -14,8 +14,6 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
-import java.util.regex.Pattern;
 
 
 public abstract class TemplateBase extends TextBuilder implements ITemplate {
@@ -24,7 +22,7 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     private transient TemplateClass templateClass = null;
     public void setTemplateClass(TemplateClass templateClass) {
         this.templateClass = templateClass;
-        __ctx.init(templateClass);
+        __ctx.init(this);
     }
 
     protected Map<String, Object> _properties = new HashMap<String, Object>();
@@ -130,17 +128,17 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         }
         tmpl.engine = engine;
         tmpl.templateClass = templateClass;
-        //if (null != out) tmpl._out = out;
         if (null != caller) {
             tmpl._caller = (TextBuilder)caller;
         }
+        tmpl.__ctx = new Context();
+        tmpl.__ctx.init(tmpl);
+        //if (null != out) tmpl._out = out;
         if (null != _out) tmpl._out = new StringBuilder();
         _properties = new HashMap<String, Object>(_properties.size());
         renderBody = "";
         renderSections = new HashMap<String, String>();
         renderProperties = new HashMap<String, Object>();
-        __ctx = new Context();
-        __ctx.init(templateClass);
         return tmpl;
     }
 
@@ -161,6 +159,15 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     private boolean _logTime() {
         return _logTime || engine.logRenderTime;
+    }
+
+    public TemplateClass getTemplateClass(boolean useCaller) {
+        TemplateClass tc = templateClass;
+        if (useCaller && null == tc) {
+            TemplateBase caller = caller();
+            if (null != caller) return caller.getTemplateClass(true);
+        }
+        return tc;
     }
 
     @Override
@@ -232,9 +239,9 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                                 }
                             }
                             RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
-                            if (re.templatelineNumber != -1) {
+                            if (re.templateLineNumber != -1) {
                                 StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templatelineNumber);
+                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templateLineNumber);
                                 System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
                                 re.setStackTrace(newStack);
                             }

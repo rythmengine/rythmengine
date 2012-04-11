@@ -65,8 +65,9 @@ public interface ITemplate extends Cloneable {
 
     public static class Context {
         public Stack<Escape> escapeStack;
-        public void init(TemplateClass templateClass) {
-            if (templateClass.name().contains("html" + TemplateClass.CN_SUFFIX)) {
+        public void init(TemplateBase templateBase) {
+            TemplateClass tc = templateBase.getTemplateClass(true);
+            if (tc.name().contains("html" + TemplateClass.CN_SUFFIX)) {
                 escapeStack.push(Escape.HTML);
             } else {
                 escapeStack.push(Escape.RAW);

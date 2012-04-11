@@ -15,16 +15,39 @@ import java.util.regex.Pattern;
 public class RythmException extends FastRuntimeException {
 
     public int javaLineNumber = 0;
-    public int templatelineNumber = -1;
+    public int templateLineNumber = -1;
     public String errorMessage = "";
     public String originalMessage = "";
     private TemplateClass templateClass = null;
+    public String javaSource;
+    public String templateSource;
+    public String templateName;
+
+    public RythmException(Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
+        super(message, t);
+        this.templateName = templateName;
+        this.javaSource = javaSource;
+        this.templateSource = templateSource;
+        this.javaLineNumber = javaLineNumber;
+        this.templateLineNumber = templateLineNumber;
+        this.originalMessage = message;
+        this.errorMessage = message;
+        resolveTemplateLineNumber();
+    }
+
+    public RythmException(String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
+        this(null, templateName, javaSource, templateSource, javaLineNumber, templateLineNumber, message);
+    }
+
+    public RythmException(String templateName, String javaSource, String templateSource, int javaLineNumber, String message) {
+        this(null, templateName, javaSource, templateSource, javaLineNumber, -1, message);
+    }
 
     public RythmException(Throwable t, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
-        this.templatelineNumber = templateLineNumber;
+        this.templateLineNumber = templateLineNumber;
         this.originalMessage = message;
         this.errorMessage = message;
         resolveTemplateLineNumber();
@@ -35,32 +58,35 @@ public class RythmException extends FastRuntimeException {
     }
 
     public RythmException(TemplateClass tc, int javaLineNumber, String message) {
-        this(tc, javaLineNumber, -1, message);
+        this(null, tc, javaLineNumber, -1, message);
     }
 
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
     private void resolveTemplateLineNumber() {
-        if (javaLineNumber != -1 && templatelineNumber == -1) {
+        if (javaLineNumber != -1 && templateLineNumber == -1) {
             String[] lines = getJavaSource().split("\\n");
             if (javaLineNumber < lines.length) {
                 String errorLine = lines[javaLineNumber - 1];
                 Matcher m = P.matcher(errorLine);
                 if (m.matches()) {
-                    templatelineNumber = Integer.parseInt(m.group(1));
+                    templateLineNumber = Integer.parseInt(m.group(1));
                 }
             }
         }
     }
 
     public String getJavaSource() {
+        if (null != javaSource) return javaSource;
         return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
     }
 
     public String getTemplateSource() {
+        if (null != templateSource) return templateSource;
         return templateClass.templateResource.asTemplateContent();
     }
 
     public String getTemplateName() {
+        if (null != templateName) return templateName;
         return templateClass.getKey();
     }
 

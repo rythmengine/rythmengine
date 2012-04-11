@@ -2,9 +2,6 @@ package com.greenlaw110.rythm.exception;
 
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Created by IntelliJ IDEA.
  * User: luog
@@ -20,7 +17,7 @@ public class CompileException extends RythmException {
         public String message;
         private CompilerException(){}
     }
-    
+
     public static CompilerException compilerException(String className, int line, String message) {
         CompilerException e = new CompilerException();
         e.javaLineNumber = line;
@@ -31,7 +28,7 @@ public class CompileException extends RythmException {
 
     public CompileException(TemplateClass tc, int javaLineNumber, String message) {
         super(tc, javaLineNumber, -1, message);
-        errorMessage = String.format("Error compile template[%s]. Java code line: %s; Template code line:%s; Error: %s", tc.getKey(), javaLineNumber, templatelineNumber, originalMessage);
+        errorMessage = String.format("Error compile template[%s]. Java code line: %s; Template code line:%s; Error: %s", tc.getKey(), javaLineNumber, templateLineNumber, originalMessage);
     }
-    
+
 }
