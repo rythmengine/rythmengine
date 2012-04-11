@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.utils;
 
+import com.greenlaw110.rythm.template.ITemplate;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -377,10 +377,10 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     // --- print expression interface
     public final TextBuilder pe(Object o) {
         if (null != o) {
-            if (o instanceof RawData) {
+            if (o instanceof ITemplate.RawData) {
                 return p(o);
             }
-            Escape escape = __ctx.currentEscape();
+            ITemplate.Escape escape = __ctx.currentEscape();
             return pe(o, escape);
         }
         return this;
@@ -410,9 +410,9 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         return p(b);
     }
 
-    public final TextBuilder pe(Object o, Escape escape) {
+    public final TextBuilder pe(Object o, ITemplate.Escape escape) {
         if (null != o) {
-            if (o instanceof RawData) {
+            if (o instanceof ITemplate.RawData) {
                 return p(o);
             }
             if (null == escape) escape = __ctx.currentEscape();
@@ -428,33 +428,31 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
                 case XML:
                     return p(S.escapeXml(o));
             }
-            return p(o);
         }
-        return this;
+        return p(o);
     }
 
-    public final TextBuilder pe(char c, Escape escape) {
+    public final TextBuilder pe(char c, ITemplate.Escape escape) {
         return p(c);
     }
 
-    public final TextBuilder pe(int i, Escape escape) {
+    public final TextBuilder pe(int i, ITemplate.Escape escape) {
         return p(i);
     }
 
-    public final TextBuilder pe(long l, Escape escape) {
+    public final TextBuilder pe(long l, ITemplate.Escape escape) {
         return p(l);
     }
 
-    public final TextBuilder pe(float f, Escape escape) {
+    public final TextBuilder pe(float f, ITemplate.Escape escape) {
         return p(f);
     }
 
-    public final TextBuilder pe(double d, Escape escape) {
-        __ctx.pushEscape(com.greenlaw110.rythm.template.ITemplate.Escape.RAW);
+    public final TextBuilder pe(double d, ITemplate.Escape escape) {
         return p(d);
     }
 
-    public final TextBuilder pe(boolean b, Escape escape) {
+    public final TextBuilder pe(boolean b, ITemplate.Escape escape) {
         return p(b);
     }
 

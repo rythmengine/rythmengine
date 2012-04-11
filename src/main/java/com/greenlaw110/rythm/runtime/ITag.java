@@ -84,7 +84,6 @@ public interface ITag extends ITemplate {
 
     public abstract static class Body extends TextBuilder {
         protected ILogger logger = Logger.get(ITag.class);
-
         protected ITemplate _context;
         public Body(ITemplate context) {
             _context = context;
@@ -110,9 +109,18 @@ public interface ITag extends ITemplate {
 //            String s = getOut().toString();
 //            setOut(old);
 //            return s;
-            _out.setLength(0);
+            StringBuilder sbNew = new StringBuilder();
+            StringBuilder sbOld = _context.getOut();
+            _context.setOut(sbNew);
+            this._out = sbNew;
             call();
-            return _out.toString();
+            String s = sbNew.toString();
+            _context.setOut(sbOld);
+            this._out = null;
+            return s;
+//            _out.setLength(0);
+//            call();
+//            return _out.toString();
         }
     }
 
