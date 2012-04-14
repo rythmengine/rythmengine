@@ -1,6 +1,10 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.cache.ICacheService;
+import com.greenlaw110.rythm.cache.SimpleCacheService;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -15,6 +19,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class RythmProperties extends Properties {
+    private ILogger logger = Logger.get(RythmProperties.class);
 
     public Integer getAsInt(String key, Integer defVal) {
         Object o = get(key);
@@ -53,7 +58,7 @@ public class RythmProperties extends Properties {
         String s = o.toString();
         return new File(s);
     }
-    
+
     public Rythm.Mode getAsMode(String key, Rythm.Mode defVal) {
         Object o = get(key);
         if (null == o) return defVal;
@@ -63,7 +68,7 @@ public class RythmProperties extends Properties {
         put(key, mode);
         return mode;
     }
-    
+
     public Rythm.ReloadMethod getAsReloadMethod(String key, Rythm.ReloadMethod defMethod) {
         Object o = get(key);
         if (null == o) return defMethod;
@@ -87,7 +92,7 @@ public class RythmProperties extends Properties {
             }
         };
     }
-    
+
     public Pattern getAsPattern(String key, Pattern defVal) {
         Object o = get(key);
         if (null == o) return defVal;
@@ -96,6 +101,33 @@ public class RythmProperties extends Properties {
         Pattern p = Pattern.compile(s);
         put(key, p);
         return p;
+    }
+
+    public ICacheService getAsCacheService(String key) {
+        Object o = get(key);
+        if (null == o) return SimpleCacheService.INSTANCE;
+        if (o instanceof ICacheService) return (ICacheService)o;
+        String s = o.toString();
+        try {
+            ICacheService cache = (ICacheService)Class.forName(s).newInstance();
+            return cache;
+        } catch (Exception e) {
+            logger.warn("error creating cache service from configuration item: %s.  Default implementation will be used instead", s);
+            return SimpleCacheService.INSTANCE;
+        }
+    }
+
+    public IDurationParser getAsDurationParser(String key) {
+        Object o = get(key);
+        if (null == o) return IDurationParser.DEFAULT_PARSER;
+        if (o instanceof IDurationParser) return (IDurationParser)o;
+        String s = o.toString();
+        try {
+            return (IDurationParser)Class.forName(s).newInstance();
+        } catch (Exception e) {
+            logger.warn("error creating duration parser from configuration item: %s. Default implementation will be used instead", s);
+            return IDurationParser.DEFAULT_PARSER;
+        }
     }
 
     public <T> T getAs(String key, T defVal, Class<T> tc) {

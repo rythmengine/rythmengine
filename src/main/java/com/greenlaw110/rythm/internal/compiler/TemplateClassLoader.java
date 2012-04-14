@@ -271,7 +271,7 @@ public class TemplateClassLoader extends ClassLoader {
                     throw new RuntimeException("Cannot find inner class def: " + name);
                 }
                 TemplateClass tc = TemplateClass.createInnerClass(name, null, parent);
-                engine.cache.loadTemplateClass(tc);
+                engine.classCache.loadTemplateClass(tc);
                 byte[] bc = tc.enhancedByteCode;
                 if (null == bc) {
                     // inner class byte code cache missed some how, let's try to recover it

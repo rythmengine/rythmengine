@@ -40,7 +40,7 @@ public class TemplateClassCache {
      * @param tc
      */
     public void loadTemplateClass(TemplateClass tc) {
-        if (!engine.cacheEnabled()) {
+        if (!engine.classCacheEnabled()) {
             // cannot handle the v version scheme
             return;
         }
@@ -100,7 +100,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClassSource(TemplateClass tc) {
-        if (!engine.cacheEnabled()) {
+        if (!engine.classCacheEnabled()) {
             return;
         }
         try {
@@ -114,7 +114,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClass(TemplateClass tc) {
-        if (!engine.cacheEnabled()) {
+        if (!engine.classCacheEnabled()) {
             return;
         }
         String hash = hash(tc);

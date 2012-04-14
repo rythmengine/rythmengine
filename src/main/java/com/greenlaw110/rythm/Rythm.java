@@ -17,6 +17,12 @@ public class Rythm {
 
     public static enum Mode {
         dev, prod;
+        public boolean isDev() {
+            return dev == this;
+        }
+        public boolean isProd() {
+            return prod == this;
+        }
     }
 
     public static enum ReloadMethod {

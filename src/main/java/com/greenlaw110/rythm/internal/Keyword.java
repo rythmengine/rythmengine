@@ -12,6 +12,10 @@ public enum Keyword implements IKeyword {
      */
     BREAK,
     /**
+     * Cache the block for certain period
+     */
+    CACHE("cacheFor"),
+    /**
      * template Debug
      */
     DEBUG,

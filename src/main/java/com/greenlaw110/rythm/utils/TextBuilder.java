@@ -36,6 +36,15 @@ public class TextBuilder {
 
     protected TextBuilder _caller;
 
+    public StringBuilder getOut() {
+        return out();
+    }
+
+    public void setOut(StringBuilder out) {
+        if (null != _caller) ((TextBuilder)_caller).setOut(out);
+        else _out = out;
+    }
+
     /**
      * Construct a root text builder
      */

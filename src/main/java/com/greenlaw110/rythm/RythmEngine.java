@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.cache.ICacheService;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
@@ -44,7 +45,7 @@ public class RythmEngine {
     public boolean reloadByIncClassVersion() {
         return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
     }
-    public boolean cacheEnabled() {
+    public boolean classCacheEnabled() {
         return reloadByRestart();
     }
 
@@ -60,11 +61,22 @@ public class RythmEngine {
     public final TemplateResourceManager resourceManager = new TemplateResourceManager(this);
     public final TemplateClassManager classes = new TemplateClassManager(this);
     public TemplateClassLoader classLoader = null;
-    public TemplateClassCache cache = new TemplateClassCache(this);
+    public TemplateClassCache classCache = new TemplateClassCache(this);
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
+    /**
+     * If this is set to true then @cacheFor() {} only effective on product mode
+     */
+    public boolean cacheOnProdOnly = true;
+    /**
+     * Default Time to live for cache items
+     */
+    public int defaultTTL = 60;
+    public ICacheService cacheService = null;
+    public IDurationParser durationParser = null;
+
     /**
      * Enable refresh resource on render. This could be turned off
      * if the resource reload service is managed by container, e.g. Play!framework
@@ -87,7 +99,7 @@ public class RythmEngine {
      *
      * disable java extension can improve parse performance
      */
-    private boolean enableJavaExtensions = false;
+    private boolean enableJavaExtensions = true;
     public boolean enableJavaExtensions() {
         return enableJavaExtensions;
     }
@@ -213,6 +225,13 @@ public class RythmEngine {
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
         }
+
+        defaultTTL = configuration.getAsInt("rythm.cache.defaultTTL", 60);
+        cacheService = configuration.getAsCacheService("rythm.cache.service");
+        cacheService.setDefaultTTL(defaultTTL);
+        durationParser = configuration.getAsDurationParser("rythm.cache.durationParser");
+
+        cacheOnProdOnly = configuration.getAsBoolean("rythm.cache.prodOnly", true);
 
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
@@ -505,6 +524,50 @@ public class RythmEngine {
             if (h.handleTemplateExecutionException(e, template)) return;
         }
         throw e;
+    }
+
+    // -- cache api
+
+    /**
+     * Store object o into cache service with ttl equals to duration specified.
+     *
+     * <p>The duration is a string parsed by IDurationParser</p>
+     *
+     * <p>The object o is associated with given key and a list of argument values</p>
+     * @param key
+     * @param o
+     * @param duration
+     * @param args
+     */
+    public void cache(String key, Object o, String duration, Object ... args) {
+        if (mode.isDev() && cacheOnProdOnly) return;
+        int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
+        String value = null == o ? "" : o.toString();
+        if (args.length > 0) {
+            StringBuilder sb = new StringBuilder(key);
+            for (Object arg: args) {
+                sb.append("-").append(arg);
+            }
+            key = sb.toString();
+        }
+        cacheService.put(key, value, ttl);
+    }
+
+    /**
+     * Get cached value using key and a list of argument values
+     * @param key
+     * @param args
+     * @return
+     */
+    public String cached(String key, Object ... args) {
+        if (args.length > 0) {
+            StringBuilder sb = new StringBuilder(key);
+            for (Object arg: args) {
+                sb.append("-").append(arg);
+            }
+            key = sb.toString();
+        }
+        return cacheService.get(key);
     }
 
     // -- SPI interface

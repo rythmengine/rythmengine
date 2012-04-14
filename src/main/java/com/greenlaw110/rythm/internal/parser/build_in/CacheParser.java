@@ -1,0 +1,142 @@
+package com.greenlaw110.rythm.internal.parser.build_in;
+
+import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.dialect.Rythm;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
+import com.stevesoft.pat.Regex;
+
+import java.util.UUID;
+
+/**
+ * Parse @cacheFor("1m")
+ */
+public class CacheParser extends KeywordParserFactory {
+
+    /*
+    {
+      String s = _engine().cached("key", 1, foo.bar());
+      if (null != s) {
+        p(s);
+      } else {
+        StringBuilder sbOld = getOut();
+        StringBuilder sbNew = new StringBuilder()
+        setOut(sbNew);
+        ...
+        s = sbNew.toString();
+        setOut(sbOld);
+        _engine().cache("key", s, duration, 1, foo.bar());
+        p(s)
+      }
+    }
+     */
+    private static class CacheToken extends BlockCodeToken {
+        private String key;
+        private String args;
+        private String duration;
+        CacheToken(String key, String duration, String args, IContext ctx) {
+            super("", ctx);
+            this.key = key;
+            this.duration = S.isEmpty(duration) ? "null" : duration;
+            this.args = args;
+        }
+        @Override
+        public void output() {
+            p("{");
+            pline();
+            pt("String s = _engine().cached(\"").p(key).p("\"").p(args).p(");");
+            pline();
+            pt("if (null != s) {");
+            pline();
+            p2t("p(s);");
+            pline();
+            pt("} else {");
+            pline();
+            p2t("StringBuilder sbOld = getOut();");
+            pline();
+            p2t("StringBuilder sbNew = new StringBuilder();");
+            pline();
+            p2t("setOut(sbNew);");
+            pline();
+        }
+
+        @Override
+        public String closeBlock() {
+            StringBuilder sbOld = getOut();
+            StringBuilder sbNew = new StringBuilder();
+            setOut(sbNew);
+            p2t("s = sbNew.toString();");
+            pline();
+            p2t("setOut(sbOld);");
+            pline();
+            p2t("_engine().cache(\"").p(key).p("\",s,").p(duration).p(args).p(");");
+            pline();
+            p2t("p(s);");
+            pline();
+            pt("}");
+            pline();
+            p("}");
+            pline();
+            String s = sbNew.toString();
+            setOut(sbOld);
+            return s;
+        }
+    }
+
+    @Override
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
+            @Override
+            public TextBuilder go() {
+                Regex r = reg(dialect());
+                if (!r.search(remain())) {
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @cacheFor statement. Correct usage: @cacheFor (\"duration_string\") {cache block}");
+                }
+                String key = UUID.nameUUIDFromBytes(remain().getBytes()).toString();
+                ctx.step(r.stringMatched().length());
+                String s = r.stringMatched(2); // ("1m", 1, bar.foo())
+                s = S.stripBrace(s); // "1m", 1, bar.foo()
+                String[] sa = s.split(",");
+                String duration = null;
+                if (sa.length > 0) duration = sa[0]; // "1m"
+                String args = "";
+                if (sa.length > 1) {
+                    StringBuilder sb = new StringBuilder("");
+                    for (int i = 1; i < sa.length; ++i) {
+                        sb.append(",").append(sa[i]);
+                    }
+                    args = sb.toString();
+                }
+                return new CacheToken(key, duration, args, ctx());
+            }
+        };
+    }
+
+    @Override
+    public Keyword keyword() {
+        return Keyword.CACHE;
+    }
+
+    @Override
+    protected String patternStr() {
+        //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
+        return "^(^%s%s\\s*((?@()))(\\s*\\{)?)";
+    }
+
+    public static void main(String[] args) {
+        Regex r = new CacheParser().reg(new Rythm());
+        String s = "@cacheFor(\"1m\", 1, bar.foo())ab";
+        if (r.search(s)) {
+            System.out.println(r.stringMatched());
+            System.out.println(r.stringMatched(1));
+            System.out.println(r.stringMatched(2));
+            System.out.println(r.stringMatched(3));
+        }
+    }
+
+}

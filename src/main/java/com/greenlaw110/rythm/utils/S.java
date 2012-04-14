@@ -3,6 +3,8 @@ package com.greenlaw110.rythm.utils;
 import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.text.Normalizer;
+
 public class S {
     public static boolean isEmpty(String s) {
         return null == s || "".equals(s.trim());
@@ -91,7 +93,8 @@ public class S {
         return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
     }
 
-    public static String pad(String str, Integer size) {
+    public static String pad(Object obj, Integer size) {
+        String str = null == obj ? "" : obj.toString();
         int t = size - str.length();
         for (int i = 0; i < t; i++) {
             str += "&nbsp;";
@@ -99,7 +102,9 @@ public class S {
         return str;
     }
 
-    public static String capitalizeWords(String source) {
+    public static String capitalizeWords(Object obj) {
+        if (null == obj) return "";
+        String source = obj.toString();
         char prevc = ' '; // first char of source is capitalized
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < source.length(); i++) {
@@ -113,6 +118,57 @@ public class S {
         }
         return sb.toString();
     }
+
+    public static String noAccents(Object obj) {
+        if (null == obj) return "";
+        String string = obj.toString();
+        return Normalizer.normalize(string, Normalizer.Form.NFKC).replaceAll("[àáâãäåāąă]", "a").replaceAll("[çćčĉċ]", "c").replaceAll("[ďđð]", "d").replaceAll("[èéêëēęěĕė]", "e").replaceAll("[ƒſ]", "f").replaceAll("[ĝğġģ]", "g").replaceAll("[ĥħ]", "h").replaceAll("[ìíîïīĩĭįı]", "i").replaceAll("[ĳĵ]", "j").replaceAll("[ķĸ]", "k").replaceAll("[łľĺļŀ]", "l").replaceAll("[ñńňņŉŋ]", "n").replaceAll("[òóôõöøōőŏœ]", "o").replaceAll("[Þþ]", "p").replaceAll("[ŕřŗ]", "r").replaceAll("[śšşŝș]", "s").replaceAll("[ťţŧț]", "t").replaceAll("[ùúûüūůűŭũų]", "u").replaceAll("[ŵ]", "w").replaceAll("[ýÿŷ]", "y").replaceAll("[žżź]", "z").replaceAll("[æ]", "ae").replaceAll("[ÀÁÂÃÄÅĀĄĂ]", "A").replaceAll("[ÇĆČĈĊ]", "C").replaceAll("[ĎĐÐ]", "D").replaceAll("[ÈÉÊËĒĘĚĔĖ]", "E").replaceAll("[ĜĞĠĢ]", "G").replaceAll("[ĤĦ]", "H").replaceAll("[ÌÍÎÏĪĨĬĮİ]", "I").replaceAll("[Ĵ]", "J").replaceAll("[Ķ]", "K").replaceAll("[ŁĽĹĻĿ]", "L").replaceAll("[ÑŃŇŅŊ]", "N").replaceAll("[ÒÓÔÕÖØŌŐŎ]", "O").replaceAll("[ŔŘŖ]", "R").replaceAll("[ŚŠŞŜȘ]", "S").replaceAll("[ÙÚÛÜŪŮŰŬŨŲ]", "U").replaceAll("[Ŵ]", "W").replaceAll("[ÝŶŸ]", "Y").replaceAll("[ŹŽŻ]", "Z").replaceAll("[ß]", "ss");
+    }
+
+    public static String slugify(Object obj) {
+        return slugify(obj, Boolean.TRUE);
+    }
+
+    public static String slugify(Object obj, Boolean lowercase) {
+        if (null == obj) return "";
+        String string = obj.toString();
+        string = noAccents(string);
+        // Apostrophes.
+        string = string.replaceAll("([a-z])'s([^a-z])", "$1s$2");
+        string = string.replaceAll("[^\\w]", "-").replaceAll("-{2,}", "-");
+        // Get rid of any - at the start and end.
+        string.replaceAll("-+$", "").replaceAll("^-+", "");
+
+        return (lowercase ? string.toLowerCase() : string);
+    }
+
+    public static String capFirst(Object o) {
+        if (null == o) return "";
+        String string = o.toString().toLowerCase();
+        if (string.length() == 0) {
+            return string;
+        }
+        return ("" + string.charAt(0)).toUpperCase() + string.substring(1);
+    }
+
+    public static String capAll(Object o) {
+        if (null == o) return "";
+        String string = o.toString();
+        return capitalizeWords(string);
+    }
+
+    public static String camelCase(Object obj) {
+        if (null == obj) return "";
+        String string = obj.toString();
+        string = noAccents(string);
+        string = string.replaceAll("[^\\w ]", "");
+        StringBuilder result = new StringBuilder(string.length());
+        for (String part : string.split(" ")) {
+            result.append(capFirst(part));
+        }
+        return result.toString();
+    }
+
 
     public static void main(String[] args) {
         System.out.println(S.escape("<h1>Hello</h1>"));

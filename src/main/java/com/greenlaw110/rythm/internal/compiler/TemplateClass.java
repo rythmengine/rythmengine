@@ -278,7 +278,7 @@ public class TemplateClass {
             }
 
             if (null == javaSource) {
-                engine().cache.loadTemplateClass(this);
+                engine().classCache.loadTemplateClass(this);
                 if (null != javaSource) {
                     // try refresh extended template class if there is
                     Pattern p = Pattern.compile(".*extends\\s+([a-zA-Z0-9_]+)\\s*\\{\\s*\\/\\/<extended_resource_key\\>(.*)\\<\\/extended_resource_key\\>.*", Pattern.DOTALL);
@@ -307,7 +307,7 @@ public class TemplateClass {
                 templateInstance = null;
                 if (e.reloadByIncClassVersion()) javaClass = null;
                 compiled = false;
-                engine().cache.deleteCache(this);
+                engine().classCache.deleteCache(this);
                 engine().restart(new ClassReloadException("extended class changed"));
                 refresh(forceRefresh);
                 return true; // pass refresh state to sub template
@@ -323,7 +323,7 @@ public class TemplateClass {
             cb.build();
             extendedTemplateClass = cb.getExtendedTemplateClass();
             javaSource = cb.toString();
-            engine().cache.cacheTemplateClassSource(this); // cache source code for debugging purpose
+            engine().classCache.cacheTemplateClassSource(this); // cache source code for debugging purpose
             if (!cb.isRythmTemplate()) {
                 isValid = false;
                 engine().classes.remove(this);
@@ -362,7 +362,7 @@ public class TemplateClass {
         javaByteCode = null;
         enhancedByteCode = null;
         javaSource = null;
-        engine().cache.deleteCache(this);
+        engine().classCache.deleteCache(this);
     }
 
     /**
@@ -456,7 +456,7 @@ public class TemplateClass {
         javaByteCode = code;
         enhancedByteCode = code;
         compiled = true;
-        if (!noCache) engine().cache.cacheTemplateClass(this);
+        if (!noCache) engine().classCache.cacheTemplateClass(this);
     }
 
     /**

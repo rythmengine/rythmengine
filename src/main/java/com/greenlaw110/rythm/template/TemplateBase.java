@@ -363,17 +363,6 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     public Context __ctx = new Context();
 
-    @Override
-    public StringBuilder getOut() {
-        return out();
-    }
-
-    @Override
-    public void setOut(StringBuilder out) {
-        if (null != _caller) ((ITemplate)_caller).setOut(out);
-        else _out = out;
-    }
-
     // --- print expression interface
     public final TextBuilder pe(Object o) {
         if (null != o) {

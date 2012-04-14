@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.spi;
 
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.IJavaExtension;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -70,7 +71,7 @@ public class Token extends TextBuilder {
     }
     static {
         String[] sa = {
-            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "escapeJava", "shrinkSpace"
+            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
         };
         for (String s: sa) {
             addExtension(new IJavaExtension.VoidParameterExtension("S", s));
@@ -204,11 +205,12 @@ public class Token extends TextBuilder {
         }
     }
 
-    public void pline() {
+    public Token pline() {
         p(" //line: ").pn(line);
+        return this;
     }
 
-    private void pp(String s) {
+    protected void pp(String s) {
         s = compact(s);
         s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
         p("p(\"").p(s).p("\");");

@@ -9,6 +9,26 @@ public class CodeToken extends Token {
         super(s, context);
     }
 
+    protected CodeToken pt(Object o) {
+        p("\t").p(o);
+        return this;
+    }
+
+    protected CodeToken p2t(Object o) {
+        p("\t\t").p(o);
+        return this;
+    }
+
+    protected CodeToken p3t(Object o) {
+        p("\t\t\t").p(o);
+        return this;
+    }
+
+    protected CodeToken p4t(Object o) {
+        p("\t\t\t\t").p(o);
+        return this;
+    }
+
     @Override
     public void output() {
         p(s);
