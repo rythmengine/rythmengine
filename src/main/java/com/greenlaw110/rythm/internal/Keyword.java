@@ -20,11 +20,6 @@ public enum Keyword implements IKeyword {
      */
     DEBUG,
     /**
-     * Render tag body
-     * used inside a tag only
-     */
-    DO_BODY("doBody"),
-    /**
      * Foreach loop
      */
     EACH("(for|forEach|each)"),

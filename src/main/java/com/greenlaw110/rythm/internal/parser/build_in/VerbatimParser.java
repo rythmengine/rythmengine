@@ -6,20 +6,21 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 public class VerbatimParser extends KeywordParserFactory {
-    
+
     private static final String R = "(%s%s\\s*(\\(\\s*\\))?\\s*((?@{})))";
 
     public VerbatimParser() {
     }
-    
+
     protected String patternStr() {
         return R;
     }
-    
+
     public IParser create(IContext c) {
         return new ParserBase(c) {
             public TextBuilder go() {
@@ -30,7 +31,15 @@ public class VerbatimParser extends KeywordParserFactory {
                     s0 = s0.substring(1); // strip '{'
                     s0 = s0.substring(0, s0.length() - 1); // strip '}'
                     final String s = s0;
-                    return new Token(s, ctx(), true);
+                    return new Token(s, ctx(), true) {
+                        @Override
+                        protected void output() {
+                            s = compact(s);
+                            s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+                            p("p(com.greenlaw110.rythm.utils.S.escape(\"").p(s).p("\"));");
+                            pline();
+                        }
+                    };
                 }
                 return null;
             }

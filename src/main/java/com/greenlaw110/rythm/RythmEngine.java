@@ -73,7 +73,7 @@ public class RythmEngine {
     /**
      * Default Time to live for cache items
      */
-    public int defaultTTL = 60;
+    public int defaultTTL = 60 * 60;
     public ICacheService cacheService = null;
     public IDurationParser durationParser = null;
 
@@ -527,21 +527,15 @@ public class RythmEngine {
     }
 
     // -- cache api
-
     /**
-     * Store object o into cache service with ttl equals to duration specified.
-     *
-     * <p>The duration is a string parsed by IDurationParser</p>
-     *
-     * <p>The object o is associated with given key and a list of argument values</p>
+     * Cache object using key and args for ttl seconds
      * @param key
      * @param o
-     * @param duration
+     * @param ttl if zero then defaultTTL used, if negative then never expire
      * @param args
      */
-    public void cache(String key, Object o, String duration, Object ... args) {
+    public void cache(String key, Object o, int ttl, Object ... args) {
         if (mode.isDev() && cacheOnProdOnly) return;
-        int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
         String value = null == o ? "" : o.toString();
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
@@ -551,6 +545,22 @@ public class RythmEngine {
             key = sb.toString();
         }
         cacheService.put(key, value, ttl);
+    }
+
+    /**
+     * Store object o into cache service with ttl equals to duration specified.
+     *
+     * <p>The duration is a string to be parsed by @{link #durationParser}</p>
+     *
+     * <p>The object o is associated with given key and a list of argument values</p>
+     * @param key
+     * @param o
+     * @param duration
+     * @param args
+     */
+    public void cache(String key, Object o, String duration, Object ... args) {
+        int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
+        cache(key, o, ttl, args);
     }
 
     /**

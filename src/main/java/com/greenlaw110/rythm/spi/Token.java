@@ -230,7 +230,7 @@ public class Token extends TextBuilder {
         return tb.toString();
     }
 
-    private String compact(String s) {
+    protected String compact(String s) {
         return compactMode() ? compact_(s) : s;
     }
 
