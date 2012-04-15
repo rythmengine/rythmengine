@@ -89,6 +89,11 @@ public class TemplateParser implements IContext {
         cursor += i;
     }
 
+    @Override
+    public String getTemplateSource(int start, int end) {
+        return template.substring(start, end);
+    }
+
     private Stack<IBlockHandler> blocks = new Stack<IBlockHandler>();
 
     @Override

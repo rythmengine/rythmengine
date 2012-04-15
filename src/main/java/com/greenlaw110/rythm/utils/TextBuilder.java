@@ -2,9 +2,7 @@ package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.template.ITemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class defines a chained source code builder. It's some how like a StringBuilder but it's chainable

@@ -36,14 +36,16 @@ public class CacheParser extends KeywordParserFactory {
     }
      */
     private static class CacheToken extends BlockCodeToken {
-        private String key;
         private String args;
         private String duration;
-        CacheToken(String key, String duration, String args, IContext ctx) {
+        private int startIndex;
+        private int endIndex;
+        private String key;
+        CacheToken( String duration, String args, IContext ctx) {
             super("", ctx);
-            this.key = key;
             this.duration = S.isEmpty(duration) ? "null" : duration;
             this.args = args;
+            this.startIndex = ctx.cursor();
         }
         @Override
         public void output() {
@@ -67,6 +69,9 @@ public class CacheParser extends KeywordParserFactory {
 
         @Override
         public String closeBlock() {
+            endIndex = ctx.cursor();
+            String body = ctx.getTemplateSource(startIndex, endIndex);
+            key = UUID.nameUUIDFromBytes(body.getBytes()).toString();
             StringBuilder sbOld = getOut();
             StringBuilder sbNew = new StringBuilder();
             setOut(sbNew);
@@ -112,7 +117,7 @@ public class CacheParser extends KeywordParserFactory {
                     }
                     args = sb.toString();
                 }
-                return new CacheToken(key, duration, args, ctx());
+                return new CacheToken(duration, args, ctx());
             }
         };
     }

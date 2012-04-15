@@ -226,7 +226,7 @@ public class RythmEngine {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
         }
 
-        defaultTTL = configuration.getAsInt("rythm.cache.defaultTTL", 60);
+        defaultTTL = configuration.getAsInt("rythm.cache.defaultTTL", 60 * 60);
         cacheService = configuration.getAsCacheService("rythm.cache.service");
         cacheService.setDefaultTTL(defaultTTL);
         durationParser = configuration.getAsDurationParser("rythm.cache.durationParser");

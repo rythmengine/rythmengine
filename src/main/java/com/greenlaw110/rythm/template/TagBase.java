@@ -50,6 +50,12 @@ public abstract class TagBase extends TemplateBase implements ITag {
     }
 
     @Override
+    protected void _pBody() {
+        if (null != _body) p(_body);
+        else super._pBody();
+    }
+
+    @Override
     public String getName() {
         return null;
     }

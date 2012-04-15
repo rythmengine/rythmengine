@@ -14,11 +14,16 @@ public enum Keyword implements IKeyword {
     /**
      * Cache the block for certain period
      */
-    CACHE("cacheFor"),
+    CACHE,
     /**
      * template Debug
      */
     DEBUG,
+    /**
+     * Render tag body
+     * used inside a tag only
+     */
+    DO_BODY("doBody"),
     /**
      * Foreach loop
      */

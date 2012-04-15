@@ -38,6 +38,14 @@ public interface IContext {
     void step(int i);
 
     /**
+     * Return any segment of template source
+     * @param start
+     * @param end
+     * @return
+     */
+    String getTemplateSource(int start, int end);
+
+    /**
      * Notify context to enter a block
      *
      * @param bh the block handler

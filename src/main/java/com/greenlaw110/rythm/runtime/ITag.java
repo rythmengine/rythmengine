@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.*;
@@ -79,6 +80,25 @@ public interface ITag extends ITemplate {
                 if (p.name != null) m.put(p.name, p.value);
             }
             return m;
+        }
+
+        private String uuid = null;
+
+        /**
+         * Used to create unique key for cacheFor extension
+         * @return
+         */
+        public String toUUID() {
+            if (null == uuid) {
+                StringBuilder sb = new StringBuilder();
+                for (Parameter p: lp) {
+                    sb.append(";").append(p.name).append("=").append(p.value);
+                }
+                String s = sb.toString();
+                if (S.isEmpty(s)) s = "EMPTY_PARAMETER_LIST";
+                uuid = UUID.nameUUIDFromBytes(s.getBytes()).toString();
+            }
+            return uuid;
         }
     }
 

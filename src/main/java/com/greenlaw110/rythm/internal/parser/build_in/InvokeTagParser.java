@@ -7,11 +7,13 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,13 +59,21 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     private static class InvokeTagToken extends CodeToken {
         String tagName;
         ParameterDeclarationList params = new ParameterDeclarationList();
-        int line;
+        protected boolean enableCache = false;
+        protected String cacheDuration = null;
+        protected String cacheArgs = null;
 
-        InvokeTagToken(String tagName, String paramLine, IContext context) {
+        protected String cacheKey() {
+            return tagName;
+        }
+
+        InvokeTagToken(String tagName, String paramLine, boolean cacheFor, String duration, String cacheForArgs, IContext context) {
             super(null, context);
             this.tagName = tagName;
+            this.enableCache = cacheFor;
+            this.cacheDuration = S.isEmpty(duration) ? "null" : duration;
+            this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _pl.toUUID()" : cacheArgs;
             parse(paramLine);
-            line = context.currentLine();
         }
 
         /*
@@ -81,29 +91,81 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public void output() {
-            p("\n{\n\tcom.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; //line: ").pn(line);
+            p("{");
+            pline();
+            pt("com.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; ");
+            pline();
             if (params.pl.size() > 0) {
-                p("\n\t_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList(); //line: ").pn(line);
+                pt("_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
+                pline();
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
-                    p("\n\t_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p("); //").pn(line);
+                    pt("_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
+                    pline();
                 }
+            }
+            if (enableCache) {
+                pt("String s = _engine().cached(\"").p(cacheKey()).p("\"");
+                p(cacheArgs).p(");");
+                pline();
+                pt("if (null != s) {");
+                pline();
+                p2t("p(s);");
+                pline();
+                pt("} else {");
+                pline();
+                p2t("StringBuilder sbOld = getOut();");
+                pline();
+                p2t("StringBuilder sbNew = new StringBuilder();");
+                pline();
+                p2t("setOut(sbNew);");
+                pline();
             }
             outputInvokeStatement();
         }
 
         protected void outputInvokeStatement() {
-            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl); //line:").p(line).p("\n}");
+            if (enableCache) {
+                p2t("_invokeTag(\"").p(tagName).p("\", _pl);");
+                pline();
+                p2t("s = sbNew.toString();");
+                pline();
+                p2t("setOut(sbOld);");
+                pline();
+                p2t("_engine().cache(\"").p(cacheKey()).p("\", s, ").p(cacheDuration).p(cacheArgs).p(");");
+                pline();
+                p2t("p(s);");
+                pline();
+                pt("}");
+                pline();
+                p("}");
+                pline();
+            } else {
+                pt("_invokeTag(\"").p(tagName).p("\", _pl);");
+                pline();
+                p("}");
+                pline();
+            }
         }
 
     }
 
     private static class InvokeTagWithBodyToken extends InvokeTagToken implements IBlockHandler {
-
-        InvokeTagWithBodyToken(String tagName, String paramLine, IContext context) {
-            super(tagName, paramLine, context);
+        private String textListenerKey = UUID.randomUUID().toString();
+        private StringBuilder tagBodyBuilder = new StringBuilder();
+        private int startIndex = 0;
+        private int endIndex = 0;
+        private String key = null;
+        InvokeTagWithBodyToken(String tagName, String paramLine, boolean cacheFor, String cacheForDuration, String cacheForArgs, IContext context) {
+            super(tagName, paramLine, cacheFor, cacheForDuration, cacheForArgs, context);
             context.openBlock(this);
+            startIndex = ctx.cursor();
+        }
+
+        @Override
+        protected String cacheKey() {
+            return tagName + key;
         }
 
         @Override
@@ -113,15 +175,54 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         protected void outputInvokeStatement() {
             String curClassName = ctx.getCodeBuilder().className();
-            p("\n\t_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) { //line:").p(line);
-            p("\n\t\t@Override public void setProperty(String name, Object val) {").p("//line: ").p(line).p("\n\t\t\tsetRenderArg(name, val); //line: ").p(line).p("\n\t}").p("//line: ").pn(line);
-            p("\n\t\t@Override public Object getProperty(String name) {").p("//line: ").p(line).p("\n\t\t\treturn getRenderArg(name); //line: ").p(line).p("\n\t}").p("//line: ").pn(line);
-            p("\n\t\t@Override public void call() { //line: ").pn(line);
+            p2t("_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
+            pline();
+            p3t("@Override public void setProperty(String name, Object val) {");
+            pline();
+            p4t("setRenderArg(name, val);");
+            pline();
+            p3t("}");
+            pline();
+            p3t("@Override public Object getProperty(String name) {");
+            pline();
+            p4t("return getRenderArg(name); ");
+            pline();
+            p3t("}");
+            pline();
+            p3t("@Override public void call() {");
+            pline();
         }
 
         @Override
         public String closeBlock() {
-            return "\n\t\t}\n\t});\n}";
+            if (!enableCache) {
+                return "\n\t\t}\n\t});\n}";
+            }
+            endIndex = ctx.cursor();
+            String body = ctx.getTemplateSource(startIndex, endIndex);
+            key = UUID.nameUUIDFromBytes(body.getBytes()).toString();
+            StringBuilder sbOld = getOut();
+            StringBuilder sbNew = new StringBuilder();
+            setOut(sbNew);
+            p3t("}");
+            pline();
+            p2t("});");
+            pline();
+            p2t("s = sbNew.toString();");
+            pline();
+            p2t("setOut(sbOld);");
+            pline();
+            p2t("_engine().cache(\"").p(cacheKey()).p("\",s,").p(cacheDuration).p(cacheArgs).p(");");
+            pline();
+            p2t("p(s);");
+            pline();
+            pt("}");
+            pline();
+            p("}");
+            pline();
+            String s = sbNew.toString();
+            setOut(sbOld);
+            return s;
         }
 
     }
@@ -145,17 +246,32 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 if (!isTag(tagName)) return null;
                 String s = r.stringMatched();
                 ctx().step(s.length());
+                String cacheFor = r.stringMatched(5);
+                boolean enableCacheFor = false;
+                String cacheForDuration = null;
+                String cacheForArgs = null;
+                if (null != cacheFor) {
+                    enableCacheFor = true;
+                    cacheFor = S.stripBrace(cacheFor); // "1h",1,foo.bar()
+                    String[] cacheForArray = cacheFor.split(",");
+                    if (cacheForArray.length > 0) {
+                        cacheForDuration = cacheForArray[0]; // "1h"
+                    }
+                    if (cacheForArray.length > 1) {
+                        cacheForArgs = cacheFor.replaceFirst(cacheForDuration, "");
+                    }
+                }
                 s = remain();
                 Matcher m0 = P_HEREDOC_SIMBOL.matcher(s);
                 Matcher m1 = P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
                     ctx().step(m0.group(1).length());
-                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), ctx());
+                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
                 } else if (m1.matches()) {
                     ctx().step(m1.group(1).length());
-                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), ctx());
+                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
                 } else {
-                    return new InvokeTagToken(tagName, r.stringMatched(3), ctx());
+                    return new InvokeTagToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
                 }
             }
         };
@@ -163,20 +279,23 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
 
     private static String patternStr() {
-        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@())))";
+        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@()))(\\.cache((?@())))?)";
     }
 
     public static void main(String[] args) {
         IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null));
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
         Regex r = new Regex(ps);
-        //String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\")  Gren";
-        String s = "@xyz()";
+        String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cacheFor(\"1h\", 1 , foo.bar())  Gren";
+        //String s = "@xyz().cacheFor(\"1h\")";
         //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
         if (r.search(s)) {
             System.out.println(r.stringMatched());
-            InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
-            System.out.println(t.params);
+            System.out.println(r.stringMatched(3));
+            System.out.println(r.stringMatched(4));
+            System.out.println(r.stringMatched(5));
+            //InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
+            //System.out.println(t.params);
         }
         else System.out.println("not found");
 
