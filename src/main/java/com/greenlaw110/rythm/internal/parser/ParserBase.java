@@ -3,12 +3,17 @@ package com.greenlaw110.rythm.internal.parser;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 
+import java.util.logging.LoggingMXBean;
 import java.util.regex.Pattern;
 
 public abstract class ParserBase implements IParser {
+
+    protected ILogger logger = Logger.get(IParser.class);
 
     public static final String R_VARNAME = "[a-zA-Z][a-zA-Z0-9_]*";
 

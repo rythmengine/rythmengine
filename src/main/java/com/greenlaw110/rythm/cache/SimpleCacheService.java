@@ -5,10 +5,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,6 +19,8 @@ public class SimpleCacheService implements ICacheService {
     public static final SimpleCacheService INSTANCE = new SimpleCacheService();
 
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private boolean started = false;
+
     private SimpleCacheService() {
         scheduler.scheduleAtFixedRate(new Runnable(){
             @Override
@@ -42,6 +41,7 @@ public class SimpleCacheService implements ICacheService {
                 }
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
+
     }
 
     private static class Item {
@@ -109,5 +109,10 @@ public class SimpleCacheService implements ICacheService {
     public void setDefaultTTL(int ttl) {
         if (ttl == 0) throw new IllegalArgumentException("time to live value couldn't be zero");
         this.defaultTTL = ttl;
+    }
+
+    @Override
+    public void shutdown() {
+        scheduler.shutdown();
     }
 }

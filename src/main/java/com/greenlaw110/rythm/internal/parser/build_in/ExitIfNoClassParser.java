@@ -15,7 +15,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
 
     @Override
     public Keyword keyword() {
-        return Keyword.EXIT_IF_NOCLASS;
+        return Keyword.EXIT_IF_NO_CLASS;
     }
 
     public IParser create(final IContext ctx) {

@@ -3,6 +3,8 @@ package com.greenlaw110.rythm.internal;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
@@ -12,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Stack;
 
 public class TemplateParser implements IContext {
+    private final ILogger logger = Logger.get(TemplateParser.class);
     private final CodeBuilder cb;
     private String template;
     private int totalLines;

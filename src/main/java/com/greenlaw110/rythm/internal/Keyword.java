@@ -28,9 +28,9 @@ public enum Keyword implements IKeyword {
      */
     ESCAPE,
     /**
-     * Exit parsign process if no class loaded in current class loader
+     * Exit parsing process if no class loaded in current class loader
      */
-    EXIT_IF_NOCLASS("__exitIfNoClass__"),
+    EXIT_IF_NO_CLASS("__exitIfNoClass__"),
     /**
      * Declare parent template for this template
      */

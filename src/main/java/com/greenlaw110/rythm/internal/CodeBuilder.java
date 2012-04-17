@@ -19,9 +19,9 @@ import java.util.*;
 public class CodeBuilder extends TextBuilder {
 
     public static class RenderArgDeclaration {
-        String name;
-        String type;
-        String defVal;
+        public String name;
+        public String type;
+        public String defVal;
 
         public RenderArgDeclaration(String name, String type) {
             this(name, type, null);

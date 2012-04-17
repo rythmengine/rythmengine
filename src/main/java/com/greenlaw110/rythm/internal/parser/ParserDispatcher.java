@@ -11,16 +11,16 @@ import java.util.regex.Pattern;
 
 /**
  * BuildInParserDispatcher test remaining template content and try
- * to find the build in parser which is interested to the next 
- * build in keyword. If one is found then the parse process is 
+ * to find the build in parser which is interested to the next
+ * build in keyword. If one is found then the parse process is
  * passed to it. Otherwise null token is returned
- * 
+ *
  * @author luog
  */
 public class ParserDispatcher extends ParserBase {
-    
+
     private final Pattern P;
-    
+
     public ParserDispatcher(IContext context) {
         super(context);
         P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), PatternStr.VarName);
@@ -42,7 +42,7 @@ public class ParserDispatcher extends ParserBase {
         }
         return null;
     }
-    
+
     public static void main(String[] args) {
         Pattern p = Pattern.compile("@([a-zA-Z0-9_]+)(\\s*|\\(|\\{).*");
         Matcher m = p.matcher("@var String name;Hello @name");

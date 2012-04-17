@@ -52,4 +52,9 @@ public interface ICacheService {
      * @param ttl
      */
     void setDefaultTTL(int ttl);
+
+    /**
+     * Shutdown the cache service
+     */
+    void shutdown();
 }

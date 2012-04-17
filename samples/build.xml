@@ -10,7 +10,7 @@
     <pathelement location="${lib}/patbinfree153.jar" />
     <pathelement location="${lib}/ecj-3.7.1.jar" />
     <pathelement location="${lib}/commons-lang3-3.1.jar" />
-    <pathelement location="${lib}/rythm-0.9-SNAPSHOT.jar" />
+    <pathelement location="${lib}/rythm-0.9.3.jar" />
   </path>
 
   <target name="init">
@@ -26,7 +26,7 @@
   </target>
 
   <target name="hello_world" depends="compile_hello_world">
-    <java classname="HelloWorld" logError="true" fork="true">
+    <java classname="HelloWorld" logError="true" fork="false">
       <classpath location="classes" />
       <classpath refid="project.class.path" />
     </java>

@@ -27,7 +27,9 @@ public class ArgsParser extends KeywordParserFactory {
             public TextBuilder go() {
                 String remain = remain();
                 String key = String.format("%s%s ", a(), keyword());
-                if (!remain.startsWith(key)) return null;
+                if (!remain.startsWith(key)) {
+                    throw new NullPointerException();
+                }
                 step(key.length());
                 remain = remain();
                 Regex r = reg(dialect());
@@ -78,7 +80,7 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String s = "Page page, FBApp app\n\tString s@agd";
+        String s = "Exception result\n Not found";
         ArgsParser ap = new ArgsParser();
         Regex r = ap.reg(new Rythm());
         System.out.println(r);
