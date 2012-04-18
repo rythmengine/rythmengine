@@ -279,7 +279,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
 
     private static String patternStr() {
-        return "^(%s([a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@()))(\\.cache((?@())))?)";
+        return "^(%s([_a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@()))(\\.cache((?@())))?)";
     }
 
     public static void main(String[] args) {
