@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
@@ -28,7 +29,7 @@ public class RenderSectionParser extends KeywordParserFactory {
                 String s = m.group(1);
                 step(s.length());
                 String section = m.group(4);
-                String code = "\n_pSection(\"" + section + "\");\n";
+                String code = S.isEmpty(section) ? "_pBody();" : "_pSection(\"" + section + "\");";
                 return new CodeToken(code, ctx());
             }
         };
@@ -36,13 +37,13 @@ public class RenderSectionParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(%s%s\\s*[\\s\\(]\"?'?(" + PatternStr.VarName + ")\"?'?\\)?).*";
+        return "(%s%s\\s*[\\s\\(]\"?'?(" + PatternStr.VarName + ")?\"?'?\\)?).*";
     }
-    
+
     public static void main(String[] args) {
         String s = String.format(new RenderSectionParser().patternStr(), "@", Keyword.RENDER_SECTION);
         Pattern p = Pattern.compile(s);
-        Matcher m = p.matcher("@render(abc) Hello world");
+        Matcher m = p.matcher("@render() Hello world");
         if (m.find()) {
             System.out.println(m.group(1));
             System.out.println(m.group(4));
