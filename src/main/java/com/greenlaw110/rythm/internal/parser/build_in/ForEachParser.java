@@ -33,7 +33,6 @@ public class ForEachParser extends KeywordParserFactory {
                     return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
                         @Override
                         public void openBlock() {
-                            logger.error(">>>>>> push break");
                             ctx().pushBreak(IContext.Break.BREAK);
                         }
 
@@ -44,7 +43,6 @@ public class ForEachParser extends KeywordParserFactory {
 
                         @Override
                         public String closeBlock() {
-                            logger.error("<<<<<< pop break");
                             ctx().popBreak();
                             return super.closeBlock();
                         }
