@@ -12,5 +12,6 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
  */
 public interface ITemplateResourceLoader {
     ITemplateResource load(String key);
-    TemplateClass tryLoadTag(String tagName);
+    TemplateClass tryLoadTag(String tagName, TemplateClass tc);
+    String getFullTagName(TemplateClass tc);
 }

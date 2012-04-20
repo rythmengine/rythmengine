@@ -18,7 +18,7 @@ import java.io.File;
  * To change this template use File | Settings | File Templates.
  */
 public class FileTemplateResource extends TemplateResourceBase implements ITemplateResource {
-    
+
     private ILogger logger = Logger.get(FileTemplateResource.class);
     private File file;
     private String key;
@@ -28,11 +28,11 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     protected long defCheckInterval() {
         return 1000 * 5;
     }
-    
+
     public FileTemplateResource(String path) {
         this(path, null);
     }
-    
+
     public FileTemplateResource(String path, RythmEngine engine) {
         super(engine);
         File home = engine().templateHome;
@@ -50,7 +50,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         }
         file = f;
         key = path;
-        
+
         if (null != tagHome && isValid()) {
             // set tag name if this file is found under tag home
             String tagPath = tagHome.getAbsolutePath();
@@ -60,7 +60,28 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
             }
         }
     }
-    
+
+    public FileTemplateResource(File templateFile) {
+        this(templateFile, null);
+    }
+
+    public FileTemplateResource(File templateFile, RythmEngine engine) {
+        super(engine);
+        File home = engine().templateHome;
+        File tagHome = engine().tagHome;
+        file = templateFile;
+        key = file.getPath();
+
+        if (null != tagHome && isValid()) {
+            // set tag name if this file is found under tag home
+            String tagPath = tagHome.getAbsolutePath();
+            String filePath = file.getAbsolutePath();
+            if (filePath.startsWith(tagPath)) {
+                this.tagName = retrieveTagName(tagHome, file);
+            }
+        }
+    }
+
     private static String retrieveTagName(File tagHome, File tagFile) {
         String tagPath = tagHome.getAbsolutePath();
         String filePath = tagFile.getAbsolutePath();
@@ -77,22 +98,13 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         }
         return tagName;
     }
-    
+
     public static void main(String[] args) {
         File tagHome = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\");
         File tagFile = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\greenscript\\css.html");
         System.out.println(retrieveTagName(tagHome, tagFile));
     }
-    
-    public FileTemplateResource(File templateFile) {
-        this(templateFile, null);
-    }
 
-    public FileTemplateResource(File templateFile, RythmEngine engine) {
-        super(engine);
-        file = templateFile;
-    }
-    
     @Override
     public String getKey() {
         return key;
@@ -128,6 +140,19 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return tagName;
     }
 
+    public static String getFullTagName(TemplateClass tc, RythmEngine engine) {
+        if (null == engine) engine = Rythm.engine;
+        String key = tc.getKey();
+        if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
+        if (key.startsWith(engine.templateHome.getPath())) {
+            key = key.replace(engine.templateHome.getPath(), "");
+        }
+        if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
+        int pos = key.lastIndexOf(".");
+        if (-1 != pos) key = key.substring(0, pos);
+        return key.replace('/', '.').replace('\\', '.');
+    }
+
     public static TemplateClass tryLoadTag(String tagName, RythmEngine engine) {
         if (null == engine) engine = Rythm.engine;
         if (engine.tags.containsKey(tagName)) return null;
@@ -141,7 +166,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         File[] roots = {engine.tagHome, engine.templateHome};
         for (String suffix: suffixes) {
             String name = tagName + suffix;
-            
+
             for (File root: roots) {
                 tagFile = new File(root, name);
                 if (tagFile.canRead()) {
@@ -161,6 +186,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                             }
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                         // ignore
                     }
                 }

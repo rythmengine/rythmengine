@@ -35,7 +35,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         }
 
         return new ParserBase(ctx){
-            
+
             @Override
             public TextBuilder go() {
                 String s = remain();

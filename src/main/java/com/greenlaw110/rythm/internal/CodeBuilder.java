@@ -133,6 +133,10 @@ public class CodeBuilder extends TextBuilder {
 
     public void addImport(String imprt) {
         if (!globalImports.contains(imprt)) imports.add(imprt);
+        if (imprt.endsWith(".*")) {
+            imprt = imprt.substring(0, imprt.lastIndexOf(".*"));
+            templateClass.importPaths.add(imprt);
+        }
     }
 
     private static class InlineTag {
@@ -301,8 +305,6 @@ public class CodeBuilder extends TextBuilder {
                 p(";");
             }
         }
-        // - this moved to TemplateBase: p("\n\tprotected java.util.Map<String, Object> _properties = new java.util.HashMap();");
-        // - this moved to TagBase: if (isTag()) p("\n\tprivate com.greenlaw110.rythm.runtime.ITag.Body _body = null;");
 
         // -- output setRenderArgs method
         p("\n\t@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
@@ -311,7 +313,6 @@ public class CodeBuilder extends TextBuilder {
             p("\n\tif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
         }
         p("\n\tsuper.setRenderArgs(args);\n}");
-        // this moved to TagBase: if (isTag()) p("\n\tif (null == _body) _body = args.get(\"_body\");\n}");
 
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
@@ -338,18 +339,7 @@ public class CodeBuilder extends TextBuilder {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p("\n\tif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
         }
-        //moved to TagBase: if (isTag()) p("\n\tif (\"_body\".equals(name)) this._body = (com.greenlaw110.rythm.runtime.ITag.Body)arg;");
         p("\n\tsuper.setRenderArg(name, arg);\n}");
-
-        // -- output getRenderArgs
-        // this is moved to TemplateBase
-        // p("\n@SuppressWarnings(\"unchecked\") @Override public java.util.Map<String,Object> getRenderArgs() { \n\treturn new HashMap<String, Object>(_properties);\n}");
-
-        // -- output getRenderArg by name - moved to TemplateBase
-//        p("\n@SuppressWarnings(\"unchecked\") protected Object internalGetRenderArg(String name) {");
-//        // moved to tag base if (isTag()) p("\n\tif (\"_body\".equals(name)) return this._body;");
-//        p("\n\treturn _properties.get(name);");
-//        p("\n}");
 
         // -- output setRenderArg by position
         p("\n@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");

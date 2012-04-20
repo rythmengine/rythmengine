@@ -15,9 +15,9 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
  * To change this template use File | Settings | File Templates.
  */
 public class TemplateResourceManager {
-    
+
     private RythmEngine engine;
-    
+
     private Map<String, ITemplateResource> cache = new HashMap<String, ITemplateResource>();
 
     public ITemplateResourceLoader resourceLoader = null;
@@ -25,21 +25,26 @@ public class TemplateResourceManager {
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
     }
-    
+
     private ITemplateResource cache(ITemplateResource resource) {
         if (resource.isValid()) cache.put(resource.getKey(), resource);
         return resource;
     }
-    
-    public TemplateClass tryLoadTag(String tagName) {
-        if (null != resourceLoader) return resourceLoader.tryLoadTag(tagName);
+
+    public TemplateClass tryLoadTag(String tagName, TemplateClass tc) {
+        if (null != resourceLoader) return resourceLoader.tryLoadTag(tagName, tc);
         else return FileTemplateResource.tryLoadTag(tagName, engine);
     }
-    
+
+    public String getFullTagName(TemplateClass tc) {
+        if (null != resourceLoader) return resourceLoader.getFullTagName(tc);
+        else return FileTemplateResource.getFullTagName(tc, engine);
+    }
+
     public ITemplateResource get(File file) {
         return cache(new FileTemplateResource(file, engine));
     }
-    
+
     public ITemplateResource get(String str) {
         ITemplateResource resource = getFileResource(str);
         if (!resource.isValid()) resource = new StringTemplateResource(str, engine);

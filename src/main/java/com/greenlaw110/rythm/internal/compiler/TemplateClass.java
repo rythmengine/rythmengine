@@ -16,6 +16,8 @@ import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -118,6 +120,10 @@ public class TemplateClass {
      * The enhanced byteCode
      */
     public byte[] enhancedByteCode;
+    /**
+     * Store a list of import path, i.e. those imports ends with ".*"
+     */
+    public Set<String> importPaths;
     /**
      * The in JVM loaded class
      */
@@ -318,6 +324,7 @@ public class TemplateClass {
 
             // now start generate source and compile source to byte code
             addVersion();
+            importPaths = new HashSet<String>();
             long start = System.currentTimeMillis();
             CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
             cb.build();

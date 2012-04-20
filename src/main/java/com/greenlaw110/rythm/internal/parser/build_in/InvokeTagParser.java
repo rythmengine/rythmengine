@@ -72,7 +72,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             this.tagName = tagName;
             this.enableCache = cacheFor;
             this.cacheDuration = S.isEmpty(duration) ? "null" : duration;
-            this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _pl.toUUID()" : cacheArgs;
+            this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _pl.toUUID()" : ", _pl.toUUID()" + cacheForArgs;
             parse(paramLine);
         }
 
@@ -224,7 +224,6 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             setOut(sbOld);
             return s;
         }
-
     }
 
     private static final Pattern P_HEREDOC_SIMBOL = Pattern.compile("(\\s*<<).*", Pattern.DOTALL);
@@ -234,8 +233,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
 
-            boolean isTag(String name) {
-                return ctx().getCodeBuilder().engine.isTag(name, ctx().getTemplateClass());
+            String testTag(String name) {
+                return ctx().getCodeBuilder().engine.testTag(name, ctx().getTemplateClass());
             }
 
             @Override
@@ -243,7 +242,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 Regex r = new Regex(String.format(patternStr(), dialect().a()));
                 if (!r.search(remain())) return null;
                 String tagName = r.stringMatched(2);
-                if (!isTag(tagName)) return null;
+                tagName = testTag(tagName);
+                if (null == tagName) return null;
                 String s = r.stringMatched();
                 ctx().step(s.length());
                 String cacheFor = r.stringMatched(5);

@@ -424,30 +424,33 @@ public class RythmEngine {
     // -- tag relevant codes
 
     public final Map<String, ITag> tags = new HashMap<String, ITag>();
+    public final Set<String> non_tags = new HashSet<String>();
 
-    public boolean isTag(String name, TemplateClass tc) {
+    public String testTag(String name, TemplateClass tc) {
+        if (mode.isProd() && non_tags.contains(name)) return null;
         boolean isTag = tags.containsKey(name);
-        if (!isTag) {
-            try {
-                // try to ask resource manager
-                TemplateClass tagTC = resourceManager.tryLoadTag(name);
-                // let's check again
-                isTag = tags.containsKey(name);
-                if (!isTag) {
-                    // if we are calling tag from the tag itself
-                    isTag = tc.equals(tagTC);
-                }
-                return isTag;
-            } catch (TagLoadException e) {
-                throw e;
-            } catch (RythmException e) {
-                throw e;
-            } catch (Exception e) {
-                logger.error(e, "error trying load tag[%s]", name);
-                // see if the
+        if (isTag) return name;
+        try {
+            // try to ask resource manager
+            TemplateClass tagTC = resourceManager.tryLoadTag(name, tc);
+            if (null == tagTC) {
+                if (mode.isProd()) non_tags.add(name);
+                return null;
             }
+            String fullName = resourceManager.getFullTagName(tagTC);
+            if (!S.isEqual(fullName, name)) {
+                tags.put(fullName, tags.get(name));
+            }
+            return fullName;
+        } catch (TagLoadException e) {
+            throw e;
+        } catch (RythmException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error(e, "error trying load tag[%s]", name);
+            // see if the
         }
-        return isTag;
+        return null;
     }
 
     /**
@@ -480,7 +483,7 @@ public class RythmEngine {
         ITag tag = tags.get(name);
         if (null == tag) {
             // try load the tag
-            resourceManager.tryLoadTag(name);
+            resourceManager.tryLoadTag(name, ((TemplateBase)caller).getTemplateClass(true));
             tag = tags.get(name);
             if (null == tag) throw new NullPointerException("cannot find tag: " + name);
             tag = (ITag)tag.cloneMe(this, caller);
