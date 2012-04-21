@@ -1,4 +1,5 @@
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.utils.IO;
 
 import java.io.File;
 import java.util.Properties;
@@ -15,12 +16,20 @@ public class Issue22 {
         try {
             Properties properties = new Properties();
             properties.put("rythm.mode", "dev");
-            properties.put("rythm.root", new File("t:/tmp/issue22/"));
+            File root = new File("tmp/issue22");
+            root.mkdirs();
+            File index = new File(root, "index.html");
+            IO.writeContent("@args String s\n@common(s)", index);
+            File common = new File(root, "common.html");
+            IO.writeContent("@args String s\nhello @s", common);
+            properties.put("rythm.root", root);
             Rythm.init(properties);
-            String s = "s";
+            String s = "rythm";
             System.out.println (Rythm.render("index.html", s));
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            Rythm.engine.cacheService.shutdown();
         }
     }
 }

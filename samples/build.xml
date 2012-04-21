@@ -1,45 +1,59 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project name="rythm_samples" default="all" basedir=".">
 
-  <property name="src_hello_world"     location="HelloWorld" />
-  <property name="classes" location="classes" />
-  <property name="lib"     location="../lib" />
-  <property environment="env" />
+    <property name="src_hello_world" location="HelloWorld"/>
+    <property name="src_issue_22" location="Issue22"/>
+    <property name="classes" location="classes"/>
+    <property name="lib" location="../lib"/>
+    <property environment="env"/>
 
-  <path id="project.class.path">
-    <pathelement location="${lib}/patbinfree153.jar" />
-    <pathelement location="${lib}/ecj-3.7.1.jar" />
-    <pathelement location="${lib}/commons-lang3-3.1.jar" />
-    <pathelement location="${lib}/rythm-0.9.3.jar" />
-  </path>
+    <path id="project.class.path">
+        <pathelement location="${lib}/pat-1.5.3.jar"/>
+        <pathelement location="${lib}/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
+        <pathelement location="${lib}/commons-lang3-3.1.jar"/>
+        <pathelement location="${lib}/rythm-0.9.3.jar"/>
+    </path>
 
-  <target name="init">
-    <tstamp/>
-    <mkdir dir="${classes}" />
-  </target>
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${classes}"/>
+    </target>
 
-  <target name="compile_hello_world" depends="init">
-    <javac srcdir="${src_hello_world}" destdir="${classes}" includeantruntime="true">
-      <classpath refid="project.class.path" />
-    </javac>
-    <copy file="${src_hello_world}/hello.txt" todir="${classes}" />
-  </target>
+    <target name="compile_hello_world" depends="init">
+        <javac srcdir="${src_hello_world}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+        <copy file="${src_hello_world}/hello.txt" todir="${classes}"/>
+    </target>
 
-  <target name="hello_world" depends="compile_hello_world">
-    <java classname="HelloWorld" logError="true" fork="false">
-      <classpath location="classes" />
-      <classpath refid="project.class.path" />
-    </java>
-  </target>
-  
-  <target name="all" depends="hello_world">
-  </target>
+    <target name="hello_world" depends="compile_hello_world">
+        <java classname="HelloWorld" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
 
-  <target name="clean">
-    <delete dir="${classes}" />
-    <delete>
-      <fileset dir="." includes="output.*" />
-    </delete>
-  </target>
+    <target name="compile_issue_22" depends="init">
+        <javac srcdir="${src_issue_22}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
+
+    <target name="issue_22" depends="compile_issue_22">
+        <java classname="Issue22" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="all" depends="hello_world, issue_22">
+    </target>
+
+    <target name="clean">
+        <delete dir="${classes}"/>
+        <delete>
+            <fileset dir="." includes="output.*"/>
+        </delete>
+    </target>
 
 </project>
