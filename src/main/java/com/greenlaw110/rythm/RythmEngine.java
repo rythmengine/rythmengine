@@ -430,6 +430,19 @@ public class RythmEngine {
         if (mode.isProd() && non_tags.contains(name)) return null;
         boolean isTag = tags.containsKey(name);
         if (isTag) return name;
+        // try imported path
+        for (String s: tc.importPaths) {
+            String name0 = s + "." + name;
+            if (tags.containsKey(name0)) return name0;
+        }
+        // try relative path
+        String callerName = resourceManager.getFullTagName(tc);
+        int pos = callerName.lastIndexOf(".");
+        if (-1 != pos) {
+            String name0 = callerName.substring(0, pos) + "." + name;
+            if (tags.containsKey(name0)) return name0;
+        }
+
         try {
             // try to ask resource manager
             TemplateClass tagTC = resourceManager.tryLoadTag(name, tc);

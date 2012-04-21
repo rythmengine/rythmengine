@@ -72,7 +72,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             this.tagName = tagName;
             this.enableCache = cacheFor;
             this.cacheDuration = S.isEmpty(duration) ? "null" : duration;
-            this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _pl.toUUID()" : ", _pl.toUUID()" + cacheForArgs;
+            this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _plUUID" : ", _plUUID" + cacheForArgs;
             parse(paramLine);
         }
 
@@ -106,6 +106,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 }
             }
             if (enableCache) {
+                pt("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
+                pline();
                 pt("String s = _engine().cached(\"").p(cacheKey()).p("\"");
                 p(cacheArgs).p(");");
                 pline();

@@ -39,6 +39,7 @@ public class CodeBuilder extends TextBuilder {
             else if ("float".equals(type)) return "Float";
             else if ("double".equals(type)) return "Double";
             else if ("char".equals(type)) return "Character";
+            else if ("long".equals(type)) return "Long";
             else return type;
         }
 
@@ -380,6 +381,7 @@ public class CodeBuilder extends TextBuilder {
             for (String argName: renderArgs.keySet()) {
                 RenderArgDeclaration arg = renderArgs.get(argName);
                 p("\n\tif (").p(argName).p(" == null) {");
+                //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
                 p("\n\t\t").p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");\n\t}");
             }
         p("\n}\n");
