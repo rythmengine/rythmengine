@@ -16,7 +16,9 @@ import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -77,6 +79,30 @@ public class TemplateClass {
         version = (long)v;
     }
     public TemplateClass extendedTemplateClass;
+    private Set<TemplateClass> includedTemplateClasses = new HashSet<TemplateClass>();
+    public void addIncludeTemplateClass(TemplateClass tc) {
+        includedTemplateClasses.add(tc);
+    }
+    public String includeTemplateClassNames = null;
+    private static final String NO_INCLUDE_CLASS = "NO_INCLUDE_CLASS";
+    public String refreshIncludeTemplateClassNames() {
+        if (includedTemplateClasses.size() == 0) {
+            includeTemplateClassNames = NO_INCLUDE_CLASS;
+            return NO_INCLUDE_CLASS;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (TemplateClass tc: includedTemplateClasses) {
+            if (!first) {
+                sb.append(",");
+            } else {
+                first = false;
+            }
+            sb.append(engine().resourceManager.getFullTagName(tc));
+        }
+        includeTemplateClassNames = sb.toString();
+        return sb.toString();
+    }
     /**
      * If not null then this template is a tag
      */
@@ -145,6 +171,13 @@ public class TemplateClass {
      * Mark if this is a valid Rythm Template
      */
     public boolean isValid = true;
+
+    /**
+     * CodeBuilder to generate java source code
+     *
+     * Could be used to merge state into including template class codeBuilder
+     */
+    public CodeBuilder codeBuilder;
 
     /**
      * The ITemplate instance
@@ -305,9 +338,35 @@ public class TemplateClass {
                 }
             }
 
-            boolean extendedTemplateModified = false;
-            if (extendedTemplateClass != null) extendedTemplateModified = extendedTemplateClass.refresh(forceRefresh);
-            if (extendedTemplateModified && engine().reloadByRestart()) {
+            boolean extendedTemplateChanged = false;
+            if (extendedTemplateClass != null) extendedTemplateChanged = extendedTemplateClass.refresh(forceRefresh);
+            boolean includedTemplateChanged = false;
+            if (includedTemplateClasses.size() == 0 && !S.isEmpty(includeTemplateClassNames) && !NO_INCLUDE_CLASS.equals(includeTemplateClassNames)) {
+                // just loaded from persistent store
+                for (String tcName: includeTemplateClassNames.split(",")) {
+                    if (S.isEmpty(tcName)) continue;
+                    tcName = tcName.trim();
+                    tcName = engine().testTag(tcName, this);
+                    if (null == tcName) {
+                        logger.warn("Unable to load included template class from name: %s", tcName);
+                        continue;
+                    }
+                    TemplateClass tc = engine().getTemplateClassFromTagName(tcName);
+                    if (null == tc) {
+                        logger.warn("Unable to load included template class from name: %s", tcName);
+                        continue;
+                    }
+                    includedTemplateClasses.add(tc);
+                }
+            }
+            for (TemplateClass tc: includedTemplateClasses) {
+                if (tc.refresh(forceRefresh)) {
+                    includedTemplateChanged = true;
+                    break;
+                }
+            }
+
+            if (extendedTemplateChanged && engine().reloadByRestart()) {
                 javaByteCode = null;
                 enhancedByteCode = null;
                 templateInstance = null;
@@ -319,19 +378,20 @@ public class TemplateClass {
                 return true; // pass refresh state to sub template
             }
             // templateResource.refresh() must be put at first so we make sure resource get refreshed
-            boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || extendedTemplateModified;
+            boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || includedTemplateChanged || extendedTemplateChanged;
             if (!refresh) return false;
 
             // now start generate source and compile source to byte code
             addVersion();
             importPaths = new HashSet<String>();
             long start = System.currentTimeMillis();
-            CodeBuilder cb = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
-            cb.build();
-            extendedTemplateClass = cb.getExtendedTemplateClass();
-            javaSource = cb.toString();
+            if (null != codeBuilder) codeBuilder.clear();
+            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
+            codeBuilder.build();
+            extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
+            javaSource = codeBuilder.toString();
             engine().classCache.cacheTemplateClassSource(this); // cache source code for debugging purpose
-            if (!cb.isRythmTemplate()) {
+            if (!codeBuilder.isRythmTemplate()) {
                 isValid = false;
                 engine().classes.remove(this);
                 return false;

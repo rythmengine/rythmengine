@@ -7,6 +7,8 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.resource.ITemplateResource;
+import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
@@ -96,10 +98,10 @@ public class CodeBuilder extends TextBuilder {
         return extendedTemplateClass;
     }
     private InvokeTagParser.ParameterDeclarationList extendArgs = null;
-    Set<String> imports = new HashSet<String>();
+    public Set<String> imports = new HashSet<String>();
     private int extendDeclareLineNo = -1;
     // <argName, argClass>
-    Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
+    public Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<TextBuilder> builders = new ArrayList<TextBuilder>();
     private TemplateParser parser;
     private TemplateClass templateClass;
@@ -120,6 +122,31 @@ public class CodeBuilder extends TextBuilder {
         this.engine = null == engine ? Rythm.engine : engine;
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
+    }
+
+    public void clear() {
+        out().ensureCapacity(0);
+        this.builders.clear();
+        this.engine = null;
+        if (null != this.extendArgs) this.extendArgs.pl.clear();
+        this.extendedTemplateClass = null;
+        this.imports.clear();
+        this.inlineTagBodies.clear();
+        this.inlineTags.clear();
+        this.parser = null;
+        this.templateClass = null;
+        this.renderArgs.clear();
+    }
+
+    public void merge(CodeBuilder codeBuilder) {
+        if (null == codeBuilder) return;
+        this.imports.addAll(codeBuilder.imports);
+        for (String key: codeBuilder.inlineTags.keySet()) {
+            InlineTag tag = codeBuilder.inlineTags.get(key).clone(this);
+            inlineTags.put(key, tag);
+        }
+        this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
+        this.renderArgs.putAll(codeBuilder.renderArgs);
     }
 
     public String className() {
@@ -148,6 +175,15 @@ public class CodeBuilder extends TextBuilder {
             tagName = name;
             signature = sig;
         }
+        InlineTag clone(CodeBuilder newCaller) {
+            InlineTag tag = new InlineTag(tagName, signature);
+            tag.builders.clear();
+            for (TextBuilder tb: builders) {
+                TextBuilder newTb = tb.clone(newCaller);
+                tag.builders.add(newTb);
+            }
+            return tag;
+        }
     }
     private Map<String, InlineTag> inlineTags = new HashMap<String, InlineTag>();
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
@@ -163,6 +199,33 @@ public class CodeBuilder extends TextBuilder {
     public void endTag() {
         if (inlineTagBodies.empty()) throw new ParseException(templateClass, parser.currentLine(), "Unexpected tag definition close");
         builders = inlineTagBodies.pop();
+    }
+
+    public String addIncludes(String includes, int lineNo) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : includes.split("[\\s,;:]+")) {
+            sb.append(addInclude(s, lineNo));
+        }
+        return sb.toString();
+    }
+
+    public String addInclude(String include, int lineNo) {
+        String tagName = engine.testTag(include, templateClass);
+        if (null == tagName) {
+            throw new ParseException(templateClass, lineNo, "include template not found: %s", include);
+        }
+        TemplateBase includeTag = (TemplateBase)engine.tags.get(tagName);
+        if (includeTag instanceof JavaTagBase) {
+            throw new ParseException(templateClass, lineNo, "cannot include Java tag: %s", include);
+        }
+        TemplateClass includeTc = includeTag.getTemplateClass(false);
+        if (null == includeTc.codeBuilder) {
+            // loaded from persistent class cache?
+            includeTc.refresh(true);
+        }
+        merge(includeTc.codeBuilder);
+        templateClass.addIncludeTemplateClass(includeTc);
+        return includeTc.codeBuilder.buildBody;
     }
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
@@ -407,12 +470,20 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
+    public String buildBody = null;
+
     private void pBuild() {
         p("\n@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
         p("\n\tout().ensureCapacity(").p(tmpl.length()).p(");");
+        StringBuilder sb = new StringBuilder();
+        StringBuilder old = out();
+        setOut(sb);
         for (TextBuilder b: builders) {
             b.build();
         }
+        buildBody = sb.toString();
+        setOut(old);
+        p(buildBody);
         p("\nreturn this;\n}");
     }
 

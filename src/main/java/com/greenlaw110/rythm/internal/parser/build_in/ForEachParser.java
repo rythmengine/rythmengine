@@ -34,6 +34,7 @@ public class ForEachParser extends KeywordParserFactory {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);
+                            ctx().pushContinue(IContext.Continue.CONTINUE);
                         }
 
                         @Override

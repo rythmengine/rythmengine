@@ -94,9 +94,22 @@ public interface IContext {
         }
     }
 
+    public static enum Continue {
+        CONTINUE("continue;"), RETURN("return true;");
+        private String statement;
+        private Continue(String statement) {
+            this.statement = statement;
+        }
+        public String getStatement() {
+            return statement;
+        }
+    }
+
     void pushBreak(Break b);
-
     Break peekBreak();
-
     Break popBreak();
+
+    void pushContinue(Continue c);
+    Continue peekContinue();
+    Continue popContinue();
 }

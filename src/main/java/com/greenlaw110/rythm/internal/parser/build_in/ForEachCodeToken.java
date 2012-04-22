@@ -32,6 +32,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         line--;
         openPos = context.cursor();
         ctx.pushBreak(IContext.Break.RETURN);
+        ctx.pushContinue(IContext.Continue.RETURN);
     }
 
     @Override

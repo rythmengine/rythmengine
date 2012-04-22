@@ -149,6 +149,25 @@ public class TemplateParser implements IContext {
         return breakStack.pop();
     }
 
+    private Stack<Continue> continueStack = new Stack<Continue>();
+
+    @Override
+    public void pushContinue(Continue b) {
+        continueStack.push(b);
+    }
+
+    @Override
+    public Continue peekContinue() {
+        if (continueStack.empty()) return null;
+        return continueStack.peek();
+    }
+
+    @Override
+    public Continue popContinue() {
+        if (continueStack.empty()) return null;
+        return continueStack.pop();
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;

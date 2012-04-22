@@ -426,14 +426,22 @@ public class RythmEngine {
     public final Map<String, ITag> tags = new HashMap<String, ITag>();
     public final Set<String> non_tags = new HashSet<String>();
 
+    public TemplateClass getTemplateClassFromTagName(String name) {
+        TemplateBase tag = (TemplateBase)tags.get(name);
+        if (null == tag) return null;
+        return tag.getTemplateClass(false);
+    }
+
     public String testTag(String name, TemplateClass tc) {
         if (mode.isProd() && non_tags.contains(name)) return null;
         boolean isTag = tags.containsKey(name);
         if (isTag) return name;
         // try imported path
-        for (String s: tc.importPaths) {
-            String name0 = s + "." + name;
-            if (tags.containsKey(name0)) return name0;
+        if (null != tc.importPaths) {
+            for (String s: tc.importPaths) {
+                String name0 = s + "." + name;
+                if (tags.containsKey(name0)) return name0;
+            }
         }
         // try relative path
         String callerName = resourceManager.getFullTagName(tc);

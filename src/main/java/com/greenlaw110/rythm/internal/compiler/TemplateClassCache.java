@@ -77,7 +77,10 @@ public class TemplateClassCache {
                 offset++;
             }
             if (source.length() != 0) {
-                tc.javaSource = source.toString();
+                String s = source.toString();
+                String[] sa = s.split("__INCULDED_TEMPLATE_CLASS_NAME_LIST__");
+                tc.javaSource = sa[0];
+                tc.includeTemplateClassNames = sa[1];
             } // else it must be an inner class
 
 //            // --- load version info
@@ -86,6 +89,17 @@ public class TemplateClassCache {
 //                    tc.setVersion(read);
 //                }
 //                offset++;
+//            }
+
+//            // -- load included template classes
+//            StringBuilder included = new StringBuilder();
+//            while((read = is.read()) != 0) {
+//                included.append((char)read);
+//                offset++;
+//            }
+//            if (included.length() != 0) {
+//                String s = included.toString();
+//                tc.includeTemplateClassNames = s;
 //            }
 
             // --- load byte code
@@ -127,7 +141,8 @@ public class TemplateClassCache {
             // --- cache java source
             os.write(0);
             if (null != tc.javaSource) {
-                os.write(tc.javaSource.getBytes("utf-8"));
+                String src = tc.javaSource + "__INCULDED_TEMPLATE_CLASS_NAME_LIST__ " + tc.refreshIncludeTemplateClassNames();
+                os.write(src.getBytes("utf-8"));
             } // else the tc is an inner class thus we don't have javaSource at all
 
 //            // --- cache class version
@@ -141,6 +156,11 @@ public class TemplateClassCache {
 //                int nv = Integer.valueOf(sv);
 //                os.write(nv);
 //            }
+
+//            // --- cache included template class names
+//            os.write(0);
+//            tc.refreshIncludeTemplateClassNames();
+//            os.write(tc.includeTemplateClassNames.getBytes("utf-8"));
 
             // --- cache byte code
             os.write(0);

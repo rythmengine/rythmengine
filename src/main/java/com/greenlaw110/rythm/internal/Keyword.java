@@ -16,6 +16,10 @@ public enum Keyword implements IKeyword {
      */
     CACHE,
     /**
+     * Continue current loop
+     */
+    CONTINUE,
+    /**
      * template Debug
      */
     DEBUG,
@@ -44,9 +48,13 @@ public enum Keyword implements IKeyword {
      */
     IF,
     /**
-     * introduce import package statement
+     * import java packages/classes
      */
     IMPORT,
+    /**
+     * include other templates
+     */
+    INCLUDE,
     /**
      * Mark a section init code. There can be
      * at most one @init{} section per template

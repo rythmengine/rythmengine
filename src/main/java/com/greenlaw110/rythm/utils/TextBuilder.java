@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.utils;
 
+import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.template.ITemplate;
 
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
  *
  * @author luog
  */
-public class TextBuilder {
+public class TextBuilder implements Cloneable {
 
     public static class TextBuilderList extends TextBuilder {
         List<TextBuilder> builders = new ArrayList<TextBuilder>();
@@ -150,5 +151,15 @@ public class TextBuilder {
     @Override
     public String toString() {
         return null != _out ? _out.toString() : _caller.toString();
+    }
+
+    public TextBuilder clone(TextBuilder caller) {
+        try {
+            TextBuilder tb = (TextBuilder)super.clone();
+            tb._caller = caller;
+            return tb;
+        } catch (CloneNotSupportedException e) {
+            throw new FastRuntimeException("Unexpected");
+        }
     }
 }

@@ -37,6 +37,10 @@ public class S {
         }
     }
 
+    public static String toString(Object o) {
+        return null == o ? "" : o.toString();
+    }
+
     public static ITemplate.RawData raw(Object s) {
         return new ITemplate.RawData(s);
     }
