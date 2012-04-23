@@ -141,7 +141,7 @@ public class TemplateClassCache {
             // --- cache java source
             os.write(0);
             if (null != tc.javaSource) {
-                String src = tc.javaSource + "__INCULDED_TEMPLATE_CLASS_NAME_LIST__ " + tc.refreshIncludeTemplateClassNames();
+                String src = tc.javaSource + "__INCULDED_TEMPLATE_CLASS_NAME_LIST__" + tc.refreshIncludeTemplateClassNames();
                 os.write(src.getBytes("utf-8"));
             } // else the tc is an inner class thus we don't have javaSource at all
 

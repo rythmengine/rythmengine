@@ -28,7 +28,7 @@ public interface ITag extends ITemplate {
 
         @Override
         public String toString() {
-            return Rythm.render("@args String name, Object value;@name=@value", name, value);
+            return new StringBuilder("[").append(name).append("]:").append(value).toString();
         }
     }
 

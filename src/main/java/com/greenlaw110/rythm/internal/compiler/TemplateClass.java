@@ -346,12 +346,12 @@ public class TemplateClass {
                 for (String tcName: includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;
                     tcName = tcName.trim();
-                    tcName = engine().testTag(tcName, this);
-                    if (null == tcName) {
+                    String fullName = engine().testTag(tcName, this);
+                    if (null == fullName) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;
                     }
-                    TemplateClass tc = engine().getTemplateClassFromTagName(tcName);
+                    TemplateClass tc = engine().getTemplateClassFromTagName(fullName);
                     if (null == tc) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;
