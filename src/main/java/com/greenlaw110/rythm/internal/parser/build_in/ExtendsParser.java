@@ -23,9 +23,9 @@ public class ExtendsParser extends KeywordParserFactory {
     public Keyword keyword() {
         return Keyword.EXTENDS;
     }
-    
+
     private static void error(IContext ctx) {
-        throw new ParseException(ctx.getTemplateClass(), ctx.currentLine(), "Error parsing extends statement. The correct format is @extends(\"my.parent.template\"[, arg1=val1, val2, ...])");
+        raiseParseException(ctx, "Error parsing extends statement. The correct format is @extends(\"my.parent.template\"[, arg1=val1, val2, ...])");
     }
 
     public IParser create(IContext ctx) {
@@ -35,6 +35,7 @@ public class ExtendsParser extends KeywordParserFactory {
                 if (!r.search(remain())) {
                     error(ctx());
                 }
+                final int lineNo = currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(2);
                 if (null == s) {
@@ -42,17 +43,12 @@ public class ExtendsParser extends KeywordParserFactory {
                 }
                 r = innerPattern;
                 if (!r.search(s)) error(ctx());
-                
+
                 // process extend target
                 s = r.stringMatched(1);
-                if (s.startsWith("\"") || s.startsWith("'")) {
-                    s = s.substring(1);
-                }
-                if (s.endsWith("\"") || s.endsWith("'")) {
-                    s = s.substring(0, s.length() - 1);
-                }
+                s = S.stripQuotation(s);
                 final String sExtend = s;
-                
+
                 // process extend params
                 final InvokeTagParser.ParameterDeclarationList params = new InvokeTagParser.ParameterDeclarationList();
                 s = r.stringMatched(2);
@@ -62,8 +58,8 @@ public class ExtendsParser extends KeywordParserFactory {
                         params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
                     }
                 }
-                final int lineNo = currentLine();
-                
+
+
                 return new Directive(s, ctx()) {
                     @Override
                     public void call() {
@@ -78,14 +74,14 @@ public class ExtendsParser extends KeywordParserFactory {
     protected String patternStr() {
         return "(^%s%s)\\s*((?@())[\\s\\r\\n;]*)";
     }
-    
+
     protected static Regex innerPattern = new Regex("\\((.*?)\\s*(,\\s*(.*))?\\)");
     protected static Regex argsPattern = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
-    
+
     protected String patternStr0() {
         return "(%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
     }
-    
+
     private static void test1() {
         Regex r = new ExtendsParser().reg(new Rythm());
         String line = "@extends(\"_panel.html\", a:5, b=foo.bar(4)[1]);";
@@ -131,7 +127,7 @@ public class ExtendsParser extends KeywordParserFactory {
     public static void main(String[] args) {
         test1();
     }
-    
+
     public static void test0() {
         Regex r = new ExtendsParser().reg(new Rythm());
         String s = "@extends('ab/cd.foo', 'a': 6, \"b\"=null); acd";

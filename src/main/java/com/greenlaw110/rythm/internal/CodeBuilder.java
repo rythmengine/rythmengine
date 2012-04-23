@@ -6,6 +6,8 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.template.JavaTagBase;
@@ -19,6 +21,8 @@ import java.util.*;
 
 
 public class CodeBuilder extends TextBuilder {
+
+    protected ILogger logger = Logger.get(CodeBuilder.class);
 
     public static class RenderArgDeclaration {
         public String name;
@@ -229,7 +233,27 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
-        if (null != this.extended) throw new IllegalStateException("extended already set for this page");
+        if (null != this.extended) {
+            throw new ParseException(templateClass, lineNo, "Extended template already declared");
+        }
+        String fullName = engine.testTag(extended, templateClass);
+        if (null == fullName) {
+            // try legacy style
+            setExtended_deprecated(extended, args, lineNo);
+            logger.warn("Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", extended, engine.resourceManager.getFullTagName(extendedTemplateClass));
+        } else {
+            TemplateBase tb = (TemplateBase) engine.tags.get(fullName);
+            TemplateClass tc = tb.getTemplateClass(false);
+            this.extended = tc.name();
+            this.extendedTemplateClass = tc;
+            this.extendArgs = args;
+        }
+    }
+
+    public void setExtended_deprecated(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
+        if (null != this.extended) {
+            throw new IllegalStateException("Extended template already declared");
+        }
         TemplateClass tc = null;
         String origin = extended;
         if (!extended.startsWith("/")) {
@@ -256,7 +280,7 @@ public class CodeBuilder extends TextBuilder {
             }
         }
         if (null == tc) {
-            throw new ParseException(templateClass, parser.currentLine(), "Cannot find extend template: %s", origin);
+            throw new ParseException(templateClass, lineNo, "Cannot find extended template by name \"%s\"", origin);
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
