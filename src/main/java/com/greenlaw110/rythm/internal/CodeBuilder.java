@@ -221,7 +221,7 @@ public class CodeBuilder extends TextBuilder {
         TemplateClass includeTc = includeTag.getTemplateClass(false);
         if (null == includeTc.codeBuilder) {
             // loaded from persistent class cache?
-            includeTc.refresh(true);
+            includeTc.buildSourceCode();
         }
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);

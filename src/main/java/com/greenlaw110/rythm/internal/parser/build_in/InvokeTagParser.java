@@ -56,23 +56,25 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
     }
 
-    private static class InvokeTagToken extends CodeToken {
+    static class InvokeTagToken extends CodeToken {
         String tagName;
         ParameterDeclarationList params = new ParameterDeclarationList();
         protected boolean enableCache = false;
         protected String cacheDuration = null;
         protected String cacheArgs = null;
+        protected boolean ignoreNonExistsTag = false;
 
         protected String cacheKey() {
             return tagName;
         }
 
-        InvokeTagToken(String tagName, String paramLine, boolean cacheFor, String duration, String cacheForArgs, IContext context) {
+        InvokeTagToken(String tagName, String paramLine, boolean cacheFor, String duration, String cacheForArgs, IContext context, boolean ignoreNonExistsTag) {
             super(null, context);
             this.tagName = tagName;
             this.enableCache = cacheFor;
             this.cacheDuration = S.isEmpty(duration) ? "null" : duration;
             this.cacheArgs = S.isEmpty(cacheForArgs) ? ", _plUUID" : ", _plUUID" + cacheForArgs;
+            this.ignoreNonExistsTag = ignoreNonExistsTag;
             parse(paramLine);
         }
 
@@ -80,10 +82,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
          * Parse line like (bar='c', foo=bar.length(), zee=component[foo], "hello")
          */
         private void parse(String line) {
-            if (null == line || "".equals(line.trim())) return;
+            if (S.isEmpty(line)) return;
             // strip '(' and ')'
-            line = line.substring(1).substring(0, line.length() - 2);
-            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+            line = S.stripBrace(line).trim();
+            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[_a-zA-Z][a-z_A-Z0-9]*|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
@@ -108,7 +110,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (enableCache) {
                 pt("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
                 pline();
-                pt("String s = _engine().cached(\"").p(cacheKey()).p("\"");
+                pt("String s = _engine().cached(").p(cacheKey());
                 p(cacheArgs).p(");");
                 pline();
                 pt("if (null != s) {");
@@ -129,13 +131,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         protected void outputInvokeStatement() {
             if (enableCache) {
-                p2t("_invokeTag(\"").p(tagName).p("\", _pl);");
+                p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 pline();
                 p2t("s = sbNew.toString();");
                 pline();
                 p2t("setOut(sbOld);");
                 pline();
-                p2t("_engine().cache(\"").p(cacheKey()).p("\", s, ").p(cacheDuration).p(cacheArgs).p(");");
+                p2t("_engine().cache(").p(cacheKey()).p(", s, ").p(cacheDuration).p(cacheArgs).p(");");
                 pline();
                 p2t("p(s);");
                 pline();
@@ -144,7 +146,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 p("}");
                 pline();
             } else {
-                pt("_invokeTag(\"").p(tagName).p("\", _pl);");
+                pt("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 pline();
                 p("}");
                 pline();
@@ -153,21 +155,21 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
     }
 
-    private static class InvokeTagWithBodyToken extends InvokeTagToken implements IBlockHandler {
+    static class InvokeTagWithBodyToken extends InvokeTagToken implements IBlockHandler {
         private String textListenerKey = UUID.randomUUID().toString();
         private StringBuilder tagBodyBuilder = new StringBuilder();
         private int startIndex = 0;
         private int endIndex = 0;
         private String key = null;
-        InvokeTagWithBodyToken(String tagName, String paramLine, boolean cacheFor, String cacheForDuration, String cacheForArgs, IContext context) {
-            super(tagName, paramLine, cacheFor, cacheForDuration, cacheForArgs, context);
+        InvokeTagWithBodyToken(String tagName, String paramLine, boolean cacheFor, String cacheForDuration, String cacheForArgs, IContext context, boolean ignoreNonExistsTag) {
+            super(tagName, paramLine, cacheFor, cacheForDuration, cacheForArgs, context, ignoreNonExistsTag);
             context.openBlock(this);
             startIndex = ctx.cursor();
         }
 
         @Override
         protected String cacheKey() {
-            return tagName + key;
+            return tagName + "+\"" + key + "\"";
         }
 
         @Override
@@ -177,7 +179,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         protected void outputInvokeStatement() {
             String curClassName = ctx.getCodeBuilder().className();
-            p2t("_invokeTag(\"").p(tagName).p("\", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
+            p2t("_invokeTag(").p(tagName).p(", _pl, new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
             pline();
             p3t("@Override public void setProperty(String name, Object val) {");
             pline();
@@ -208,13 +210,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             setOut(sbNew);
             p3t("}");
             pline();
-            p2t("});");
+            p2t("}, ").p(ignoreNonExistsTag).p(");");
             pline();
             p2t("s = sbNew.toString();");
             pline();
             p2t("setOut(sbOld);");
             pline();
-            p2t("_engine().cache(\"").p(cacheKey()).p("\",s,").p(cacheDuration).p(cacheArgs).p(");");
+            p2t("_engine().cache(").p(cacheKey()).p(",s,").p(cacheDuration).p(cacheArgs).p(");");
             pline();
             p2t("p(s);");
             pline();
@@ -228,8 +230,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
     }
 
-    private static final Pattern P_HEREDOC_SIMBOL = Pattern.compile("(\\s*<<).*", Pattern.DOTALL);
-    private static final Pattern P_STANDARD_BLOCK = Pattern.compile("(\\s*\\{).*", Pattern.DOTALL);
+    static final Pattern P_HEREDOC_SIMBOL = Pattern.compile("(\\s*<<).*", Pattern.DOTALL);
+    static final Pattern P_STANDARD_BLOCK = Pattern.compile("(\\s*\\{).*", Pattern.DOTALL);
 
     @Override
     public IParser create(IContext ctx) {
@@ -246,6 +248,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 String tagName = r.stringMatched(2);
                 tagName = testTag(tagName);
                 if (null == tagName) return null;
+                else tagName = new StringBuilder("\"").append(tagName).append("\"").toString();
                 String s = r.stringMatched();
                 ctx().step(s.length());
                 String cacheFor = r.stringMatched(5);
@@ -268,12 +271,12 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 Matcher m1 = P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
                     ctx().step(m0.group(1).length());
-                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
+                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx(), false);
                 } else if (m1.matches()) {
                     ctx().step(m1.group(1).length());
-                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
+                    return new InvokeTagWithBodyToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx(), false);
                 } else {
-                    return new InvokeTagToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx());
+                    return new InvokeTagToken(tagName, r.stringMatched(3), enableCacheFor, cacheForDuration, cacheForArgs, ctx(), false);
                 }
             }
         };
@@ -285,27 +288,42 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     }
 
     public static void main(String[] args) {
-        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null));
-        String ps = String.format(new InvokeTagParser().patternStr(), "@");
-        Regex r = new Regex(ps);
-        String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cacheFor(\"1h\", 1 , foo.bar())  Gren";
-        //String s = "@xyz().cacheFor(\"1h\")";
-        //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(3));
-            System.out.println(r.stringMatched(4));
-            System.out.println(r.stringMatched(5));
-            //InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
-            //System.out.println(t.params);
-        }
-        else System.out.println("not found");
+//        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null));
+//        String ps = String.format(new InvokeTagParser().patternStr(), "@");
+//        Regex r = new Regex(ps);
+//        String s = "@xyz (xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cacheFor(\"1h\", 1 , foo.bar())  Gren";
+//        //String s = "@xyz().cacheFor(\"1h\")";
+//        //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
+//        if (r.search(s)) {
+//            System.out.println(r.stringMatched());
+//            System.out.println(r.stringMatched(3));
+//            System.out.println(r.stringMatched(4));
+//            System.out.println(r.stringMatched(5));
+//            //InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
+//            //System.out.println(t.params);
+//        }
+//        else System.out.println("not found");
+//        String tag = "testCache";
+//        tag = new StringBuilder("\"").append(tag).append("\"").toString();
+//        TextBuilder tb = new TextBuilder();
+//        tb.p(tag);
+//        System.out.println(tb.toString());
 
 //        String s = " << asdfuisf@";
 //        Matcher m = P_HEREDOC_SIMBOL.matcher(s);
 //        if (m.matches()) {
 //            System.out.println(m.group(1));
 //        }
+        String line = " ls";
+        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[_a-zA-Z][a-z_A-Z0-9]*|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+        while (r.search(line)) {
+            System.out.println(r.stringMatched());
+            System.out.println(r.stringMatched(1));
+            System.out.println(r.stringMatched(2));
+            System.out.println(r.stringMatched(3));
+            System.out.println(r.stringMatched(4));
+            System.out.println(r.stringMatched(5));
+        }
     }
 
 }

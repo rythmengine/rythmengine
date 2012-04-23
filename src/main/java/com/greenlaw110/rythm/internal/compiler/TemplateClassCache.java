@@ -4,9 +4,11 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.io.*;
 import java.security.MessageDigest;
+import java.util.HashSet;
 
 /**
  * Used to speed up compilation time
@@ -22,6 +24,7 @@ public class TemplateClassCache {
 
     /**
      * Delete the bytecode
+     *
      * @param tc The template class
      */
     public void deleteCache(TemplateClass tc) {
@@ -37,6 +40,7 @@ public class TemplateClassCache {
 
     /**
      * Retrieve java source and bytecode if template content has not changed
+     *
      * @param tc
      */
     public void loadTemplateClass(TemplateClass tc) {
@@ -73,15 +77,40 @@ public class TemplateClassCache {
             read = -1;
             StringBuilder source = new StringBuilder();
             while ((read = is.read()) != 0) {
-                source.append((char)read);
+                source.append((char) read);
                 offset++;
             }
             if (source.length() != 0) {
                 String s = source.toString();
                 String[] sa = s.split("__INCULDED_TEMPLATE_CLASS_NAME_LIST__");
                 tc.javaSource = sa[0];
-                tc.includeTemplateClassNames = sa[1];
+                s = sa[1];
+                sa = s.split("__IMPORT_PATH_LIST__");
+                tc.includeTemplateClassNames = sa[0];
+                s = sa[1];
+                sa = s.split(";");
+                tc.importPaths = new HashSet<String>();
+                for (String path: sa) {
+                    if ("java.lang".equals(path)) continue;
+                    tc.importPaths.add(path);
+                }
             } // else it must be an inner class
+
+//            read = -1;
+//            StringBuilder imported = new StringBuilder();
+//            while ((read = is.read()) != 0) {
+//                imported.append((char)read);
+//                offset++;
+//            }
+//            if (imported.length() != 0) {
+//                String s = imported.toString();
+//                String[] sa = s.split(";");
+//                tc.importPaths = new HashSet<String>();
+//                for (String path: sa) {
+//                    if ("java.lang.*".equals(path)) continue;
+//                    tc.importPaths.add(path);
+//                }
+//            }
 
 //            // --- load version info
 //            while ((read = is.read()) != 0) {
@@ -141,8 +170,25 @@ public class TemplateClassCache {
             // --- cache java source
             os.write(0);
             if (null != tc.javaSource) {
-                String src = tc.javaSource + "__INCULDED_TEMPLATE_CLASS_NAME_LIST__" + tc.refreshIncludeTemplateClassNames();
-                os.write(src.getBytes("utf-8"));
+                TextBuilder tb = new TextBuilder();
+                tb.p(tc.javaSource).p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
+                    .p("__IMPORT_PATH_LIST__");
+                if (tc.importPaths == null) {
+                    tc.importPaths = new HashSet<String>(0);
+                }
+                if (tc.importPaths.isEmpty()) {
+                    tc.importPaths.add("java.lang");
+                }
+                boolean  first = true;
+                for (String s : tc.importPaths) {
+                    if (!first) {
+                        tb.p(";");
+                    } else {
+                        first = false;
+                    }
+                    tb.p(s);
+                }
+                os.write(tb.toString().getBytes("utf-8"));
             } // else the tc is an inner class thus we don't have javaSource at all
 
 //            // --- cache class version
@@ -162,11 +208,31 @@ public class TemplateClassCache {
 //            tc.refreshIncludeTemplateClassNames();
 //            os.write(tc.includeTemplateClassNames.getBytes("utf-8"));
 
+            //}
+
+//            // -- cache import paths
+//            os.write(0);
+//            if (tc.importPaths == null) {
+//                tc.importPaths = new HashSet<String>(0);
+//                tc.importPaths.add("java.lang.*");
+//            }
+//            TextBuilder tb = new TextBuilder();
+//            boolean  first = true;
+//            for (String s : tc.importPaths) {
+//                if (!first) {
+//                    tb.p(";");
+//                } else {
+//                    first = false;
+//                }
+//                tb.p(s);
+//            }
+//            os.write(tb.toString().getBytes("utf-8"));
+
             // --- cache byte code
             os.write(0);
             //if (null != tc.enhancedByteCode) {
-                os.write(tc.enhancedByteCode);
-            //}
+            os.write(tc.enhancedByteCode);
+
             os.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -180,7 +246,7 @@ public class TemplateClassCache {
     String hash(TemplateClass tc) {
         try {
             StringBuffer enhancers = new StringBuffer();
-            for(ITemplateClassEnhancer plugin : engine.templateClassEnhancers) {
+            for (ITemplateClassEnhancer plugin : engine.templateClassEnhancers) {
                 enhancers.append(plugin.getClass().getName());
             }
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");

@@ -61,6 +61,10 @@ public enum Keyword implements IKeyword {
      */
     INIT,
     /**
+     * Explicitly invoke a tag (could be used to implement dynamic tag dispatch
+     */
+    INVOKE,
+    /**
      * Instruct that this template needs to log execution time
      */
     LOG_TIME("__logTime__"),

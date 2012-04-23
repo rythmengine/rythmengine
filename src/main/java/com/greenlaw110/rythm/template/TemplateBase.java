@@ -35,12 +35,24 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         _engine().invokeTag(name, this, null, null);
     }
 
+    protected void _invokeTag(String name, boolean ignoreNonExistsTag) {
+        _engine().invokeTag(name, this, null, null, ignoreNonExistsTag);
+    }
+
     protected void _invokeTag(String name, ITag.ParameterList params) {
         _engine().invokeTag(name, this, params, null);
     }
 
+    protected void _invokeTag(String name, ITag.ParameterList params, boolean ignoreNonExistsTag) {
+        _engine().invokeTag(name, this, params, null, ignoreNonExistsTag);
+    }
+
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body) {
         _engine().invokeTag(name, this, params, body);
+    }
+
+    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, boolean ignoreNonExistsTag) {
+        _engine().invokeTag(name, this, params, body, ignoreNonExistsTag);
     }
 
     /* to be used by dynamic generated sub classes */

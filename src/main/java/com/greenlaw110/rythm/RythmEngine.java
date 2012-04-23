@@ -28,6 +28,9 @@ import java.io.FileFilter;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,18 +42,22 @@ import java.util.*;
 public class RythmEngine {
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
+
     public boolean reloadByRestart() {
         return isDevMode() && reloadMethod == Rythm.ReloadMethod.RESTART;
     }
+
     public boolean reloadByIncClassVersion() {
         return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
     }
+
     public boolean classCacheEnabled() {
         return reloadByRestart();
     }
 
     public static final String version = "0.9.3";
     public static String pluginVersion = "";
+
     public static String versionSignature() {
         return version + "-" + pluginVersion;
     }
@@ -82,6 +89,7 @@ public class RythmEngine {
      * if the resource reload service is managed by container, e.g. Play!framework
      */
     private boolean refreshOnRender = true;
+
     public boolean refreshOnRender() {
         return refreshOnRender && !isProdMode();
     }
@@ -90,16 +98,18 @@ public class RythmEngine {
      * When compactMode is true, then by default redundant spaces/line breaks are removed
      */
     private boolean compactMode = true;
+
     public boolean compactMode() {
         return compactMode;
     }
 
     /**
      * enable java extensions to expressions, e.g. @myvar.escapeHtml() or @myvar.pad(5) etc.
-     *
+     * <p/>
      * disable java extension can improve parse performance
      */
     private boolean enableJavaExtensions = true;
+
     public boolean enableJavaExtensions() {
         return enableJavaExtensions;
     }
@@ -110,27 +120,33 @@ public class RythmEngine {
     public FileFilter tagFileFilter;
 
     public final List<IRythmListener> listeners = new ArrayList<IRythmListener>();
+
     public void registerListener(IRythmListener listener) {
         if (null == listener) throw new NullPointerException();
         if (!listeners.contains(listener)) listeners.add(listener);
     }
+
     public void unregisterListener(IRythmListener listener) {
         if (null == listener) throw new NullPointerException();
         listeners.remove(listener);
     }
+
     public void clearListener() {
         listeners.clear();
     }
 
     public final List<ITemplateClassEnhancer> templateClassEnhancers = new ArrayList<ITemplateClassEnhancer>();
+
     public void registerTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
         if (null == enhancer) throw new NullPointerException();
         if (!templateClassEnhancers.contains(enhancer)) templateClassEnhancers.add(enhancer);
     }
+
     public void unregisterTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
         if (null == enhancer) throw new NullPointerException();
         templateClassEnhancers.remove(enhancer);
     }
+
     public void clearTemplateClassEnhancer() {
         templateClassEnhancers.clear();
     }
@@ -247,7 +263,7 @@ public class RythmEngine {
             resourceManager.resourceLoader = (ITemplateResourceLoader) o;
         } else if (o instanceof String) {
             try {
-                resourceManager.resourceLoader = (ITemplateResourceLoader)Class.forName(((String) o)).newInstance();
+                resourceManager.resourceLoader = (ITemplateResourceLoader) Class.forName(((String) o)).newInstance();
             } catch (Exception e) {
                 logger.warn("invalid resource loader class");
             }
@@ -274,13 +290,13 @@ public class RythmEngine {
 
         // clear all template tags which is managed by TemplateClassManager
         List<String> templateTags = new ArrayList<String>();
-        for (String name: tags.keySet()) {
+        for (String name : tags.keySet()) {
             ITag tag = tags.get(name);
             if (!(tag instanceof JavaTagBase)) {
                 templateTags.add(name);
             }
         }
-        for (String name: templateTags) {
+        for (String name : templateTags) {
             tags.remove(name);
         }
     }
@@ -289,24 +305,26 @@ public class RythmEngine {
         tags.clear();
         // code come from http://vafer.org/blog/20071112204524/
         class FileTraversal {
-            public final void traverse( final File f )  {
+            public final void traverse(final File f) {
                 if (f.isDirectory()) {
                     // aha, we don't want to traverse .svn
                     if (".svn".equals(f.getName())) return;
                     onDirectory(f);
                     final File[] childs = f.listFiles();
-                    for( File child : childs ) {
+                    for (File child : childs) {
                         traverse(child);
                     }
                     return;
                 }
                 onFile(f);
             }
-            public void onDirectory( final File d ) {
+
+            public void onDirectory(final File d) {
             }
-            public void onFile( final File f ) {
+
+            public void onFile(final File f) {
                 if (tagFileFilter.accept(f)) {
-                    ITag tag = (ITag)getTemplate(f);
+                    ITag tag = (ITag) getTemplate(f);
                     if (null != tag) registerTag(tag);
                 }
             }
@@ -328,7 +346,7 @@ public class RythmEngine {
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
         if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>)args[0]);
+            t.setRenderArgs((Map<String, Object>) args[0]);
         } else {
             t.setRenderArgs(args);
         }
@@ -343,7 +361,7 @@ public class RythmEngine {
         }
         ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>)args[0]);
+            t.setRenderArgs((Map<String, Object>) args[0]);
         } else {
             t.setRenderArgs(args);
         }
@@ -353,7 +371,7 @@ public class RythmEngine {
     public void preprocess(ITemplate t) {
         IImplicitRenderArgProvider p = implicitRenderArgProvider;
         if (null != p) p.setRenderArgs(t);
-        for (IRythmListener l: listeners) {
+        for (IRythmListener l : listeners) {
             l.onRender(t);
         }
     }
@@ -369,7 +387,7 @@ public class RythmEngine {
         return renderTemplate(t);
     }
 
-    public String renderStr(String template, Object ... args) {
+    public String renderStr(String template, Object... args) {
         return renderString(template, args);
     }
 
@@ -381,7 +399,7 @@ public class RythmEngine {
         }
         ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>)args[0]);
+            t.setRenderArgs((Map<String, Object>) args[0]);
         } else {
             t.setRenderArgs(args);
         }
@@ -393,19 +411,57 @@ public class RythmEngine {
         return renderTemplate(t);
     }
 
+    public Set<String> nonExistsTemplates = new HashSet<String>();
+
+    private class NonExistsTemplatesChecker {
+        boolean started = false;
+        private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+        NonExistsTemplatesChecker() {
+            scheduler.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    List<String> toBeRemoved = new ArrayList<String>();
+                    for (String template : nonExistsTemplates) {
+                        ITemplateResource rsrc = resourceManager.getFileResource(template);
+                        if (rsrc.isValid()) {
+                            toBeRemoved.add(template);
+                        }
+                    }
+                    nonExistsTemplates.removeAll(toBeRemoved);
+                    toBeRemoved.clear();
+                    TemplateClass tc = classes.all().get(0);
+                    for (String tag : nonExistsTags) {
+                        if (null != resourceManager.tryLoadTag(tag, tc)) {
+                            toBeRemoved.add(tag);
+                        }
+                    }
+                    nonExistsTags.removeAll(toBeRemoved);
+                    toBeRemoved.clear();
+                }
+            }, 0, 1000 * 10, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private NonExistsTemplatesChecker nonExistsTemplatesChecker = null;
+
     public String renderIfTemplateExists(String template, Object... args) {
+        if (mode.isDev() && nonExistsTemplatesChecker == null) {
+            nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+        }
+        if (nonExistsTemplates.contains(template)) return "";
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
             ITemplateResource rsrc = resourceManager.getFileResource(template);
             if (rsrc.isValid()) {
                 tc = new TemplateClass(rsrc, this);
             } else {
+                nonExistsTemplates.add(template);
                 return "";
             }
         }
         ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>)args[0]);
+            t.setRenderArgs((Map<String, Object>) args[0]);
         } else {
             t.setRenderArgs(args);
         }
@@ -427,7 +483,7 @@ public class RythmEngine {
     public final Set<String> non_tags = new HashSet<String>();
 
     public TemplateClass getTemplateClassFromTagName(String name) {
-        TemplateBase tag = (TemplateBase)tags.get(name);
+        TemplateBase tag = (TemplateBase) tags.get(name);
         if (null == tag) return null;
         return tag.getTemplateClass(false);
     }
@@ -438,7 +494,7 @@ public class RythmEngine {
         if (isTag) return name;
         // try imported path
         if (null != tc.importPaths) {
-            for (String s: tc.importPaths) {
+            for (String s : tc.importPaths) {
                 String name0 = s + "." + name;
                 if (tags.containsKey(name0)) return name0;
             }
@@ -477,6 +533,7 @@ public class RythmEngine {
     /**
      * Register a tag class. If there is name collision then registration
      * will fail
+     *
      * @return true if registration failed
      */
     public boolean registerTag(ITag tag) {
@@ -486,6 +543,7 @@ public class RythmEngine {
 
     /**
      * Register a tag using the given name
+     *
      * @param name
      * @param tag
      * @return
@@ -500,15 +558,56 @@ public class RythmEngine {
     }
 
     public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body) {
+        invokeTag(name, caller, params, body, false);
+    }
+
+    public Set<String> nonExistsTags = new HashSet<String>();
+
+    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, boolean ignoreNonExistsTag) {
+        if (nonExistsTags.contains(name)) return;
         // try tag registry first
         ITag tag = tags.get(name);
+        TemplateClass tc = ((TemplateBase) caller).getTemplateClass(true);
         if (null == tag) {
-            // try load the tag
-            resourceManager.tryLoadTag(name, ((TemplateBase)caller).getTemplateClass(true));
-            tag = tags.get(name);
-            if (null == tag) throw new NullPointerException("cannot find tag: " + name);
-            tag = (ITag)tag.cloneMe(this, caller);
-        } else if (!(tag instanceof JavaTagBase)) {
+            // try imported path
+            if (null != tc.importPaths) {
+                for (String s : tc.importPaths) {
+                    String name0 = s + "." + name;
+                    tag = tags.get(name0);
+                    if (null != tag) break;
+                }
+            }
+
+            // try relative path
+            if (null == tag) {
+                String callerName = resourceManager.getFullTagName(tc);
+                int pos = callerName.lastIndexOf(".");
+                if (-1 != pos) {
+                    String name0 = callerName.substring(0, pos) + "." + name;
+                    tag = tags.get(name0);
+                }
+            }
+
+            // try load the tag from resource
+            if (null == tag) {
+                resourceManager.tryLoadTag(name, tc);
+                tag = tags.get(name);
+                if (null == tag) {
+                    if (ignoreNonExistsTag) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("cannot find tag: " + name);
+                        }
+                        nonExistsTags.add(name);
+                        return;
+                    } else  {
+                        throw new NullPointerException("cannot find tag: " + name);
+                    }
+                }
+                tag = (ITag) tag.cloneMe(this, caller);
+            }
+        }
+
+        if (!(tag instanceof JavaTagBase)) {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
             String cn = tag.getClass().getName();
@@ -516,17 +615,18 @@ public class RythmEngine {
                 int pos = cn.lastIndexOf("v");
                 if (-1 < pos) cn = cn.substring(0, pos);
             }
-            TemplateClass tc = classes.getByClassName(cn);
-            if (null == tc) {
+            TemplateClass tc0 = classes.getByClassName(cn);
+            if (null == tc0) {
                 System.out.println(tag.getClass());
                 System.out.println(name);
                 System.out.println(cn);
                 System.out.println(caller.getClass());
             }
-            tag = (ITag)tc.asTemplate(caller);
+            tag = (ITag) tc0.asTemplate(caller);
         } else {
-            tag = (ITag)tag.cloneMe(this, caller);
+            tag = (ITag) tag.cloneMe(this, caller);
         }
+
         if (null != params) {
             if (tag instanceof JavaTagBase) {
                 ((JavaTagBase) tag).setRenderArgs(params);
@@ -544,26 +644,28 @@ public class RythmEngine {
 
 
     public void handleTemplateExecutionException(Exception e, TemplateBase template) throws Exception {
-        for (ITemplateExecutionExceptionHandler h: em_.exceptionHandlers()) {
+        for (ITemplateExecutionExceptionHandler h : em_.exceptionHandlers()) {
             if (h.handleTemplateExecutionException(e, template)) return;
         }
         throw e;
     }
 
     // -- cache api
+
     /**
      * Cache object using key and args for ttl seconds
+     *
      * @param key
      * @param o
-     * @param ttl if zero then defaultTTL used, if negative then never expire
+     * @param ttl  if zero then defaultTTL used, if negative then never expire
      * @param args
      */
-    public void cache(String key, Object o, int ttl, Object ... args) {
+    public void cache(String key, Object o, int ttl, Object... args) {
         if (mode.isDev() && cacheOnProdOnly) return;
         String value = null == o ? "" : o.toString();
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
-            for (Object arg: args) {
+            for (Object arg : args) {
                 sb.append("-").append(arg);
             }
             key = sb.toString();
@@ -573,30 +675,32 @@ public class RythmEngine {
 
     /**
      * Store object o into cache service with ttl equals to duration specified.
-     *
+     * <p/>
      * <p>The duration is a string to be parsed by @{link #durationParser}</p>
-     *
+     * <p/>
      * <p>The object o is associated with given key and a list of argument values</p>
+     *
      * @param key
      * @param o
      * @param duration
      * @param args
      */
-    public void cache(String key, Object o, String duration, Object ... args) {
+    public void cache(String key, Object o, String duration, Object... args) {
         int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
         cache(key, o, ttl, args);
     }
 
     /**
      * Get cached value using key and a list of argument values
+     *
      * @param key
      * @param args
      * @return
      */
-    public String cached(String key, Object ... args) {
+    public String cached(String key, Object... args) {
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
-            for (Object arg: args) {
+            for (Object arg : args) {
                 sb.append("-").append(arg);
             }
             key = sb.toString();
@@ -606,11 +710,13 @@ public class RythmEngine {
 
     // -- SPI interface
     private DialectManager dm_ = new DialectManager();
+
     public DialectManager getDialectManager() {
         return dm_;
     }
 
     private ExtensionManager em_ = new ExtensionManager(this);
+
     public ExtensionManager getExtensionManager() {
         return em_;
     }

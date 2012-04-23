@@ -292,6 +292,20 @@ public class TemplateClass {
         return refresh(false);
     }
 
+    public void buildSourceCode() {
+        long start = System.currentTimeMillis();
+        addVersion();
+        importPaths = new HashSet<String>();
+        if (null != codeBuilder) codeBuilder.clear();
+        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
+        codeBuilder.build();
+        extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
+        javaSource = codeBuilder.toString();
+        if (logger.isTraceEnabled()) {
+            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
+        }
+    }
+
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
      */
@@ -382,14 +396,7 @@ public class TemplateClass {
             if (!refresh) return false;
 
             // now start generate source and compile source to byte code
-            addVersion();
-            importPaths = new HashSet<String>();
-            long start = System.currentTimeMillis();
-            if (null != codeBuilder) codeBuilder.clear();
-            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
-            codeBuilder.build();
-            extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
-            javaSource = codeBuilder.toString();
+            buildSourceCode();
             engine().classCache.cacheTemplateClassSource(this); // cache source code for debugging purpose
             if (!codeBuilder.isRythmTemplate()) {
                 isValid = false;
@@ -398,9 +405,6 @@ public class TemplateClass {
             }
             isValid = true;
             //if (!engine().isProdMode()) logger.info(javaSource);
-            if (logger.isTraceEnabled()) {
-                logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
-            }
             javaByteCode = null;
             enhancedByteCode = null;
             templateInstance = null;
@@ -524,7 +528,7 @@ public class TemplateClass {
         enhancedByteCode = code;
         compiled = true;
         if (!noCache) engine().classCache.cacheTemplateClass(this);
-    }
+}
 
     /**
      * Call back when a class is compiled.
