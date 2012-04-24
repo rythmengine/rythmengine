@@ -93,6 +93,7 @@ public interface ITemplate extends Cloneable {
         CSV,
         HTML,
         JS,
+        JSON,
         JAVA,
         XML;
         private static String[] sa_ = null;

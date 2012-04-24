@@ -59,6 +59,12 @@ public class S {
         return new ITemplate.RawData(StringEscapeUtils.escapeCsv(s.toString()));
     }
 
+    public static ITemplate.RawData escapeJson(Object s) {
+        if (null == s) return ITemplate.RawData.NULL;
+        String s0 = s.toString().replaceAll("[\n\r\t]+", " ").replaceAll("\"", "\\\\\"");
+        return new ITemplate.RawData(s0);
+    }
+
     public static ITemplate.RawData escapeJava(Object s) {
         if (null == s) return ITemplate.RawData.NULL;
         return new ITemplate.RawData(StringEscapeUtils.escapeJava(s.toString()));

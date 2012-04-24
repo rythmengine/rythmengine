@@ -80,7 +80,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         renderBody = body;
     }
 
-    private void addRenderSection(String name, String section) {
+    private void addRenderSection(String name, String section, boolean def) {
+        if (def  && renderSections.containsKey(name)) return;
         renderSections.put(name, section);
     }
 
@@ -99,8 +100,12 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     }
 
     protected void _endSection() {
+        _endSection(false);
+    }
+
+    protected void _endSection(boolean def) {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
-        addRenderSection(section, _out.toString());
+        addRenderSection(section, _out.toString(), def);
         _out = tmpOut;
         _caller = tmpCaller;
         tmpOut = null;
@@ -420,6 +425,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             switch (escape) {
                 case HTML:
                     return p(S.escapeHtml(o));
+                case JSON:
+                    return p(S.escapeJson(o));
                 case JS:
                     return p(S.escapeJavaScript(o));
                 case JAVA:

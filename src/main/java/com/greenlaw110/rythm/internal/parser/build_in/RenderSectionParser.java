@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.PatternStr;
@@ -16,6 +17,28 @@ import java.util.regex.Pattern;
  * Parse @render section
  */
 public class RenderSectionParser extends KeywordParserFactory {
+
+    public class DefaultSectionToken extends BlockCodeToken {
+        private String section;
+        public DefaultSectionToken(String section, IContext context) {
+            super(null, context);
+            if (S.isEmpty(section)) {
+                raiseParseException(context, "@renderSection with optional section block must have a section name provided");
+            }
+            this.section = section;
+        }
+
+        @Override
+        public void output() {
+            p("\n_startSection(\"").p(section).p("\");\n");
+        }
+
+        @Override
+        public String closeBlock() {
+            return "\n_endSection(true); _pSection(\"" + section + "\");";
+        }
+    }
+
     @Override
     public Keyword keyword() {
         return Keyword.RENDER_SECTION;
@@ -29,8 +52,19 @@ public class RenderSectionParser extends KeywordParserFactory {
                 String s = m.group(1);
                 step(s.length());
                 String section = m.group(4);
-                String code = S.isEmpty(section) ? "_pBody();" : "_pSection(\"" + section + "\");";
-                return new CodeToken(code, ctx());
+                s = remain();
+                Matcher m0 = InvokeTagParser.P_HEREDOC_SIMBOL.matcher(s);
+                Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
+                if (m0.matches()) {
+                    ctx().step(m0.group(1).length());
+                    return new DefaultSectionToken(section, ctx());
+                } else if (m1.matches()) {
+                    ctx().step(m1.group(1).length());
+                    return new DefaultSectionToken(section, ctx());
+                } else {
+                    String code = S.isEmpty(section) ? "_pBody();" : "_pSection(\"" + section + "\");";
+                    return new CodeToken(code, ctx());
+                }
             }
         };
     }
