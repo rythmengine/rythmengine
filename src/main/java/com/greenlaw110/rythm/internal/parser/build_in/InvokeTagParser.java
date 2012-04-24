@@ -85,7 +85,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (S.isEmpty(line)) return;
             // strip '(' and ')'
             line = S.stripBrace(line).trim();
-            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[_a-zA-Z][a-z_A-Z0-9]*|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
@@ -314,8 +314,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 //        if (m.matches()) {
 //            System.out.println(m.group(1));
 //        }
-        String line = " ls";
-        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[_a-zA-Z][a-z_A-Z0-9]*|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+        String line = "ls";
+        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
         while (r.search(line)) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
