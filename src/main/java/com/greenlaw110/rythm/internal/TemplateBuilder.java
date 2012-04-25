@@ -45,6 +45,8 @@ public class TemplateBuilder extends TextBuilder {
             }
             if (null == escape) escape = ITemplate.Escape.HTML;
             switch (escape) {
+                case RAW:
+                    return (TemplateBuilder)p(S.raw(o));
                 case HTML:
                     return (TemplateBuilder)p(S.escapeHtml(o));
                 case JSON:

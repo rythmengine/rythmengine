@@ -143,42 +143,42 @@ public class TextBuilder implements Cloneable {
         return this;
     }
 
-    protected TextBuilder pt(Object o) {
+    public TextBuilder pt(Object o) {
         p("\t").p(o);
         return this;
     }
 
-    protected TextBuilder ptn(Object o) {
+    public TextBuilder ptn(Object o) {
         p("\t").p(o).pn();
         return this;
     }
 
-    protected TextBuilder p2t(Object o) {
+    public TextBuilder p2t(Object o) {
         p("\t\t").p(o);
         return this;
     }
 
-    protected TextBuilder p2tn(Object o) {
+    public TextBuilder p2tn(Object o) {
         p("\t\t").p(o).pn();
         return this;
     }
 
-    protected TextBuilder p3t(Object o) {
+    public TextBuilder p3t(Object o) {
         p("\t\t\t").p(o);
         return this;
     }
 
-    protected TextBuilder p3tn(Object o) {
+    public TextBuilder p3tn(Object o) {
         p("\t\t\t").p(o).pn();
         return this;
     }
 
-    protected TextBuilder p4t(Object o) {
+    public TextBuilder p4t(Object o) {
         p("\t\t\t\t").p(o);
         return this;
     }
 
-    protected TextBuilder p4tn(Object o) {
+    public TextBuilder p4tn(Object o) {
         p("\t\t\t\t").p(o).pn();
         return this;
     }

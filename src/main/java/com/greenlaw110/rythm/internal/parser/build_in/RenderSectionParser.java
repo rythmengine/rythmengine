@@ -23,19 +23,31 @@ public class RenderSectionParser extends KeywordParserFactory {
         public DefaultSectionToken(String section, IContext context) {
             super(null, context);
             if (S.isEmpty(section)) {
-                raiseParseException(context, "@renderSection with optional section block must have a section name provided");
+                section = "__CONTENT__";
             }
             this.section = section;
         }
 
         @Override
         public void output() {
-            p("\n_startSection(\"").p(section).p("\");\n");
+            p2t("_startSection(\"").p(section).p("\");");
+            pline();
         }
 
         @Override
         public String closeBlock() {
-            return "\n_endSection(true); _pLayoutSection(\"" + section + "\");";
+            StringBuilder sbNew = new StringBuilder();
+            StringBuilder sbOld = getOut();
+            setOut(sbNew);
+            p2tline("_endSection(true);");
+            if ("__CONTENT__".equals(section)) {
+                p2tline("_pLayoutContent();");
+            } else {
+                p2t("_pLayoutSection(\"").p(section).p("\");");
+                pline();
+            }
+            setOut(sbOld);
+            return sbNew.toString();
         }
     }
 

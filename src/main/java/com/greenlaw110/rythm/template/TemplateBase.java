@@ -118,7 +118,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected void _pLayoutContent() {
-        p(layoutContent);
+        String content = S.isEmpty(layoutContent) ? layoutSections.get("__CONTENT__") : layoutContent;
+        p(content);
     }
 
     private void addAllLayoutSections(Map<String, String> sections) {
