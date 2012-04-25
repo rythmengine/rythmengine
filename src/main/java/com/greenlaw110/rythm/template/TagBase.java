@@ -49,10 +49,15 @@ public abstract class TagBase extends TemplateBase implements ITag {
             render(); // an normal template
     }
 
+    protected void _pTagBody(ParameterList parameterList) {
+        if (null == _body) return;
+        _body.render(parameterList, out());
+    }
+
     @Override
-    protected void _pBody() {
-        if (null != _body) p(_body);
-        else super._pBody();
+    protected void _pLayoutContent() {
+        if (null != _body) _body.render(null, out());
+        else super._pLayoutContent();
     }
 
     @Override

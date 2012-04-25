@@ -112,6 +112,18 @@ public class CodeBuilder extends TextBuilder {
     public TemplateClass getTemplateClass() {
         return templateClass;
     }
+    /*
+     * Simple template
+     * 1. does not have global render args,
+     * 2. does not extends layout template
+     */
+    private boolean simpleTemplate = false;
+    public void setSimpleTemplate(int lineNo) {
+        if (null != this.extended) {
+            throw new ParseException(templateClass, lineNo, "Simple template does not allow to extend layout template");
+        }
+        simpleTemplate = true;
+    }
 
     public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine) {
         tmpl = template;
@@ -233,6 +245,9 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
+        if (simpleTemplate) {
+            throw new ParseException(templateClass, lineNo, "Simple template does not allow to extend layout template");
+        }
         if (null != this.extended) {
             throw new ParseException(templateClass, lineNo, "Extended template already declared");
         }
@@ -313,14 +328,14 @@ public class CodeBuilder extends TextBuilder {
         try {
             parser.parse();
             invokeDirectives();
-            addDefaultRenderArgs();
+            if (!simpleTemplate) addDefaultRenderArgs();
             pPackage();
             pImports();
             pClassOpen();
             pTagImpl();
             pInitCode();
             pSetup();
-            pExtendInitArgCode();
+            if (!simpleTemplate) pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
             pBuild();
@@ -352,136 +367,138 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private void pPackage() {
-        if (!S.isEmpty(pName)) p("\npackage ").p(pName).p(";");
+        if (!S.isEmpty(pName)) p("package ").p(pName).pn(";");
     }
 
     // print imports
     private void pImports() {
         for (String s: imports) {
-            p("\nimport ").p(s).p(';');
+            p("import ").p(s).pn(';');
         }
         for (String s: globalImports) {
-            p("\nimport ").p(s).p(';');
+            p("import ").p(s).pn(';');
         }
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         if (null != p) {
             for (String s: p.getImplicitImportStatements()) {
-                p("\nimport ").p(s).p(';');
+                p("import ").p(s).pn(';');
             }
         }
         // common imports
-        p("\nimport java.util.*;");
-        p("\nimport java.io.*;");
+        pn("import java.util.*;");
+        pn("import java.io.*;");
     }
 
     private void pClassOpen() {
-        p("\npublic class ").p(cName).p(" extends ").p(extended()).p(" {").p(extendedResourceMark());
+        p("public class ").p(cName).p(" extends ").p(extended()).p(" {").pn(extendedResourceMark());
     }
 
     private void pClassClose() {
-        p("\n}");
+        np("}").pn();
     }
 
     private void pRenderArgs() {
         // -- output private members
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\t\tprotected ").p(arg.type).p(" ").p(argName);
+            pt("protected ").p(arg.type).p(" ").p(argName);
             if (null != arg.defVal) {
                 p("=").p(arg.defVal).p(";");
             } else {
                 p(";");
             }
+            pn();
         }
 
         // -- output setRenderArgs method
-        p("\n\t@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
+        ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\tif (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).p("\");");
+            p2t("if (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
         }
-        p("\n\tsuper.setRenderArgs(args);\n}");
+        p2t("super.setRenderArgs(args);\n\t}\n");
 
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         int userDefinedArgNumber = renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size());
         if (0 < userDefinedArgNumber) {
-            p("\n@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
+            ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
-                p("\n\tint p = 0, l = args.length;");
+                p2tn("int p = 0, l = args.length;");
                 int i = userDefinedArgNumber;
                 for (String argName: renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
-                    p("\n\tif (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                            .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                            .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
                 }
-                p("\n}");
             }
+            ptn("}");
         }
 
         // -- output setRenderArg by name
-        p("\n@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\n\tif (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).p(")arg;");
+            p2t("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
         }
-        p("\n\tsuper.setRenderArg(name, arg);\n}");
+        p2t("super.setRenderArg(name, arg);\n\t}\n");
 
         // -- output setRenderArg by position
-        p("\n@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
-        p("\nint p = 0;");
+        ptn("@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
+        p2tn("int p = 0;");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p("\nif (p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
+            p2t("if (p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
                     .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                    .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                    .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
         }
         // the first argument has a default name "arg"
-        p("\n\tif(0 == pos) setRenderArg(\"arg\", arg);");
-        p("\n}");
+        p2tn("if(0 == pos) setRenderArg(\"arg\", arg);");
+        ptn("}");
     }
 
     private void pExtendInitArgCode() {
         if (null == extendArgs || extendArgs.pl.size() < 1) return;
-        p("\n@Override protected void loadExtendingArgs() {");
+        ptn("@Override protected void loadExtendingArgs() {");
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
             InvokeTagParser.ParameterDeclaration pd = extendArgs.pl.get(i);
             if (S.isEmpty(pd.nameDef)) {
-                p("\n\t__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
+                p2t("__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).pn(");");
             } else {
-                p("\n\t__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).p(");");
+                p2t("__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).pn(");");
             }
             if (extendDeclareLineNo != -1) {
-                p(" //line: ").p(extendDeclareLineNo);
+                pn(" //line: ").p(extendDeclareLineNo);
             }
         }
-        p("\n}\n");
+        ptn("}");
     }
 
     private void pSetup() {
-        p("\n@Override protected void setup() {");
+        if (!logTime && renderArgs.isEmpty()) return;
+        ptn("@Override protected void setup() {");
             if (logTime) {
-                p("\n\t_logTime = true;");
+                p2tn("_logTime = true;");
             }
             for (String argName: renderArgs.keySet()) {
                 RenderArgDeclaration arg = renderArgs.get(argName);
-                p("\n\tif (").p(argName).p(" == null) {");
+                p2t("if (").p(argName).p(" == null) {");
                 //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-                p("\n\t\t").p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");\n\t}");
+                p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");}\n");
             }
-        p("\n}\n");
+        ptn("}");
     }
 
     private void pInitCode() {
-        if (null == initCode) return;
-        p("\n@Override public void init() {").p(initCode).p(";").p("}\n");
+        if (S.isEmpty(initCode)) return;
+        pt("@Override public void init() {").p(initCode).p(";").pn("\n\t}");
     }
 
     private void pTagImpl() {
         if (!isTag()) return;
-        p("\n@Override public java.lang.String getName() {\n\treturn \"").p(tagName).p("\";\n}\n");
+        pt("@Override public java.lang.String getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
     private void pInlineTags() {
@@ -497,8 +514,8 @@ public class CodeBuilder extends TextBuilder {
     public String buildBody = null;
 
     private void pBuild() {
-        p("\n@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
-        p("\n\tout().ensureCapacity(").p(tmpl.length()).p(");");
+        ptn("@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
+        p2t("out().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
         StringBuilder old = out();
         setOut(sb);
@@ -508,7 +525,7 @@ public class CodeBuilder extends TextBuilder {
         buildBody = sb.toString();
         setOut(old);
         p(buildBody);
-        p("\nreturn this;\n}");
+        p("\n\t\treturn this;\n\t}\n");
     }
 
 }

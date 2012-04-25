@@ -23,7 +23,7 @@ public class ParserDispatcher extends ParserBase {
 
     public ParserDispatcher(IContext context) {
         super(context);
-        P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), PatternStr.VarName);
+        P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), Patterns.VarName);
     }
 
     public TextBuilder go() {

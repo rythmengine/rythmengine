@@ -34,14 +34,14 @@ public class Token extends TextBuilder {
     }
 
     public Token(String s, IContext context) {
+        this(s, context, false);
+    }
+
+    public Token(String s, IContext context, boolean disableCompactMode) {
         super(null == context ? null : context.getCodeBuilder());
         this.s = s;
         ctx = context;
         line = (null == context) ? -1 : context.currentLine();
-    }
-
-    public Token(String s, IContext context, boolean disableCompactMode) {
-        this(s, context);
         this.disableCompactMode = disableCompactMode;
     }
 
@@ -203,6 +203,48 @@ public class Token extends TextBuilder {
             p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             pline();
         }
+    }
+
+    public Token ptline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p("\t").p(s);
+        pline();
+        return this;
+    }
+
+    public Token p2tline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p("\t\t").p(s);
+        pline();
+        return this;
+    }
+
+    public Token p3tline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p("\t\t\t").p(s);
+        pline();
+        return this;
+    }
+
+    public Token p4tline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p("\t\t\t\t").p(s);
+        pline();
+        return this;
+    }
+
+    public Token p5tline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p("\t\t\t\t\t").p(s);
+        pline();
+        return this;
+    }
+
+    public Token pline(String msg, Object ... args) {
+        String s = String.format(msg, args);
+        p(s);
+        pline();
+        return this;
     }
 
     public Token pline() {

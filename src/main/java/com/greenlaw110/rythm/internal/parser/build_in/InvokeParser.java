@@ -23,7 +23,7 @@ public class InvokeParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(^%s(%s\\s*((?@()))\\s*)(\\.cache((?@())))?(\\.ignoreNonExistsTag(?@()))?)";
+        return "(^%s(%s\\s*((?@()))\\s*)((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
     }
 
     @Override
@@ -50,32 +50,17 @@ public class InvokeParser extends KeywordParserFactory {
                     tagName = invocation.substring(0, pos);
                     params = invocation.substring(pos + 1);
                 }
-                String cacheFor = r.stringMatched(5);
-                boolean enableCacheFor = false;
-                String cacheForDuration = null;
-                String cacheForArgs = null;
-                if (null != cacheFor) {
-                    enableCacheFor = true;
-                    cacheFor = S.stripBrace(cacheFor); // "1h",1,foo.bar()
-                    String[] cacheForArray = cacheFor.split(",");
-                    if (cacheForArray.length > 0) {
-                        cacheForDuration = cacheForArray[0]; // "1h"
-                    }
-                    if (cacheForArray.length > 1) {
-                        cacheForArgs = cacheFor.replaceFirst(cacheForDuration, "");
-                    }
-                }
                 String s = remain();
                 Matcher m0 = InvokeTagParser.P_HEREDOC_SIMBOL.matcher(s);
                 Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
                     ctx().step(m0.group(1).length());
-                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, enableCacheFor, cacheForDuration, cacheForArgs, ctx(), ignoreNonExistsTag);
+                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, r.stringMatched(4), ctx());
                 } else if (m1.matches()) {
                     ctx().step(m1.group(1).length());
-                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, enableCacheFor, cacheForDuration, cacheForArgs, ctx(), ignoreNonExistsTag);
+                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, r.stringMatched(4), ctx());
                 } else {
-                    return new InvokeTagParser.InvokeTagToken(tagName, params, enableCacheFor, cacheForDuration, cacheForArgs, ctx(), ignoreNonExistsTag);
+                    return new InvokeTagParser.InvokeTagToken(tagName, params, r.stringMatched(4), ctx());
                 }
             }
         };

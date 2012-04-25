@@ -1,9 +1,11 @@
 package com.greenlaw110.rythm.runtime;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -102,10 +104,10 @@ public interface ITag extends ITemplate {
         }
     }
 
-    public abstract static class Body extends TextBuilder {
+    public abstract static class Body extends TemplateBuilder {
         protected ILogger logger = Logger.get(ITag.class);
-        protected ITemplate _context;
-        public Body(ITemplate context) {
+        protected TemplateBase _context;
+        public Body(TemplateBase context) {
             _context = context;
         }
         public StringBuilder getOut() {
@@ -118,30 +120,64 @@ public interface ITag extends ITemplate {
         public void setOut(StringBuilder out) {
             //_context.setOut(out);
         }
-        public abstract void call();
+        private void call(StringBuilder out) {
+            _out = out;
+            _call();
+            _out = null;
+        }
+        public final Body pe(Object o) {
+            if (null == o) return this;
+            if (o instanceof ITemplate.RawData) {
+                return (Body)p(o);
+            }
+            ITemplate.Escape escape = _context.__ctx.currentEscape();
+            return (Body)pe(o, escape);
+        }
+        protected abstract void setBodyArgByName(String name, Object val);
+        protected abstract void setBodyArgByPos(int pos, Object val);
+        public void render(StringBuilder out, Object ... vals) {
+            for (int i = vals.length - 1; i > -1; --i) {
+                setBodyArgByPos(i, vals[i]);
+            }
+            call(out);
+        }
+        public void render(ParameterList parameterList, StringBuilder out) {
+            if (null != parameterList) {
+                for (int i = 0; i < parameterList.size(); ++i) {
+                    Parameter p = parameterList.get(i);
+                    if (!S.isEmpty(p.name)) {
+                        setBodyArgByName(p.name, p.value);
+                    } else {
+                        setBodyArgByPos(i, p.value);
+                    }
+                }
+            }
+            call(out);
+        }
+        protected abstract void _call();
         public abstract void setProperty(String name, Object val);
         public abstract Object getProperty(String name);
-        @Override
-        public String toString() {
-//            StringBuilder old = getOut();
-//            setOut(new StringBuilder());
-//            call();
-//            String s = getOut().toString();
-//            setOut(old);
+//        @Override
+//        public String toString() {
+////            StringBuilder old = getOut();
+////            setOut(new StringBuilder());
+////            call();
+////            String s = getOut().toString();
+////            setOut(old);
+////            return s;
+//            StringBuilder sbNew = new StringBuilder();
+//            StringBuilder sbOld = _context.getOut();
+//            _context.setOut(sbNew);
+//            this._out = sbNew;
+//            _call();
+//            String s = sbNew.toString();
+//            _context.setOut(sbOld);
+//            this._out = null;
 //            return s;
-            StringBuilder sbNew = new StringBuilder();
-            StringBuilder sbOld = _context.getOut();
-            _context.setOut(sbNew);
-            this._out = sbNew;
-            call();
-            String s = sbNew.toString();
-            _context.setOut(sbOld);
-            this._out = null;
-            return s;
-//            _out.setLength(0);
-//            call();
-//            return _out.toString();
-        }
+////            _out.setLength(0);
+////            call();
+////            return _out.toString();
+//        }
     }
 
     String getName();

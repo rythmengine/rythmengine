@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
@@ -7,16 +8,35 @@ import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.IDurationParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * Parse @cacheFor("1m")
  */
 public class CacheParser extends KeywordParserFactory {
+
+    private static final Pattern P_INT = Pattern.compile("\\-?[0-9\\*\\/\\+\\-]+");
+    public static void validateDurationStr(String d, IContext ctx) {
+        if ("null".equals(d)) return;
+        if ((d.startsWith("\"") && d.endsWith("\""))) {
+            String s = S.stripQuotation(d);
+            try {
+                ctx.getEngine().durationParser.parseDuration(s);
+            } catch (Exception e) {
+                raiseParseException(ctx, "Invalid time duration: %s", d);
+            }
+        } else {
+            if (!P_INT.matcher(d).matches()) {
+                raiseParseException(ctx, "Invalid time duration: %s. int(second) or string expected. String must be double quoted", d);
+            }
+        }
+    }
 
     /*
     {
@@ -44,14 +64,17 @@ public class CacheParser extends KeywordParserFactory {
         CacheToken( String duration, String args, IContext ctx) {
             super("", ctx);
             this.duration = S.isEmpty(duration) ? "null" : duration;
+            // check if duration is valid
+            validateDurationStr(this.duration, ctx);
             this.args = args;
             this.startIndex = ctx.cursor();
         }
+
         @Override
         public void output() {
             p("{");
             pline();
-            pt("String s = _engine().cached(\"").p(key).p("\"").p(args).p(");");
+            pt("java.io.Serializable s = _engine().cached(\"").p(key).p("\"").p(args).p(");");
             pline();
             pt("if (null != s) {");
             pline();

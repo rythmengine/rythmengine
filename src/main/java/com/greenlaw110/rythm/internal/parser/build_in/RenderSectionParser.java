@@ -4,7 +4,7 @@ import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.PatternStr;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.S;
@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parse @render section
+ * Parse @render section|content
  */
 public class RenderSectionParser extends KeywordParserFactory {
 
@@ -35,7 +35,7 @@ public class RenderSectionParser extends KeywordParserFactory {
 
         @Override
         public String closeBlock() {
-            return "\n_endSection(true); _pSection(\"" + section + "\");";
+            return "\n_endSection(true); _pLayoutSection(\"" + section + "\");";
         }
     }
 
@@ -62,7 +62,7 @@ public class RenderSectionParser extends KeywordParserFactory {
                     ctx().step(m1.group(1).length());
                     return new DefaultSectionToken(section, ctx());
                 } else {
-                    String code = S.isEmpty(section) ? "_pBody();" : "_pSection(\"" + section + "\");";
+                    String code = S.isEmpty(section) ? "_pLayoutContent();" : "_pLayoutSection(\"" + section + "\");";
                     return new CodeToken(code, ctx());
                 }
             }
@@ -71,7 +71,7 @@ public class RenderSectionParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(%s%s\\s*[\\s\\(]\"?'?(" + PatternStr.VarName + ")?\"?'?\\)?).*";
+        return "(%s%s\\s*[\\s\\(]\"?'?(" + Patterns.VarName + ")?\"?'?\\)?).*";
     }
 
     public static void main(String[] args) {

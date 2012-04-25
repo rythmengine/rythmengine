@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.template;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.internal.compiler.ClassReloadException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public abstract class TemplateBase extends TextBuilder implements ITemplate {
+public abstract class TemplateBase extends TemplateBuilder implements ITemplate {
 
     protected transient RythmEngine engine = null;
     private transient TemplateClass templateClass = null;
@@ -56,8 +57,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     }
 
     /* to be used by dynamic generated sub classes */
-    private String renderBody = "";
-    private Map<String, String> renderSections = new HashMap<String, String>();
+    private String layoutContent = "";
+    private Map<String, String> layoutSections = new HashMap<String, String>();
     private Map<String, Object> renderProperties = new HashMap<String, Object>();
 
     protected TemplateBase __parent = null;
@@ -76,13 +77,13 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         }
     }
 
-    protected final void setRenderBody(String body) {
-        renderBody = body;
+    protected final void setLayoutContent(String body) {
+        layoutContent = body;
     }
 
-    private void addRenderSection(String name, String section, boolean def) {
-        if (def  && renderSections.containsKey(name)) return;
-        renderSections.put(name, section);
+    private void addLayoutSection(String name, String section, boolean def) {
+        if (def  && layoutSections.containsKey(name)) return;
+        layoutSections.put(name, section);
     }
 
     private StringBuilder tmpOut = null;
@@ -105,23 +106,23 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     protected void _endSection(boolean def) {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
-        addRenderSection(section, _out.toString(), def);
+        addLayoutSection(section, _out.toString(), def);
         _out = tmpOut;
         _caller = tmpCaller;
         tmpOut = null;
         tmpCaller = null;
     }
 
-    protected void _pSection(String name) {
-        p(renderSections.get(name));
+    protected void _pLayoutSection(String name) {
+        p(layoutSections.get(name));
     }
 
-    protected void _pBody() {
-        p(renderBody);
+    protected void _pLayoutContent() {
+        p(layoutContent);
     }
 
-    private void addAllRenderSections(Map<String, String> sections) {
-        if (null != sections) renderSections.putAll(sections);
+    private void addAllLayoutSections(Map<String, String> sections) {
+        if (null != sections) layoutSections.putAll(sections);
     }
 
     private void addAllRenderProperties(Map<String, Object> properties) {
@@ -153,8 +154,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
         //if (null != out) tmpl._out = out;
         if (null != _out) tmpl._out = new StringBuilder();
         _properties = new HashMap<String, Object>(_properties.size());
-        renderBody = "";
-        renderSections = new HashMap<String, String>();
+        layoutContent = "";
+        layoutSections = new HashMap<String, String>();
         renderProperties = new HashMap<String, Object>();
         return tmpl;
     }
@@ -193,7 +194,6 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
             long l = 0l;
             if (_logTime()) {
                 l = System.currentTimeMillis();
-                _logger.debug(">>>>>>>>>>>> [%s]", getClass().getName());
             }
             engine.preprocess(this);
             setup();
@@ -282,8 +282,8 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
     protected String internalRender() {
         internalBuild();
         if (null != __parent) {
-            __parent.setRenderBody(toString());
-            __parent.addAllRenderSections(renderSections);
+            __parent.setLayoutContent(toString());
+            __parent.addAllLayoutSections(layoutSections);
             __parent.addAllRenderProperties(renderProperties);
             return __parent.render();
         } else {
@@ -380,91 +380,24 @@ public abstract class TemplateBase extends TextBuilder implements ITemplate {
 
     public Context __ctx = new Context();
 
-    // --- print expression interface
-    public final TextBuilder pe(Object o) {
-        if (null != o) {
-            if (o instanceof ITemplate.RawData) {
-                return p(o);
-            }
-            ITemplate.Escape escape = __ctx.currentEscape();
-            return pe(o, escape);
+    public final TemplateBase pe(Object o) {
+        if (null == o) return this;
+        if (o instanceof ITemplate.RawData) {
+            return (TemplateBase)p(o);
         }
-        return this;
+        ITemplate.Escape escape = __ctx.currentEscape();
+        return pe(o, escape);
     }
 
-    public final TextBuilder pe(char c) {
-        return p(c);
-    }
-
-    public final TextBuilder pe(int i) {
-        return p(i);
-    }
-
-    public final TextBuilder pe(long l) {
-        return p(l);
-    }
-
-    public final TextBuilder pe(float f) {
-        return p(f);
-    }
-
-    public final TextBuilder pe(double d) {
-        return p(d);
-    }
-
-    public final TextBuilder pe(boolean b) {
-        return p(b);
-    }
-
-    public final TextBuilder pe(Object o, ITemplate.Escape escape) {
-        if (null != o) {
-            if (o instanceof ITemplate.RawData) {
-                return p(o);
-            }
-            if (null == escape) escape = __ctx.currentEscape();
-            switch (escape) {
-                case HTML:
-                    return p(S.escapeHtml(o));
-                case JSON:
-                    return p(S.escapeJson(o));
-                case JS:
-                    return p(S.escapeJavaScript(o));
-                case JAVA:
-                    return p(S.escapeJava(o));
-                case CSV:
-                    return p(S.escapeCsv(o));
-                case XML:
-                    return p(S.escapeXml(o));
-            }
+    public final TemplateBase pe(Object o, ITemplate.Escape escape) {
+        if (null == o) return this;
+        if (o instanceof ITemplate.RawData) {
+            return (TemplateBase)p(o);
         }
-        return p(o);
+        if (null == escape) escape = __ctx.currentEscape();
+        return (TemplateBase)super.pe(o, escape);
     }
-
-    public final TextBuilder pe(char c, ITemplate.Escape escape) {
-        return p(c);
-    }
-
-    public final TextBuilder pe(int i, ITemplate.Escape escape) {
-        return p(i);
-    }
-
-    public final TextBuilder pe(long l, ITemplate.Escape escape) {
-        return p(l);
-    }
-
-    public final TextBuilder pe(float f, ITemplate.Escape escape) {
-        return p(f);
-    }
-
-    public final TextBuilder pe(double d, ITemplate.Escape escape) {
-        return p(d);
-    }
-
-    public final TextBuilder pe(boolean b, ITemplate.Escape escape) {
-        return p(b);
-    }
-
-    // --- debugging interface
+        // --- debugging interface
     protected static ILogger _logger = Logger.get(TemplateBase.class);
     protected static void _debug(String msg, Object... args) {
         _logger.debug(msg, args);

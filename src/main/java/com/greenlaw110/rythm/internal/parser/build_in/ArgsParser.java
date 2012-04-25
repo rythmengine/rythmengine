@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -70,9 +71,27 @@ public class ArgsParser extends KeywordParserFactory {
         };
     }
 
+    public static List<CodeBuilder.RenderArgDeclaration> parseArgDeclaration(String s) {
+        final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
+        Regex r = new ArgsParser().reg((DialectBase)com.greenlaw110.rythm.Rythm.getDialectManager().get());
+        while (r.search(s)) {
+            String matched = r.stringMatched();
+            if (matched.startsWith("\n") || matched.startsWith("\r")) {
+                break;
+            }
+            String name = r.stringMatched(3);
+            String type = r.stringMatched(2);
+            String defVal = r.stringMatched(5);
+            ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
+        }
+        return ral;
+    }
+
+    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+
     @Override
     protected String patternStr() {
-        return "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+        return PATTERN;
     }
 
     protected String patternStr0() {

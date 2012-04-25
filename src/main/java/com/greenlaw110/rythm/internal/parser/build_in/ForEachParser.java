@@ -2,11 +2,9 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.PatternStr;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
@@ -75,7 +73,7 @@ public class ForEachParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s(\\s+|\\s*\\(\\s*)((" + PatternStr.Type + ")(\\s+(" + PatternStr.VarName + "))?)\\s*\\:\\s*(" + PatternStr.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
+        return "^(%s%s(\\s+|\\s*\\(\\s*)((" + Patterns.Type + ")(\\s+(" + Patterns.VarName + "))?)\\s*\\:\\s*(" + Patterns.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
     }
 
     public static void main(String[] args) {

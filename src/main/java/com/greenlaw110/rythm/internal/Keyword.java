@@ -4,6 +4,10 @@ import com.greenlaw110.rythm.spi.IKeyword;
 
 public enum Keyword implements IKeyword {
     /**
+     * Assign enclosed part into a String variable
+     */
+    ASSIGN,
+    /**
      * Declare arguments used in the template
      */
     ARGS,
@@ -75,11 +79,11 @@ public enum Keyword implements IKeyword {
     /**
      * Output sub template render content in place
      */
-    RENDER_BODY("(renderBody|doLayout)"),
+    RENDER_BODY("(renderBody|doBody)"),
     /**
      * Output sub template section content in place
      */
-    RENDER_SECTION("(render(Section)?)"),
+    RENDER_SECTION("(render(Section|Layout)?|doLayout)"),
     /**
      * break the current template execution process and return to caller
      */
@@ -93,17 +97,17 @@ public enum Keyword implements IKeyword {
      */
     SET,
     /**
-     * Shortcut for tag invocation (Only used in Japid dialect)
+     * Identify current template is a simple template
      */
-    T,
+    SIMPLE("__simple__"),
     /**
-     * Invoke tag (Only used in Japid dialect)
+     * output timestamp
      */
-    TAG,
+    TS,
     /**
-     * This Is Not Rythm Template tag
+     * define tag
      */
-    TINRT,
+    TAG("(tag|def)"),
     /**
      * Verbatim tag mark a block of template source shall
      * not be parsed

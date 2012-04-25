@@ -81,12 +81,16 @@ public class S {
     }
 
     public static final String stripBrace(String s) {
+        if (null == s) return "";
+        s = s.trim();
         if (s.startsWith("(")) s = s.substring(1);
         if (s.endsWith(")")) s = s.substring(0, s.length() - 1);
         return s;
     }
 
     public static final String stripQuotation(String s) {
+        if (null == s) return "";
+        s = s.trim();
         if (s.startsWith("\"") || s.startsWith("'")) s = s.substring(1);
         if (s.endsWith("\"") || s.endsWith("'")) s = s.substring(0, s.length() - 1);
         return s;

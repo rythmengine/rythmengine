@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.cache;
 
 import com.greenlaw110.rythm.RythmEngine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +47,9 @@ public class SimpleCacheService implements ICacheService {
 
     private static class Item {
         String key;
-        String value;
+        Serializable value;
         int ttl;
-        Item(String key, String value, int ttl) {
+        Item(String key, Serializable value, int ttl) {
             this.key = key;
             this.value = value;
             this.ttl = ttl;
@@ -58,7 +59,7 @@ public class SimpleCacheService implements ICacheService {
     private ConcurrentHashMap<String, Item> cache_ = new ConcurrentHashMap<String, Item>();
 
     @Override
-    public void put(String key, String value, int ttl) {
+    public void put(String key, Serializable value, int ttl) {
         if (null == key) throw new NullPointerException();
         if (0 == ttl) {
             ttl = defaultTTL;
@@ -77,12 +78,13 @@ public class SimpleCacheService implements ICacheService {
         }
     }
 
-    public void put(String key, String value) {
+    @Override
+    public void put(String key, Serializable value) {
         put(key, value, defaultTTL);
     }
 
     @Override
-    public String remove(String key) {
+    public Serializable remove(String key) {
         Item item = cache_.remove(key);
         return null == item ? null : item.value;
     }
@@ -93,7 +95,7 @@ public class SimpleCacheService implements ICacheService {
     }
 
     @Override
-    public String get(String key) {
+    public Serializable get(String key) {
         Item item = cache_.get(key);
         return null == item ? null : item.value;
     }

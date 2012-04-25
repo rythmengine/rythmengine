@@ -125,6 +125,11 @@ public class TextBuilder implements Cloneable {
         return this;
     }
 
+    public final TextBuilder pn() {
+        p_('\n');
+        return this;
+    }
+
     /**
      * Append an new line character and then append the object specified
      * to the string buffer
@@ -135,6 +140,46 @@ public class TextBuilder implements Cloneable {
     public final TextBuilder np(Object o) {
         p_('\n');
         if (null != o) p_(o);
+        return this;
+    }
+
+    protected TextBuilder pt(Object o) {
+        p("\t").p(o);
+        return this;
+    }
+
+    protected TextBuilder ptn(Object o) {
+        p("\t").p(o).pn();
+        return this;
+    }
+
+    protected TextBuilder p2t(Object o) {
+        p("\t\t").p(o);
+        return this;
+    }
+
+    protected TextBuilder p2tn(Object o) {
+        p("\t\t").p(o).pn();
+        return this;
+    }
+
+    protected TextBuilder p3t(Object o) {
+        p("\t\t\t").p(o);
+        return this;
+    }
+
+    protected TextBuilder p3tn(Object o) {
+        p("\t\t\t").p(o).pn();
+        return this;
+    }
+
+    protected TextBuilder p4t(Object o) {
+        p("\t\t\t\t").p(o);
+        return this;
+    }
+
+    protected TextBuilder p4tn(Object o) {
+        p("\t\t\t\t").p(o).pn();
         return this;
     }
 

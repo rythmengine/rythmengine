@@ -45,11 +45,11 @@ public class DefTagParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @tag, correct usage: @tag([arguments...])");
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @def, correct usage: @def tagName([arguments...])");
                 }
                 step(r.stringMatched().length());
-                String tagName = r.stringMatched(1);
-                String signature = r.stringMatched(2);
+                String tagName = r.stringMatched(2);
+                String signature = r.stringMatched(3);
                 return new DefTagToken(tagName, signature, ctx());
             }
         };
@@ -59,7 +59,7 @@ public class DefTagParser extends KeywordParserFactory {
     protected String patternStr() {
         return "^%s%s\\s+([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{\\s*\\r*\\n*";
     }
-    
+
     public static void main(String[] args) {
         DefTagParser tp = new DefTagParser();
         Regex r = tp.reg(new Rythm());

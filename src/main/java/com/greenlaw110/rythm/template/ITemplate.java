@@ -2,7 +2,9 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.utils.S;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
@@ -90,12 +92,50 @@ public interface ITemplate extends Cloneable {
 
     public static enum Escape {
         RAW,
-        CSV,
-        HTML,
-        JS,
-        JSON,
-        JAVA,
-        XML;
+        CSV {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeCsv(s);
+            }
+        },
+        HTML {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeHtml(s);
+            }
+        },
+        JS {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeJavaScript(s);
+            }
+        },
+        JSON {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeJson(s);
+            }
+        },
+        JAVA {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeJava(s);
+            }
+        },
+        XML {
+            @Override
+            protected RawData apply_(String s) {
+                return S.escapeXml(s);
+            }
+        };
+        public RawData apply(Object o) {
+            if (null == o) return RawData.NULL;
+            String s = o.toString();
+            return apply_(s);
+        }
+        protected RawData apply_(String s) {
+            return new RawData(s);
+        }
         private static String[] sa_ = null;
         public static String[] stringValues() {
             if (null == sa_) {
@@ -111,7 +151,7 @@ public interface ITemplate extends Cloneable {
         }
     }
 
-    public static class RawData {
+    public static class RawData implements Serializable {
         public String data;
         public RawData(Object val) {
             if (val == null) {

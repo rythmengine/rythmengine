@@ -26,6 +26,7 @@ import com.greenlaw110.rythm.utils.*;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -253,6 +254,12 @@ public class RythmEngine {
         classLoader = new TemplateClassLoader(cl, this);
         classes.clear();
         tags.clear();
+        tags.put("chain", new JavaTagBase() {
+            @Override
+            protected void call(ParameterList params, Body body) {
+                body.render(getOut());
+            }
+        });
         //defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
         implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
         byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
@@ -662,7 +669,7 @@ public class RythmEngine {
      */
     public void cache(String key, Object o, int ttl, Object... args) {
         if (mode.isDev() && cacheOnProdOnly) return;
-        String value = null == o ? "" : o.toString();
+        Serializable value = null == o ? "" : (o instanceof Serializable ? (Serializable)o : o.toString());
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
             for (Object arg : args) {
@@ -697,7 +704,7 @@ public class RythmEngine {
      * @param args
      * @return
      */
-    public String cached(String key, Object... args) {
+    public Serializable cached(String key, Object... args) {
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
             for (Object arg : args) {
