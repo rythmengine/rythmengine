@@ -175,8 +175,12 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             argList = ArgsParser.parseArgDeclaration(param);
         }
 
+        private String cacheKey = null;
         protected String cacheKey() {
-            return "\"_RYTHM_TAG_\" + " + tagName;
+            if (null == cacheKey) {
+                cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+            }
+            return cacheKey;
         }
 
         protected boolean needsNewOut() {
@@ -248,9 +252,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             startIndex = ctx.cursor();
         }
 
+        private String cacheKey = null;
         @Override
         protected String cacheKey() {
-            return tagName + "+\"" + key + "\"";
+            if (null == cacheKey) {
+                cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + key + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+            }
+            return cacheKey;
         }
 
         @Override

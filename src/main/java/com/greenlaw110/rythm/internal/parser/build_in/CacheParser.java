@@ -94,7 +94,9 @@ public class CacheParser extends KeywordParserFactory {
         public String closeBlock() {
             endIndex = ctx.cursor();
             String body = ctx.getTemplateSource(startIndex, endIndex);
-            key = UUID.nameUUIDFromBytes(body.getBytes()).toString();
+            String tmplName = ctx.getTemplateClass().name();
+            String keySeed = body + tmplName;
+            key = UUID.nameUUIDFromBytes(keySeed.getBytes()).toString();
             StringBuilder sbOld = getOut();
             StringBuilder sbNew = new StringBuilder();
             setOut(sbNew);
