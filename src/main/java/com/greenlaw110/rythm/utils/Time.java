@@ -38,7 +38,7 @@ public class Time {
         if (duration == null) {
             return 60 * 60 * 24 * 30;
         }
-        int toAdd = -1;
+        Integer toAdd = null;
         if (days.matcher(duration).matches()) {
             Matcher matcher = days.matcher(duration);
             matcher.matches();
@@ -55,8 +55,10 @@ public class Time {
             Matcher matcher = seconds.matcher(duration);
             matcher.matches();
             toAdd = Integer.parseInt(matcher.group(1));
+        } else if ("forever".equals(duration)) {
+            toAdd = -1;
         }
-        if (toAdd == -1) {
+        if (toAdd == null) {
             throw new IllegalArgumentException("Invalid duration pattern : " + duration);
         }
         return toAdd;
