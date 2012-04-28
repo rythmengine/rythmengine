@@ -59,6 +59,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     }
 
     static class InvokeTagToken extends CodeToken {
+        protected boolean isDynamic = false;
         protected String tagName;
         private boolean enableCallback = false;
         ParameterDeclarationList params = new ParameterDeclarationList();
@@ -69,6 +70,18 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         protected boolean ignoreNonExistsTag = false;
         protected String assignTo = null;
         protected List<CodeBuilder.RenderArgDeclaration> argList = null;
+
+        static InvokeTagToken dynamicTagToken(String tagName, String paramLine, String extLine, IContext context) {
+            InvokeTagToken t = new InvokeTagToken(tagName, paramLine, extLine, context);
+            t.isDynamic = true;
+            return t;
+        }
+
+        static InvokeTagToken dynamicTagToken(String tagName, String paramLine, String extLine, IContext context, boolean enableCallback) {
+            InvokeTagToken t = new InvokeTagToken(tagName, paramLine, extLine, context, enableCallback);
+            t.isDynamic = true;
+            return t;
+        }
 
         InvokeTagToken(String tagName, String paramLine, String extLine, IContext context) {
             this(tagName, paramLine, extLine, context, false);
@@ -178,7 +191,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         private String cacheKey = null;
         protected String cacheKey() {
             if (null == cacheKey) {
-                cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+                if (!isDynamic) {
+                    cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+                } else {
+                    cacheKey = "\"_RYTHM_TAG_\" + " + tagName + " + \"" + ctx.getTemplateClass().name() + "\"";
+                }
             }
             return cacheKey;
         }
@@ -256,7 +273,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         protected String cacheKey() {
             if (null == cacheKey) {
-                cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + key + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+                if (!isDynamic) {
+                    cacheKey = "\"" + UUID.nameUUIDFromBytes(("_RYTHM_TAG_" + tagName + key + ctx.getTemplateClass().name()).getBytes()).toString() + "\"";
+                } else {
+                    cacheKey = "\"_RYTHM_TAG_\" + " + tagName + " + \"" + key + "\"" + " + \"" + ctx.getTemplateClass().name() + "\"";
+                }
             }
             return cacheKey;
         }

@@ -55,12 +55,12 @@ public class InvokeParser extends KeywordParserFactory {
                 Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
                     ctx().step(m0.group(1).length());
-                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, r.stringMatched(4), ctx());
+                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                 } else if (m1.matches()) {
                     ctx().step(m1.group(1).length());
-                    return new InvokeTagParser.InvokeTagWithBodyToken(tagName, params, r.stringMatched(4), ctx());
+                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                 } else {
-                    return new InvokeTagParser.InvokeTagToken(tagName, params, r.stringMatched(4), ctx());
+                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                 }
             }
         };

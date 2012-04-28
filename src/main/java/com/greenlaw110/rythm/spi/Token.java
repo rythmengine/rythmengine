@@ -62,6 +62,7 @@ public class Token extends TextBuilder {
     }
 
     protected void output() {
+        if (null == s || "".equals(s)) return;
         pp(s);
     }
 

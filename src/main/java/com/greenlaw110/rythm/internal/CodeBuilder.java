@@ -390,7 +390,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private void pClassOpen() {
-        p("public class ").p(cName).p(" extends ").p(extended()).p(" {").pn(extendedResourceMark());
+        np("public class ").p(cName).p(" extends ").p(extended()).p(" {").pn(extendedResourceMark());
     }
 
     private void pClassClose() {
@@ -398,6 +398,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private void pRenderArgs() {
+        pn();
         // -- output private members
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -411,6 +412,7 @@ public class CodeBuilder extends TextBuilder {
         }
 
         // -- output setRenderArgs method
+        pn();
         ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -422,6 +424,7 @@ public class CodeBuilder extends TextBuilder {
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         int userDefinedArgNumber = renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size());
         if (0 < userDefinedArgNumber) {
+            pn();
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
                 p2tn("int p = 0, l = args.length;");
@@ -438,6 +441,7 @@ public class CodeBuilder extends TextBuilder {
         }
 
         // -- output setRenderArg by name
+        pn();
         ptn("@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -446,6 +450,7 @@ public class CodeBuilder extends TextBuilder {
         p2t("super.setRenderArg(name, arg);\n\t}\n");
 
         // -- output setRenderArg by position
+        pn();
         ptn("@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
         p2tn("int p = 0;");
         for (String argName: renderArgs.keySet()) {
@@ -461,6 +466,7 @@ public class CodeBuilder extends TextBuilder {
 
     private void pExtendInitArgCode() {
         if (null == extendArgs || extendArgs.pl.size() < 1) return;
+        pn();
         ptn("@Override protected void loadExtendingArgs() {");
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
             InvokeTagParser.ParameterDeclaration pd = extendArgs.pl.get(i);
@@ -478,6 +484,7 @@ public class CodeBuilder extends TextBuilder {
 
     private void pSetup() {
         if (!logTime && renderArgs.isEmpty()) return;
+        pn();
         ptn("@Override protected void setup() {");
             if (logTime) {
                 p2tn("_logTime = true;");
@@ -493,15 +500,18 @@ public class CodeBuilder extends TextBuilder {
 
     private void pInitCode() {
         if (S.isEmpty(initCode)) return;
+        pn();
         pt("@Override public void init() {").p(initCode).p(";").pn("\n\t}");
     }
 
     private void pTagImpl() {
         if (!isTag()) return;
+        pn();
         pt("@Override public java.lang.String getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
     private void pInlineTags() {
+        pn();
         for (InlineTag tag: inlineTags.values()) {
             p("\nprotected String ").p(tag.tagName).p(tag.signature).p("{\n");
             for (TextBuilder b: tag.builders) {
@@ -514,6 +524,8 @@ public class CodeBuilder extends TextBuilder {
     public String buildBody = null;
 
     private void pBuild() {
+        pn();
+        pn();
         ptn("@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
         p2t("out().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
