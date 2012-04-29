@@ -1,0 +1,11 @@
+@hello("rythm")
+\n
+@bye(who: "velocity")
+\n
+@bye(who: "freemarker") {
+    Good bye!
+}
+\n
+@bye(who: "groovy").callback(String who) {
+    Good bye! @who
+}

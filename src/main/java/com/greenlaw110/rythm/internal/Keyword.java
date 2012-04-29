@@ -16,7 +16,7 @@ public enum Keyword implements IKeyword {
      */
     BREAK,
     /**
-     * Cache the block for certain period
+     * Cache the block for a certain period
      */
     CACHE,
     /**
@@ -24,7 +24,7 @@ public enum Keyword implements IKeyword {
      */
     CONTINUE,
     /**
-     * template Debug
+     * output debug message
      */
     DEBUG,
     /**
@@ -32,7 +32,7 @@ public enum Keyword implements IKeyword {
      */
     EACH("(for|forEach|each)"),
     /**
-     * Mark a section that expression should be output after excaped
+     * Mark a section that expression should be output after escaped
      */
     ESCAPE,
     /**

@@ -3,6 +3,7 @@
 
     <property name="src_hello_world" location="HelloWorld"/>
     <property name="src_issue_22" location="Issue22"/>
+    <property name="src_java_tag" location="JavaTag"/>
     <property name="classes" location="classes"/>
     <property name="lib" location="../lib"/>
     <property environment="env"/>
@@ -11,7 +12,7 @@
         <pathelement location="${lib}/pat-1.5.3.jar"/>
         <pathelement location="${lib}/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
         <pathelement location="${lib}/commons-lang3-3.1.jar"/>
-        <pathelement location="${lib}/rythm-1.0.0-RC1-20120412.jar"/>
+        <pathelement location="${lib}/rythm-1.0.0-RC1-20120428.jar"/>
     </path>
 
     <target name="init">
@@ -46,7 +47,21 @@
         </java>
     </target>
 
-    <target name="all" depends="hello_world, issue_22">
+    <target name="compile_java_tag" depends="init">
+        <javac srcdir="${src_java_tag}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+        <copy file="${src_java_tag}/javaTagDemo.txt" todir="${classes}"/>
+    </target>
+
+    <target name="java_tag" depends="compile_java_tag">
+        <java classname="JavaTags" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="all" depends="hello_world, issue_22, java_tag">
     </target>
 
     <target name="clean">
