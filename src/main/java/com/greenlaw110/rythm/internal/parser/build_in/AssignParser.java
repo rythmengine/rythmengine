@@ -70,7 +70,7 @@ public class AssignParser extends KeywordParserFactory {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain())) raiseParseException("bad @assignTo statement. Correct usage: @assignTo(\"mySection\"){...}");
+                if (!r.search(remain())) raiseParseException("bad @assign statement. Correct usage: @assign(\"myVariable\"){...}");
                 int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);
@@ -84,12 +84,12 @@ public class AssignParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
-        return "%s%s\\s*((?@()))[\\s]+\\{?\\s*";
+        return "%s%s\\s*((?@()))[\\s]*\\{?\\s*";
     }
 
     public static void main(String[] args) {
         Regex r = new AssignParser().reg(new Rythm());
-        if (r.search("@assignTo(\"JS\") \nab")) {
+        if (r.search("@assign(\"JS\"){..}")) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }
