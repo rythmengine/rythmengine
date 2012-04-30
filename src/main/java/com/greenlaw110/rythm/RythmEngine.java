@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.cache.ICacheService;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -496,6 +497,9 @@ public class RythmEngine {
     }
 
     public String testTag(String name, TemplateClass tc) {
+        if (Keyword.THIS.toString().equals(name)) {
+            return resourceManager.getFullTagName(tc);
+        }
         if (mode.isProd() && non_tags.contains(name)) return null;
         boolean isTag = tags.containsKey(name);
         if (isTag) return name;

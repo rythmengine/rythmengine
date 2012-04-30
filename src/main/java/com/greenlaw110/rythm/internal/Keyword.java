@@ -101,6 +101,10 @@ public enum Keyword implements IKeyword {
      */
     SIMPLE("__simple__"),
     /**
+     * Call self as a tag
+     */
+    THIS,
+    /**
      * output timestamp
      */
     TS,
