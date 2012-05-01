@@ -71,7 +71,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
     @Override
     protected Long userCheckInterval() {
-        return engine().configuration.getAsLong("rythm.resource.classpath.interval", null);
+        return engine().configuration.getAsLong("rythm.resource.classpath.interval", Long.valueOf(1000 * 5));
     }
 
     @Override

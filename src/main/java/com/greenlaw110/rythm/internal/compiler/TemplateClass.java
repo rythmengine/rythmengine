@@ -264,7 +264,7 @@ public class TemplateClass {
     }
 
     public ITemplate asTemplate() {
-        if (null == name) refresh();
+        if (null == name || engine().mode.isDev()) refresh();
         return templateInstance_().cloneMe(engine(), null);
     }
 
@@ -274,8 +274,16 @@ public class TemplateClass {
 
     private boolean refreshing = false;
     private boolean compiling = false;
+    private Object refreshLock = new Object();
     private boolean refreshing() {
-        return refreshing || compiling;
+        synchronized (refreshLock) {
+            return refreshing || compiling;
+        }
+    }
+    private void refreshing(boolean b) {
+        synchronized (refreshLock) {
+            refreshing = b;
+        }
     }
 
     private void addVersion() {
@@ -314,7 +322,7 @@ public class TemplateClass {
         if (inner) return false;
         try {
             RythmEngine e = engine();
-            refreshing = true;
+            refreshing(true);
             if (!templateResource.isValid()) {
                 // it is removed?
                 isValid = false;
@@ -412,7 +420,7 @@ public class TemplateClass {
             compiled = false;
             return true;
         } finally {
-            refreshing = false;
+            refreshing(false);
         }
     }
 
