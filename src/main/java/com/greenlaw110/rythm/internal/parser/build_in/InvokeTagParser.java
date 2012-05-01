@@ -221,33 +221,33 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 }
             }
             if (needsNewOut()) {
-                ptline("Object s = null;");
+                ptline("Object _r_s = null;");
                 if (enableCache) {
                     ptline("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
-                    pt("s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
+                    pt("_r_s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
                     pline();
                 }
-                ptline("if (null == s) {");
+                ptline("if (null == _r_s) {");
                 p2tline("StringBuilder sbOld = getOut();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setOut(sbNew);");
                 p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 pline();
-                p2tline("s = sbNew.toString();");
+                p2tline("_r_s = sbNew.toString();");
                 p2tline("setOut(sbOld);");
                 if (escape != null) {
-                    p2tline(String.format("s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(s);", escape.name()));
+                    p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
                 }
                 if (enableCache) {
-                    p2t("_engine().cache(").p(cacheKey()).p(", s, ").p(cacheDuration).p(cacheArgs).p(");");
+                    p2t("_engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
                     pline();
                 }
                 ptline("}");
                 if (assignTo != null) {
-                    pt(assignTo).p(" = s.toString();");
+                    pt(assignTo).p(" = _r_s.toString();");
                     pline();
                 } else {
-                    ptline("p(s);");
+                    ptline("p(_r_s);");
                 }
             } else {
                 p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
@@ -304,13 +304,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             }
             String curClassName = ctx.getCodeBuilder().className();
             if (needsNewOut()) {
-                pline("Object s = null;");
+                pline("Object _r_s = null;");
                 if (enableCache) {
                     ptline("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
-                    pt("s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
+                    pt("_r_s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
                     pline();
                 }
-                ptline("if (null == s) {");
+                ptline("if (null == _r_s) {");
                 p2tline("StringBuilder sbOld = getOut();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setOut(sbNew);");
@@ -384,21 +384,21 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             p3tline("}");
             p2t("}, ").p(ignoreNonExistsTag).p(");");
             pline();
-            p2tline("s = sbNew.toString();");
+            p2tline("_r_s = sbNew.toString();");
             p2tline("setOut(sbOld);");
             if (escape != null) {
-                p2tline(String.format("s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(s);", escape.name()));
+                p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
             }
             if (enableCache) {
-                p2t("_engine().cache(").p(cacheKey()).p(", s, ").p(cacheDuration).p(cacheArgs).p(");");
+                p2t("_engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
                 pline();
             }
             ptline("}");
             if (assignTo != null) {
-                pt(assignTo).p(" = s;");
+                pt(assignTo).p(" = _r_s;");
                 pline();
             } else {
-                ptline("p(s);");
+                ptline("p(_r_s);");
             }
             p2tline("}");
             String s = sbNew.toString();
