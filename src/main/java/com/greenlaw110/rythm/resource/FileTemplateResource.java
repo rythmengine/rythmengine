@@ -144,7 +144,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         if (null == engine) engine = Rythm.engine;
         String key = tc.getKey();
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
-        if (key.startsWith(engine.templateHome.getPath())) {
+        if (null != engine.templateHome && key.startsWith(engine.templateHome.getPath())) {
             key = key.replace(engine.templateHome.getPath(), "");
         }
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
@@ -168,6 +168,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
             String name = tagName + suffix;
 
             for (File root: roots) {
+                if (null == root) continue;
                 tagFile = new File(root, name);
                 if (tagFile.canRead()) {
                     try {

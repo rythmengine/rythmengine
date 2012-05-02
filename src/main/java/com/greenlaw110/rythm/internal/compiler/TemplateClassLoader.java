@@ -473,7 +473,7 @@ public class TemplateClassLoader extends ClassLoader {
     int pathHash = 0;
 
     int computePathHash() {
-        return classStateHashCreator.computePathHash(engine.tmpDir);
+        return engine.noFileWrite ? 0 : classStateHashCreator.computePathHash(engine.tmpDir);
     }
 
 }

@@ -97,6 +97,10 @@ public class Rythm {
         return engine.renderIfTemplateExists(template, args);
     }
 
+    public static void shutdown() {
+        engine.shutdown();
+    }
+
     public static void main(String[] args) {
         String template = "@args java.util.List<String> users, String title, String name; @each String u: users @u @ title: @title name: @name ";
         List<String> l = new ArrayList<String>();

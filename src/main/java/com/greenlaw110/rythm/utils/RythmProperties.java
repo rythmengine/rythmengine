@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.cache.ICacheService;
+import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -105,7 +106,10 @@ public class RythmProperties extends Properties {
 
     public ICacheService getAsCacheService(String key) {
         Object o = get(key);
-        if (null == o) return SimpleCacheService.INSTANCE;
+        if (null == o) {
+            Boolean b = getAsBoolean("rythm.cache.enabled", false);
+            return b ? SimpleCacheService.INSTANCE : new NoCacheService();
+        }
         if (o instanceof ICacheService) return (ICacheService)o;
         String s = o.toString();
         try {

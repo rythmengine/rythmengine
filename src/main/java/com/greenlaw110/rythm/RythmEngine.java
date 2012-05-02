@@ -54,7 +54,7 @@ public class RythmEngine {
     }
 
     public boolean classCacheEnabled() {
-        return reloadByRestart();
+        return !noFileWrite && reloadByRestart();
     }
 
     public static final String version = "1.0.0-RC1-20120426";
@@ -111,6 +111,11 @@ public class RythmEngine {
      * disable java extension can improve parse performance
      */
     private boolean enableJavaExtensions = true;
+
+    /**
+     * Some context doesn't allow file write, e.g. GAE
+     */
+    public boolean noFileWrite = false;
 
     public boolean enableJavaExtensions() {
         return enableJavaExtensions;
@@ -226,7 +231,8 @@ public class RythmEngine {
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
-        tmpDir = configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
+        noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
+        tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);
         tagHome = configuration.getAsFile("rythm.tag.root", null);
@@ -453,9 +459,6 @@ public class RythmEngine {
     private NonExistsTemplatesChecker nonExistsTemplatesChecker = null;
 
     public String renderIfTemplateExists(String template, Object... args) {
-        if (mode.isDev() && nonExistsTemplatesChecker == null) {
-            nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
-        }
         if (nonExistsTemplates.contains(template)) return "";
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
@@ -464,6 +467,9 @@ public class RythmEngine {
                 tc = new TemplateClass(rsrc, this);
             } else {
                 nonExistsTemplates.add(template);
+                if (mode.isDev() && nonExistsTemplatesChecker == null) {
+                    nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+                }
                 return "";
             }
         }
@@ -609,6 +615,9 @@ public class RythmEngine {
                             logger.debug("cannot find tag: " + name);
                         }
                         nonExistsTags.add(name);
+                        if (mode.isDev() && nonExistsTemplatesChecker == null) {
+                            nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+                        }
                         return;
                     } else  {
                         throw new NullPointerException("cannot find tag: " + name);
@@ -717,6 +726,10 @@ public class RythmEngine {
             key = sb.toString();
         }
         return cacheService.get(key);
+    }
+
+    public void shutdown() {
+        if (null != cacheService) cacheService.shutdown();
     }
 
     // -- SPI interface
