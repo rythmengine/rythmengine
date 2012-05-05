@@ -29,16 +29,25 @@ public class Rythm {
         V_VERSION,
         RESTART
     }
-    public static RythmEngine engine = new RythmEngine();
+    public static RythmEngine engine = null;
 
     public static final String version = engine.version;
 
     public static void init(Properties conf) {
-        engine.init(conf);
+        engine = new RythmEngine(conf);
     }
 
     public static void init() {
-        engine.init();
+        engine = new RythmEngine();
+    }
+
+    private static void checkInit() {
+        if (null == engine) init();
+    }
+
+    private static RythmEngine engine() {
+        checkInit();
+        return engine;
     }
 
     public static void registerLoggerFactory(ILoggerFactory fact) {
@@ -46,59 +55,63 @@ public class Rythm {
     }
 
     public static void registerListener(IRythmListener listener) {
-        engine.registerListener(listener);
+        engine().registerListener(listener);
     }
 
     public static void unregisterListener(IRythmListener listener) {
-        engine.unregisterListener(listener);
+        engine().unregisterListener(listener);
     }
 
     public static void clearListener() {
-        engine.clearListener();
+        engine().clearListener();
     }
 
     public static void registerTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
-        engine.registerTemplateClassEnhancer(enhancer);
+        engine().registerTemplateClassEnhancer(enhancer);
     }
 
     public static void unregisterTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
-        engine.unregisterTemplateClassEnhancer(enhancer);
+        engine().unregisterTemplateClassEnhancer(enhancer);
     }
 
     public static void clearTemplateClassEnhancer() {
-        engine.clearTemplateClassEnhancer();
+        engine().clearTemplateClassEnhancer();
     }
 
     public static boolean registerTag(ITag tag) {
-        return engine.registerTag(tag);
+        return engine().registerTag(tag);
+    }
+
+    public boolean registerTag(String name, ITag tag) {
+        return engine().registerTag(name, tag);
     }
 
     public boolean isProdMode() {
-        return engine.isProdMode();
+        return engine().isProdMode();
     }
 
     public static String render(String template, Object... args) {
-        return engine.render(template, args);
+        return engine().render(template, args);
     }
 
     public static String render(File file, Object... args) {
-        return engine.render(file, args);
+        return engine().render(file, args);
     }
 
     public static String renderStr(String template, Object... args) {
-        return engine.renderString(template, args);
+        return engine().renderString(template, args);
     }
 
     public static String renderString(String template, Object... args) {
-        return engine.renderString(template, args);
+        return engine().renderString(template, args);
     }
 
     public static String renderIfTemplateExists(String template, Object... args) {
-        return engine.renderIfTemplateExists(template, args);
+        return engine().renderIfTemplateExists(template, args);
     }
 
     public static void shutdown() {
-        engine.shutdown();
+        engine().shutdown();
     }
 
     public static void main(String[] args) {
@@ -149,10 +162,10 @@ public class Rythm {
 
     // --- SPI interfaces ---
     public static DialectManager getDialectManager() {
-        return engine.getDialectManager();
+        return engine().getDialectManager();
     }
 
     public static ExtensionManager getExtensionManager() {
-        return engine.getExtensionManager();
+        return engine().getExtensionManager();
     }
 }

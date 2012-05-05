@@ -42,9 +42,8 @@ public abstract class JavaTags {
     }
 
     public static void main(String[] args) {
-        RythmEngine engine = Rythm.engine;
-        engine.registerTag(new Hello());
-        engine.registerTag(new Bye());
+        Rythm.registerTag(new Hello());
+        Rythm.registerTag(new Bye());
         String s = Rythm.render("javaTagDemo.txt");
         System.out.println(s);
     }
