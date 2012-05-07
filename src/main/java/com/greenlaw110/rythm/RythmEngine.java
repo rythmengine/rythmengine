@@ -659,7 +659,16 @@ public class RythmEngine {
             }
         }
         if (null != body) tag.setRenderArg("_body", body);
-        tag.call();
+        for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
+            l.onInvoke(tag);
+        }
+        try {
+            tag.call();
+        } finally {
+            for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
+                l.tagInvoked(tag);
+            }
+        }
     }
 
 

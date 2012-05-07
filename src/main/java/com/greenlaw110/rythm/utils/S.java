@@ -6,6 +6,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.text.Normalizer;
 
 public class S {
+    public static boolean isEmpty(Object s) {
+        return null == s || "".equals(s.toString().trim());
+    }
     public static boolean isEmpty(String s) {
         return null == s || "".equals(s.trim());
     }
@@ -47,6 +50,20 @@ public class S {
 
     public static ITemplate.RawData escape(Object s) {
         return escapeHtml(s);
+    }
+
+    public static ITemplate.RawData escape(Object s, Object escape) {
+        if (isEmpty(s)) return ITemplate.RawData.NULL;
+        if (isEmpty(escape)) return escape(s);
+        String se = escape.toString();
+        if ("json".equalsIgnoreCase(se)) return escapeJson(s);
+        if ("xml".equalsIgnoreCase(se)) return escapeXml(s);
+        if ("javascript".equalsIgnoreCase(se) || "js".equalsIgnoreCase(se)) return escapeJavaScript(s);
+        if ("csv".equalsIgnoreCase(se)) return escapeCsv(s);
+        if ("java".equalsIgnoreCase(se)) return escapeJava(s);
+        if ("html".equalsIgnoreCase(se)) return escapeHtml(s);
+        if ("raw".equalsIgnoreCase(se)) return raw(s);
+        throw new IllegalArgumentException("Unknown escape scheme: " + se);
     }
 
     public static ITemplate.RawData escapeHtml(Object s) {

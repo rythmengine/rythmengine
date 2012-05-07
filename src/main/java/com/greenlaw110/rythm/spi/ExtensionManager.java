@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.ITagInvokeListener;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.DialectNotFoundException;
@@ -60,4 +61,15 @@ public class ExtensionManager {
     public Iterable<IExpressionProcessor> expressionProcessors() {
         return expressionProcessors;
     }
+
+    private List<ITagInvokeListener> tagInvokeListeners = new ArrayList<ITagInvokeListener>();
+    public ExtensionManager registerTagInvoeListener(ITagInvokeListener l) {
+        if (!tagInvokeListeners.contains(l)) tagInvokeListeners.add(l);
+        return this;
+    }
+
+    public Iterable<ITagInvokeListener> tagInvokeListeners() {
+        return tagInvokeListeners;
+    }
+
 }

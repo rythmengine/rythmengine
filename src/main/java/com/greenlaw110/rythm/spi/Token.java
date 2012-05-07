@@ -77,6 +77,7 @@ public class Token extends TextBuilder {
         for (String s: sa) {
             addExtension(new IJavaExtension.VoidParameterExtension("S", s));
         }
+        addExtension(new IJavaExtension.ParameterExtension("S", "escape", ".+"));
         //addExtension(new IJavaExtension.ParameterExtension("pad",  "[0-9]+"));
     }
 
