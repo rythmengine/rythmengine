@@ -138,6 +138,7 @@ public class CodeBuilder extends TextBuilder {
         this.engine = null == engine ? Rythm.engine : engine;
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
+        this.simpleTemplate = templateClass.simpleTemplate;
     }
 
     public void clear() {

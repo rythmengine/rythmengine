@@ -180,6 +180,11 @@ public class TemplateClass {
     public CodeBuilder codeBuilder;
 
     /**
+     * Indicate this template class represent a simple template
+     */
+    public boolean simpleTemplate;
+
+    /**
      * The ITemplate instance
      */
     public TemplateBase templateInstance;
@@ -213,6 +218,9 @@ public class TemplateClass {
         this(engine);
         if (null == resource) throw new NullPointerException();
         templateResource = resource;
+        if (resource instanceof StringTemplateResource) {
+            simpleTemplate = true;
+        }
         if (!noRefresh) refresh();
     }
 
