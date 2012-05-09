@@ -57,7 +57,7 @@ public class RythmEngine {
         return !noFileWrite && reloadByRestart();
     }
 
-    public static final String version = "1.0.0-20120505";
+    public static final String version = "1.0.0-20120509";
     public static String pluginVersion = "";
 
     public static String versionSignature() {

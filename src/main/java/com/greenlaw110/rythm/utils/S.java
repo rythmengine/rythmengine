@@ -78,9 +78,42 @@ public class S {
 
     public static ITemplate.RawData escapeJson(Object s) {
         if (null == s) return ITemplate.RawData.NULL;
-        String s0 = s.toString().replaceAll("[\n\r\t]+", " ").replaceAll("\"", "\\\\\"");
+        String s0 = s.toString();
+        // not easy to do. Need to parse into the content, as "//" also used as a protocol separator
+//        if (s0.contains("//")) {
+//            s0 = s0.replaceAll("[\n\r]+", "\n");
+//            int pos = s0.indexOf("//", 0);
+//            StringBuilder sb = new StringBuilder();
+//            int lastPos = 0;
+//            while (pos > -1) {
+//                // check if this // is a protocol separator
+//
+//                sb.append(s0.substring(0, pos));
+//                sb.append("/*");
+//                int pos0 = pos;
+//                pos = s0.indexOf('\n', pos);
+//                if (pos < 0) {
+//                    sb.append(s0.substring(pos0 + 2));
+//                    sb.append("*/");
+//                    break;
+//                } else {
+//                    sb.append(s0.substring(pos0 + 2, pos));
+//                    sb.append("*/");
+//                }
+//                pos0 = pos;
+//                pos = s0.indexOf("//", pos);
+//                if (pos < 0) {
+//                    sb.append(s0.substring(pos0));
+//                    break;
+//                }
+//            }
+//            s0 = sb.toString();
+//        }
+        s0 = s0.replaceAll("[\n\r]+", "\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
         return new ITemplate.RawData(s0);
     }
+
+
 
     public static ITemplate.RawData escapeJava(Object s) {
         if (null == s) return ITemplate.RawData.NULL;
@@ -202,7 +235,8 @@ public class S {
 
 
     public static void main(String[] args) {
-        System.out.println(S.escape("<h1>Hello</h1>"));
+        String s = "var x = 0; ybc\n\nvar y = 1";
+        System.out.println(S.escapeJson(s));
     }
 
 }
