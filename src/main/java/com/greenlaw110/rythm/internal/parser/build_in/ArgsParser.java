@@ -42,9 +42,9 @@ public class ArgsParser extends KeywordParserFactory {
                         break;
                     }
                     step += matched.length();
-                    String name = r.stringMatched(3);
+                    String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
-                    String defVal = r.stringMatched(5);
+                    String defVal = r.stringMatched(6);
                     ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
                 }
                 step(step);
@@ -79,7 +79,7 @@ public class ArgsParser extends KeywordParserFactory {
             if (matched.startsWith("\n") || matched.startsWith("\r")) {
                 break;
             }
-            String name = r.stringMatched(3);
+            String name = r.stringMatched(4);
             String type = r.stringMatched(2);
             String defVal = r.stringMatched(5);
             ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
@@ -87,7 +87,7 @@ public class ArgsParser extends KeywordParserFactory {
         return ral;
     }
 
-    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*([0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
 
     @Override
     protected String patternStr() {
@@ -99,10 +99,10 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String s = "Exception result\n Not found";
+        String s = "List<Object>[] ia = 5";
         ArgsParser ap = new ArgsParser();
         Regex r = ap.reg(new Rythm());
-        System.out.println(r);
+        //System.out.println(r);
         while (r.search(s)) {
             String m = r.stringMatched();
             if (m.contains("\n") || m.contains("\r")) {
@@ -110,11 +110,7 @@ public class ArgsParser extends KeywordParserFactory {
             } else {
                 System.out.println("m: " + (int)m.toCharArray()[0]);
             }
-            System.out.println("1: " + r.stringMatched(1));
-            System.out.println("2: " + r.stringMatched(2));
-            System.out.println("3: " + r.stringMatched(3));
-            System.out.println("4: " + r.stringMatched(4));
-            System.out.println("5: " + r.stringMatched(5));
+            p(r, 10);
         }
     }
 

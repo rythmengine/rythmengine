@@ -26,13 +26,25 @@ public class ForEachCodeToken extends BlockCodeToken {
     public ForEachCodeToken(String type, String varname, String iterable, IContext context) {
         super(null, context);
         if (null == type || null == iterable) throw new NullPointerException();
-        this.type = type;
+        this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname;
         this.iterable = iterable;
         line--;
         openPos = context.cursor();
         ctx.pushBreak(IContext.Break.RETURN);
         ctx.pushContinue(IContext.Continue.RETURN);
+    }
+
+    private String ObjectType(String type) {
+        if ("int".equals(type)) return "Integer";
+        if ("float".equals(type)) return "Float";
+        if ("double".equals(type)) return "Double";
+        if ("boolean".equals(type)) return "Boolean";
+        if ("char".equals(type)) return "Character";
+        if ("long".equals(type)) return "Long";
+        if ("byte".equals(type)) return "Byte";
+        if ("short".equals(type)) return "Integer";
+        return type;
     }
 
     @Override
