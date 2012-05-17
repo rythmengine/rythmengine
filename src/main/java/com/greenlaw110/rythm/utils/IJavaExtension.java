@@ -17,6 +17,7 @@ public interface IJavaExtension  {
     String extend(String s, String signature);
     Pattern pattern1();
     Pattern pattern2();
+    String methodName();
 
     static class VoidParameterExtension implements IJavaExtension {
         private String waiveName = null;
@@ -47,6 +48,11 @@ public interface IJavaExtension  {
         @Override
         public String extend(String s, String signature) {
             return String.format("%s(%s)", fullMethodName, s);
+        }
+
+        @Override
+        public String methodName() {
+            return methodName;
         }
     }
 
@@ -83,6 +89,11 @@ public interface IJavaExtension  {
         public String extend(String s, String signature) {
             return String.format("%s(%s, %s)", fullMethodName, s, signature);
         }
+
+        @Override
+        public String methodName() {
+            return methodName;
+        }
     }
-    
+
 }

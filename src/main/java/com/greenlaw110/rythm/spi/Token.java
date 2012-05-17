@@ -70,6 +70,14 @@ public class Token extends TextBuilder {
     public static final void addExtension(IJavaExtension extension) {
         extensions.add(extension);
     }
+    public static boolean isJavaExtension(String methodName) {
+        for (IJavaExtension ext : extensions) {
+            if (S.isEqual(methodName, ext.methodName())) {
+                return true;
+            }
+        }
+        return false;
+    }
     static {
         String[] sa = {
             "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
@@ -114,6 +122,17 @@ public class Token extends TextBuilder {
         if (S.isEmpty(elvis)) return s;
         elvis = elvis.replaceFirst("^\\s*\\?\\s*:\\s*", "");
         return String.format("((null == %1$s) ? %2$s : %1$s)", s, elvis);
+    }
+    protected final void outputExpression(List<String> nullValueTester) {
+        int size = nullValueTester.size();
+        for (String s: nullValueTester) {
+            p("if (null != ").p(s).p(") {\n\t");
+        }
+        outputExpression();
+        pn();
+        for (int i = 0; i < size; ++i) {
+            pn("}");
+        }
     }
     protected final void outputExpression() {
         if (S.isEmpty(s)) return;
