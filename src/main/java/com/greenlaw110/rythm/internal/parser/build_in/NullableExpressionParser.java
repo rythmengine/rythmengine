@@ -47,18 +47,19 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                 int step = 0;
                 if (r1.search(s)) {
                     exp = r1.stringMatched(2);
-                    step = r1.stringMatched().length();
+                    step = r1.stringMatched(1).length();
                 } else if (r2.search(s)) {
                     exp = r2.stringMatched(2);
                     exp = S.stripBrace(exp);
-                    step = r1.stringMatched().length();
+                    step = r2.stringMatched().length();
                 } else {
                     return null;
                 }
                 exp = exp.trim();
                 if (!exp.contains("?")) return null; // leave it to normal expression handler
                 if (!r4.search(exp)) {
-                    raiseParseException("nullable expression can contain only expression, \"[]\", \"()\", \".\", \"?\", found: %s", exp);
+                    //raiseParseException("nullable expression can contain only expression, \"[]\", \"()\", \".\", \"?\", found: %s", exp);
+                    return null; // the foo == null ? "bar" : foo style expression?
                 }
                 step(step);
                 StringBuilder curExp = new StringBuilder();
@@ -88,7 +89,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr1() {
-        return "^(%1$s([^\\s\\<\\>%1$s]+))";
+        return "^(%s(([a-zA-Z_][\\w]*((?@())(?@[])?|(?@[])(?@())?)?(\\??\\.)?)+)).*";
     }
 
     protected String patternStr2() {
@@ -105,37 +106,24 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
     }
 
     public static void main(String[] args) {
-        main2(args);
+        main1(args);
     }
 
     public static void main2(String[] args) {
-        String s = "abc.foo().format(\"dd/mm/yy\", 5+4)";
+        String s = "app?.name\"";
         Regex r = new Regex(new NullableExpressionParser().patternStr4());
-        System.out.println(r.search(s));
+        if (r.search(s)) {
+            p(r, 5);
+        }
     }
 
     public static void main1(String[] args) {
         String ps = String.format(new NullableExpressionParser().patternStr1(), "@");
+        System.out.println(ps);
         Regex r = new Regex(ps);
-        //s = "@a.b() is something";
-        String s = "@foo.bar?.x dd";
+        String s = "@foo?.bar\"dsfsa";
         if (r.search(s)) {
             p(r, 5);
-        }
-        System.out.println();
-        ps = String.format(new NullableExpressionParser().patternStr2(), "@");
-        r = new Regex(ps);
-        s = "@(xyz?.foo()?.bar[]()?.abc)abc";
-        if (r.search(s)) {
-            p(r, 5);
-        }
-        System.out.println();
-        ps = String.format(new NullableExpressionParser().patternStr3(), "@");
-        s = "xyz.foo()?bar[]()?.abc + xyz";
-        r = new Regex(ps);
-        while (r.search(s)) {
-            System.out.println("--------------------------");
-            System.out.println(r.stringMatched());
         }
     }
 

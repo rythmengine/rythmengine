@@ -261,7 +261,10 @@ public class TemplateClassLoader extends ClassLoader {
         } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
             return null;
         } else {
-            int pos = name.lastIndexOf("$");
+            class T {
+            }
+            T t;
+            int pos = name.indexOf("$");
             if (-1 != pos) {
                 // should be an inner class, let's try to create it load it from cache
                 // 1. find the root class
