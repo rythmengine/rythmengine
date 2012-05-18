@@ -68,14 +68,10 @@ public class InvokeParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         Regex r = new InvokeParser().reg(new Rythm());
-        String s = "@invoke(\"hello.world\" + foo.bar(), 1, 2, 3).cache(\"1h\", foo).ignoreNonExistsTag() \nxyz";
+        //String s = "@invoke(\"hello.world\" + foo.bar(), foo.bar()).cache(\"1h\", foo).ignoreNonExistsTag() \nxyz";
+        String s = "@invoke(\"testTagCacheTag\", foo.rint())";
         if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-            System.out.println(r.stringMatched(2));
-            System.out.println(r.stringMatched(3));
-            System.out.println(r.stringMatched(4));
-            System.out.println(r.stringMatched(5));
+            p(r, 6);
         }
 
         s = r.stringMatched(3);

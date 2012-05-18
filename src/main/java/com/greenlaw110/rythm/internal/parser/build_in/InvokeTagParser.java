@@ -105,7 +105,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         static void parseParams(String line, ParameterDeclarationList params) {
             if (S.isEmpty(line)) return;
             // strip '(' and ')'
-            line = S.stripBrace(line).trim();
+            line = line.trim();
+            if (line.startsWith("(")) line = S.stripBrace(line);
             Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
