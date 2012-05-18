@@ -21,6 +21,7 @@ import com.greenlaw110.rythm.spi.ITemplateExecutionExceptionHandler;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
+import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.*;
 
@@ -585,6 +586,11 @@ public class RythmEngine {
         // try tag registry first
         ITag tag = tags.get(name);
         TemplateClass tc = ((TemplateBase) caller).getTemplateClass(true);
+        if (null == tag) {
+            // is calling self
+            if (S.isEqual(name, ((TagBase)caller).getName())) tag = (TagBase)caller;
+        }
+
         if (null == tag) {
             // try imported path
             if (null != tc.importPaths) {
