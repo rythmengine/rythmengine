@@ -226,14 +226,14 @@ public class TemplateClassLoader extends ClassLoader {
             if (templateClass.isDefinable()) {
                 return templateClass.javaClass;
             }
-            byte[] bc = null;//bCache.getBytecode(name, templateClass.javaSource);
+            byte[] bc = templateClass.enhancedByteCode;//bCache.getBytecode(name, templateClass.javaSource);
             if (!templateClass.isClass()) {
                 definePackage(templateClass.getPackage(), null, null, null, null, null, null, null);
             } else {
                 loadPackage(name);
             }
             if (bc != null) {
-                templateClass.enhancedByteCode = bc;
+                //templateClass.enhancedByteCode = bc;
                 templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
@@ -261,9 +261,6 @@ public class TemplateClassLoader extends ClassLoader {
         } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
             return null;
         } else {
-            class T {
-            }
-            T t;
             int pos = name.indexOf("$");
             if (-1 != pos) {
                 // should be an inner class, let's try to create it load it from cache

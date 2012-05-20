@@ -134,7 +134,7 @@ public class TemplateClassCache {
             // --- load byte code
             byte[] byteCode = new byte[(int) f.length() - (offset + 2)];
             is.read(byteCode);
-            tc.compiled(byteCode, true);
+            tc.loadCachedByteCode(byteCode);
 
             is.close();
         } catch (Exception e) {

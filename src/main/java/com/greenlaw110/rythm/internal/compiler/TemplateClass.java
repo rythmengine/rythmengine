@@ -45,7 +45,7 @@ public class TemplateClass {
         TemplateClass tc = new TemplateClass();
         tc.name = className;
         tc.javaByteCode = byteCode;
-        tc.enhancedByteCode = byteCode;
+        //tc.enhancedByteCode = byteCode;
         tc.inner = true;
         tc.root = parent.root();
         tc.version = parent.version();
@@ -504,17 +504,20 @@ public class TemplateClass {
         enhancing = true;
         try {
             byte[] bytes = enhancedByteCode;
-            if (null == bytes) { bytes = compile(); }
-            long start = System.currentTimeMillis();
-            for (ITemplateClassEnhancer en: engine().templateClassEnhancers) {
-                try {
-                    bytes = en.enhance(name(), bytes);
-                } catch (Exception e) {
-                    logger.warn(e, "Error enhancing template class: %s", getKey());
+            if (null == bytes) {
+                bytes = javaByteCode;
+                if (null == bytes) bytes = compile();
+                long start = System.currentTimeMillis();
+                for (ITemplateClassEnhancer en: engine().templateClassEnhancers) {
+                    try {
+                        bytes = en.enhance(name(), bytes);
+                    } catch (Exception e) {
+                        logger.warn(e, "Error enhancing template class: %s", getKey());
+                    }
                 }
-            }
-            if (logger.isTraceEnabled()) {
-                logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+                if (logger.isTraceEnabled()) {
+                    logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+                }
             }
             enhancedByteCode = bytes;
             return bytes;
@@ -539,10 +542,15 @@ public class TemplateClass {
         return dot > -1 ? name().substring(0, dot) : "";
     }
 
+    public void loadCachedByteCode(byte[] code) {
+        enhancedByteCode = code;
+    }
+
     public void compiled(byte[] code, boolean noCache) {
         javaByteCode = code;
-        enhancedByteCode = code;
+        //enhancedByteCode = code;
         compiled = true;
+        enhance();
         if (!noCache) engine().classCache.cacheTemplateClass(this);
 }
 
