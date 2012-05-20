@@ -54,8 +54,12 @@ public class RythmEngine {
         return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
     }
 
+    public boolean loadPreCompiled() {
+        return loadPreCompiled;
+    }
+
     public boolean classCacheEnabled() {
-        return !noFileWrite && reloadByRestart();
+        return preCompiling || loadPreCompiled() || (!noFileWrite && reloadByRestart());
     }
 
     public static final String version = "1.0.0-20120518b";
@@ -75,6 +79,8 @@ public class RythmEngine {
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
+    private boolean loadPreCompiled = false;
+    public boolean preCompiling = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
@@ -125,6 +131,10 @@ public class RythmEngine {
     public File tmpDir;
     public File templateHome;
     public File tagHome;
+    private File preCompiledHome;
+    public File preCompiledHome() {
+        return preCompiledHome;
+    }
     public FileFilter tagFileFilter;
 
     public final List<IRythmListener> listeners = new ArrayList<IRythmListener>();
@@ -246,6 +256,8 @@ public class RythmEngine {
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
+        loadPreCompiled = configuration.getAsBoolean("rythm.loadPreCompiled", false);
+        preCompiledHome = configuration.getAsFile("rythm.preCompiled.root", null);
         logRenderTime = configuration.getAsBoolean("rythm.logRenderTime", false);
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");

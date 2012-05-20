@@ -271,17 +271,25 @@ public class TemplateClassCache {
         return tc.name0() + suffix;
     }
 
+    private File getCacheFile(String fileName) {
+        if (engine.loadPreCompiled() || (engine.preCompiling && (null != engine.preCompiledHome() && engine.preCompiledHome().exists()))) {
+            return new File(engine.preCompiledHome(), fileName);
+        } else {
+            return new File(engine.tmpDir, fileName);
+        }
+    }
+
     /**
      * Retrieve the real file that will be used as cache.
      */
     File getCacheFile(TemplateClass tc) {
         String id = cacheFileName(tc, ".rythm");
-        return new File(engine.tmpDir, id);
+        return getCacheFile(id);
     }
 
     File getCacheSourceFile(TemplateClass tc) {
         String id = cacheFileName(tc, ".java");
-        return new File(engine.tmpDir, id);
+        return getCacheFile(id);
     }
 
 }
