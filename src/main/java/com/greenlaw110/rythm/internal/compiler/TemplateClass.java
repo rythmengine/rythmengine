@@ -499,6 +499,15 @@ public class TemplateClass {
     }
 
     private boolean enhancing = false;
+    private transient List<TemplateClass> embeddedClasses = new ArrayList<TemplateClass>();
+    /**
+     * Used to instruct embedded class byte code needs to be enhanced, but for now
+     * let's just use the java byte code as the enhanced bytecode
+     */
+    public void delayedEnhance(TemplateClass root) {
+        enhancedByteCode = javaByteCode;
+        root.embeddedClasses.add(this);
+    }
     public byte[] enhance() {
         if (enhancing) throw new IllegalStateException("reenter enhance() call");
         enhancing = true;
@@ -520,6 +529,9 @@ public class TemplateClass {
                 }
             }
             enhancedByteCode = bytes;
+            for (TemplateClass embedded: embeddedClasses) {
+                embedded.enhance();
+            }
             return bytes;
         } finally {
             enhancing = false;
