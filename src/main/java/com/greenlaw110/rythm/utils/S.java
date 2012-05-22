@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.text.Normalizer;
 
 public class S {
+    public static S INSTANCE = new S();
+
     public static boolean isEmpty(Object s) {
         return null == s || "".equals(s.toString().trim());
     }

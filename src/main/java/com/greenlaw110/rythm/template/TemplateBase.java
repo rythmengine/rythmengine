@@ -26,6 +26,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         __ctx.init(this);
     }
 
+    protected S s() {
+        return S.INSTANCE;
+    }
+
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
     protected RythmEngine _engine() {
