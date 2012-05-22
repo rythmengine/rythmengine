@@ -82,15 +82,7 @@ public class ForEachParser extends KeywordParserFactory {
 
         String s = "@for(int i = 0; i < 100; ++i){\nHello world}";
         if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(1 + r.stringMatched(1));
-            System.out.println(2 + r.stringMatched(2));
-            System.out.println(3 + r.stringMatched(3));
-            System.out.println(4 + r.stringMatched(4));
-            System.out.println(5 + r.stringMatched(5));
-            System.out.println(6 + r.stringMatched(6));
-            System.out.println(7 + r.stringMatched(7));
-            System.out.println(8 + r.stringMatched(8));
+            p(r, 8);
         }
     }
 

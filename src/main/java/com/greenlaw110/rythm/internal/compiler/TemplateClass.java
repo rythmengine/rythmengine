@@ -397,12 +397,8 @@ public class TemplateClass {
             }
 
             if (extendedTemplateChanged && engine().reloadByRestart()) {
-                javaByteCode = null;
-                enhancedByteCode = null;
-                templateInstance = null;
-                if (e.reloadByIncClassVersion()) javaClass = null;
+                reset();
                 compiled = false;
-                engine().classCache.deleteCache(this);
                 engine().restart(new ClassReloadException("extended class changed"));
                 refresh(forceRefresh);
                 return true; // pass refresh state to sub template
@@ -412,6 +408,7 @@ public class TemplateClass {
             if (!refresh) return false;
 
             // now start generate source and compile source to byte code
+            reset();
             buildSourceCode();
             engine().classCache.cacheTemplateClassSource(this); // cache source code for debugging purpose
             if (!codeBuilder.isRythmTemplate()) {
@@ -420,11 +417,7 @@ public class TemplateClass {
                 return false;
             }
             isValid = true;
-            //if (!engine().isProdMode()) logger.info(javaSource);
-            javaByteCode = null;
-            enhancedByteCode = null;
-            templateInstance = null;
-            if (e.reloadByIncClassVersion()) javaClass = null;
+            //if (!engine().isProd  Mode()) logger.info(javaSource);
             compiled = false;
             return true;
         } finally {
@@ -449,7 +442,14 @@ public class TemplateClass {
         javaByteCode = null;
         enhancedByteCode = null;
         javaSource = null;
+        templateInstance = null;
+        for (TemplateClass tc: embeddedClasses) {
+            tc.reset();
+            engine().classes.remove(tc);
+        }
+        embeddedClasses.clear();
         engine().classCache.deleteCache(this);
+        if (engine().reloadByIncClassVersion()) javaClass = null;
     }
 
     /**

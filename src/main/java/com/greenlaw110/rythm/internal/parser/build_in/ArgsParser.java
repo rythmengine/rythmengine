@@ -29,7 +29,7 @@ public class ArgsParser extends KeywordParserFactory {
                 String remain = remain();
                 String key = String.format("%s%s ", a(), keyword());
                 if (!remain.startsWith(key)) {
-                    throw new NullPointerException();
+                    raiseParseException("No argument declaration found");
                 }
                 step(key.length());
                 remain = remain();

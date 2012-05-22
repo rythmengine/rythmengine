@@ -256,7 +256,7 @@ public class CodeBuilder extends TextBuilder {
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
-            logger.warn("Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", extended, engine.resourceManager.getFullTagName(extendedTemplateClass));
+            logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager.getFullTagName(extendedTemplateClass));
         } else {
             TemplateBase tb = (TemplateBase) engine.tags.get(fullName);
             TemplateClass tc = tb.getTemplateClass(false);
