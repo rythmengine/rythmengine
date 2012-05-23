@@ -62,7 +62,7 @@ public class RythmEngine {
         return preCompiling || loadPreCompiled() || (!noFileWrite && reloadByRestart());
     }
 
-    public static final String version = "1.0.0-20120520";
+    public static final String version = "1.0.0-20120523";
     public static String pluginVersion = "";
 
     public static String versionSignature() {
