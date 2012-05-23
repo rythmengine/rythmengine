@@ -130,6 +130,31 @@ public class TemplateParser implements IContext {
         return cb.engine;
     }
 
+    @Override
+    public boolean compactMode() {
+        if (!compactStack.empty()) return compactStack.peek();
+        return getEngine().compactMode();
+    }
+
+    private Stack<Boolean> compactStack = new Stack<Boolean>();
+
+    @Override
+    public void pushCompact(Boolean compact) {
+        compactStack.push(compact);
+    }
+
+    @Override
+    public Boolean peekCompact() {
+        if (compactStack.empty()) return null;
+        return compactStack.peek();
+    }
+
+    @Override
+    public Boolean popCompact() {
+        if (compactStack.empty()) return null;
+        return compactStack.pop();
+    }
+
     private Stack<Break> breakStack = new Stack<Break>();
 
     @Override

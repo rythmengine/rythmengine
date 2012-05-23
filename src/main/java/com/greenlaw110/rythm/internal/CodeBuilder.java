@@ -316,8 +316,40 @@ public class CodeBuilder extends TextBuilder {
         renderArgs.put(name, new RenderArgDeclaration(name, type));
     }
 
+    private Map<String, List<TextBuilder>> macros = new HashMap<String, List<TextBuilder>>();
+    private Stack<String> macroStack = new Stack<String>();
+    public void pushMacro(String macro) {
+        if (macros.containsKey(macro)) {
+            throw new ParseException(templateClass, parser.currentLine(), "Macro already defined: %s", macro);
+        }
+        macroStack.push(macro);
+        macros.put(macro, new ArrayList<TextBuilder>());
+    }
+    public void popMacro() {
+        if (macroStack.empty()) {
+            throw new ParseException(templateClass, parser.currentLine(), "no macro found in stack");
+        }
+        macroStack.pop();
+    }
+    public boolean hasMacro(String macro) {
+        return macros.containsKey(macro);
+    }
+    public List<TextBuilder> getMacro(String macro) {
+        List<TextBuilder> list = this.macros.get(macro);
+        if (null == list) throw new NullPointerException();
+        return list;
+    }
     public void addBuilder(TextBuilder builder) {
-        builders.add(builder);
+        if (macroStack.empty()) builders.add(builder);
+        else {
+            String macro = macroStack.peek();
+            List<TextBuilder> list = macros.get(macro);
+            if (null == list) {
+                list = new ArrayList<TextBuilder>();
+                macros.put(macro, list);
+            }
+            list.add(builder);
+        }
     }
 
     String template() {

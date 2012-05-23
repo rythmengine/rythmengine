@@ -21,8 +21,8 @@ public class Token extends TextBuilder {
     protected int line;
     protected boolean disableCompactMode = false;
     protected boolean compactMode() {
-        boolean mode = null == ctx ? true : ctx.getEngine().compactMode();
-        return !disableCompactMode && mode;
+        if (disableCompactMode) return false;
+        return (null == ctx ? true : ctx.compactMode());
     }
     /*
      * Indicate whether token parse is good

@@ -20,6 +20,10 @@ public enum Keyword implements IKeyword {
      */
     CACHE,
     /**
+     * Force compact mode in regard of engine.compactMode()
+     */
+    COMPACT,
+    /**
      * Continue current loop
      */
     CONTINUE,
@@ -35,6 +39,10 @@ public enum Keyword implements IKeyword {
      * Mark a section that expression should be output after escaped
      */
     ESCAPE,
+    /**
+     * Execute an macro
+     */
+    EXEC,
     /**
      * Exit parsing process if no class loaded in current class loader
      */
@@ -72,6 +80,18 @@ public enum Keyword implements IKeyword {
      * Instruct that this template needs to log execution time
      */
     LOG_TIME("__logTime__"),
+    /**
+     * Define an macro.
+     *
+     * A macro is different from an assignment or an inline tag in that
+     * it is purely happen at parsing time, while the assign and inline tag
+     * is evaluated at runtime
+     */
+    MACRO,
+    /**
+     * For no compact in regard to engine.compactMode
+     */
+    NOCOMPACT(),
     /**
      * Mark a section that expression should be output as raw data
      */

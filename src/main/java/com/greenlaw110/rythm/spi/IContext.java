@@ -112,4 +112,10 @@ public interface IContext {
     void pushContinue(Continue c);
     Continue peekContinue();
     Continue popContinue();
+
+    void pushCompact(Boolean compact);
+    Boolean peekCompact();
+    Boolean popCompact();
+
+    boolean compactMode();
 }

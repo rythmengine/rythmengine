@@ -34,4 +34,7 @@ public abstract class CaretParserFactoryBase implements ICaretParserFactory {
             p(i, r);
         }
     }
+    protected static void p(Regex r) {
+        p(r, 6);
+    }
 }
