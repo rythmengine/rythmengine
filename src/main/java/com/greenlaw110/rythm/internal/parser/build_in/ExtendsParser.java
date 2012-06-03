@@ -53,7 +53,8 @@ public class ExtendsParser extends KeywordParserFactory {
                 final InvokeTagParser.ParameterDeclarationList params = new InvokeTagParser.ParameterDeclarationList();
                 s = r.stringMatched(2);
                 if (!S.isEmpty(s)) {
-                    r = argsPattern;
+                    //r = argsPattern;
+                    r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
                     while (r.search(s)) {
                         params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
                     }
@@ -76,7 +77,7 @@ public class ExtendsParser extends KeywordParserFactory {
     }
 
     protected static Regex innerPattern = new Regex("\\((.*?)\\s*(,\\s*(.*))?\\)");
-    protected static Regex argsPattern = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
+    protected static Regex argsPattern = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
 
     protected String patternStr0() {
         return "(%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
@@ -125,7 +126,15 @@ public class ExtendsParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        test1();
+        test2();
+    }
+
+    public static void test2() {
+        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
+        String s = "(ab().fpp[9]+xx)";
+        while (r.search(s)) {
+            System.out.println(r.stringMatched());
+        }
     }
 
     public static void test0() {

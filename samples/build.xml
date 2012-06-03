@@ -12,7 +12,7 @@
         <pathelement location="${lib}/pat-1.5.3.jar"/>
         <pathelement location="${lib}/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
         <pathelement location="${lib}/commons-lang3-3.1.jar"/>
-        <pathelement location="${lib}/rythm-1.0.0-20120505.jar"/>
+        <pathelement location="${lib}/rythm-1.0.0-20120527.jar"/>
     </path>
 
     <target name="init">

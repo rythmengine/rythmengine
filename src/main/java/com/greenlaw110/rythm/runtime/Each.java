@@ -113,86 +113,90 @@ public class Each {
     }
 
     public static abstract class Looper<E> implements IBody<E> {
-        private StringBuilder out = null;
-        private int bodySize = 16;
+//        private StringBuilder out = null;
+//        private int bodySize = 16;
         public Looper (TextBuilder tb) {
-            out = tb.out();
+            //out = tb.out();
         }
         public Looper(TextBuilder tb, int bodySize) {
-            out = tb.out();
-            this.bodySize = bodySize;
+            //out = tb.out();
+            //this.bodySize = bodySize;
         }
 
         public void ensureCapacity(int loopCnt) {
-            int len = out.length();
-            int delta = loopCnt * bodySize;
-            out.ensureCapacity(len + delta);
+//            int len = out.length();
+//            int delta = loopCnt * bodySize;
+//            out.ensureCapacity(len + delta);
             //System.out.println(String.format("capacity: %s + %s * %s", len, bodySize, loopCnt ));
         }
 
-        protected String toString(Object o) {
-            return null == o ? "" : o.toString();
-        }
-
-        private void p_(Object o) {
-            String s = toString(o);
-            if (!s.isEmpty()) out.append(s);
-            //out.append(o);
-        }
-
-        /**
-         * Append the object specified to the string buffer
-         *
-         * @param o
-         * @return
-         */
-        public final Looper p(Object o) {
-            if (null != o) out.append(o);
-            return this;
-        }
-
-        public final Looper p(String s) {
-            if (null != s && !s.isEmpty()) out.append(s);
-            return this;
-        }
-
-        /**
-         * Append to object specified to the string buffer and then append
-         * an new line character
-         *
-         * @param o
-         * @return
-         */
-        protected final Looper pn(Object o) {
-            if (null != o) p_(o);
-            out.append('\n');
-            return this;
-        }
-
-        protected final Looper pn(String s) {
-            if (null != s && !s.isEmpty()) out.append(s);
-            out.append("\n");
-            return this;
-        }
-
-        /**
-         * Append an new line character and then append the object specified
-         * to the string buffer
-         *
-         * @param o
-         * @return
-         */
-        protected final Looper np(Object o) {
-            out.append('\n');
-            if (null != o) p_(o);
-            return this;
-        }
-
-        protected final Looper np(String s) {
-            out.append("\n");
-            if (null != s && !s.isEmpty()) out.append(s);
-            return this;
-        }
+//        protected String toString(Object o) {
+//            return null == o ? "" : o.toString();
+//        }
+//
+//        private void p_(Object o) {
+//            String s = toString(o);
+//            if (!s.isEmpty()) out.append(s);
+//            //out.append(o);
+//        }
+//
+//        /**
+//         * Append the object specified to the string buffer
+//         *
+//         * @param o
+//         * @return
+//         */
+//        public final Looper p(Object o) {
+//            if (null != o) out.append(o);
+//            return this;
+//        }
+//
+//        public final Looper p(String s) {
+//            if (null != s && !s.isEmpty()) out.append(s);
+//            return this;
+//        }
+//
+//        /**
+//         * Append to object specified to the string buffer and then append
+//         * an new line character
+//         *
+//         * @param o
+//         * @return
+//         */
+//        protected final Looper pn(Object o) {
+//            if (null != o) p_(o);
+//            out.append('\n');
+//            return this;
+//        }
+//
+//        protected final Looper pn(String s) {
+//            if (null != s && !s.isEmpty()) out.append(s);
+//            out.append("\n");
+//            return this;
+//        }
+//
+//        /**
+//         * Append an new line character and then append the object specified
+//         * to the string buffer
+//         *
+//         * @param o
+//         * @return
+//         */
+//        protected final Looper np(Object o) {
+//            out.append('\n');
+//            if (null != o) p_(o);
+//            return this;
+//        }
+//
+//        protected final Looper np(String s) {
+//            out.append("\n");
+//            if (null != s && !s.isEmpty()) out.append(s);
+//            return this;
+//        }
+//
+//        protected final Looper pe(Object o) {
+//
+//        }
 
     }
 }

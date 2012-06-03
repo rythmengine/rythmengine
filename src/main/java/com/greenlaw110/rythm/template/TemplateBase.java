@@ -19,6 +19,8 @@ import java.util.Map;
 
 public abstract class TemplateBase extends TemplateBuilder implements ITemplate {
 
+    protected final ILogger logger = Logger.get(TemplateBase.class);
+
     protected transient RythmEngine engine = null;
     private transient TemplateClass templateClass = null;
     public void setTemplateClass(TemplateClass templateClass) {

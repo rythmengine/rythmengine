@@ -35,7 +35,8 @@ public class SetParser extends KeywordParserFactory {
                 String s = r.stringMatched(2); // s: ("name": val)
                 s = s.substring(1); // s: name: val)
                 s = s.substring(0, s.length() - 1); // s: "name": val
-                r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
+                //r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
+                r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*(.*)");
                 if (!r.search(s)) throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @set tag. Correct usage: @set(\"name\": val)");
                 s = r.stringMatched(1); // propName: "name"
                 if (s.startsWith("\"") || s.startsWith("'")) {
@@ -70,11 +71,7 @@ public class SetParser extends KeywordParserFactory {
 //        }
         Regex r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
         String s = " title: title";
-        if (r.search(s)) {
-            System.out.println("1 " + r.stringMatched(1));
-            System.out.println("2 " + r.stringMatched(2));
-            System.out.println("3 " + r.stringMatched(3));
-        }
+        p(s, r);
     }
 
 }

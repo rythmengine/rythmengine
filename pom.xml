@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project 
-    xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.rythmengine</groupId>
     <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-20120523</version>
+    <version>1.0.0-20120603</version>
 
     <name>Rythm Template Engine</name>
     <description>Rythm Template Engine</description>
     <url>http://rythmengine.com/</url>
-    
+
     <scm>
         <url>http://github.com/greenlaw110/Rythm</url>
         <connection>scm:git:git://github.com/greenlaw110/Rythm.git</connection>
     </scm>
-    
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -27,8 +27,8 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
-    <repositories>  
+
+    <repositories>
         <repository>
             <id>com.google.code.maven-play-plugin</id>
             <name>Maven Play Plugin - releases</name>
@@ -45,7 +45,7 @@
 
         <maven.test.skip>true</maven.test.skip> <!-- until tests are fixed -->
     </properties>
-    
+
     <dependencies>
         <!-- TODO - maybe change to ecj (and deploy it) -->
         <dependency>
@@ -73,7 +73,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -137,5 +137,5 @@
             </build>
         </profile>
     </profiles>
-    
+
 </project>

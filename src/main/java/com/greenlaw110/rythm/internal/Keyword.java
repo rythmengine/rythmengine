@@ -44,6 +44,10 @@ public enum Keyword implements IKeyword {
      */
     EXEC,
     /**
+     * Expand an macro, alias of exec
+     */
+    EXPAND,
+    /**
      * Exit parsing process if no class loaded in current class loader
      */
     EXIT_IF_NO_CLASS("__exitIfNoClass__"),

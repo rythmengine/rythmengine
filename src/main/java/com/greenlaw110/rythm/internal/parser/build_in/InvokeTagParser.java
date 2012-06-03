@@ -69,6 +69,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         protected ITemplate.Escape escape = null;
         protected boolean ignoreNonExistsTag = false;
         protected String assignTo = null;
+        protected boolean assignToFinal = false;
         protected List<CodeBuilder.RenderArgDeclaration> argList = null;
 
         static InvokeTagToken dynamicTagToken(String tagName, String paramLine, String extLine, IContext context) {
@@ -107,7 +108,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             // strip '(' and ')'
             line = line.trim();
             if (line.startsWith("(")) line = S.stripBrace(line);
-            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
+            Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
             while (r.search(line)) {
                 params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
             }
@@ -172,14 +173,17 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
 
         private void parseAssign(String param) {
-            param = S.stripQuotation(param).trim();
-            if (S.isEmpty(param)) {
+            String[] sa = param.split(",");
+            assignTo = S.stripQuotation(sa[0]);
+            if (S.isEmpty(assignTo)) {
                 raiseParseException(ctx, "assign extension needs a variable name");
             }
-            if (Patterns.RESERVED.matches(param)) {
-                raiseParseException(ctx, "assign variable name is reserved: %s", param);
+            if (Patterns.RESERVED.matches(assignTo)) {
+                raiseParseException(ctx, "assign variable name is reserved: %s", assignTo);
             }
-            assignTo = param;
+            if (sa.length > 1) {
+                this.assignToFinal = Boolean.parseBoolean(sa[1].trim());
+            }
         }
 
         private void parseCallback(String param) {
@@ -208,7 +212,12 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         public void output() {
             if (assignTo != null) {
-                ptline("String ").p(assignTo).p(" = null;");
+                if (assignToFinal) {
+                    pt("Object ").p(assignTo).p("___ = null;");
+                } else {
+                    pt("Object ").p(assignTo).p(" = null;");
+                }
+                pline();
             }
             pline("{");
             ptline("com.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; ");
@@ -245,7 +254,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 }
                 ptline("}");
                 if (assignTo != null) {
-                    pt(assignTo).p(" = _r_s.toString();");
+                    if (assignToFinal) {
+                        pt(assignTo).p("___ = _r_s;");
+                    } else {
+                        pt(assignTo).p(" = _r_s;");
+                    }
                     pline();
                 } else {
                     ptline("p(_r_s);");
@@ -255,6 +268,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 pline();
             }
             pline("}");
+            if (assignTo != null && assignToFinal) {
+                p("final Object ").p(assignTo).p(" = ").p(assignTo).p("___;");
+                pline();
+            }
         }
     }
 

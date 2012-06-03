@@ -50,10 +50,7 @@ public class IncludeParser extends KeywordParserFactory {
         Regex r = p.reg(new Rythm());
         String s = "@include(\"x.y.z,foo.bar\") \n@sayHi(\"green\")";
         if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-            System.out.println(r.stringMatched(2));
-            System.out.println(r.stringMatched(3));
+            p(r);
         }
     }
 }

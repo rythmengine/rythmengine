@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.S;
@@ -12,19 +13,30 @@ import com.stevesoft.pat.Regex;
 
 /**
  * assign enclosed part into a variable
- *
+ * @assign("xx") {...} create a variable
+ * @assign("xxx", true) {...} // create a final variable
  */
 public class AssignParser extends KeywordParserFactory {
 
     public class AssignToken extends BlockCodeToken {
         private String assignTo;
+        private boolean isFinal;
         public AssignToken(String assignTo, IContext context) {
             super(null, context);
-            this.assignTo = assignTo;
+            String[] sa = assignTo.split(",");
+            this.assignTo = S.stripQuotation(sa[0]);
+            if (Patterns.RESERVED.matches(this.assignTo)) {
+                raiseParseException(ctx, "assign variable name is reserved: %s", this.assignTo);
+            }
+            if (sa.length > 1) {
+                isFinal = Boolean.parseBoolean(sa[1].trim());
+            }
         }
 
         @Override
         public void output() {
+            String assignTo = this.assignTo;
+            if (isFinal) assignTo = this.assignTo + "___";
             p2tline("Object ").p(assignTo).p(" = null;");
             p2tline("{");
             p3tline("StringBuilder sbOld = getOut();");
@@ -34,6 +46,8 @@ public class AssignParser extends KeywordParserFactory {
 
         @Override
         public String closeBlock() {
+            String assignTo = this.assignTo;
+            if (isFinal) assignTo = this.assignTo + "___";
             StringBuilder sbNew = new StringBuilder();
             StringBuilder sbOld = getOut();
             setOut(sbNew);
@@ -42,6 +56,10 @@ public class AssignParser extends KeywordParserFactory {
             p3t(assignTo).p(" = s;");
             pline();
             p2tline("}");
+            if (isFinal) {
+                p2t("final Object ").p(this.assignTo).p(" = ").p(assignTo).p(";");
+                pline();
+            }
             String s = sbNew.toString();
             setOut(sbOld);
             return s;
@@ -74,7 +92,7 @@ public class AssignParser extends KeywordParserFactory {
                 int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);
-                s = S.stripBraceAndQuotation(s);
+                s = S.stripBrace(s);
                 return new AssignToken(s, ctx());
             }
         };
@@ -89,7 +107,7 @@ public class AssignParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         Regex r = new AssignParser().reg(new Rythm());
-        if (r.search("@assign(\"JS\"){..}")) {
+        if (r.search("@assign(\"JS\", false){..}")) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }

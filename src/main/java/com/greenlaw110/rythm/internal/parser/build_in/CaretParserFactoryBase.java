@@ -29,6 +29,12 @@ public abstract class CaretParserFactoryBase implements ICaretParserFactory {
             System.out.println(i + ": " + r.stringMatched(i));
         }
     }
+    protected static void p(String s, Regex r) {
+        if (r.search(s)) p(r);
+    }
+    protected static void p(String s, Regex r, int max) {
+        if (r.search(s)) p(r, max);
+    }
     protected static void p(Regex r, int max) {
         for (int i = 0; i < max; ++i) {
             p(i, r);
