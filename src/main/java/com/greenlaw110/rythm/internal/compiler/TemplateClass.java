@@ -400,6 +400,7 @@ public class TemplateClass {
                 reset();
                 compiled = false;
                 engine().restart(new ClassReloadException("extended class changed"));
+                refreshing(false);
                 refresh(forceRefresh);
                 return true; // pass refresh state to sub template
             }
@@ -458,7 +459,7 @@ public class TemplateClass {
      */
     public byte[] compile() {
         if (null != javaByteCode) return javaByteCode;
-        if (null == javaSource) throw new IllegalStateException("Cannot find java source when compiling");
+        if (null == javaSource) throw new IllegalStateException("Cannot find java source when compiling " + getKey());
         compiling = true;
         long start = System.currentTimeMillis();
         try {
