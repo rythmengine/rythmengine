@@ -44,6 +44,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
+    public static final String version = "1.0.0-20120608";
+    public static String pluginVersion = "";
+
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
 
     public boolean reloadByRestart() {
@@ -61,9 +64,6 @@ public class RythmEngine {
     public boolean classCacheEnabled() {
         return preCompiling || loadPreCompiled() || (!noFileWrite && reloadByRestart());
     }
-
-    public static final String version = "1.0.0-20120603";
-    public static String pluginVersion = "";
 
     public static String versionSignature() {
         return version + "-" + pluginVersion;
