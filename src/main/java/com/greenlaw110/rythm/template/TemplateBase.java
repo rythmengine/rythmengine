@@ -412,6 +412,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected static void _info(String msg, Object... args) {
         _logger.info(msg, args);
     }
+    protected static void _warn(String msg, Object... args) {
+        _logger.error(msg, args);
+    }
+    protected static void _warn(Throwable t, String msg, Object... args) {
+        _logger.error(t, msg, args);
+    }
     protected static void _error(String msg, Object... args) {
         _logger.error(msg, args);
     }

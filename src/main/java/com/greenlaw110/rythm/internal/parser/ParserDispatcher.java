@@ -33,7 +33,10 @@ public class ParserDispatcher extends ParserBase {
         if (m.matches()) {
             String s = m.group(1);
             IParser p = d.createBuildInParser(s, c);
-            if (null != p) return p.go();
+            if (null != p) {
+                TextBuilder tb = p.go();
+                if (null != tb) return tb;
+            }
         }
         for (IParserFactory f: d.freeParsers()) {
             IParser p = f.create(c);

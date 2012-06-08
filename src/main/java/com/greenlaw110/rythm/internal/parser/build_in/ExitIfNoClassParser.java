@@ -8,6 +8,7 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -23,20 +24,11 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @debug, correct usage: @debug(\"msg\", args...)");
+                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @debug, correct usage: @__exitIfNoClass__(My.Class.Name)");
                 }
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);
-                if (s.startsWith("(")) {
-                    s = s.substring(1);
-                    s = s.substring(0, s.length() - 1);
-                }
-                if (s.startsWith("\"") || s.startsWith("'")) {
-                    s = s.substring(1);
-                }
-                if (s.endsWith("\"") || s.endsWith("'")) {
-                    s = s.substring(0, s.length() -1);
-                }
+                s = S.stripBraceAndQuotation(s);
                 try {
                     ctx().getEngine().classLoader.loadClass(s);
                     return new Token("", ctx());
