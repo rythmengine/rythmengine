@@ -12,7 +12,7 @@ public abstract class JavaTagBase extends TagBase{
     protected  ITag.ParameterList _params;
     protected Body _body;
     public void setRenderArgs(ITag.ParameterList params) {
-        _params = params;
+        _params = null == params ? new ParameterList() : params;
         _properties.putAll(params.asMap());
     }
     @Override
@@ -23,6 +23,7 @@ public abstract class JavaTagBase extends TagBase{
 
     @Override
     public TextBuilder build() {
+        if (null == _params) _params = new ParameterList();
         call(_params, _body);
         return this;
     }
