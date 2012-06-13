@@ -262,6 +262,7 @@ public class CodeBuilder extends TextBuilder {
             TemplateClass tc = tb.getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;
+            this.engine.addExtendRelationship(tc, this.templateClass);
             this.extendArgs = args;
         }
     }
@@ -300,6 +301,7 @@ public class CodeBuilder extends TextBuilder {
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
+        this.engine.addExtendRelationship(tc, this.templateClass);
         this.extendArgs = args;
     }
 

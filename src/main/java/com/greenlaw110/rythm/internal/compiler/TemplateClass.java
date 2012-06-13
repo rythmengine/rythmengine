@@ -251,8 +251,11 @@ public class TemplateClass {
         if (!isValid) return  NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
+                if (Logger.isTraceEnabled()) logger.trace("About to new template instance");
                 Class<?> clz = getJavaClass();
+                if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
+                if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
             } catch (Exception e) {
@@ -364,6 +367,7 @@ public class TemplateClass {
                                 extendedTemplateClass.refresh();
                             }
                         }
+                        engine().addExtendRelationship(extendedTemplateClass, this);
                     }
                 }
             }
@@ -450,6 +454,7 @@ public class TemplateClass {
         }
         embeddedClasses.clear();
         engine().classCache.deleteCache(this);
+        engine().invalidate(this);
         if (engine().reloadByIncClassVersion()) javaClass = null;
     }
 
@@ -588,5 +593,10 @@ public class TemplateClass {
             return that.getKey().equals(getKey());
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getKey().hashCode();
     }
 }

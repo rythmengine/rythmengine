@@ -771,4 +771,27 @@ public class RythmEngine {
     public ExtensionManager getExtensionManager() {
         return em_;
     }
+
+    // -- issue #47
+    private Map<TemplateClass, Set<TemplateClass>> extendMap = new HashMap<TemplateClass, Set<TemplateClass>>();
+    public void addExtendRelationship(TemplateClass parent, TemplateClass child) {
+        if (mode.isProd()) return;
+        Set<TemplateClass> children = extendMap.get(parent);
+        if (null == children) {
+            children = new HashSet<TemplateClass>();
+            extendMap.put(parent, children);
+        }
+        children.add(child);
+    }
+    // called to invalidate all template class which extends the parent
+    public void invalidate(TemplateClass parent) {
+        if (mode.isProd()) return;
+        Set<TemplateClass> children = extendMap.get(parent);
+        if (null == children) return;
+        for (TemplateClass child: children) {
+            invalidate(child);
+            child.reset();
+        }
+    }
+
 }
