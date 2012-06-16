@@ -364,6 +364,7 @@ public class RythmEngine {
         loadTags(tagHome);
     }
 
+    static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File template, Object... args) {
         TemplateClass tc = classes.getByTemplate(resourceManager.get(template).getKey());
@@ -372,11 +373,32 @@ public class RythmEngine {
         }
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
-        } else {
-            t.setRenderArgs(args);
+        try {
+            if (1 == args.length && args[0] instanceof Map) {
+                t.setRenderArgs((Map<String, Object>) args[0]);
+            } else {
+                t.setRenderArgs(args);
+            }
+        } catch (ClassCastException ce) {
+            if (mode.isDev()) {
+                Integer I = cceCounter.get();
+                if (null == I) {
+                    I = 0;
+                    cceCounter.set(1);
+                } else {
+                    I++;
+                    cceCounter.set(I);
+                }
+                if (I > 2) {
+                    cceCounter.remove();
+                    throw ce;
+                }
+                restart(ce);
+                return getTemplate(template, args);
+            }
+            throw ce;
         }
+        if (mode.isDev()) cceCounter.remove();
         return t;
     }
 
@@ -387,10 +409,31 @@ public class RythmEngine {
             tc = new TemplateClass(template, this);
         }
         ITemplate t = tc.asTemplate();
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
-        } else {
-            t.setRenderArgs(args);
+        try {
+            if (1 == args.length && args[0] instanceof Map) {
+                t.setRenderArgs((Map<String, Object>) args[0]);
+            } else {
+                t.setRenderArgs(args);
+            }
+            if (mode.isDev()) cceCounter.remove();
+        } catch (ClassCastException ce) {
+            if (mode.isDev()) {
+                Integer I = cceCounter.get();
+                if (null == I) {
+                    I = 1;
+                    cceCounter.set(I);
+                } else {
+                    I++;
+                    cceCounter.set(I);
+                }
+                if (I > 2) {
+                    cceCounter.remove();
+                    throw ce;
+                }
+                restart(ce);
+                return getTemplate(template, args);
+            }
+            throw ce;
         }
         return t;
     }
