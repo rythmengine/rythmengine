@@ -334,12 +334,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    public Object getRenderArg(String name) {
+    public <T> T getRenderArg(String name) {
         Object val = _properties.get(name);
-        return null != val ? val : (null != _caller ? caller().getRenderArg(name) : null);
+        return (T)(null != val ? val : (null != _caller ? caller().getRenderArg(name) : null));
     }
 
-    protected final Object _get(String name) {
+    protected final <T> T _get(String name) {
         return getRenderArg(name);
     }
 
@@ -349,13 +349,13 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return (T)o;
     }
 
-    protected final Object _getRenderProperty(String name, Object def) {
+    protected final <T> T _getRenderProperty(String name, Object def) {
         Object o = renderProperties.get(name);
-        return null == o ? def : o;
+        return (T)(null == o ? def : o);
     }
 
-    protected final Object _getRenderProperty(String name) {
-        return _getRenderProperty(name, null);
+    protected final <T> T _getRenderProperty(String name) {
+        return (T)_getRenderProperty(name, null);
     }
 
     protected final <T> T _getRenderPropertyAs(String name, T def) {

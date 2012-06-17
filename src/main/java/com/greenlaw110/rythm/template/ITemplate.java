@@ -30,7 +30,7 @@ public interface ITemplate extends Cloneable {
 
     Map<String, Object> getRenderArgs();
 
-    Object getRenderArg(String name);
+    <T> T getRenderArg(String name);
 
     /**
      * Set a render arg at position
