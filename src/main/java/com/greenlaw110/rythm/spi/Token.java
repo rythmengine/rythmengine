@@ -275,7 +275,11 @@ public class Token extends TextBuilder {
 
     protected void pp(String s) {
         s = compact(s);
-        s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+        if (compactMode()) {
+            s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+        } else {
+            s = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
+        }
         p("p(\"").p(s).p("\");");
         pline();
     }
@@ -285,6 +289,7 @@ public class Token extends TextBuilder {
         TextBuilder tb = new TextBuilder();
         int i = 0;
         for (String line: lines) {
+            if (S.isEmpty(line)) continue;
             if (i++ > 0) tb.p("\n");
             line = line.replaceAll("[ \t]+", " ");
             tb.p(line);

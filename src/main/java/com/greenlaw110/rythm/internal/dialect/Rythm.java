@@ -22,7 +22,7 @@ public class Rythm extends DialectBase {
                 NullableExpressionParser.class, ExpressionParser.class, ExtendsParser.class, ForEachParser.class,
                 GetParser.class, IfParser.class, ImportParser.class, IncludeParser.class, InitCodeParser.class,
                 NoCompactParser.class, RawParser.class, RenderBodyParser.class, RenderSectionParser.class,
-                ReturnParser.class, SectionParser.class,SetParser.class, SimpleParser.class, TimestampParser.class,
+                ReturnParser.class, SectionParser.class, SetParser.class, SimpleParser.class, TimestampParser.class,
                 VerbatimParser.class};
     }
 
