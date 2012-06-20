@@ -41,7 +41,7 @@ public class RenderBodyParser extends KeywordParserFactory {
                     pline();
                 }
             }
-            ptline("_pTagBody(_pl);");
+            ptline("_pTagBody(_pl, _out);");
             pline("}");
         }
     }
