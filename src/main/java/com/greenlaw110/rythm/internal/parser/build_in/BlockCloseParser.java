@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class BlockCloseParser extends ParserBase {
 
     private static final String PTN = "([\\}]?%s[\\}\\s\\n\\>\\]]).*";
-    
+
     public BlockCloseParser(IContext context) {
         super(context);
     }
@@ -42,7 +42,7 @@ public class BlockCloseParser extends ParserBase {
         }
         return new CodeToken(s, ctx);
     }
-    
+
     public static void main(String[] args) {
         String s = "@";
         Pattern p = Pattern.compile(String.format(PTN, "@"), Pattern.DOTALL);
