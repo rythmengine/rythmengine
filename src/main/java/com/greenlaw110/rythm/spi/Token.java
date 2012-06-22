@@ -289,15 +289,10 @@ public class Token extends TextBuilder {
         TextBuilder tb = new TextBuilder();
         int i = 0;
         for (String line: lines) {
-            if (S.isEmpty(line)) {
-                if (0 == i) tb.p("\n"); // fix #53
-                continue;
-            }
             if (i++ > 0) tb.p("\n");
-            line = line.replaceAll("[ \t]+", " ");
+            line = line.replaceAll("[ \t]+", " ").trim();
             tb.p(line);
         }
-        tb.p("\n");
         return tb.toString();
     }
 

@@ -35,8 +35,10 @@ public class BlockCloseParser extends ParserBase {
         // keep ">" or "]" for case like <a id=".." @if (...) class="error" @>
         if (s.endsWith(">") || s.endsWith("]")) s = s.substring(0, s.length() - 1);
         ctx.step(s.length());
+        boolean hasLineBreak = s.contains("\\n") || s.contains("\\r");
         try {
             s = ctx.closeBlock();
+            if (hasLineBreak) s = s + "\n"; // fix #53
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
