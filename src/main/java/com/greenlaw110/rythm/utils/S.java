@@ -102,12 +102,16 @@ public class S {
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(s.toString()));
     }
 
-    public static final String stripBrace(String s) {
+    public static final String strip(String s, String prefix, String postfix) {
         if (null == s) return "";
         s = s.trim();
-        if (s.startsWith("(")) s = s.substring(1);
-        if (s.endsWith(")")) s = s.substring(0, s.length() - 1);
+        if (s.startsWith(prefix)) s = s.substring(prefix.length());
+        if (s.endsWith(postfix)) s = s.substring(0, s.length() - postfix.length());
         return s;
+    }
+
+    public static final String stripBrace(String s) {
+        return strip(s, "(", ")");
     }
 
     public static final String stripQuotation(String s) {
