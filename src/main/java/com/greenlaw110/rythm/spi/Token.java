@@ -288,11 +288,15 @@ public class Token extends TextBuilder {
         String[] lines = s.split("[\\r\\n]+");
         TextBuilder tb = new TextBuilder();
         int i = 0;
+        boolean startsWithSpace = s.startsWith(" ") || s.startsWith("\t");
+        boolean endsWithSpace = s.endsWith(" ") || s.endsWith("\t");
+        if (startsWithSpace) tb.p(" ");
         for (String line: lines) {
             if (i++ > 0) tb.p("\n");
             line = line.replaceAll("[ \t]+", " ").trim();
             tb.p(line);
         }
+        if (endsWithSpace) tb.p(" ");
         return tb.toString();
     }
 

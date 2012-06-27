@@ -277,7 +277,7 @@ public class CodeBuilder extends TextBuilder {
             // relative path ?
             String me = templateClass.getKey();
             int pos = me.lastIndexOf("/");
-            extended = me.substring(0, pos) + "/" + extended;
+            if (-1 != pos) extended = me.substring(0, pos) + "/" + extended;
             tc = engine.classes.getByTemplate(extended);
             if (null == tc) {
                 ITemplateResource resource = engine.resourceManager.getFileResource(extended);

@@ -176,15 +176,15 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                         TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
                         if (null == tc) {
                             tc = new TemplateClass(tr, engine);
-                            try {
-                                ITag tag = (ITag)tc.asTemplate();
-                                if (null != tag) {
-                                    engine.registerTag(tagName, tag);
-                                    return tc;
-                                }
-                            } catch (Exception e) {
+                        }
+                        try {
+                            ITag tag = (ITag)tc.asTemplate();
+                            if (null != tag) {
+                                engine.registerTag(tagName, tag);
                                 return tc;
                             }
+                        } catch (Exception e) {
+                            return tc;
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
