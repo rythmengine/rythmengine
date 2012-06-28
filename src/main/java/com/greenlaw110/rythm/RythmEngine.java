@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120628";
+    public static final String version = "1.0.0-20120629";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;

@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.IO;
+import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
 
 import java.io.File;
@@ -43,10 +44,13 @@ public class ScriptParser extends ParserBase {
         String[] lines = s.split("[\\n\\r]+");
         int len = lines.length;
         StringBuilder sb = new StringBuilder(s.length() * 2);
+        String lastLine = null;
         for (int i = 0; i < len; ++i) {
-            sb.append(lines[i]).append(" //line: ").append(curLine++).append("\n");
+            String line = lines[i];
+            if (!S.isEmpty(line)) lastLine = line;
+            sb.append(line).append(" //line: ").append(curLine++).append("\n");
         }
-        sb.append(";");
+        if (!lastLine.trim().endsWith(";")) sb.append(";");
         return new CodeToken(sb.toString(), ctx);
     }
 

@@ -187,13 +187,15 @@ public class CodeBuilder extends TextBuilder {
     private static class InlineTag {
         String tagName;
         String signature;
+        String retType = "void";
         List<TextBuilder> builders = new ArrayList<TextBuilder>();
-        InlineTag(String name, String sig) {
+        InlineTag(String name, String ret, String sig) {
             tagName = name;
             signature = sig;
+            retType = null == ret ? "void" : ret;
         }
         InlineTag clone(CodeBuilder newCaller) {
-            InlineTag tag = new InlineTag(tagName, signature);
+            InlineTag tag = new InlineTag(tagName, retType, signature);
             tag.builders.clear();
             for (TextBuilder tb: builders) {
                 TextBuilder newTb = tb.clone(newCaller);
@@ -204,11 +206,11 @@ public class CodeBuilder extends TextBuilder {
     }
     private Map<String, InlineTag> inlineTags = new HashMap<String, InlineTag>();
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
-    public void defTag(String tagName, String signature) {
+    public void defTag(String tagName, String retType, String signature) {
         if (inlineTags.containsKey(tagName)) {
             throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
-        InlineTag tag = new InlineTag(tagName, signature);
+        InlineTag tag = new InlineTag(tagName, retType, signature);
         inlineTags.put(tagName, tag);
         inlineTagBodies.push(builders);
         builders = tag.builders;
@@ -548,11 +550,11 @@ public class CodeBuilder extends TextBuilder {
     private void pInlineTags() {
         pn();
         for (InlineTag tag: inlineTags.values()) {
-            p("\nprotected String ").p(tag.tagName).p(tag.signature).p("{\n");
+            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\n");
             for (TextBuilder b: tag.builders) {
                 b.build();
             }
-            p("\nreturn \"\";\n}\n");
+            p("\n}");
         }
     }
 

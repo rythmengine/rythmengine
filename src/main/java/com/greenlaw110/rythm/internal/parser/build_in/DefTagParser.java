@@ -10,18 +10,20 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 /**
- * Parse @tag tagname(Type var,...) {template...}
+ * Parse @tag [return-type] tagname(Type var,...) {template...}
  */
 public class DefTagParser extends KeywordParserFactory {
 
     private static class DefTagToken extends BlockToken {
         String tagName;
         String signature;
-        public DefTagToken(String tagName, String signature, IContext context) {
+        String retType;
+        public DefTagToken(String tagName, String retType, String signature, IContext context) {
             super("", context);
+            this.retType = retType;
             this.tagName = tagName;
             this.signature = signature;
-            ctx.getCodeBuilder().defTag(tagName, signature);
+            ctx.getCodeBuilder().defTag(tagName, retType, signature);
         }
 
         @Override
@@ -48,29 +50,24 @@ public class DefTagParser extends KeywordParserFactory {
                     throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @def, correct usage: @def tagName([arguments...])");
                 }
                 step(r.stringMatched().length());
-                String tagName = r.stringMatched(2);
-                String signature = r.stringMatched(3);
-                return new DefTagToken(tagName, signature, ctx());
+                String retType = r.stringMatched(3);
+                String tagName = r.stringMatched(6);
+                String signature = r.stringMatched(7);
+                return new DefTagToken(tagName, retType, signature, ctx());
             }
         };
     }
 
     @Override
     protected String patternStr() {
-        return "^%s%s\\s+([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{\\s*\\r*\\n*";
+        return "^%s%s\\s+(([_a-zA-Z][\\w_$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{\\s*\\r*\\n*";
     }
 
     public static void main(String[] args) {
         DefTagParser tp = new DefTagParser();
         Regex r = tp.reg(new Rythm());
-        String s = "@tag myTag(String x, User y) {\\n y.name: x\\n}";
-        if (r.search(s)) {
-            System.out.println("m " + r.stringMatched());
-            System.out.println(1 + r.stringMatched(1));
-            System.out.println(2 + r.stringMatched(2));
-            System.out.println(3 + r.stringMatched(3));
-            System.out.println(4 + r.stringMatched(4));
-        }
+        String s = "@tag Map<String, Map<String, Map<String, Long>>> myTag(String x, Map<String, Map<String, Map<String, Long>>> y) {\\n y.name: x\\n}";
+        p(s, r, 9);
     }
 
 }
