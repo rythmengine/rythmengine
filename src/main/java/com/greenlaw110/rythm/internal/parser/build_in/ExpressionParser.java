@@ -17,6 +17,23 @@ import com.stevesoft.pat.Regex;
  */
 public class ExpressionParser extends CaretParserFactoryBase {
 
+    private static class ExpressionToken extends CodeToken {
+        public ExpressionToken(String s, IContext context) {
+            super(s, context);
+        }
+
+        @Override
+        public void output() {
+            boolean isInlineTag = false;
+            int pos = s.indexOf("(");
+            if (pos != -1) {
+                String tagName = s.substring(0, pos).trim();
+                isInlineTag = ctx.getCodeBuilder().isInlineTag(tagName);
+            }
+            outputExpression(isInlineTag);
+        }
+    }
+
     @Override
     public IParser create(IContext ctx) {
 
@@ -41,16 +58,10 @@ public class ExpressionParser extends CaretParserFactoryBase {
                 String s = remain();
                 if (r1.search(s)) {
                     s = r1.stringMatched(1);
-                    if (null != s && !"@".equals(s.trim())) {
+                    if (null != s && !caret.equals(s.trim())) {
                         step(s.length());
                         s = s.replaceFirst(caret, "");
-                        return new CodeToken(s, ctx()) {
-                            //TODO support java bean spec and JavaExtension
-                            @Override
-                            public void output() {
-                                outputExpression();
-                            }
-                        };
+                        return new ExpressionToken(s, ctx());
                     }
                 }
                 s = remain();
@@ -58,13 +69,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     s = r2.stringMatched(1);
                     if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
-                        return new CodeToken(s.replaceFirst(caret, ""), ctx()) {
-                            //TODO support java bean spec and JavaExtension
-                            @Override
-                            public void output() {
-                                outputExpression();
-                            }
-                        };
+                        return new ExpressionToken(s.replaceFirst(caret, ""), ctx());
                     }
                 }
                 return null;
@@ -95,6 +100,9 @@ public class ExpressionParser extends CaretParserFactoryBase {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
         }
+
+        String m = "abd3_d90 (dsa)";
+        System.out.println(m.substring(0, m.indexOf("(")));
     }
 
 }

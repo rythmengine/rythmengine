@@ -135,9 +135,13 @@ public class Token extends TextBuilder {
         }
     }
     protected final void outputExpression() {
+        outputExpression(false);
+    }
+    protected final void outputExpression(boolean noPrint) {
         if (S.isEmpty(s)) return;
         if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
-            p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            if (noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             return;
         }
         String s0 = s;
@@ -221,7 +225,8 @@ public class Token extends TextBuilder {
             }
         }
         if (!processed) {
-            p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            if (!noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             pline();
         }
     }

@@ -205,8 +205,12 @@ public class CodeBuilder extends TextBuilder {
         }
     }
     private Map<String, InlineTag> inlineTags = new HashMap<String, InlineTag>();
+    public boolean isInlineTag(String tagName) {
+        return inlineTags.containsKey(tagName);
+    }
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
     public void defTag(String tagName, String retType, String signature) {
+        tagName = tagName.trim();
         if (inlineTags.containsKey(tagName)) {
             throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
