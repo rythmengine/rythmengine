@@ -18,9 +18,9 @@ public class SimpleRythm extends DialectBase {
         // BraceParser must be put in front of ElseIfParser
         return new Class<?>[]{AssignParser.class, BreakParser.class, BraceParser.class, ContinueParser.class,
                 CommentParser.class, DebugParser.class, EscapeParser.class, ElseIfParser.class, BraceParser.class,
-                InvokeParser.class,InvokeTagParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class,
-                ImportParser.class, RawParser.class, ReturnParser.class, SimpleParser.class, TimestampParser.class,
-                VerbatimParser.class};
+                InvokeParser.class, InvokeTagParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class,
+                ImportParser.class, NoSIMParser.class, RawParser.class, ReturnParser.class, SimpleParser.class,
+                TimestampParser.class, VerbatimParser.class};
     }
 
     @Override

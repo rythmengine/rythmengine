@@ -21,9 +21,9 @@ public class Rythm extends DialectBase {
                 BraceParser.class, LogTimeParser.class, InvokeParser.class, InvokeTagParser.class, MacroParser.class,
                 NullableExpressionParser.class, ExpressionParser.class, ExtendsParser.class, ForEachParser.class,
                 GetParser.class, IfParser.class, ImportParser.class, IncludeParser.class, InitCodeParser.class,
-                NoCompactParser.class, RawParser.class, RenderBodyParser.class, RenderSectionParser.class,
-                ReturnParser.class, SectionParser.class, SetParser.class, SimpleParser.class, TimestampParser.class,
-                VerbatimParser.class};
+                NoCompactParser.class, NoSIMParser.class, RawParser.class, RenderBodyParser.class,
+                RenderSectionParser.class, ReturnParser.class, SectionParser.class, SetParser.class, SimpleParser.class,
+                TimestampParser.class, VerbatimParser.class};
     }
 
     public boolean isMyTemplate(String template) {
