@@ -172,7 +172,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 tagFile = new File(root, name);
                 if (tagFile.canRead()) {
                     try {
-                        FileTemplateResource tr = new FileTemplateResource(tagFile);
+                        FileTemplateResource tr = new FileTemplateResource(tagFile, engine);
                         TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
                         if (null == tc) {
                             tc = new TemplateClass(tr, engine);
