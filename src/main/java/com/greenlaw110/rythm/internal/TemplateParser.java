@@ -1,8 +1,11 @@
 package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.internal.dialect.DialectManager;
+import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IBlockHandler;
@@ -26,17 +29,38 @@ public class TemplateParser implements IContext {
         this.cb = cb;
     }
 
-    public static class ExitInstruction extends RuntimeException {
+    public static class ExitInstruction extends FastRuntimeException {
+    }
+
+    public static class NotSIMTemplate extends FastRuntimeException {
     }
 
     void parse() {
-        TemplateTokenizer tt = new TemplateTokenizer(template, this);
+        DialectManager dm = cb.engine.getDialectManager();
+        dm.beginParse(this);
         try {
+            TemplateTokenizer tt = new TemplateTokenizer(template, this);
             for (TextBuilder builder: tt) {
                 cb.addBuilder(builder);
             }
         } catch (ExitInstruction e) {
             // ignore, just break the parsing process
+        } catch (NotSIMTemplate e) {
+            cb.rewind();
+            cursor = 0;
+            dm.push(new Rythm());
+            try {
+                TemplateTokenizer tt = new TemplateTokenizer(template, this);
+                for (TextBuilder builder: tt) {
+                    cb.addBuilder(builder);
+                }
+            } catch (ExitInstruction e0) {
+                // ignore just break
+            } finally {
+                dm.pop();
+            }
+        } finally {
+            dm.endParse(this);
         }
     }
 

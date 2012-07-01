@@ -1,2 +1,2 @@
-@args String who;
+@args String who
 Hello @who!

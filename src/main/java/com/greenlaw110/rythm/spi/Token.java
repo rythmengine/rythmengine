@@ -140,7 +140,7 @@ public class Token extends TextBuilder {
     protected final void outputExpression(boolean noPrint) {
         if (S.isEmpty(s)) return;
         if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
-            if (noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            if (!noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             return;
         }

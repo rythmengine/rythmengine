@@ -36,9 +36,7 @@ public class ExtensionManager {
      * @param parsers
      */
     public ExtensionManager registerUserDefinedParsers(String dialect, IParserFactory... parsers) {
-        IDialect d = engine().getDialectManager().get(dialect);
-        if (null == d) throw new DialectNotFoundException(dialect);
-        for (IParserFactory p: parsers) d.registerParserFactory(p);
+        engine().getDialectManager().registerExternalParsers(dialect, parsers);
         return this;
     }
 

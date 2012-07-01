@@ -26,4 +26,8 @@ public class Rythm extends DialectBase {
                 VerbatimParser.class};
     }
 
+    public boolean isMyTemplate(String template) {
+        return true; // default all template is Rythm template
+    }
+
 }

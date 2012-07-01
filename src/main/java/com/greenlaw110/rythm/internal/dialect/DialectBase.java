@@ -112,4 +112,17 @@ public abstract class DialectBase implements IDialect {
     public String toString() {
         return String.format("%s Dialect", id());
     }
+
+    @Override
+    public boolean isMyTemplate(String template) {
+        return false;
+    }
+
+    @Override
+    public void begin(IContext ctx) {
+    }
+
+    @Override
+    public void end(IContext ctx) {
+    }
 }

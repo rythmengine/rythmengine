@@ -141,18 +141,55 @@ public class CodeBuilder extends TextBuilder {
         this.simpleTemplate = templateClass.simpleTemplate;
     }
 
+    /**
+     * Reset to the state before construction
+     */
     public void clear() {
         out().ensureCapacity(0);
-        this.builders.clear();
         this.engine = null;
-        if (null != this.extendArgs) this.extendArgs.pl.clear();
+        this.tmpl = null;
+        this.cName = null;
+        this.pName = null;
+        this.tagName = null;
+        this.initCode = null;
+        this.extended = null;
         this.extendedTemplateClass = null;
+        if (null != this.extendArgs) this.extendArgs.pl.clear();
         this.imports.clear();
-        this.inlineTagBodies.clear();
-        this.inlineTags.clear();
+        this.extendDeclareLineNo = 0;
+        this.renderArgs.clear();
+        this.builders.clear();
         this.parser = null;
         this.templateClass = null;
+        this.simpleTemplate = false;
+        this.inlineTags.clear();
+        this.inlineTagBodies.clear();
+        this.logTime = false;
+        this.macros.clear();
+        this.macroStack.clear();
+        this.buildBody = null;
+    }
+
+    /**
+     * Rewind to the state when construction finished
+     */
+    public void rewind() {
+        out().ensureCapacity(0);
+        this.initCode = null;
+        this.extended = null;
+        this.extendedTemplateClass = null;
+        if (null != this.extendArgs) this.extendArgs.pl.clear();
+        this.imports.clear();
+        this.extendDeclareLineNo = 0;
         this.renderArgs.clear();
+        this.builders.clear();
+        this.simpleTemplate = false;
+        this.inlineTags.clear();
+        this.inlineTagBodies.clear();
+        this.logTime = false;
+        this.macros.clear();
+        this.macroStack.clear();
+        this.buildBody = null;
     }
 
     public void merge(CodeBuilder codeBuilder) {

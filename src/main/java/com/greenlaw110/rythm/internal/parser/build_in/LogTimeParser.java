@@ -47,12 +47,7 @@ public class LogTimeParser extends KeywordParserFactory {
         LogTimeParser ap = new LogTimeParser();
         Regex r = ap.reg(new Rythm());
         if (r.search(s)) {
-            System.out.println("m: " + r.stringMatched());
-            System.out.println("1: " + r.stringMatched(1));
-            System.out.println("2: " + r.stringMatched(2));
-            System.out.println("3: " + r.stringMatched(3));
-            System.out.println("4: " + r.stringMatched(4));
-            System.out.println("5: " + r.stringMatched(5));
+            p(r);
 
             s = r.stringMatched(1);
             if (null == s) return;

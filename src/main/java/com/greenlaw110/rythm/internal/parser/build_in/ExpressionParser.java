@@ -1,7 +1,9 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
+import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
+import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
@@ -18,8 +20,24 @@ import com.stevesoft.pat.Regex;
 public class ExpressionParser extends CaretParserFactoryBase {
 
     private static class ExpressionToken extends CodeToken {
+        private static void assertSimple(String symbol, IContext context) {
+            boolean isSimple = symbol.indexOf(".") == -1 && symbol.indexOf("[") == -1;
+            if (!isSimple) throw new TemplateParser.NotSIMTemplate();
+        }
+
         public ExpressionToken(String s, IContext context) {
             super(s, context);
+            if (context.getDialect() instanceof SimpleRythm) {
+                // simple rythm dialect support only simple expression
+                int pos = s.indexOf("("); // find out the method name
+                if (pos != -1) {
+                    String methodName = s.substring(0, pos);
+                    assertSimple(methodName, context);
+                } else {
+                    assertSimple(s, context);
+                    context.getCodeBuilder().addRenderArgs("Object", s);
+                }
+            }
         }
 
         @Override
@@ -40,7 +58,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         Regex r1_ = null, r2_ = null;
         String caret_ = null;
         final IDialect dialect = ctx.getDialect();
-        if (dialect instanceof Rythm) {
+        if (dialect instanceof Rythm || dialect instanceof SimpleRythm) {
             caret_ = dialect.a();
             r1_ = new Regex(String.format(patternStr(), caret_));
             r2_ = new Regex(String.format("^(%s(?@())*).*", caret_));

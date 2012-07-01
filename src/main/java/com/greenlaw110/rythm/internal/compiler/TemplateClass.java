@@ -315,6 +315,7 @@ public class TemplateClass {
         long start = System.currentTimeMillis();
         addVersion();
         importPaths = new HashSet<String>();
+        // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
         codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
         codeBuilder.build();

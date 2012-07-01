@@ -95,7 +95,11 @@ public enum Keyword implements IKeyword {
     /**
      * For no compact in regard to engine.compactMode
      */
-    NOCOMPACT(),
+    NOCOMPACT,
+    /**
+     * Indicate this is not a SIM template
+     */
+    NOSIM,
     /**
      * Mark a section that expression should be output as raw data
      */
