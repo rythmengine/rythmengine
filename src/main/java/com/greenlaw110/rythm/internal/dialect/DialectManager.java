@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.internal.dialect;
 
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParserFactory;
@@ -7,6 +9,7 @@ import com.greenlaw110.rythm.spi.IParserFactory;
 import java.util.*;
 
 public class DialectManager {
+    protected ILogger logger = Logger.get(DialectManager.class);
     IDialect def = null;
     public DialectManager() {
         def = new Rythm();
@@ -20,14 +23,24 @@ public class DialectManager {
         new SimpleRythm(),
         new Rythm()
     };
+    private Stack<IDialect> dialectStack() {
+        Stack<IDialect> stack = threadLocal.get();
+        if (null == stack) {
+            stack = new Stack<IDialect>();
+            threadLocal.set(stack);
+        }
+        return stack;
+    }
     public IDialect get() {
-        return threadLocal.get().peek();
+        Stack<IDialect> stack = dialectStack();
+        return stack.empty() ? null : stack.peek();
     }
     public void push(IDialect dialect) {
-        threadLocal.get().push(dialect);
+        dialectStack().push(dialect);
     }
     public IDialect pop(){
-        return threadLocal.get().pop();
+        Stack<IDialect> stack = dialectStack();
+        return stack.empty() ? null : stack.pop();
     }
     public IDialect get(String id) {
         if (null == id || "rythm".equalsIgnoreCase(id)) return def;
@@ -43,6 +56,7 @@ public class DialectManager {
             }
         }
         IDialect d = get();
+        logger.error(">>>> begin Parse::dialect is: %s", d.getClass());
         List<IParserFactory> l = externalParsers.get(d);
         if (null != l) {
             for (IParserFactory pf: l) {

@@ -55,7 +55,7 @@ public class TemplateClass {
 
     private RythmEngine engine = null;
     private RythmEngine engine() {
-        return null == engine ? Rythm.engine : engine;
+        return null == engine ? Rythm.engine() : engine;
     }
 
     /**

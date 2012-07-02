@@ -241,9 +241,10 @@ public class RythmEngine {
 
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
-        enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", false);
+        enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
+        logger.debug(">>>>temp dir is: %s", tmpDir);
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", null);
         tagHome = configuration.getAsFile("rythm.tag.root", null);

@@ -2,8 +2,10 @@
 <project name="rythm_samples" default="all" basedir=".">
 
     <property name="src_hello_world" location="HelloWorld"/>
+    <property name="src_performance" location="Performance"/>
     <property name="src_issue_22" location="Issue22"/>
     <property name="src_issue_57" location="Issue57"/>
+    <property name="src_issue_60" location="Issue60"/>
     <property name="src_java_tag" location="JavaTag"/>
     <property name="classes" location="classes"/>
     <property name="lib" location="../lib"/>
@@ -35,14 +37,22 @@
         </java>
     </target>
 
-    <target name="compile_issue_22" depends="init">
-        <javac srcdir="${src_issue_22}" destdir="${classes}" includeantruntime="true">
+    <target name="compile_performance" depends="init">
+        <javac srcdir="${src_performance}" destdir="${classes}" includeantruntime="true">
             <classpath refid="project.class.path"/>
         </javac>
+        <copy file="${src_performance}/performance.txt" todir="${classes}"/>
     </target>
 
-    <target name="compile_issue_57" depends="init">
-        <javac srcdir="${src_issue_57}" destdir="${classes}" includeantruntime="true">
+    <target name="performance" depends="compile_performance">
+        <java classname="Performance" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="compile_issue_22" depends="init">
+        <javac srcdir="${src_issue_22}" destdir="${classes}" includeantruntime="true">
             <classpath refid="project.class.path"/>
         </javac>
     </target>
@@ -54,8 +64,25 @@
         </java>
     </target>
 
+    <target name="compile_issue_57" depends="init">
+        <javac srcdir="${src_issue_57}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
     <target name="issue_57" depends="compile_issue_57">
         <java classname="Issue57" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="compile_issue_60" depends="init">
+        <javac srcdir="${src_issue_60}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
+    <target name="issue_60" depends="compile_issue_60">
+        <java classname="Issue60" logError="true" fork="false">
             <classpath location="classes"/>
             <classpath refid="project.class.path"/>
         </java>

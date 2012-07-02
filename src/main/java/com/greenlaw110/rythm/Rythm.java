@@ -45,7 +45,7 @@ public class Rythm {
         if (null == engine) init();
     }
 
-    private static RythmEngine engine() {
+    public static RythmEngine engine() {
         checkInit();
         return engine;
     }

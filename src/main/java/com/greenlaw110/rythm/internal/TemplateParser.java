@@ -46,6 +46,7 @@ public class TemplateParser implements IContext {
         } catch (ExitInstruction e) {
             // ignore, just break the parsing process
         } catch (NotSIMTemplate e) {
+            logger.error("NotSIMTemplate captured");
             cb.rewind();
             cursor = 0;
             dm.push(new Rythm());

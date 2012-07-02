@@ -130,7 +130,6 @@ public class CodeBuilder extends TextBuilder {
         this.tagName = (null == tagName) ? className : tagName;
         className = className.replace('/', '.');
         cName = className;
-        logger.error(">>> code builder: %s", cName);
         int i = className.lastIndexOf('.');
         if (-1 < i) {
             cName = className.substring(i + 1);
@@ -140,6 +139,7 @@ public class CodeBuilder extends TextBuilder {
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
         this.simpleTemplate = templateClass.simpleTemplate;
+        if (logger.isDebugEnabled()) logger.debug("codebuilder prepared for :%s", cName);
     }
 
     /**

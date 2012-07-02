@@ -22,6 +22,11 @@ public class NoSIMParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
+                Regex r = reg(dialect());
+                if (r.search(remain())) {
+                    String s = r.stringMatched();
+                    step(s.length());
+                }
                 return new CodeToken("", ctx());
             }
         };
