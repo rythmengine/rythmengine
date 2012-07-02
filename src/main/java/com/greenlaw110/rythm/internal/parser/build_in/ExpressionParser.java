@@ -36,8 +36,13 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     String methodName = s.substring(0, pos);
                     assertSimple(methodName, context);
                 } else {
+                    // find out array
+                    pos = s.indexOf("[");
+                    if (pos != -1) {
+                        s = s.substring(0, pos);
+                    }
                     assertSimple(s, context);
-                    context.getCodeBuilder().addRenderArgs("Object", s);
+                    context.getCodeBuilder().addRenderArgs(pos == -1 ? "Object" : "Object[]", s);
                 }
             }
         }
