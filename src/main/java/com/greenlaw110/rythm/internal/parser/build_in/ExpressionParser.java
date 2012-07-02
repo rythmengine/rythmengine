@@ -9,6 +9,7 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -28,6 +29,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         public ExpressionToken(String s, IContext context) {
             super(s, context);
             if (context.getDialect() instanceof SimpleRythm) {
+                s = S.stripBrace(s);
                 // simple rythm dialect support only simple expression
                 int pos = s.indexOf("("); // find out the method name
                 if (pos != -1) {
