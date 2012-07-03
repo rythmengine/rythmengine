@@ -489,7 +489,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     }
 
     private static void testOuterMatch() {
-        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null));
+        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null, null));
         String ps = String.format(new InvokeTagParser().patternStr(), "@");
         Regex r = new Regex(ps);
         String s = "@xyz(xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cache(ab, d).escape()  Gren";
