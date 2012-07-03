@@ -47,16 +47,23 @@ public class DialectManager {
         return null;
     }
     public void beginParse(IContext ctx) {
-        String template = ctx.getRemain();
-        for (IDialect d: dialects) {
-            if (d.isMyTemplate(template)) {
-                push(d);
-                d.begin(ctx);
-                break;
+        IDialect d = ctx.getCodeBuilder().dialect;
+        if (null != d) {
+            push(d);
+            d.begin(ctx);
+        } else {
+            String template = ctx.getRemain();
+            for (IDialect d0: dialects) {
+                if (d0.isMyTemplate(template)) {
+                    push(d0);
+                    d0.begin(ctx);
+                    d = d0;
+                    break;
+                }
             }
         }
-        IDialect d = get();
-        logger.error(">>>> begin Parse::dialect is: %s", d.getClass());
+        d = get();
+        if (logger.isDebugEnabled()) logger.debug(">>>> begin Parse::dialect is: %s", d.getClass());
         List<IParserFactory> l = externalParsers.get(d);
         if (null != l) {
             for (IParserFactory pf: l) {

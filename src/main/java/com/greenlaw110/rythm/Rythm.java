@@ -98,6 +98,10 @@ public class Rythm {
         return engine().render(file, args);
     }
 
+    public static String toString(String template, Object obj) {
+        return engine().toString(template, obj);
+    }
+
     public static String renderStr(String template, Object... args) {
         return engine().renderString(template, args);
     }

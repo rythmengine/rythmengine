@@ -9,6 +9,7 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -189,6 +190,11 @@ public class TemplateClass {
      */
     public TemplateBase templateInstance;
 
+    /**
+     * specify the dialect for the template
+     */
+    transient private IDialect dialect;
+
     private TemplateClass(RythmEngine engine) {
         this.engine = null == engine ? null : engine.isSingleton() ? null : engine;
     }
@@ -214,6 +220,10 @@ public class TemplateClass {
         this(resource, engine, false);
     }
 
+    public TemplateClass(ITemplateResource resource, RythmEngine engine, IDialect dialect) {
+        this(resource, engine, false, dialect);
+    }
+
     public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh) {
         this(engine);
         if (null == resource) throw new NullPointerException();
@@ -224,6 +234,16 @@ public class TemplateClass {
         if (!noRefresh) refresh();
     }
 
+    public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh, IDialect dialect) {
+        this(engine);
+        if (null == resource) throw new NullPointerException();
+        templateResource = resource;
+        if (resource instanceof StringTemplateResource) {
+            simpleTemplate = true;
+        }
+        this.dialect = dialect;
+        if (!noRefresh) refresh();
+    }
 
     /**
      * Return string representation of the template
@@ -317,7 +337,7 @@ public class TemplateClass {
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
-        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
+        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, dialect);
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();

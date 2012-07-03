@@ -46,7 +46,9 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
     @Override
     protected long lastModified() {
-        return 0;
+        if (engine().isProdMode()) return 0;
+        long now = System.currentTimeMillis();
+        return ++now;
     }
 
     @Override

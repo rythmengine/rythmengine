@@ -7,6 +7,7 @@ import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
+import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
@@ -44,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120630";
+    public static final String version = "1.0.0-20120704";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -460,6 +461,19 @@ public class RythmEngine {
 
     public String renderStr(String template, Object... args) {
         return renderString(template, args);
+    }
+
+    public String toString(String template, Object obj) {
+        Class argClass = obj.getClass();
+        String key = template + argClass;
+        TemplateClass tc = classes.getByTemplate(key);
+        if (null == tc) {
+            tc = new TemplateClass(new StringTemplateResource(template), this, new ToString(argClass));
+            classes.tmplIdx.put(key, tc);
+        }
+        ITemplate t = tc.asTemplate();
+        t.setRenderArg(0, obj);
+        return t.render();
     }
 
     @SuppressWarnings("unchecked")

@@ -10,6 +10,7 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -125,7 +126,9 @@ public class CodeBuilder extends TextBuilder {
         simpleTemplate = true;
     }
 
-    public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine) {
+    transient public IDialect dialect = null;
+
+    public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine, IDialect dialect) {
         tmpl = template;
         this.tagName = (null == tagName) ? className : tagName;
         className = className.replace('/', '.');
@@ -136,6 +139,7 @@ public class CodeBuilder extends TextBuilder {
             pName = className.substring(0, i);
         }
         this.engine = null == engine ? Rythm.engine : engine;
+        this.dialect = dialect;
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
         this.simpleTemplate = templateClass.simpleTemplate;
