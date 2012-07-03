@@ -47,8 +47,23 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     @Override
     protected long lastModified() {
         if (engine().isProdMode()) return 0;
-        long now = System.currentTimeMillis();
-        return ++now;
+
+        String fileName;
+        if ("file".equals(url.getProtocol())) {
+            fileName = url.getFile();
+        } else if ("jar".equals(url.getProtocol())) {
+            try {
+                java.net.JarURLConnection jarUrl = (java.net.JarURLConnection) url.openConnection();
+                fileName = jarUrl.getJarFile().getName();
+            } catch (Exception e) {
+                return System.currentTimeMillis() + 1;
+            }
+        } else {
+            return System.currentTimeMillis() + 1;
+        }
+
+        java.io.File file = new java.io.File(fileName);
+        return file.lastModified();
     }
 
     @Override
