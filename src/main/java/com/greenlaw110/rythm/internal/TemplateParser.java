@@ -49,7 +49,7 @@ public class TemplateParser implements IContext {
             logger.error("NotSIMTemplate captured");
             cb.rewind();
             cursor = 0;
-            dm.push(new Rythm());
+            dm.pushDef();
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(template, this);
                 for (TextBuilder builder: tt) {

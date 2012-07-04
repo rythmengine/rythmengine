@@ -35,6 +35,9 @@ public class DialectManager {
         Stack<IDialect> stack = dialectStack();
         return stack.empty() ? null : stack.peek();
     }
+    public void pushDef() {
+        dialectStack().push(def);
+    }
     public void push(IDialect dialect) {
         dialectStack().push(dialect);
     }
@@ -91,5 +94,8 @@ public class DialectManager {
             throw new IllegalArgumentException("dialect not found: " + dialect);
         }
         externalParsers.put(d, Arrays.asList(factories));
+        for (IParserFactory f: factories) {
+            def.registerParserFactory(f);
+        }
     }
 }
