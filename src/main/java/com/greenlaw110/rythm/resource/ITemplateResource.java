@@ -15,7 +15,7 @@ public interface ITemplateResource extends Serializable {
      * The unique identifier used to fetch this resource from ResourceManager
      * @return
      */
-    String getKey();
+    Object getKey();
 
     /**
      * Propose a name of generated java class for this resource

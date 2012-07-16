@@ -87,7 +87,7 @@ public class RythmException extends FastRuntimeException {
 
     public String getTemplateName() {
         if (null != templateName) return templateName;
-        return templateClass.getKey();
+        return templateClass.getKey().toString();
     }
 
     @Override

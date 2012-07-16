@@ -265,7 +265,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                             RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
                             if (re.templateLineNumber != -1) {
                                 StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey(), re.templateLineNumber);
+                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey().toString(), re.templateLineNumber);
                                 System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
                                 re.setStackTrace(newStack);
                             }

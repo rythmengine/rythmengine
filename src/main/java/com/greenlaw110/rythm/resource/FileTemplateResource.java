@@ -142,7 +142,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     public static String getFullTagName(TemplateClass tc, RythmEngine engine) {
         if (null == engine) engine = Rythm.engine;
-        String key = tc.getKey();
+        String key = tc.getKey().toString();
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
         if (null != engine.templateHome && key.startsWith(engine.templateHome.getPath())) {
             key = key.replace(engine.templateHome.getPath(), "");

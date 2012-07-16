@@ -1,5 +1,9 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+
 public interface IDialect {
 
     /**
@@ -32,4 +36,5 @@ public interface IDialect {
 
     void end(IContext ctx);
 
+    CodeBuilder createCodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine);
 }

@@ -1,5 +1,8 @@
 package com.greenlaw110.rythm.internal.dialect;
 
+import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.build_in.KeywordParserFactory;
 import com.greenlaw110.rythm.spi.*;
 
@@ -124,5 +127,10 @@ public abstract class DialectBase implements IDialect {
 
     @Override
     public void end(IContext ctx) {
+    }
+
+    @Override
+    public CodeBuilder createCodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine) {
+        return new CodeBuilder(template, className, tagName, templateClass, engine, this);
     }
 }

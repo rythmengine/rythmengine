@@ -8,6 +8,8 @@ import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.toString.ToStringOption;
+import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.IRythmListener;
 
 import java.io.File;
@@ -100,6 +102,18 @@ public class Rythm {
 
     public static String toString(String template, Object obj) {
         return engine().toString(template, obj);
+    }
+
+    public static String toString(Object obj) {
+        return engine().toString(obj);
+    }
+
+    public static String toString(Object obj, ToStringOption option, ToStringStyle style) {
+        return engine().toString(obj, option, style);
+    }
+
+    public static String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
+        return engine().toString(obj, option, style);
     }
 
     public static String renderStr(String template, Object... args) {

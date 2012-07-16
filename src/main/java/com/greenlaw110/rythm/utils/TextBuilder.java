@@ -44,6 +44,14 @@ public class TextBuilder implements Cloneable {
         else _out = out;
     }
 
+    public void setSelfOut(StringBuilder out) {
+        _out = out;
+    }
+
+    public StringBuilder getSelfOut() {
+        return _out;
+    }
+
     /**
      * Construct a root text builder
      */

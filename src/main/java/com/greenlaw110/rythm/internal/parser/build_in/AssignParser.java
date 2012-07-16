@@ -37,11 +37,11 @@ public class AssignParser extends KeywordParserFactory {
         public void output() {
             String assignTo = this.assignTo;
             if (isFinal) assignTo = this.assignTo + "___";
-            p2tline("Object ").p(assignTo).p(" = null;");
+            p2t("Object ").p(assignTo).p(" = null;");
             p2tline("{");
-            p3tline("StringBuilder sbOld = getOut();");
+            p3tline("StringBuilder sbOld = getSelfOut();");
             p3tline("StringBuilder sbNew = new StringBuilder();");
-            p3tline("setOut(sbNew);");
+            p3tline("setSelfOut(sbNew);");
         }
 
         @Override
@@ -52,7 +52,7 @@ public class AssignParser extends KeywordParserFactory {
             StringBuilder sbOld = getOut();
             setOut(sbNew);
             p3tline("String s = sbNew.toString();");
-            p3tline("setOut(sbOld);");
+            p3tline("setSelfOut(sbOld);");
             p3t(assignTo).p(" = s;");
             pline();
             p2tline("}");

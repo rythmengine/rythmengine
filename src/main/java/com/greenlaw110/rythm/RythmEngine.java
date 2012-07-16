@@ -6,15 +6,13 @@ import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.compiler.*;
+import com.greenlaw110.rythm.internal.dialect.AutoToString;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.resource.ITemplateResource;
-import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
-import com.greenlaw110.rythm.resource.StringTemplateResource;
-import com.greenlaw110.rythm.resource.TemplateResourceManager;
+import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
@@ -24,6 +22,8 @@ import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.toString.ToStringOption;
+import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.*;
 
 import java.io.File;
@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120704a";
+    public static final String version = "1.0.0-20120716";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -82,6 +82,7 @@ public class RythmEngine {
     public boolean logRenderTime = false;
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
+    public boolean playHost = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
@@ -286,6 +287,7 @@ public class RythmEngine {
         implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
         byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
         hotswapAgent = configuration.getAs("rythm.classLoader.hotswapAgent", null, IHotswapAgent.class);
+        playHost = configuration.getAsBoolean("rythm.playHost", false);
 
         Object o = configuration.get("rythm.resource.loader");
         if (o instanceof ITemplateResourceLoader) {
@@ -474,6 +476,28 @@ public class RythmEngine {
         ITemplate t = tc.asTemplate();
         t.setRenderArg(0, obj);
         return t.render();
+    }
+
+    public String toString(Object obj) {
+        return toString(obj, ToStringOption.defaultOption, (ToStringStyle)null);
+    }
+
+    public String toString(Object obj, ToStringOption option, ToStringStyle style) {
+        Class<?> c = obj.getClass();
+        AutoToString.AutoToStringData key = new AutoToString.AutoToStringData(c, option, style);
+        //String template = AutoToString.templateStr(c, option, style);
+        TemplateClass tc = classes.getByTemplate(key);
+        if (null == tc) {
+            tc = new TemplateClass(new ToStringTemplateResource(key), this, new AutoToString(c, key));
+            classes.tmplIdx.put(key, tc);
+        }
+        ITemplate t = tc.asTemplate();
+        t.setRenderArg(0, obj);
+        return t.render();
+    }
+
+    public String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
+        return toString(obj, option, ToStringStyle.fromApacheStyle(style));
     }
 
     @SuppressWarnings("unchecked")

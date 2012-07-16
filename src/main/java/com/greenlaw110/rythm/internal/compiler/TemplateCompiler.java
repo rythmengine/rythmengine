@@ -40,7 +40,7 @@ public class TemplateCompiler {
     // -- util methods
     private String getTemplateByClassName(String className) {
         TemplateClass tc = engine().classes.getByClassName(className);
-        return null == tc ? null : tc.getKey();
+        return null == tc ? null : tc.getKey().toString();
     }
 
     // -- the following code comes from PlayFramework 1.2

@@ -33,6 +33,17 @@ public class Token extends TextBuilder {
         ok = false;
     }
 
+    protected Token(String s, TextBuilder caller) {
+        this(s, caller, false);
+    }
+
+    protected Token(String s, TextBuilder caller, boolean disableCompactMode) {
+        super(caller);
+        this.s = s;
+        line = -1;
+        this.disableCompactMode = disableCompactMode;
+    }
+
     public Token(String s, IContext context) {
         this(s, context, false);
     }

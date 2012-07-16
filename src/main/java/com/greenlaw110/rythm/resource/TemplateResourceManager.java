@@ -18,7 +18,7 @@ public class TemplateResourceManager {
 
     private RythmEngine engine;
 
-    private Map<String, ITemplateResource> cache = new HashMap<String, ITemplateResource>();
+    private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
 
     public ITemplateResourceLoader resourceLoader = null;
 

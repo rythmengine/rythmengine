@@ -77,8 +77,9 @@ public class CodeBuilder extends TextBuilder {
     public boolean isRythmTemplate() {
         return !isNotRythmTemplate;
     }
-    private String tmpl;
+    protected String tmpl;
     private String cName;
+    public String includingCName;
     private String pName;
     private String tagName;
     private boolean isTag() {
@@ -90,7 +91,7 @@ public class CodeBuilder extends TextBuilder {
         initCode = code;
     }
     private String extended; // the cName of the extended template
-    private String extended() {
+    protected String extended() {
         String defClass = isTag() ? TagBase.class.getName() : TemplateBase.class.getName();
         return null == extended ? defClass : extended;
     }
@@ -200,9 +201,8 @@ public class CodeBuilder extends TextBuilder {
     public void merge(CodeBuilder codeBuilder) {
         if (null == codeBuilder) return;
         this.imports.addAll(codeBuilder.imports);
-        for (String key: codeBuilder.inlineTags.keySet()) {
-            InlineTag tag = codeBuilder.inlineTags.get(key).clone(this);
-            inlineTags.put(key, tag);
+        for (InlineTag tag: codeBuilder.inlineTags) {
+            inlineTags.add(tag.clone(this));
         }
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
@@ -210,6 +210,10 @@ public class CodeBuilder extends TextBuilder {
 
     public String className() {
         return cName;
+    }
+
+    public String forLoopTypeName() {
+        return null == includingCName ? cName : includingCName;
     }
 
     private static Set<String > globalImports = new HashSet<String>();
@@ -245,19 +249,38 @@ public class CodeBuilder extends TextBuilder {
             }
             return tag;
         }
+
+        @Override
+        public int hashCode() {
+            return (37 + tagName.hashCode()) * 31 + signature.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj instanceof InlineTag) {
+                InlineTag that = (InlineTag)obj;
+                return S.isEqual(that.signature, this.signature) && S.isEqual(that.tagName, this.tagName);
+            }
+            return false;
+        }
     }
-    private Map<String, InlineTag> inlineTags = new HashMap<String, InlineTag>();
+    private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
+
     public boolean isInlineTag(String tagName) {
-        return inlineTags.containsKey(tagName);
+        for (InlineTag tag: inlineTags) {
+            if (S.isEqual(tagName, tag.tagName)) return true;
+        }
+        return false;
     }
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
     public void defTag(String tagName, String retType, String signature) {
         tagName = tagName.trim();
-        if (inlineTags.containsKey(tagName)) {
+        InlineTag tag = new InlineTag(tagName, retType, signature);
+        if (inlineTags.contains(tag)) {
             throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
-        InlineTag tag = new InlineTag(tagName, retType, signature);
-        inlineTags.put(tagName, tag);
+        inlineTags.add(tag);
         inlineTagBodies.push(builders);
         builders = tag.builders;
     }
@@ -284,13 +307,14 @@ public class CodeBuilder extends TextBuilder {
             throw new ParseException(templateClass, lineNo, "cannot include Java tag: %s", include);
         }
         TemplateClass includeTc = includeTag.getTemplateClass(false);
-        if (null == includeTc.codeBuilder) {
-            // loaded from persistent class cache?
-            includeTc.buildSourceCode();
-        }
+        includeTc.buildSourceCode(forLoopTypeName());
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);
         return includeTc.codeBuilder.buildBody;
+    }
+
+    public void setExtended(Class<? extends TemplateBase> c) {
+        this.extended = c.getName();
     }
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
@@ -323,7 +347,7 @@ public class CodeBuilder extends TextBuilder {
         String origin = extended;
         if (!extended.startsWith("/")) {
             // relative path ?
-            String me = templateClass.getKey();
+            String me = templateClass.getKey().toString();
             int pos = me.lastIndexOf("/");
             if (-1 != pos) extended = me.substring(0, pos) + "/" + extended;
             tc = engine.classes.getByTemplate(extended);
@@ -353,7 +377,7 @@ public class CodeBuilder extends TextBuilder {
         this.extendArgs = args;
     }
 
-    private boolean logTime = false;
+    protected boolean logTime = false;
     public void setLogTime() {
         logTime = true;
     }
@@ -449,12 +473,12 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private void pPackage() {
+    protected void pPackage() {
         if (!S.isEmpty(pName)) p("package ").p(pName).pn(";");
     }
 
     // print imports
-    private void pImports() {
+    protected void pImports() {
         for (String s: imports) {
             p("import ").p(s).pn(';');
         }
@@ -472,15 +496,15 @@ public class CodeBuilder extends TextBuilder {
         pn("import java.io.*;");
     }
 
-    private void pClassOpen() {
+    protected void pClassOpen() {
         np("public class ").p(cName).p(" extends ").p(extended()).p(" {").pn(extendedResourceMark());
     }
 
-    private void pClassClose() {
+    protected void pClassClose() {
         np("}").pn();
     }
 
-    private void pRenderArgs() {
+    protected void pRenderArgs() {
         pn();
         // -- output private members
         for (String argName: renderArgs.keySet()) {
@@ -547,7 +571,7 @@ public class CodeBuilder extends TextBuilder {
         ptn("}");
     }
 
-    private void pExtendInitArgCode() {
+    protected void pExtendInitArgCode() {
         if (null == extendArgs || extendArgs.pl.size() < 1) return;
         pn();
         ptn("@Override protected void loadExtendingArgs() {");
@@ -565,7 +589,7 @@ public class CodeBuilder extends TextBuilder {
         ptn("}");
     }
 
-    private void pSetup() {
+    protected void pSetup() {
         if (!logTime && renderArgs.isEmpty()) return;
         pn();
         ptn("@Override protected void setup() {");
@@ -581,21 +605,21 @@ public class CodeBuilder extends TextBuilder {
         ptn("}");
     }
 
-    private void pInitCode() {
+    protected void pInitCode() {
         if (S.isEmpty(initCode)) return;
         pn();
         pt("@Override public void init() {").p(initCode).p(";").pn("\n\t}");
     }
 
-    private void pTagImpl() {
+    protected void pTagImpl() {
         if (!isTag()) return;
         pn();
         pt("@Override public java.lang.String getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
-    private void pInlineTags() {
+    protected void pInlineTags() {
         pn();
-        for (InlineTag tag: inlineTags.values()) {
+        for (InlineTag tag: inlineTags) {
             p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\n");
             for (TextBuilder b: tag.builders) {
                 b.build();
@@ -606,7 +630,7 @@ public class CodeBuilder extends TextBuilder {
 
     public String buildBody = null;
 
-    private void pBuild() {
+    protected void pBuild() {
         pn();
         pn();
         ptn("@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");

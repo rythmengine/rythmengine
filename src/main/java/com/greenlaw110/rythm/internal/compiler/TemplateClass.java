@@ -249,7 +249,7 @@ public class TemplateClass {
      * Return string representation of the template
      * @return
      */
-    public String getKey() {
+    public Object getKey() {
         return null == templateResource ? name() : templateResource.getKey();
     }
 
@@ -331,13 +331,30 @@ public class TemplateClass {
         return refresh(false);
     }
 
-    public void buildSourceCode() {
+    public void buildSourceCode(String includingClassName) {
         long start = System.currentTimeMillis();
         addVersion();
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
         codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, dialect);
+        codeBuilder.includingCName = includingClassName;
+        codeBuilder.build();
+        extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
+        javaSource = codeBuilder.toString();
+        if (logger.isTraceEnabled()) {
+            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
+        }
+    }
+
+    public void buildSourceCode() {
+        long start = System.currentTimeMillis();
+        addVersion();
+        importPaths = new HashSet<String>();
+        // Possible bug here?
+        if (null != codeBuilder) codeBuilder.clear();
+        if (null == dialect) codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, null);
+        else codeBuilder = dialect.createCodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();

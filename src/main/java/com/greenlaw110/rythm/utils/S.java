@@ -182,9 +182,18 @@ public class S {
         return (lowercase ? string.toLowerCase() : string);
     }
 
+    public static String lowerFirst(Object o) {
+        if (null == o) return "";
+        String string = o.toString();
+        if (string.length() == 0) {
+            return string;
+        }
+        return ("" + string.charAt(0)).toLowerCase() + string.substring(1);
+    }
+
     public static String capFirst(Object o) {
         if (null == o) return "";
-        String string = o.toString().toLowerCase();
+        String string = o.toString();
         if (string.length() == 0) {
             return string;
         }

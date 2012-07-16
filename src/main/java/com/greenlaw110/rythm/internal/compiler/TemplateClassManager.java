@@ -35,7 +35,7 @@ public class TemplateClassManager {
     /**
      * Index template class with inline template content or template file name
      */
-    public Map<String, TemplateClass> tmplIdx = new HashMap<String, TemplateClass>();
+    public Map<Object, TemplateClass> tmplIdx = new HashMap<Object, TemplateClass>();
 
     public TemplateClassManager(RythmEngine engine) {
         if (null == engine) throw new NullPointerException();
@@ -47,7 +47,7 @@ public class TemplateClassManager {
      */
     public void clear() {
         clsNameIdx = new HashMap<String, TemplateClass>();
-        tmplIdx = new HashMap<String, TemplateClass>();
+        tmplIdx = new HashMap<Object, TemplateClass>();
     }
 
     /**
@@ -69,11 +69,11 @@ public class TemplateClassManager {
         return tc;
     }
 
-    public TemplateClass getByTemplate(String name) {
+    public TemplateClass getByTemplate(Object name) {
         TemplateClass tc = tmplIdx.get(name);
         if (null == tc) {
             // try to see if resourceLoader has some kind of name transform
-            ITemplateResource r = engine.resourceManager.getFileResource(name);
+            ITemplateResource r = engine.resourceManager.getFileResource(name.toString());
             if (null == r) return null;
             tc = tmplIdx.get(r.getKey());
         }
