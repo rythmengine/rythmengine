@@ -113,7 +113,7 @@ public class Rythm {
     }
 
     public static String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
-        return engine().toString(obj, option, style);
+        return engine().commonsToString(obj, option, style);
     }
 
     public static String renderStr(String template, Object... args) {
