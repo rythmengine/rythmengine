@@ -766,7 +766,11 @@ public class RythmEngine {
             tag.call();
         } finally {
             for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
-                l.tagInvoked(tag);
+                try {
+                    l.tagInvoked(tag);
+                } catch (RuntimeException e) {
+                    logger.error("Error call tagInvoked hook of %s", l.getClass());
+                }
             }
         }
     }

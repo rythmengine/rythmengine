@@ -5,6 +5,7 @@
     <property name="src_performance" location="Performance"/>
     <property name="src_issue_22" location="Issue22"/>
     <property name="src_issue_57" location="Issue57"/>
+    <property name="src_issue_71" location="Issue71"/>
     <property name="src_issue_60" location="Issue60"/>
     <property name="src_java_tag" location="JavaTag"/>
     <property name="classes" location="classes"/>
@@ -15,7 +16,7 @@
         <pathelement location="${lib}/pat-1.5.3.jar"/>
         <pathelement location="${lib}/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
         <pathelement location="${lib}/commons-lang3-3.1.jar"/>
-        <pathelement location="${lib}/rythm-1.0.0-20120703.jar"/>
+        <pathelement location="${lib}/rythm-1.0.0-20120719.jar"/>
     </path>
 
     <target name="init">
@@ -71,6 +72,18 @@
     </target>
     <target name="issue_57" depends="compile_issue_57">
         <java classname="Issue57" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="compile_issue_71" depends="init">
+        <javac srcdir="${src_issue_71}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+    </target>
+    <target name="issue_71" depends="compile_issue_71">
+        <java classname="Issue71" logError="true" fork="false">
             <classpath location="classes"/>
             <classpath refid="project.class.path"/>
         </java>
