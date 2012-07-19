@@ -144,7 +144,6 @@ public class CodeBuilder extends TextBuilder {
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
         this.simpleTemplate = templateClass.simpleTemplate;
-        if (logger.isDebugEnabled()) logger.debug("codebuilder prepared for :%s", cName);
     }
 
     /**

@@ -28,7 +28,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -38,7 +41,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -48,7 +54,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -58,7 +67,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -68,7 +80,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -78,7 +93,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -88,7 +106,10 @@ public class Each {
         body.ensureCapacity(size);
         for (int i = 0; i < size; ++i) {
             boolean isOdd = i % 2 == 1;
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", i == 1, i == items.length)) break;
+            boolean isFirst = (i == 1);
+            boolean isLast = (i == items.length);
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
     }
 
@@ -102,13 +123,37 @@ public class Each {
             i++;
             Object o = it.next();
             boolean isOdd = i % 2 == 1;
-            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", i == start + 1, !it.hasNext())) break;
+            boolean isFirst = (i == (start + 1));
+            boolean isLast = !it.hasNext();
+            String sep = isLast ? "" : ","; // default loop item separator
+            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
         }
         //p(body.toString());
     }
 
     public static interface IBody<E>  {
-        boolean render(final E e, final int size, final int index, final boolean isOdd, final String parity, final boolean isFirst, final boolean isLast);
+        public static class LoopUtils {
+            private final int id;
+            private final boolean isFirst;
+            private final boolean isLast;
+            private final int size;
+            public LoopUtils(int id, int size, boolean isFirst, boolean isLast) {
+                this.id = id;
+                this.isFirst = isFirst;
+                this.isLast = isLast;
+                this.size = size;
+            }
+            public String sep(String sep) {
+                return postSep(sep);
+            }
+            public String preSep(String sep) {
+                return isFirst ? "" : sep;
+            }
+            public String postSep(String sep) {
+                return isLast ? "" : sep;
+            }
+        }
+        boolean render(final E e, final int size, final int index, final boolean isOdd, final String parity, final boolean isFirst, final boolean isLast, final String sep, final LoopUtils utils);
         void ensureCapacity(int loopCnt);
     }
 

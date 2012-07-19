@@ -59,7 +59,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         pt("public boolean render(final ");
         p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ");
         p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ");
-        p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast) { ");
+        p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast, final String ").p(prefix).p("_sep, final com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(prefix).p("_utils) { ");
         pline();
     }
 

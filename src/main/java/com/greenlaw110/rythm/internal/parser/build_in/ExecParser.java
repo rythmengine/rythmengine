@@ -44,20 +44,7 @@ public class ExecParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @exec statement. Correct usage: @exec(\"my-macro\")");
                 }
                 final String macro = S.stripBraceAndQuotation(s);
-                return new CodeToken(s, ctx()) {
-                    int line = curLine;
-                    @Override
-                    public void output() {
-                        CodeBuilder cb = ctx().getCodeBuilder();
-                        if (!cb.hasMacro(macro)) {
-                            throw new ParseException(ctx().getTemplateClass(), line, "Cannot find macro definition for \"%s\"", macro);
-                        }
-                        List<TextBuilder> list = cb.getMacro(macro);
-                        for (TextBuilder tb: list) {
-                            tb.build();
-                        }
-                    }
-                };
+                return new ExecMacroToken(macro, ctx(), curLine);
             }
         };
     }

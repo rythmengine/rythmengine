@@ -66,7 +66,6 @@ public class DialectManager {
             }
         }
         d = get();
-        if (logger.isDebugEnabled()) logger.debug(">>>> begin Parse::dialect is: %s", d.getClass());
         List<IParserFactory> l = externalParsers.get(d);
         if (null != l) {
             for (IParserFactory pf: l) {
