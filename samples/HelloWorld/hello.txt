@@ -1,2 +1,3 @@
 @args String who
-Hello @who!
+
+<h2>Hello @who!</h2>

@@ -19,6 +19,7 @@ public enum Keyword implements IKeyword {
      * Cache the block for a certain period
      */
     CACHE,
+    CASE,
     /**
      * Force compact mode in regard of engine.compactMode()
      */
@@ -128,6 +129,7 @@ public enum Keyword implements IKeyword {
      * Identify current template is a simple template
      */
     SIMPLE("__simple__"),
+    SWITCH,
     /**
      * Call self as a tag
      */
