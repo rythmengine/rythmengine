@@ -134,8 +134,14 @@ public interface ITag extends ITemplate {
             ITemplate.Escape escape = _context.__ctx.currentEscape();
             return (Body)pe(o, escape);
         }
+
         protected abstract void setBodyArgByName(String name, Object val);
         protected abstract void setBodyArgByPos(int pos, Object val);
+        public String render(Object ... vals) {
+            StringBuilder sb = new StringBuilder();
+            render(sb, vals);
+            return sb.toString();
+        }
         public void render(StringBuilder out, Object ... vals) {
             for (int i = vals.length - 1; i > -1; --i) {
                 setBodyArgByPos(i, vals[i]);

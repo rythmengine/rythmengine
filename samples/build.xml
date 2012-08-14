@@ -14,9 +14,9 @@
 
     <path id="project.class.path">
         <pathelement location="${lib}/pat-1.5.3.jar"/>
-        <pathelement location="${lib}/org.eclipse.jdt.core-3.8.0.v_C03.jar"/>
+        <pathelement location="${lib}/ecj-3.7.2.jar"/>
         <pathelement location="${lib}/commons-lang3-3.1.jar"/>
-        <pathelement location="${lib}/rythm-1.0.0-20120719.jar"/>
+        <pathelement location="${lib}/rythm-1.0.0-20120814a.jar"/>
     </path>
 
     <target name="init">

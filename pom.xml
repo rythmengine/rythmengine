@@ -9,7 +9,7 @@
     <groupId>com.rythmengine</groupId>
     <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-20120814</version>
+    <version>1.0.0-20120814a</version>
 
     <name>Rythm Template Engine</name>
     <description>Rythm Template Engine</description>
@@ -49,9 +49,9 @@
     <dependencies>
         <!-- TODO - maybe change to ecj (and deploy it) -->
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.org.eclipse.jdt</groupId>
-            <artifactId>org.eclipse.jdt.core</artifactId>
-            <version>3.8.0.v_C03</version>
+            <groupId>org.eclipse.jdt.core.compiler</groupId>
+            <artifactId>ecj</artifactId>
+            <version>3.7.2</version>
         </dependency>
 
         <dependency>
@@ -118,6 +118,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2</version>
                         <executions>
                             <execution>
                                 <id>make-assembly</id>
