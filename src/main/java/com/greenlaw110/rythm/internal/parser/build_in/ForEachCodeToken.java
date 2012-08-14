@@ -50,7 +50,7 @@ public class ForEachCodeToken extends BlockCodeToken {
     @Override
     public void output() {
         String prefix = "_".equals(varname) ? "" : varname;
-        String curClassName = ctx.getCodeBuilder().forLoopTypeName();
+        String curClassName = ctx.getCodeBuilder().includingClassName();
         int bodySize = closePos - openPos;
         p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(iterable);
         p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(");

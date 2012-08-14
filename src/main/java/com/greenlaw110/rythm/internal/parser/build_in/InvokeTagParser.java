@@ -243,11 +243,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 ptline("if (null == _r_s) {");
                 p2tline("StringBuilder sbOld = getOut();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
-                p2tline("setOut(sbNew);");
+                p2tline("setSelfOut(sbNew);");
                 p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 pline();
                 p2tline("_r_s = sbNew.toString();");
-                p2tline("setOut(sbOld);");
+                p2tline("setSelfOut(sbOld);");
                 if (escape != null) {
                     p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
                 }
@@ -323,7 +323,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                     pline();
                 }
             }
-            String curClassName = ctx.getCodeBuilder().className();
+            String curClassName = ctx.getCodeBuilder().includingClassName();
             if (needsNewOut()) {
                 pline("Object _r_s = null;");
                 if (enableCache) {
@@ -334,7 +334,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 ptline("if (null == _r_s) {");
                 p2tline("StringBuilder sbOld = getOut();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
-                p2tline("setOut(sbNew);");
+                p2tline("setSelfOut(sbNew);");
             }
             p2t("_invokeTag(").p(tagName).p(", _pl,  new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
             pline();
@@ -406,7 +406,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             p2t("}, ").p(ignoreNonExistsTag).p(");");
             pline();
             p2tline("_r_s = sbNew.toString();");
-            p2tline("setOut(sbOld);");
+            p2tline("setSelfOut(sbOld);");
             if (escape != null) {
                 p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
             }

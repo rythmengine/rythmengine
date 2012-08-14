@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120808";
+    public static final String version = "1.0.0-20120814";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -661,6 +661,7 @@ public class RythmEngine {
      * @return
      */
     public boolean registerTag(String name, ITag tag) {
+        if (null == tag) throw new NullPointerException();
         if (tags.containsKey(name)) {
             return false;
         }

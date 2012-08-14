@@ -9,7 +9,6 @@ import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
-import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
@@ -211,7 +210,7 @@ public class CodeBuilder extends TextBuilder {
         return cName;
     }
 
-    public String forLoopTypeName() {
+    public String includingClassName() {
         return null == includingCName ? cName : includingCName;
     }
 
@@ -306,7 +305,7 @@ public class CodeBuilder extends TextBuilder {
             throw new ParseException(templateClass, lineNo, "cannot include Java tag: %s", include);
         }
         TemplateClass includeTc = includeTag.getTemplateClass(false);
-        includeTc.buildSourceCode(forLoopTypeName());
+        includeTc.buildSourceCode(includingClassName());
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);
         return includeTc.codeBuilder.buildBody;
