@@ -44,7 +44,7 @@ public class ScriptParser extends ParserBase {
         String[] lines = s.split("[\\n\\r]+");
         int len = lines.length;
         StringBuilder sb = new StringBuilder(s.length() * 2);
-        String lastLine = null;
+        String lastLine = "";
         for (int i = 0; i < len; ++i) {
             String line = lines[i];
             if (!S.isEmpty(line)) lastLine = line;

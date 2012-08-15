@@ -8,6 +8,7 @@ import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.spi.IBlockHandler;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -244,7 +245,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 p2tline("StringBuilder sbOld = getOut();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
-                p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                if (ctx.peekInsideBody()) {
+                    p2t("_invokeTag(").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                } else {
+                    p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                }
                 pline();
                 p2tline("_r_s = sbNew.toString();");
                 p2tline("setSelfOut(sbOld);");
@@ -267,7 +272,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                     ptline("p(_r_s);");
                 }
             } else {
-                p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                if (ctx.peekInsideBody()) {
+                    p2t("_invokeTag(").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                } else {
+                    p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                }
                 pline();
             }
             pline("}");
@@ -305,6 +314,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public void openBlock() {
+            ctx.getCodeBuilder().addBuilder(new Token("", ctx){
+                @Override
+                protected void output() {
+                    ctx.pushInsideBody(true);
+                    super.output();
+                }
+            });
         }
 
         @Override
@@ -391,8 +407,19 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public String closeBlock() {
+            ctx.getCodeBuilder().addBuilder(new Token("", ctx){
+                @Override
+                protected void output() {
+                    ctx.popInsideBody();
+                    super.output();
+                }
+            });
             if (!needsNewOut()) {
-                return "\n\t\t}\n\t});\n}";
+                if (ctx.peekInsideBody()) {
+                    return "\n\t\t}\n\t}, self);\n}";
+                } else {
+                    return "\n\t\t}\n\t});\n}";
+                }
             }
             if (enableCache) {
                 endIndex = ctx.cursor();
@@ -424,6 +451,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             p2tline("}");
             String s = sbNew.toString();
             setOut(sbOld);
+
             return s;
         }
     }

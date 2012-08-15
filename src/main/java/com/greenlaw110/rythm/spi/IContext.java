@@ -5,6 +5,8 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
+import java.util.Stack;
+
 public interface IContext {
 
     /**
@@ -113,9 +115,14 @@ public interface IContext {
     Continue peekContinue();
     Continue popContinue();
 
+    boolean compactMode();
     void pushCompact(Boolean compact);
     Boolean peekCompact();
     Boolean popCompact();
 
-    boolean compactMode();
+    public boolean insideBody();
+    public Boolean peekInsideBody();
+    public void pushInsideBody(Boolean b);
+    public Boolean popInsideBody();
+
 }

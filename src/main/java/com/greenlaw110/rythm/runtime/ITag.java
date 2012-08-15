@@ -107,6 +107,7 @@ public interface ITag extends ITemplate {
     public abstract static class Body extends TemplateBuilder {
         protected ILogger logger = Logger.get(ITag.class);
         protected TemplateBase _context;
+        protected Body self = this;
         public Body(TemplateBase context) {
             _context = context;
         }
@@ -122,8 +123,11 @@ public interface ITag extends ITemplate {
         }
         private void call(StringBuilder out) {
             _out = out;
-            _call();
-            _out = null;
+            try {
+                _call();
+            } finally {
+                _out = null;
+            }
         }
 
         public final Body pe(Object o) {

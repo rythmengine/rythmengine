@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120814a";
+    public static final String version = "1.0.0-20120815c";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -670,13 +670,13 @@ public class RythmEngine {
         return true;
     }
 
-    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body) {
-        invokeTag(name, caller, params, body, false);
+    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
+        invokeTag(name, caller, params, body, context, false);
     }
 
     public Set<String> nonExistsTags = new HashSet<String>();
 
-    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, boolean ignoreNonExistsTag) {
+    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
         if (nonExistsTags.contains(name)) return;
         // try tag registry first
         ITag tag = tags.get(name);
@@ -764,6 +764,9 @@ public class RythmEngine {
             l.onInvoke(tag);
         }
         try {
+            if (null != context) {
+                ((TagBase)tag).setBodyContext(context);
+            }
             tag.call();
         } finally {
             for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {

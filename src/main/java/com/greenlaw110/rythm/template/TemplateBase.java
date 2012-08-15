@@ -39,27 +39,35 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected void _invokeTag(String name) {
-        _engine().invokeTag(name, this, null, null);
+        _engine().invokeTag(name, this, null, null, null);
     }
 
     protected void _invokeTag(String name, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, null, null, ignoreNonExistsTag);
+        _engine().invokeTag(name, this, null, null, null, ignoreNonExistsTag);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params) {
-        _engine().invokeTag(name, this, params, null);
+        _engine().invokeTag(name, this, params, null, null);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, params, null, ignoreNonExistsTag);
+        _engine().invokeTag(name, this, params, null, null, ignoreNonExistsTag);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body) {
-        _engine().invokeTag(name, this, params, body);
+        _engine().invokeTag(name, this, params, body, null);
     }
 
-    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, params, body, ignoreNonExistsTag);
+    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, boolean ignoreNoExistsTag) {
+        _engine().invokeTag(name, this, params, body, null, ignoreNoExistsTag);
+    }
+
+    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
+        _engine().invokeTag(name, this, params, body, context);
+    }
+
+    protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
+        _engine().invokeTag(name, this, params, body, context, ignoreNonExistsTag);
     }
 
     /* to be used by dynamic generated sub classes */

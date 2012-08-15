@@ -5,6 +5,8 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.Map;
 
@@ -19,6 +21,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
     protected ILogger logger = Logger.get(TagBase.class);
 
     protected Body _body;
+
+    protected Body _context;
 
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
@@ -41,12 +45,21 @@ public abstract class TagBase extends TemplateBase implements ITag {
         super.setRenderArg(name, arg);
     }
 
+    public TextBuilder setBodyContext(Body body) {
+        this._context = body;
+        return this;
+    }
+
     @Override
     public void call() {
-        if (null != _caller && null != _out)
-            _caller.p(render()); // a real tag
-        else
+        if (null != _context) {
+            _out = new StringBuilder();
+            _context.p(S.raw(render()));
+        } else if (null != _caller && null != _out) {
+            _caller.p(S.raw(render())); // a real tag
+        } else {
             render(); // an normal template
+        }
     }
 
     protected void _pTagBody(ParameterList parameterList, StringBuilder out) {
