@@ -125,4 +125,9 @@ public interface IContext {
     public void pushInsideBody(Boolean b);
     public Boolean popInsideBody();
 
+    public boolean insideBody2();
+    public Boolean peekInsideBody2();
+    public void pushInsideBody2(Boolean b);
+    public Boolean popInsideBody2();
+
 }

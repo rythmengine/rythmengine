@@ -23,9 +23,7 @@ import java.util.regex.Pattern;
 /**
  * Parse tag invocation:
  *
- * @myApp.myTag(...)
- *
- * Note since this is also a pattern for expression parser, InvokeTagParser must
+ * @myApp.myTag(...) Note since this is also a pattern for expression parser, InvokeTagParser must
  * be put in front of expression parser
  */
 public class InvokeTagParser extends CaretParserFactoryBase {
@@ -33,6 +31,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     public static class ParameterDeclaration {
         public String nameDef;
         public String valDef;
+
         ParameterDeclaration(String name, String val) {
             if (null != name) {
                 if (name.startsWith("\"") || name.startsWith("'")) name = name.substring(1);
@@ -42,17 +41,20 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             valDef = val;
             //System.out.println(String.format("%s : %s", name, val));
         }
+
         @Override
         public String toString() {
-            return String.format("%s:%s", nameDef,  valDef);
+            return String.format("%s:%s", nameDef, valDef);
         }
     }
 
     public static class ParameterDeclarationList {
         public List<ParameterDeclaration> pl = new ArrayList<ParameterDeclaration>();
+
         void addParameterDeclaration(String nameDef, String valDef) {
             pl.add(new ParameterDeclaration(nameDef, valDef));
         }
+
         @Override
         public String toString() {
             return pl.toString();
@@ -198,6 +200,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
 
         private String cacheKey = null;
+
         protected String cacheKey() {
             if (null == cacheKey) {
                 if (!isDynamic) {
@@ -293,6 +296,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         private int startIndex = 0;
         private int endIndex = 0;
         private String key = null;
+
         InvokeTagWithBodyToken(String tagName, String paramLine, String extLine, IContext context) {
             super(tagName, paramLine, extLine, context, true);
             context.openBlock(this);
@@ -300,6 +304,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
 
         private String cacheKey = null;
+
         @Override
         protected String cacheKey() {
             if (null == cacheKey) {
@@ -314,7 +319,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public void openBlock() {
-            ctx.getCodeBuilder().addBuilder(new Token("", ctx){
+            ctx.pushInsideBody2(true);
+            CodeBuilder cb = ctx.getCodeBuilder();
+            cb.addBuilder(new Token("", ctx) {
                 @Override
                 protected void output() {
                     ctx.pushInsideBody(true);
@@ -377,7 +384,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
 
         private void buildBodyArgList(List<CodeBuilder.RenderArgDeclaration> al) {
-            for (CodeBuilder.RenderArgDeclaration arg: al) {
+            for (CodeBuilder.RenderArgDeclaration arg : al) {
                 p3t("protected ").p(arg.type).p(" ").p(arg.name);
                 if (null != arg.defVal) {
                     p("=").p(arg.defVal).p(";");
@@ -389,7 +396,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         }
 
         private void buildSetBodyArgByName(List<CodeBuilder.RenderArgDeclaration> al) {
-            for (CodeBuilder.RenderArgDeclaration arg: al) {
+            for (CodeBuilder.RenderArgDeclaration arg : al) {
                 p4t("if (\"").p(arg.name).p("\".equals(name)) this.").p(arg.name).p("=(").p(arg.type).p(")val;");
                 pline();
             }
@@ -397,7 +404,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         private void buildSetBodyArgByPos(List<CodeBuilder.RenderArgDeclaration> al) {
             p4tline("int p = 0;");
-            for (CodeBuilder.RenderArgDeclaration arg: al) {
+            for (CodeBuilder.RenderArgDeclaration arg : al) {
                 p4t("if (p++ == pos) { Object v = val; boolean isString = (\"java.lang.String\".equals(\"")
                         .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                         .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
@@ -407,6 +414,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
         @Override
         public String closeBlock() {
+            ctx.popInsideBody2();
             ctx.getCodeBuilder().addBuilder(new Token("", ctx){
                 @Override
                 protected void output() {
@@ -415,7 +423,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 }
             });
             if (!needsNewOut()) {
-                if (ctx.peekInsideBody()) {
+                if (ctx.peekInsideBody2()) {
                     return "\n\t\t}\n\t}, self);\n}";
                 } else {
                     return "\n\t\t}\n\t});\n}";
@@ -430,7 +438,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             StringBuilder sbNew = new StringBuilder();
             setOut(sbNew);
             p3tline("}");
-            p2t("}, ").p(ignoreNonExistsTag).p(");");
+            if (ctx.peekInsideBody2()) {
+                p2t("}, self, ").p(ignoreNonExistsTag).p(");");
+            } else {
+                p2t("}, ").p(ignoreNonExistsTag).p(");");
+            }
             pline();
             p2tline("_r_s = sbNew.toString();");
             p2tline("setSelfOut(sbOld);");
@@ -521,8 +533,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             p(r, 7);
             //InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
             //System.out.println(t.params);
-        }
-        else System.out.println("not found");
+        } else System.out.println("not found");
 
 //        String s = " << asdfuisf@";
 //        Matcher m = P_HEREDOC_SIMBOL.matcher(s);

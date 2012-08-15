@@ -243,6 +243,31 @@ public class TemplateParser implements IContext {
         return inBodyStack.pop();
     }
 
+    @Override
+    public boolean insideBody2() {
+        if (!inBodyStack2.empty()) return inBodyStack2.peek();
+        return getEngine().compactMode();
+    }
+
+    private Stack<Boolean> inBodyStack2 = new Stack<Boolean>();
+
+    @Override
+    public void pushInsideBody2(Boolean b) {
+        inBodyStack2.push(b);
+    }
+
+    @Override
+    public Boolean peekInsideBody2() {
+        if (inBodyStack2.empty()) return false;
+        return inBodyStack2.peek();
+    }
+
+    @Override
+    public Boolean popInsideBody2() {
+        if (inBodyStack2.empty()) return null;
+        return inBodyStack2.pop();
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;
