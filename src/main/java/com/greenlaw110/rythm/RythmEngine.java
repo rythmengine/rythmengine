@@ -14,10 +14,7 @@ import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.spi.ExtensionManager;
-import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
-import com.greenlaw110.rythm.spi.ITemplateExecutionExceptionHandler;
-import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
@@ -45,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120815d";
+    public static final String version = "1.0.0-20120817";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
