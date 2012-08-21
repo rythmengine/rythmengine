@@ -285,7 +285,6 @@ public class TemplateCompiler {
                             tc = TemplateClass.createInnerClass(cn, clazzFile.getBytes(), root);
                             tc.delayedEnhance(root);
                             classCache.add(tc);
-                            engine().classCache.cacheTemplateClass(tc);
                         } else {
                             throw new RuntimeException("Cannot find class by name: " + cn);
                         }

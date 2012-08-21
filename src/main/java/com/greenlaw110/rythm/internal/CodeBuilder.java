@@ -14,10 +14,10 @@ import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
-import com.greenlaw110.rythm.utils.S;
-import com.greenlaw110.rythm.utils.TextBuilder;
+import com.greenlaw110.rythm.utils.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -219,6 +219,11 @@ public class CodeBuilder extends TextBuilder {
 
     public static void registerImports(String imports) {
         globalImports.addAll(Arrays.asList(imports.split(",")));
+    }
+
+    private static IImportProvider importProvider = null;
+    public static void registerImportProvider(IImportProvider provider) {
+        importProvider = provider;
     }
 
     public void addImport(String imprt) {
@@ -449,6 +454,14 @@ public class CodeBuilder extends TextBuilder {
             }
             pBuild();
             pClassClose();
+            try {
+                File d = new File("d:/rythm");
+                if (!d.exists()) d.mkdir();
+                File f = new File(d, templateClass.name0() + ".java");
+                IO.writeContent(toString(), f);
+            } catch (Exception e) {
+                logger.error(e, "");
+            }
             return this;
         } catch (NotRythmTemplateException e) {
             isNotRythmTemplate = true;
@@ -482,11 +495,17 @@ public class CodeBuilder extends TextBuilder {
     // print imports
     protected void pImports() {
         for (String s: imports) {
-            p("import ").p(s).pn(';');
+            if (!S.isEmpty(s)) p("import ").p(s).pn(';');
         }
         for (String s: globalImports) {
-            p("import ").p(s).pn(';');
+            if (!S.isEmpty(s)) p("import ").p(s).pn(';');
         }
+        if (null != importProvider) {
+            for (String s: importProvider.imports()) {
+                if (!S.isEmpty(s)) p("import ").p(s).pn(';');
+            }
+        }
+
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         if (null != p) {
             for (String s: p.getImplicitImportStatements()) {

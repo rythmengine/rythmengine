@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120817";
+    public static final String version = "1.0.0-20120821";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -300,6 +300,8 @@ public class RythmEngine {
         if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
             loadTags();
         }
+
+        logger.info("Rythm started in %s mode", mode);
     }
 
     public void restart(RuntimeException cause) {
@@ -581,6 +583,10 @@ public class RythmEngine {
 
     public static void registerGlobalImports(String imports) {
         CodeBuilder.registerImports(imports);
+    }
+
+    public static void registerGlobalImportProvider(IImportProvider provider) {
+        CodeBuilder.registerImportProvider(provider);
     }
 
     // -- tag relevant codes

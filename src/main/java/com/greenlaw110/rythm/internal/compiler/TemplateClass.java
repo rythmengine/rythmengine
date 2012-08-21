@@ -549,7 +549,7 @@ public class TemplateClass {
      * let's just use the java byte code as the enhanced bytecode
      */
     public void delayedEnhance(TemplateClass root) {
-        enhancedByteCode = javaByteCode;
+        //enhancedByteCode = javaByteCode;
         root.embeddedClasses.add(this);
     }
     public byte[] enhance() {
@@ -571,8 +571,9 @@ public class TemplateClass {
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
                 }
+                enhancedByteCode = bytes;
+                engine().classCache.cacheTemplateClass(this);
             }
-            enhancedByteCode = bytes;
             for (TemplateClass embedded: embeddedClasses) {
                 embedded.enhance();
             }
@@ -602,20 +603,24 @@ public class TemplateClass {
         enhancedByteCode = code;
     }
 
-    public void compiled(byte[] code, boolean noCache) {
-        javaByteCode = code;
-        //enhancedByteCode = code;
-        compiled = true;
-        enhance();
-        if (!noCache) engine().classCache.cacheTemplateClass(this);
-}
+//    public void compiled(byte[] code, boolean noCache) {
+//        javaByteCode = code;
+//        //enhancedByteCode = code;
+//        compiled = true;
+//        enhance();
+//        if (!noCache) engine().classCache.cacheTemplateClass(this);
+//    }
 
     /**
      * Call back when a class is compiled.
      * @param code The bytecode.
      */
     public void compiled(byte[] code) {
-        compiled(code, false);
+        javaByteCode = code;
+        //enhancedByteCode = code;
+        compiled = true;
+        enhance();
+        //compiled(code, false);
     }
 
     @Override
