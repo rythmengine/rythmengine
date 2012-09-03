@@ -33,6 +33,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return S.INSTANCE;
     }
 
+    protected RythmEngine r() {
+        return engine;
+    }
+
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
     protected RythmEngine _engine() {
@@ -40,35 +44,35 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected void _invokeTag(String name) {
-        _engine().invokeTag(name, this, null, null, null);
+        engine.invokeTag(name, this, null, null, null);
     }
 
     protected void _invokeTag(String name, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, null, null, null, ignoreNonExistsTag);
+        engine.invokeTag(name, this, null, null, null, ignoreNonExistsTag);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params) {
-        _engine().invokeTag(name, this, params, null, null);
+        engine.invokeTag(name, this, params, null, null);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, params, null, null, ignoreNonExistsTag);
+        engine.invokeTag(name, this, params, null, null, ignoreNonExistsTag);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body) {
-        _engine().invokeTag(name, this, params, body, null);
+        engine.invokeTag(name, this, params, body, null);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, boolean ignoreNoExistsTag) {
-        _engine().invokeTag(name, this, params, body, null, ignoreNoExistsTag);
+        engine.invokeTag(name, this, params, body, null, ignoreNoExistsTag);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
-        _engine().invokeTag(name, this, params, body, context);
+        engine.invokeTag(name, this, params, body, context);
     }
 
     protected void _invokeTag(String name, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
-        _engine().invokeTag(name, this, params, body, context, ignoreNonExistsTag);
+        engine.invokeTag(name, this, params, body, context, ignoreNonExistsTag);
     }
 
     /* to be used by dynamic generated sub classes */
@@ -416,6 +420,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
         // --- debugging interface
     protected static ILogger _logger = Logger.get(TemplateBase.class);
+    protected static void _log(String msg, Object... args) {
+        _logger.info(msg, args);
+    }
     protected static void _debug(String msg, Object... args) {
         _logger.debug(msg, args);
     }

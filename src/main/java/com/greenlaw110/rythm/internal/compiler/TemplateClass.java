@@ -438,7 +438,7 @@ public class TemplateClass {
                 }
             }
 
-            if (extendedTemplateChanged && engine().reloadByRestart()) {
+            if (extendedTemplateChanged && engine().reloadByRestart() && !forceRefresh) {
                 reset();
                 compiled = false;
                 engine().restart(new ClassReloadException("extended class changed"));
@@ -447,7 +447,9 @@ public class TemplateClass {
                 return true; // pass refresh state to sub template
             }
             // templateResource.refresh() must be put at first so we make sure resource get refreshed
-            boolean refresh = templateResource.refresh() || forceRefresh || (null == javaSource) || includedTemplateChanged || extendedTemplateChanged;
+
+            boolean resourceChanged = templateResource.refresh();
+            boolean refresh = resourceChanged || forceRefresh || (null == javaSource) || includedTemplateChanged || extendedTemplateChanged;
             if (!refresh) return false;
 
             // now start generate source and compile source to byte code
@@ -549,7 +551,7 @@ public class TemplateClass {
      * let's just use the java byte code as the enhanced bytecode
      */
     public void delayedEnhance(TemplateClass root) {
-        //enhancedByteCode = javaByteCode;
+        enhancedByteCode = javaByteCode;
         root.embeddedClasses.add(this);
     }
     public byte[] enhance() {
@@ -575,6 +577,7 @@ public class TemplateClass {
                 engine().classCache.cacheTemplateClass(this);
             }
             for (TemplateClass embedded: embeddedClasses) {
+                embedded.enhancedByteCode = null;
                 embedded.enhance();
             }
             return bytes;
