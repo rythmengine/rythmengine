@@ -511,9 +511,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     }
 
     private static void testParseParams() {
-        String line = "ls";
-        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?('.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
-        p(line, r);
+        String line = "value: (me()._getProperty(\"fn\"))";
+        ParameterDeclarationList params = new ParameterDeclarationList();
+        InvokeTagToken.parseParams(line, params);
+        System.out.println(params);
     }
 
     private static void testParseExtension() {
@@ -544,6 +545,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
     public static void main(String[] args) {
         //testOuterMatch();
-        testParseExtension();
+        //testParseExtension();
+        testParseParams();
     }
 }

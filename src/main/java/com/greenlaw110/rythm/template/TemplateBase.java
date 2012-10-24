@@ -136,9 +136,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         p(layoutSections.get(name));
     }
 
+    protected RawData _getSection(String name) {
+        return S.raw(layoutSections.get(name));
+    }
+
+    protected RawData _getSection() {
+        return S.raw(S.isEmpty(layoutContent) ? layoutSections.get("__CONTENT__") : layoutContent);
+    }
+
     protected void _pLayoutContent() {
-        String content = S.isEmpty(layoutContent) ? layoutSections.get("__CONTENT__") : layoutContent;
-        p(content);
+        p(_getSection());
     }
 
     private void addAllLayoutSections(Map<String, String> sections) {
