@@ -291,10 +291,14 @@ public class CodeBuilder extends TextBuilder {
 
     private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
 
-    public boolean isInlineTag(String tagName) {
+    public boolean needsPrint(String tagName) {
         for (InlineTag tag : inlineTags) {
-            if (S.isEqual(tagName, tag.tagName)) return true;
+            if (S.isEqual(tagName, tag.tagName)) {
+                return !"void".equals(tag.retType);
+            }
         }
+        // check the parent template
+
         return false;
     }
 
@@ -577,11 +581,11 @@ public class CodeBuilder extends TextBuilder {
             pn();
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
-                p2tn("int p = 0, l = args.length;");
+                p2tn("int _p = 0, l = args.length;");
                 int i = userDefinedArgNumber;
                 for (String argName : renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
-                    p2t("if (p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (_p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
@@ -602,10 +606,10 @@ public class CodeBuilder extends TextBuilder {
         // -- output setRenderArg by position
         pn();
         ptn("@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
-        p2tn("int p = 0;");
+        p2tn("int _p = 0;");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
+            p2t("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
                     .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                     .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
         }
