@@ -146,12 +146,12 @@ public class Token extends TextBuilder {
         }
     }
     protected final void outputExpression() {
-        outputExpression(false);
+        outputExpression(true);
     }
-    protected final void outputExpression(boolean noPrint) {
+    protected final void outputExpression(boolean needsPrint) {
         if (S.isEmpty(s)) return;
         if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
-            if (!noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             return;
         }
@@ -236,7 +236,7 @@ public class Token extends TextBuilder {
             }
         }
         if (!processed) {
-            if (!noPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             pline();
         }

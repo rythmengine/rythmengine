@@ -41,10 +41,10 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         if (null != home) {
             f = new File(home, path);
         }
-        if (null == f || !f.canRead()) {
-            // try tag home
-            if (null != tagHome) f = new File(tagHome, path);
-        }
+//        if (null == f || !f.canRead()) {
+//            // try tag home
+//            if (null != tagHome) f = new File(tagHome, path);
+//        }
         if (null == f || !f.canRead()) {
             f = new File(path);
         }
@@ -180,7 +180,9 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                         try {
                             ITag tag = (ITag)tc.asTemplate();
                             if (null != tag) {
-                                engine.registerTag(tagName, tag);
+                                String fullName = getFullTagName(tc, engine);
+                                tc.setFullName(fullName);
+                                engine.registerTag(fullName, tag);
                                 return tc;
                             }
                         } catch (Exception e) {

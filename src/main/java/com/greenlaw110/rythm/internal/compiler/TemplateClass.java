@@ -14,13 +14,11 @@ import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,6 +81,7 @@ public class TemplateClass {
     private Set<TemplateClass> includedTemplateClasses = new HashSet<TemplateClass>();
     public void addIncludeTemplateClass(TemplateClass tc) {
         includedTemplateClasses.add(tc);
+        includeTagTypes.putAll(tc.includeTagTypes);
     }
     public String includeTemplateClassNames = null;
     private static final String NO_INCLUDE_CLASS = "NO_INCLUDE_CLASS";
@@ -104,11 +103,55 @@ public class TemplateClass {
         includeTemplateClassNames = sb.toString();
         return sb.toString();
     }
+    private Map<String, String> includeTagTypes = new HashMap<String, String>();
+    public void setTagType(String tagName, String type) {
+        includeTagTypes.put(tagName, type);
+    }
+    public String getTagType(String tagName) {
+        return includeTagTypes.get(tagName);
+    }
+    public boolean returnObject(String tagName) {
+        String retType = includeTagTypes.get(tagName);
+        if (null != retType) {
+            return !"void".equals(retType);
+        }
+        if (null != extendedTemplateClass) return extendedTemplateClass.returnObject(tagName);
+        return true;
+    }
+    public String serializeIncludeTagTypes() {
+        if (includeTagTypes.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        boolean empty = true;
+        for (String tagName: includeTagTypes.keySet()) {
+            if (!empty) sb.append(";");
+            else empty = false;
+            sb.append(tagName).append(":").append(includeTagTypes.get(tagName));
+        }
+        return sb.toString();
+    }
+    public void deserializeIncludeTagTypes(String s) {
+        includeTagTypes = new HashMap<String, String>();
+        if (S.isEmpty(s)) return;
+        String[] sa = s.split(";");
+        for (String s0: sa) {
+            String[] sa0 = s0.split(":");
+            if (sa0.length != 2) throw new IllegalArgumentException("Unknown include tag types string: " + s);
+            includeTagTypes.put(sa0[0], sa0[1]);
+        }
+    }
     /**
      * If not null then this template is a tag
      */
     public String tagName() {
         return null != templateResource ? templateResource.tagName() : null;
+    }
+    transient private String fullName;
+    public void setFullName(String fn) {
+        fullName = fn;
+    }
+    public String getFullName() {
+        if (null == fullName) return tagName();
+        return fullName;
     }
     /**
      * the template resource
@@ -518,7 +561,12 @@ public class TemplateClass {
             if (null == tc) tc = this;
             CompileException ce = new CompileException(tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
             if (engine().isProdMode()) {
-                logger.error("error compiling java source:\n%s", javaSource);
+                TextBuilder tb = new TextBuilder();
+                String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+                for (int line = 0;line < lines.length; ++line) {
+                    tb.p(line+1).p(":").p(lines[line]).p("\n");
+                }
+                logger.error("error compiling java source:\n%s", tb.toString());
             }
             javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
             throw ce;

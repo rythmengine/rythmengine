@@ -82,8 +82,11 @@ public class TemplateClassCache {
             }
             if (source.length() != 0) {
                 String s = source.toString();
-                String[] sa = s.split("__INCULDED_TEMPLATE_CLASS_NAME_LIST__");
+                String[] sa = s.split("__INCLUDED_TAG_TYPES__");
                 tc.javaSource = sa[0];
+                s = sa[1];
+                sa = s.split("__INCULDED_TEMPLATE_CLASS_NAME_LIST__");
+                tc.deserializeIncludeTagTypes(sa[0]);
                 s = sa[1];
                 sa = s.split("__IMPORT_PATH_LIST__");
                 tc.includeTemplateClassNames = sa[0];
@@ -143,7 +146,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClassSource(TemplateClass tc) {
-        if (!engine.classCacheEnabled()) {
+        if (!engine.classCacheEnabled() || engine.noFileWrite) {
             return;
         }
         try {
@@ -171,7 +174,9 @@ public class TemplateClassCache {
             os.write(0);
             if (null != tc.javaSource) {
                 TextBuilder tb = new TextBuilder();
-                tb.p(tc.javaSource).p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
+                tb.p(tc.javaSource);
+                tb.p("__INCLUDED_TAG_TYPES__").p(tc.serializeIncludeTagTypes());
+                tb.p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
                     .p("__IMPORT_PATH_LIST__");
                 if (tc.importPaths == null) {
                     tc.importPaths = new HashSet<String>(0);
@@ -275,7 +280,8 @@ public class TemplateClassCache {
         if (engine.loadPreCompiled() || (engine.preCompiling && (null != engine.preCompiledHome() && engine.preCompiledHome().exists()))) {
             return new File(engine.preCompiledHome(), fileName);
         } else {
-            return new File(engine.tmpDir, fileName);
+            File f = new File(engine.tmpDir, fileName);
+            return f;
         }
     }
 

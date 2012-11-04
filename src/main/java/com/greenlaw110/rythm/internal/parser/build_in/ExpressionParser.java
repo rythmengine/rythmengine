@@ -49,13 +49,15 @@ public class ExpressionParser extends CaretParserFactoryBase {
 
         @Override
         public void output() {
-            boolean isInlineTag = false;
+            boolean needsPrint = true;
             int pos = s.indexOf("(");
             if (pos != -1) {
                 String tagName = s.substring(0, pos).trim();
-                isInlineTag = ctx.getCodeBuilder().isInlineTag(tagName);
+                if (!S.isEmpty(tagName)) {
+                    needsPrint = ctx.getCodeBuilder().needsPrint(tagName);
+                }
             }
-            outputExpression(isInlineTag);
+            outputExpression(needsPrint);
         }
     }
 

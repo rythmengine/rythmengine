@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -18,12 +19,12 @@ public class DefTagParser extends KeywordParserFactory {
         String tagName;
         String signature;
         String retType;
-        public DefTagToken(String tagName, String retType, String signature, IContext context) {
+        public DefTagToken(String tagName, String retType, String signature, String body, IContext context) {
             super("", context);
             this.retType = retType;
             this.tagName = tagName;
             this.signature = signature;
-            ctx.getCodeBuilder().defTag(tagName, retType, signature);
+            ctx.getCodeBuilder().defTag(tagName, retType, signature, body);
         }
 
         @Override
@@ -53,7 +54,31 @@ public class DefTagParser extends KeywordParserFactory {
                 String retType = r.stringMatched(3);
                 String tagName = r.stringMatched(6);
                 String signature = r.stringMatched(7);
-                return new DefTagToken(tagName, retType, signature, ctx());
+                if (null != retType && !"void".equals(retType)) {
+                    r = new Regex("^(\\s*((?@{})))");
+                    if (!r.search("{" + ctx().getRemain())) {
+                        this.raiseParseException("code blocked expected after @def tag");
+                    }
+                    String s = r.stringMatched(1);
+                    int curLine = ctx().currentLine();
+                    ctx().step(s.length() - 1);
+                    while(ctx().peek() != '}') ctx().step(-1);
+                    s = r.stringMatched(2);
+                    s = s.substring(1); // strip left "{"
+                    s = s.substring(0, s.length() - 1); // strip right "}"
+                    String[] lines = s.split("[\\n\\r]+");
+                    int len = lines.length;
+                    StringBuilder sb = new StringBuilder(s.length() * 2);
+                    String lastLine = "";
+                    for (int i = 0; i < len; ++i) {
+                        String line = lines[i];
+                        if (!S.isEmpty(line)) lastLine = line;
+                        sb.append(line).append(" //line: ").append(curLine++).append("\n");
+                    }
+                    if (!lastLine.trim().endsWith(";")) sb.append(";");
+                    return new DefTagToken(tagName, retType, signature, sb.toString(), ctx());
+                }
+                return new DefTagToken(tagName, retType, signature, null, ctx());
             }
         };
     }

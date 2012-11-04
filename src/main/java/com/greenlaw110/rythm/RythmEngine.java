@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20120821";
+    public static final String version = "1.0.0-20121103";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -629,10 +629,7 @@ public class RythmEngine {
                 if (mode.isProd()) non_tags.add(name);
                 return null;
             }
-            String fullName = resourceManager.getFullTagName(tagTC);
-            if (!S.isEqual(fullName, name)) {
-                tags.put(fullName, tags.get(name));
-            }
+            String fullName = tagTC.getFullName();
             return fullName;
         } catch (TagLoadException e) {
             throw e;

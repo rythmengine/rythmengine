@@ -140,6 +140,7 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(templateClass, lineNo, "Simple template does not allow to extend layout template");
         }
+        //if (true) throw new RuntimeException(this.template());
         simpleTemplate = true;
     }
 
@@ -255,16 +256,18 @@ public class CodeBuilder extends TextBuilder {
         String tagName;
         String signature;
         String retType = "void";
+        String body;
         List<TextBuilder> builders = new ArrayList<TextBuilder>();
 
-        InlineTag(String name, String ret, String sig) {
+        InlineTag(String name, String ret, String sig, String body) {
             tagName = name;
             signature = sig;
             retType = null == ret ? "void" : ret;
+            this.body = body;
         }
 
         InlineTag clone(CodeBuilder newCaller) {
-            InlineTag tag = new InlineTag(tagName, retType, signature);
+            InlineTag tag = new InlineTag(tagName, retType, signature, body);
             tag.builders.clear();
             for (TextBuilder tb : builders) {
                 TextBuilder newTb = tb.clone(newCaller);
@@ -292,27 +295,21 @@ public class CodeBuilder extends TextBuilder {
     private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
 
     public boolean needsPrint(String tagName) {
-        for (InlineTag tag : inlineTags) {
-            if (S.isEqual(tagName, tag.tagName)) {
-                return !"void".equals(tag.retType);
-            }
-        }
-        // check the parent template
-
-        return false;
+        return templateClass.returnObject(tagName);
     }
 
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
 
-    public void defTag(String tagName, String retType, String signature) {
+    public void defTag(String tagName, String retType, String signature, String body) {
         tagName = tagName.trim();
-        InlineTag tag = new InlineTag(tagName, retType, signature);
+        InlineTag tag = new InlineTag(tagName, retType, signature, body);
         if (inlineTags.contains(tag)) {
             throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
         inlineTags.add(tag);
         inlineTagBodies.push(builders);
         builders = tag.builders;
+        templateClass.setTagType(tagName, tag.retType);
     }
 
     public void endTag() {
@@ -366,6 +363,7 @@ public class CodeBuilder extends TextBuilder {
             TemplateClass tc = tb.getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;
+            this.templateClass.extendedTemplateClass = tc;
             this.engine.addExtendRelationship(tc, this.templateClass);
             this.extendArgs = args;
         }
@@ -405,6 +403,7 @@ public class CodeBuilder extends TextBuilder {
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
+        this.templateClass.extendedTemplateClass = tc;
         this.engine.addExtendRelationship(tc, this.templateClass);
         this.extendArgs = args;
     }
@@ -585,7 +584,7 @@ public class CodeBuilder extends TextBuilder {
                 int i = userDefinedArgNumber;
                 for (String argName : renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
-                    p2t("if (_p < l) { Object v = args[p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
@@ -668,8 +667,13 @@ public class CodeBuilder extends TextBuilder {
         pn();
         for (InlineTag tag : inlineTags) {
             p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\n");
-            for (TextBuilder b : tag.builders) {
-                b.build();
+            boolean isVoid = "void".equals(tag.retType);StringBuilder sb = out();
+            if (!isVoid) {
+                p(tag.body);
+            } else {
+                for (TextBuilder b : tag.builders) {
+                    b.build();
+                }
             }
             p("\n}");
         }

@@ -24,6 +24,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     protected Body _context;
 
+    private String fullName;
+
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
