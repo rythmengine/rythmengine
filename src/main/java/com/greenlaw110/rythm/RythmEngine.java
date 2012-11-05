@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20121103";
+    public static final String version = "1.0.0-20121106";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -708,8 +708,8 @@ public class RythmEngine {
 
             // try load the tag from resource
             if (null == tag) {
-                resourceManager.tryLoadTag(name, tc);
-                tag = tags.get(name);
+                TemplateClass tagC = resourceManager.tryLoadTag(name, tc);
+                tag = tags.get(tagC.getFullName());
                 if (null == tag) {
                     if (ignoreNonExistsTag) {
                         if (logger.isDebugEnabled()) {

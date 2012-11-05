@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -19,12 +20,13 @@ public class DefTagParser extends KeywordParserFactory {
         String tagName;
         String signature;
         String retType;
+        CodeBuilder.InlineTag tag;
         public DefTagToken(String tagName, String retType, String signature, String body, IContext context) {
             super("", context);
             this.retType = retType;
             this.tagName = tagName;
             this.signature = signature;
-            ctx.getCodeBuilder().defTag(tagName, retType, signature, body);
+            tag = ctx.getCodeBuilder().defTag(tagName, retType, signature, body);
         }
 
         @Override
@@ -33,7 +35,7 @@ public class DefTagParser extends KeywordParserFactory {
 
         @Override
         public String closeBlock() {
-            ctx.getCodeBuilder().endTag();
+            ctx.getCodeBuilder().endTag(tag);
             return "";
         }
     }

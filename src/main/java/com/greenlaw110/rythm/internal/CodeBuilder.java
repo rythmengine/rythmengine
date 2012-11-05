@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -252,11 +253,12 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private static class InlineTag {
+    public static class InlineTag {
         String tagName;
         String signature;
         String retType = "void";
         String body;
+        boolean autoRet = false;
         List<TextBuilder> builders = new ArrayList<TextBuilder>();
 
         InlineTag(String name, String ret, String sig, String body) {
@@ -300,7 +302,7 @@ public class CodeBuilder extends TextBuilder {
 
     private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
 
-    public void defTag(String tagName, String retType, String signature, String body) {
+    public InlineTag defTag(String tagName, String retType, String signature, String body) {
         tagName = tagName.trim();
         InlineTag tag = new InlineTag(tagName, retType, signature, body);
         if (inlineTags.contains(tag)) {
@@ -309,12 +311,22 @@ public class CodeBuilder extends TextBuilder {
         inlineTags.add(tag);
         inlineTagBodies.push(builders);
         builders = tag.builders;
+        if ("void".equals(tag.retType)) {
+            tag.retType = "com.greenlaw110.rythm.template.ITemplate.RawData";
+            tag.autoRet = true;
+            String code = "StringBuilder __sb = this.getSelfOut();this.setSelfOut(new StringBuilder());";
+            builders.add(new CodeToken(code, parser));
+        }
         templateClass.setTagType(tagName, tag.retType);
+        return tag;
     }
 
-    public void endTag() {
+    public void endTag(InlineTag tag) {
         if (inlineTagBodies.empty())
             throw new ParseException(templateClass, parser.currentLine(), "Unexpected tag definition close");
+        if (tag.autoRet) {
+            builders.add(new CodeToken("String __s = toString();this.setSelfOut(__sb);return s().raw(__s);", parser));
+        }
         builders = inlineTagBodies.pop();
     }
 
@@ -667,7 +679,8 @@ public class CodeBuilder extends TextBuilder {
         pn();
         for (InlineTag tag : inlineTags) {
             p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\n");
-            boolean isVoid = "void".equals(tag.retType);StringBuilder sb = out();
+            boolean isVoid = tag.autoRet;
+            StringBuilder sb = out();
             if (!isVoid) {
                 p(tag.body);
             } else {
