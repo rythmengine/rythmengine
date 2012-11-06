@@ -242,6 +242,7 @@ public class RythmEngine {
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
+        logger.debug(">>>>no file write is: %s", noFileWrite);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         logger.debug(">>>>temp dir is: %s", tmpDir);
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default

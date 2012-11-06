@@ -160,7 +160,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClass(TemplateClass tc) {
-        if (!engine.classCacheEnabled()) {
+        if (!engine.classCacheEnabled() || engine.noFileWrite) {
             return;
         }
         String hash = hash(tc);
