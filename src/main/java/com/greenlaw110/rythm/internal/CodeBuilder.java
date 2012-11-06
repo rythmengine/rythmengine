@@ -275,6 +275,7 @@ public class CodeBuilder extends TextBuilder {
                 TextBuilder newTb = tb.clone(newCaller);
                 tag.builders.add(newTb);
             }
+            tag.autoRet = autoRet;
             return tag;
         }
 
