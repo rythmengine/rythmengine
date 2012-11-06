@@ -65,12 +65,16 @@ public class TemplateClassCache {
                 hash.append((char) read);
                 offset++;
             }
-            String curHash = hash(tc);
-            if (!curHash.equals(hash.toString())) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Bytecode too old (%s != %s)", hash, curHash);
-                }
-                return;
+            
+            //check hash only in non precompiled mode
+            if(!engine.loadPreCompiled()){
+	            String curHash = hash(tc);
+	            if (!curHash.equals(hash.toString())) {
+	                if (logger.isTraceEnabled()) {
+	                    logger.trace("Bytecode too old (%s != %s)", hash, curHash);
+	                }
+	                return;
+	            }
             }
 
             // --- load java source
