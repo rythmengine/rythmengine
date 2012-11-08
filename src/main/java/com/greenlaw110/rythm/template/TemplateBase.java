@@ -96,6 +96,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
     }
 
+    protected RawData _render(String template, Object... args) {
+        return S.raw(engine.render(template, args));
+    }
+
+    protected RawData _render(String template) {
+        return S.raw(engine.render(template, _properties));
+    }
+
     protected final void setLayoutContent(String body) {
         layoutContent = body;
     }
