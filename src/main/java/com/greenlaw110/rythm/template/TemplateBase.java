@@ -230,7 +230,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
             String s = internalRender();
             if (_logTime()) {
-                _logger.debug("<<<<<<<<<<<< [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
+                _logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
             }
             return s;
         } catch (ClassReloadException e) {
@@ -258,7 +258,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         } else {
             try {
                 try {
+                    long l = 0l;
+                    if (_logTime()) {
+                        l = System.currentTimeMillis();
+                    }
                     build();
+                    if (_logTime()) {
+                        _logger.debug("<<<<<<<<<<<< [%s] build: %sms", getClass().getName(), System.currentTimeMillis() - l);
+                    }
                 } catch (RythmException e) {
                     throw e;
                 } catch (Exception e) {

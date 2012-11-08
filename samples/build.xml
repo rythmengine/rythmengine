@@ -8,6 +8,7 @@
     <property name="src_issue_71" location="Issue71"/>
     <property name="src_issue_60" location="Issue60"/>
     <property name="src_issue_88" location="Issue88"/>
+    <property name="src_issue_88a" location="Issue88a"/>
     <property name="src_java_tag" location="JavaTag"/>
     <property name="classes" location="classes"/>
     <property name="lib" location="../lib"/>
@@ -110,6 +111,20 @@
     </target>
     <target name="issue_88" depends="compile_issue_88">
         <java classname="Issue88" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
+    <target name="compile_issue_88a" depends="init">
+        <javac srcdir="${src_issue_88a}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+        <copy file="${src_issue_88a}/template.html" todir="${classes}"/>
+        <copy file="${src_issue_88a}/test.html" todir="${classes}"/>
+    </target>
+    <target name="issue_88a" depends="compile_issue_88a">
+        <java classname="Main" logError="true" fork="false">
             <classpath location="classes"/>
             <classpath refid="project.class.path"/>
         </java>
