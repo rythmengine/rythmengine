@@ -709,7 +709,7 @@ public class RythmEngine {
             // try load the tag from resource
             if (null == tag) {
                 TemplateClass tagC = resourceManager.tryLoadTag(name, tc);
-                tag = tags.get(tagC.getFullName());
+                if (null != tagC) tag = tags.get(tagC.getFullName());
                 if (null == tag) {
                     if (ignoreNonExistsTag) {
                         if (logger.isDebugEnabled()) {
