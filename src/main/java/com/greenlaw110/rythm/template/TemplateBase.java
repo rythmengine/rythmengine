@@ -97,10 +97,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected RawData _render(String template, Object... args) {
+        if (null == template) return new RawData("");
         return S.raw(engine.render(template, args));
     }
 
     protected RawData _render(String template) {
+        if (null == template) return new RawData("");
         return S.raw(engine.render(template, _properties));
     }
 
@@ -188,10 +190,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.__ctx.init(tmpl);
         //if (null != out) tmpl._out = out;
         if (null != _out) tmpl._out = new StringBuilder();
-        _properties = new HashMap<String, Object>(_properties.size());
-        layoutContent = "";
-        layoutSections = new HashMap<String, String>();
-        renderProperties = new HashMap<String, Object>();
+        tmpl._properties = new HashMap<String, Object>(_properties.size());
+        tmpl.layoutContent = "";
+        tmpl.layoutSections = new HashMap<String, String>();
+        tmpl.renderProperties = new HashMap<String, Object>();
+        tmpl.section = null;
+        tmpl.tmpCaller = null;
+        tmpl.tmpOut = null;
+        tmpl._logTime = _logTime;
         return tmpl;
     }
 

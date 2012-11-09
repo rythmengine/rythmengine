@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20121106";
+    public static final String version = "1.0.0-20121110";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -451,7 +451,6 @@ public class RythmEngine {
     }
 
     private String renderTemplate(ITemplate t) {
-        if (null == t) return "This is not rythm template";
         // inject implicity render args
         return t.render();
     }
