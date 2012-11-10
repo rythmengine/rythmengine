@@ -64,7 +64,7 @@ public class RythmException extends FastRuntimeException {
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
     private void resolveTemplateLineNumber() {
         if (javaLineNumber != -1 && templateLineNumber == -1) {
-            String[] lines = getJavaSource().split("\\n");
+            String[] lines = getJavaSource().split("(\\r\\n|\\n\\r|\\n|\\r)");
             if (javaLineNumber < lines.length) {
                 String errorLine = lines[javaLineNumber - 1];
                 Matcher m = P.matcher(errorLine);
