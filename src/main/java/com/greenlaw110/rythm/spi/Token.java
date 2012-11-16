@@ -91,7 +91,7 @@ public class Token extends TextBuilder {
     }
     static {
         String[] sa = {
-            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
+            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeJson", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
         };
         for (String s: sa) {
             addExtension(new IJavaExtension.VoidParameterExtension("S", s));
