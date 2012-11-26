@@ -42,7 +42,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                         s = s.substring(0, pos);
                     }
                     assertSimple(s, context);
-                    context.getCodeBuilder().addRenderArgs(pos == -1 ? "Object" : "Object[]", s);
+                    context.getCodeBuilder().addRenderArgs(context.currentLine(), pos == -1 ? "Object" : "Object[]", s);
                 }
             }
         }

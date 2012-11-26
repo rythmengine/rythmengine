@@ -48,7 +48,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                     return null;
                 }
                 if (!s1.endsWith("{")) s1 = s1 + "{";
-                if (!s1.startsWith("{")) s1 = "}" + s1;
+                if (!s1.startsWith("}")) s1 = "}" + s1;
                 try {
                     ctx.closeBlock();
                 } catch (ParseException e) {

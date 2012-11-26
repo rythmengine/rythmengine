@@ -33,7 +33,7 @@ public class AutoToString extends ToString {
     @Override
     public void begin(IContext ctx) {
         CodeBuilder cb = ctx.getCodeBuilder();
-        cb.addRenderArgs(type.getName(), "_");
+        cb.addRenderArgs(ctx.currentLine(), type.getName(), "_");
         cb.setSimpleTemplate(0);
         cb.setExtended(ToStringTemplateBase.class);
     }

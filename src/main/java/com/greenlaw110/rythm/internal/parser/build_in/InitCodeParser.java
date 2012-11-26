@@ -20,11 +20,11 @@ public class InitCodeParser extends KeywordParserFactory {
 
     public InitCodeParser() {
     }
-    
+
     protected String patternStr() {
         return R;
     }
-    
+
     public IParser create(final IContext c) {
         return new ParserBase(c) {
             public TextBuilder go() {
@@ -42,7 +42,8 @@ public class InitCodeParser extends KeywordParserFactory {
                         }
                     };
                 }
-                throw new ParseException(c.getTemplateClass(), c.currentLine(), "Invalid @init syntax found. Correct usage: @init{/*your code come here*/}");
+                raiseParseException("Invalid @init syntax found. Correct usage: @init{/*your code come here*/}");
+                return null;
             }
         };
     }

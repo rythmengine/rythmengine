@@ -1,9 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
@@ -14,8 +15,6 @@ import com.stevesoft.pat.Regex;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ArgsParser extends KeywordParserFactory {
 
@@ -38,7 +37,7 @@ public class ArgsParser extends KeywordParserFactory {
                     String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
                     String defVal = r.stringMatched(6);
-                    ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
+                    ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                 }
                 return new Directive("", ctx()) {
                     @Override
@@ -79,7 +78,7 @@ public class ArgsParser extends KeywordParserFactory {
                     String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
                     String defVal = r.stringMatched(6);
-                    ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
+                    ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                 }
                 step(step);
                 // strip off the following ";" symbol and line breaks
@@ -104,7 +103,7 @@ public class ArgsParser extends KeywordParserFactory {
         };
     }
 
-    public static List<CodeBuilder.RenderArgDeclaration> parseArgDeclaration(String s) {
+    public static List<CodeBuilder.RenderArgDeclaration> parseArgDeclaration(int lineNo, String s) {
         final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
         Regex r = new ArgsParser().reg((DialectBase)com.greenlaw110.rythm.Rythm.getDialectManager().get());
         while (r.search(s)) {
@@ -115,12 +114,12 @@ public class ArgsParser extends KeywordParserFactory {
             String name = r.stringMatched(4);
             String type = r.stringMatched(2);
             String defVal = r.stringMatched(5);
-            ral.add(new CodeBuilder.RenderArgDeclaration(name, type, defVal));
+            ral.add(new CodeBuilder.RenderArgDeclaration(lineNo, name, type, defVal));
         }
         return ral;
     }
 
-    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]+[fLld]?|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
 
     public static final String PATTERN2 = "";
 
@@ -144,19 +143,8 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public static void test1() {
-        String s = ",String,foo,=,\"bar\",int,bar,=,5;,";
-        ArgsParser ap = new ArgsParser();
-        Regex r = ap.reg(new Rythm());
-        //System.out.println(r);
-        while (r.search(s)) {
-            String m = r.stringMatched();
-            if (m.contains("\n") || m.contains("\r")) {
-                break;
-            } else {
-                System.out.println("m: " + (int)m.toCharArray()[0]);
-            }
-            p(r, 10);
-        }
+        String s = "@args int x = 99, long y = 100\n@x=@y;\n@{String s = null;\nif (s.length() > 0{\n}\n} \n@{_setOutput(\"c:/t/1.txt\")} \n";
+        System.out.println(Rythm.render(s));
     }
 
 }

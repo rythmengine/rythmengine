@@ -17,7 +17,7 @@ public class Rythm extends DialectBase {
         // BraceParser must be put in front of ElseIfParser
         return new Class<?>[]{AssignParser.class, ArgsParser.class, BreakParser.class, ContinueParser.class,
                 CacheParser.class, CommentParser.class, CompactParser.class, DebugParser.class, DefTagParser.class,
-                EscapeParser.class, ElseIfParser.class, ExecParser.class, ExpandParser.class, ExitIfNoClassParser.class,
+                EscapeParser.class, ElseForParser.class, ElseIfParser.class, ExecParser.class, ExpandParser.class, ExitIfNoClassParser.class,
                 BraceParser.class, LogTimeParser.class, InvokeParser.class, InvokeMacroParser.class, InvokeTagParser.class,
                 MacroParser.class, NullableExpressionParser.class, ExpressionParser.class, ExtendsParser.class,
                 ForEachParser.class, GetParser.class, IfParser.class, ImportParser.class, IncludeParser.class,

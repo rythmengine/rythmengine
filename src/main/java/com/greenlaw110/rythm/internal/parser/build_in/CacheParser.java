@@ -125,7 +125,7 @@ public class CacheParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @cacheFor statement. Correct usage: @cacheFor (\"duration_string\") {cache block}");
+                    raiseParseException("Error parsing @cacheFor statement. Correct usage: @cacheFor (\"duration_string\") {cache block}");
                 }
                 String key = UUID.nameUUIDFromBytes(remain().getBytes()).toString();
                 ctx.step(r.stringMatched().length());

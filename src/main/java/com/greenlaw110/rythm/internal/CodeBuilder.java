@@ -31,15 +31,27 @@ public class CodeBuilder extends TextBuilder {
         public String name;
         public String type;
         public String defVal;
+        public int lineNo;
 
-        public RenderArgDeclaration(String name, String type) {
-            this(name, type, null);
+        public RenderArgDeclaration(int lineNo, String name, String type) {
+            this(lineNo, name, type, null);
         }
 
-        public RenderArgDeclaration(String name, String type, String defVal) {
+        public RenderArgDeclaration(int lineNo, String name, String type, String defVal) {
+            this.lineNo = lineNo;
             this.name = name;
             this.type = typeTransform(type);
+            defVal = defValTransform(type, defVal);
             this.defVal = null == defVal ? defVal(type) : defVal;
+        }
+
+        private static String defValTransform(String type, String defVal) {
+            if (S.isEmpty(defVal)) return null;
+            defVal = defVal.toLowerCase();
+            if ("long".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "L";
+            if ("float".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "f";
+            if ("double".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "d";
+            return defVal;
         }
 
         private static String typeTransform(String type) {
@@ -95,7 +107,7 @@ public class CodeBuilder extends TextBuilder {
 
     public void setInitCode(String code) {
         if (null != initCode)
-            throw new ParseException(templateClass, parser.currentLine(), "@init section already declared.");
+            throw new ParseException(engine, templateClass, parser.currentLine(), "@init section already declared.");
         initCode = code;
     }
 
@@ -139,7 +151,7 @@ public class CodeBuilder extends TextBuilder {
 
     public void setSimpleTemplate(int lineNo) {
         if (null != this.extended) {
-            throw new ParseException(templateClass, lineNo, "Simple template does not allow to extend layout template");
+            throw new ParseException(engine, templateClass, lineNo, "Simple template does not allow to extend layout template");
         }
         //if (true) throw new RuntimeException(this.template());
         simpleTemplate = true;
@@ -307,7 +319,7 @@ public class CodeBuilder extends TextBuilder {
         tagName = tagName.trim();
         InlineTag tag = new InlineTag(tagName, retType, signature, body);
         if (inlineTags.contains(tag)) {
-            throw new ParseException(templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
+            throw new ParseException(engine, templateClass, parser.currentLine(), "inline tag already defined: %s", tagName);
         }
         inlineTags.add(tag);
         inlineTagBodies.push(builders);
@@ -324,7 +336,7 @@ public class CodeBuilder extends TextBuilder {
 
     public void endTag(InlineTag tag) {
         if (inlineTagBodies.empty())
-            throw new ParseException(templateClass, parser.currentLine(), "Unexpected tag definition close");
+            throw new ParseException(engine, templateClass, parser.currentLine(), "Unexpected tag definition close");
         if (tag.autoRet) {
             builders.add(new CodeToken("String __s = toString();this.setSelfOut(__sb);return s().raw(__s);", parser));
         }
@@ -342,11 +354,11 @@ public class CodeBuilder extends TextBuilder {
     public String addInclude(String include, int lineNo) {
         String tagName = engine.testTag(include, templateClass);
         if (null == tagName) {
-            throw new ParseException(templateClass, lineNo, "include template not found: %s", include);
+            throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
         TemplateBase includeTag = (TemplateBase) engine.tags.get(tagName);
         if (includeTag instanceof JavaTagBase) {
-            throw new ParseException(templateClass, lineNo, "cannot include Java tag: %s", include);
+            throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
         }
         TemplateClass includeTc = includeTag.getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
@@ -361,10 +373,10 @@ public class CodeBuilder extends TextBuilder {
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
         if (simpleTemplate) {
-            throw new ParseException(templateClass, lineNo, "Simple template does not allow to extend layout template");
+            throw new ParseException(engine, templateClass, lineNo, "Simple template does not allow to extend layout template");
         }
         if (null != this.extended) {
-            throw new ParseException(templateClass, lineNo, "Extended template already declared");
+            throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
         String fullName = engine.testTag(extended, templateClass);
         if (null == fullName) {
@@ -412,7 +424,7 @@ public class CodeBuilder extends TextBuilder {
             }
         }
         if (null == tc) {
-            throw new ParseException(templateClass, lineNo, "Cannot find extended template by name \"%s\"", origin);
+            throw new ParseException(engine, templateClass, lineNo, "Cannot find extended template by name \"%s\"", origin);
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
@@ -431,8 +443,8 @@ public class CodeBuilder extends TextBuilder {
         renderArgs.put(declaration.name, declaration);
     }
 
-    public void addRenderArgs(String type, String name) {
-        renderArgs.put(name, new RenderArgDeclaration(name, type));
+    public void addRenderArgs(int lineNo, String type, String name) {
+        renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
     }
 
     private Map<String, List<TextBuilder>> macros = new HashMap<String, List<TextBuilder>>();
@@ -440,7 +452,7 @@ public class CodeBuilder extends TextBuilder {
 
     public void pushMacro(String macro) {
         if (macros.containsKey(macro)) {
-            throw new ParseException(templateClass, parser.currentLine(), "Macro already defined: %s", macro);
+            throw new ParseException(engine, templateClass, parser.currentLine(), "Macro already defined: %s", macro);
         }
         macroStack.push(macro);
         macros.put(macro, new ArrayList<TextBuilder>());
@@ -448,7 +460,7 @@ public class CodeBuilder extends TextBuilder {
 
     public void popMacro() {
         if (macroStack.empty()) {
-            throw new ParseException(templateClass, parser.currentLine(), "no macro found in stack");
+            throw new ParseException(engine, templateClass, parser.currentLine(), "no macro found in stack");
         }
         macroStack.pop();
     }
@@ -522,7 +534,7 @@ public class CodeBuilder extends TextBuilder {
         for (String name : defArgs.keySet()) {
             Object o = defArgs.get(name);
             String type = (o instanceof Class<?>) ? ((Class<?>) o).getName() : o.toString();
-            addRenderArgs(type, name);
+            addRenderArgs(-1, type, name);
         }
     }
 
@@ -574,7 +586,8 @@ public class CodeBuilder extends TextBuilder {
             } else {
                 p(";");
             }
-            pn();
+            if (arg.lineNo > -1) p(" //line: ").pn(arg.lineNo);
+            else pn();
         }
 
         // -- output setRenderArgs method
@@ -642,7 +655,7 @@ public class CodeBuilder extends TextBuilder {
                 p2t("__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).pn(");");
             }
             if (extendDeclareLineNo != -1) {
-                pn(" //line: ").p(extendDeclareLineNo);
+                p(" //line: ").pn(extendDeclareLineNo);
             }
         }
         ptn("}");

@@ -50,7 +50,7 @@ public class DefTagParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @def, correct usage: @def tagName([arguments...])");
+                    raiseParseException("Error parsing @def, correct usage: @def tagName([arguments...])");
                 }
                 step(r.stringMatched().length());
                 String retType = r.stringMatched(3);

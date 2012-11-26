@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.URL;
 
 public class IO {
-    
+
     /**
      * Read file content to a String (always use utf-8)
      * @param file The file to read
@@ -52,7 +52,7 @@ public class IO {
     public static String readContentAsString(InputStream is) {
         return readContentAsString(is, "utf-8");
     }
-    
+
     public static String readContentAsString(InputStream is, String encoding) {
         try {
             StringWriter result = new StringWriter();
@@ -75,7 +75,7 @@ public class IO {
             }
         }
     }
-    
+
     /**
      * Write String content to a file (always use utf-8)
      * @param content The content to write
@@ -108,7 +108,24 @@ public class IO {
             }
         }
     }
-    
+
+    public static void writeContent(CharSequence content, Writer writer) {
+        try {
+            PrintWriter printWriter = new PrintWriter(writer);
+            printWriter.println(content);
+            printWriter.flush();
+            writer.flush();
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if(writer != null) writer.close();
+            } catch(Exception e) {
+                //
+            }
+        }
+    }
+
     public static File tmpDir() {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
         if (!tmpDir.isDirectory() && !tmpDir.mkdir()) throw new RuntimeException("couldn't create temp dir " + tmpDir.getName());

@@ -338,7 +338,8 @@ public class TemplateClass {
     }
 
     public ITemplate asTemplate() {
-        if (null == name || engine().mode.isDev()) refresh();
+        RythmEngine e = engine();
+        if (null == name || e.mode.isDev()) refresh();
         return templateInstance_().cloneMe(engine(), null);
     }
 
@@ -559,15 +560,7 @@ public class TemplateClass {
             String cn = e.className;
             TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes.getByClassName(cn);
             if (null == tc) tc = this;
-            CompileException ce = new CompileException(tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
-            if (engine().isProdMode()) {
-                TextBuilder tb = new TextBuilder();
-                String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
-                for (int line = 0;line < lines.length; ++line) {
-                    tb.p(line+1).p(":").p(lines[line]).p("\n");
-                }
-                logger.error("error compiling java source:\n%s", tb.toString());
-            }
+            CompileException ce = new CompileException(engine(), tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
             javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
             throw ce;
         } catch (NullPointerException e) {

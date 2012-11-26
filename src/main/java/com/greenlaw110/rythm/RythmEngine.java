@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-20121110a";
+    public static final String version = "1.0.0-20121126";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -80,6 +80,11 @@ public class RythmEngine {
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
     public boolean playHost = false;
+    public boolean recordJavaSourceOnError = false;
+    public boolean recordTemplateSourceOnError = true;
+    public boolean recordJavaSourceOnRuntimeError = false;
+    public boolean recordTemplateSourceOnRuntimeError = true;
+    public boolean logSourceInfoOnRuntimeError = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
@@ -205,7 +210,6 @@ public class RythmEngine {
     private void loadDefConf() {
         setConf("rythm.mode", Rythm.Mode.prod);
         setConf("rythm.loader", "file");
-        setConf("rythm.logJavaSource", false);
     }
 
     public void init() {
@@ -239,6 +243,11 @@ public class RythmEngine {
         if (null != fact) Logger.registerLoggerFactory(fact);
 
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
+        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", false);
+        recordTemplateSourceOnError = configuration.getAsBoolean("rythm.recordTemplateSourceOnError", true);
+        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", false);
+        recordTemplateSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordTemplateSourceOnRuntimeError", true);
+        logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
@@ -308,7 +317,12 @@ public class RythmEngine {
     public void restart(RuntimeException cause) {
         if (isProdMode()) throw cause;
         if (!(cause instanceof ClassReloadException)) {
-            logger.warn(cause, "restarting rythm engine due to %s", cause.getMessage());
+            String msg = cause.getMessage();
+            if (cause instanceof RythmException) {
+                RythmException re = (RythmException)cause;
+                msg = re.getSimpleMessage();
+            }
+            logger.warn("restarting rythm engine due to %s", msg);
         }
         restart();
     }

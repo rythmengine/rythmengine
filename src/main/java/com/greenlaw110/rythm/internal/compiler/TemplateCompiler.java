@@ -243,6 +243,8 @@ public class TemplateCompiler {
             }
         };
 
+        final RythmEngine engine = engine();
+
         /**
          * Compilation result
          */

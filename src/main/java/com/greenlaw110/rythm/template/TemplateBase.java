@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.internal.compiler.ClassReloadException;
@@ -10,10 +11,13 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
+import java.io.*;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -264,10 +268,33 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
     }
 
-    protected void internalBuild() {
-        internalInit();
+    private Writer w_ = null;
+    protected void _setOutput(String path) {
+        try {
+            w_ = new BufferedWriter(new FileWriter(path));
+        } catch (Exception e) {
+            throw new FastRuntimeException(e.getMessage());
+        }
+    }
+    protected void _setOutput(File file) {
+        try {
+            w_ = new BufferedWriter(new FileWriter(file));
+        } catch (Exception e) {
+            throw new FastRuntimeException(e.getMessage());
+        }
+    }
+    protected void _setOutput(OutputStream os) {
+        w_ = new OutputStreamWriter(os);
+    }
+    protected void _setOutput(Writer w) {
+        w_ = w;
+    }
 
-        if (engine.isProdMode()) {
+    protected void internalBuild() {
+        w_ = null; // reset output destination
+        //if (!(engine.recordTemplateSourceOnError || engine.recordJavaSourceOnError)) {
+        if (false) {
+            internalInit();
             build();
         } else {
             try {
@@ -276,6 +303,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     if (_logTime()) {
                         l = System.currentTimeMillis();
                     }
+                    internalInit();
                     build();
                     if (_logTime()) {
                         _logger.debug("<<<<<<<<<<<< [%s] build: %sms", getClass().getName(), System.currentTimeMillis() - l);
@@ -299,14 +327,25 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                             if (null == msg) {
                                 msg = e.getMessage();
                                 if (S.isEmpty(msg)) {
-                                    msg = "caused by " + e.getClass().getName();
+                                    msg = "Rythm runtime exception caused by " + e.getClass().getName();
                                     //System.out.println("<<<<<" + msg);
                                 }
                             }
-                            RythmException re = new RythmException(e, tc, se.getLineNumber(), -1, msg);
-                            if (re.templateLineNumber != -1) {
+                            RythmException re = new RythmException(engine, e, tc, se.getLineNumber(), -1, msg);
+                            if (engine.logSourceInfoOnRuntimeError) {
+                                Logger.error("Error executing template: %2$s. \n%1$s\n%2$s", re.javaSourceInfo(), re.templateSourceInfo(), msg);
+                            }
+                            int lineNo = re.templateLineNumber;
+                            String key = tc.getKey().toString();
+                            int i = key.indexOf('\n');
+                            if (i == -1) i = key.indexOf('\r');
+                            if (i > -1) {
+                                key = key.substring(0, i - 1) + "...";
+                            }
+                            if (key.length() > 80) key = key.substring(0, 80) + "...";
+                            if (lineNo != -1) {
                                 StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                                newStack[0] = new StackTraceElement(tc.name(), "", tc.getKey().toString(), re.templateLineNumber);
+                                newStack[0] = new StackTraceElement(tc.name(), "", key, lineNo);
                                 System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
                                 re.setStackTrace(newStack);
                             }
@@ -323,6 +362,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     // ignore it because we already thrown it out
                 }
                 throw e;
+            }
+        }
+        if (null != w_) {
+            try {
+                IO.writeContent(toString(), w_);
+                w_ = null;
+            } catch (Exception e) {
+                Logger.error(e, "failed to write template content to output destination");
             }
         }
     }
@@ -471,4 +518,44 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
     protected boolean _logTime = false;
 
+    protected int _sizeOf(Collection c) {
+        return c.size();
+    }
+
+    protected int _sizeOf(Object[] oa) {
+        return oa.length;
+    }
+
+    protected int _sizeOf(int[] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(long[] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(float[] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(double[] a) {
+        return a.length;
+    }
+    protected int _sizeOf(boolean [] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(char[] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(short[] a) {
+        return a.length;
+    }
+
+    protected int _sizeOf(Iterable<?> itr) {
+        int i = 0;
+        for (Object o: itr) i++;
+        return i;
+    }
 }

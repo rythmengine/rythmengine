@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.exception;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 /**
@@ -26,9 +27,8 @@ public class CompileException extends RythmException {
         return e;
     }
 
-    public CompileException(TemplateClass tc, int javaLineNumber, String message) {
-        super(tc, javaLineNumber, -1, message);
-        errorMessage = String.format("Error compile template[%s]. Java code line: %s; Template code line:%s; Error: %s", tc.getKey(), javaLineNumber, templateLineNumber, originalMessage);
+    public CompileException(RythmEngine engine, TemplateClass tc, int javaLineNumber, String message) {
+        super(engine, tc, javaLineNumber, -1, message);
     }
 
 }

@@ -24,7 +24,7 @@ public class LogTimeParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @debug, correct usage: @debug(\"msg\", args...)");
+                    raiseParseException("error parsing @__logTime__, correct usage: @__logTime__()");
                 }
                 step(r.stringMatched().length());
                 return new Directive("", ctx()) {

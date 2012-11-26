@@ -31,14 +31,17 @@ public class GetParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @get call. Correct usage: @get(\"myVal\")");
+                    raiseParseException("Error parsing @get call. Correct usage: @get(\"myVal\")");
                 }
                 step(r.stringMatched().length()); // remain: @get("name")...
                 String s = r.stringMatched(2); // s: ("name")
                 s = s.substring(1); // s: "name")
                 s = s.substring(0, s.length() - 1); // s: "name"
                 r = new Regex("(((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)(\\s*[:=,]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?)");
-                if (!r.search(s)) throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @get tag. Correct usage: @get(\"name\"[:default-value])");
+
+                if (!r.search(s)) {
+                    raiseParseException("Error parsing @get tag. Correct usage: @get(\"name\"[:default-value])");
+                }
                 s = r.stringMatched(2); // propName: "name"
                 if (s.startsWith("\"") || s.startsWith("'")) {
                     s = s.substring(1);

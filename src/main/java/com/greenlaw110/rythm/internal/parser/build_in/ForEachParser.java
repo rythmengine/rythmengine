@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
@@ -24,7 +26,7 @@ public class ForEachParser extends KeywordParserFactory {
                 if (!r.search(remain)) {
                     r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                     if (!r.search(remain)) {
-                        throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
                     }
                     String s = r.stringMatched(2);
                     step(r.stringMatched().length());
@@ -53,7 +55,7 @@ public class ForEachParser extends KeywordParserFactory {
                     String varname = r.stringMatched(6);
                     String iterable = r.stringMatched(8);
                     if (S.isEmpty(iterable)) {
-                        throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
                     }
                     return new ForEachCodeToken(type, varname, iterable, ctx());
                 }
@@ -77,13 +79,11 @@ public class ForEachParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-
-        Regex r = new Regex(String.format(new ForEachParser().patternStr2(), "@", "for"));
-
-        String s = "@for(int i = 0; i < 100; ++i){\nHello world}";
-        if (r.search(s)) {
-            p(r, 8);
-        }
+        String s = "@args String[] sa\n@if(sa.length == 1){ good! } else if (sa.length > 1) { great! } else { empty !} ";
+        RythmEngine re = new RythmEngine();
+        re.recordJavaSourceOnRuntimeError = true;
+        re.recordTemplateSourceOnRuntimeError = true;
+        System.out.println(re.render(s, new String[]{}, "x"));
     }
 
 }

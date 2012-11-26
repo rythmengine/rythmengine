@@ -30,10 +30,11 @@ public class BreakParser extends KeywordParserFactory {
                 if (r.search(remain())) {
                     step(r.stringMatched().length());
                     IContext.Break b = ctx().peekBreak();
-                    if (null == b) throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Bad @break statement: No loop context");
+                    if (null == b) raiseParseException("Bad @break statement: No loop context");
                     return new CodeToken(b.getStatement(), ctx());
                 }
-                throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Bad @break statement found. Correct usage: @break()");
+                raiseParseException("Bad @break statement. Correct usage: @break()");
+                return null;
             }
         };
     }

@@ -18,7 +18,7 @@ public abstract class CaretParserFactoryBase implements ICaretParserFactory {
     }
 
     public static void raiseParseException(IContext ctx, String msg, Object... args) {
-        throw new ParseException(ctx.getTemplateClass(), ctx.currentLine(), msg, args);
+        throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), ctx.currentLine(), msg, args);
     }
 
     // -- for testing purpose

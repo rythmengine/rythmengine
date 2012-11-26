@@ -28,10 +28,11 @@ public class ContinueParser extends KeywordParserFactory {
                 if (r.search(remain())) {
                     step(r.stringMatched().length());
                     IContext.Continue c = ctx().peekContinue();
-                    if (null == c) throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Bad @continue statement: No loop context");
+                    if (null == c) raiseParseException("Bad @continue statement: No loop context");
                     return new CodeToken(c.getStatement(), ctx());
                 }
-                throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Bad @continue statement found. Correct usage: @break");
+                raiseParseException("Bad @continue statement. Correct usage: @continue()");
+                return null;
             }
         };
     }

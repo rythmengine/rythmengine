@@ -24,7 +24,7 @@ public class IfParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "Error parsing @if statement. Correct usage: @if (some-condition) {some-template-code}");
+                    raiseParseException("Error parsing @if statement. Correct usage: @if (some-condition) {some-template-code}");
                 }
                 String s = r.stringMatched(1);
                 ctx.step(s.length());

@@ -29,7 +29,7 @@ public class DebugParser  extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @debug, correct usage: @debug(\"msg\", args...)");
+                    raiseParseException("error parsing @debug, correct usage: @debug(\"msg\", args...)");
                 }
                 step(r.stringMatched().length());
                 String s = new TextBuilder().p("_logger.debug").p(r.stringMatched(1)).p(";").toString();

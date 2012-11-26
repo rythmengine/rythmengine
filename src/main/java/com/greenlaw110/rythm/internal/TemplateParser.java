@@ -137,7 +137,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public String closeBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException(cb.getTemplateClass(), currentLine(), "No open block found");
+        if (blocks.isEmpty()) throw new ParseException(getEngine(), cb.getTemplateClass(), currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return null == bh ? "" : bh.closeBlock();
     }

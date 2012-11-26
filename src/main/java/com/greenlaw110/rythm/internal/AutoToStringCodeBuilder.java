@@ -193,7 +193,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             addBuilder(new AppendFieldToken(fn, exp, this));
         }
         addBuilder(new AppendEndToken(this));
-        this.addRenderArgs(meta.clazz.getName(), "_");
+        this.addRenderArgs(-1, meta.clazz.getName(), "_");
     }
 
 }

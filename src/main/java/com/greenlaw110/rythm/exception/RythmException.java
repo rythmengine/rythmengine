@@ -1,6 +1,10 @@
 package com.greenlaw110.rythm.exception;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.utils.F;
+import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,62 +26,163 @@ public class RythmException extends FastRuntimeException {
     public String javaSource;
     public String templateSource;
     public String templateName;
+    private RythmEngine engine;
 
-    public RythmException(Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
+    public RythmException(RythmEngine engine, Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
+        boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
+        boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
+        boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
+        F.T2<String, Integer> t2 = parse(message, logJava, logTmpl, javaLineNumber, templateLineNumber, javaSource, templateSource, null);
+        this.engine = engine;
         this.templateName = templateName;
         this.javaSource = javaSource;
         this.templateSource = templateSource;
         this.javaLineNumber = javaLineNumber;
-        this.templateLineNumber = templateLineNumber;
+        this.templateLineNumber = t2._2;
         this.originalMessage = message;
-        this.errorMessage = message;
-        resolveTemplateLineNumber();
+        this.errorMessage = t2._1;
     }
 
-    public RythmException(String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
-        this(null, templateName, javaSource, templateSource, javaLineNumber, templateLineNumber, message);
+    public RythmException(RythmEngine engine, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
+        this(engine, null, templateName, javaSource, templateSource, javaLineNumber, templateLineNumber, message);
     }
 
-    public RythmException(String templateName, String javaSource, String templateSource, int javaLineNumber, String message) {
-        this(null, templateName, javaSource, templateSource, javaLineNumber, -1, message);
+    public RythmException(RythmEngine engine, String templateName, String javaSource, String templateSource, int javaLineNumber, String message) {
+        this(engine, null, templateName, javaSource, templateSource, javaLineNumber, -1, message);
     }
 
-    public RythmException(Throwable t, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
+    public RythmException(RythmEngine engine, Throwable t, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
+        boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
+        boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
+        boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
+        F.T2<String, Integer> t2 = parse(message, logJava, logTmpl, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
+        this.engine = engine;
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
-        this.templateLineNumber = templateLineNumber;
+        this.templateLineNumber = t2._2;
         this.originalMessage = message;
-        this.errorMessage = message;
-        resolveTemplateLineNumber();
+        this.errorMessage = t2._1;
     }
 
-    public RythmException(TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
-        this(null, tc, javaLineNumber, templateLineNumber, message);
+    public String javaSourceInfo() {
+        String javaSource = getJavaSource();
+        if (S.isEmpty(javaSource)) return "No java source available";
+        TextBuilder tb = new TextBuilder();
+        tb.p("Relevant Java source lines:\n-------------------------------------------------\n");
+        String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+        int start = 0, end = lines.length;
+        int javaLineNumber = this.javaLineNumber;
+        if (javaLineNumber > -1) {
+            start = Math.max(0, javaLineNumber - 6);
+            end = Math.min(end, javaLineNumber + 6);
+        }
+        for (int line = start; line < end; ++line) {
+            if ((line + 1) == javaLineNumber) tb.p(">> ");
+            else tb.p("   ");
+            tb.p(line + 1).p(": ").p(lines[line]).p("\n");
+        }
+        return tb.toString();
     }
 
-    public RythmException(TemplateClass tc, int javaLineNumber, String message) {
-        this(null, tc, javaLineNumber, -1, message);
+    public String templateSourceInfo() {
+        String tmplSource = getTemplateSource();
+        if (S.isEmpty(tmplSource)) return "No template source available";
+        TextBuilder tb = new TextBuilder();
+        tb.p("Relevant template source lines:\n-------------------------------------------------\n");
+        String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+        int start = 0, end = lines.length ;
+        if (templateLineNumber > -1) {
+            start = Math.max(0, templateLineNumber - 6);
+            end = Math.min(end, templateLineNumber + 6);
+        }
+        for (int line = start;line < end; ++line) {
+            if ((line + 1) == templateLineNumber) tb.p(">> ");
+            else tb.p("   ");
+            tb.p(line+1).p(": ").p(lines[line]).p("\n");
+        }
+        return tb.toString();
+    }
+
+    public RythmException(RythmEngine engine, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
+        this(engine, null, tc, javaLineNumber, templateLineNumber, message);
+    }
+
+    public RythmException(RythmEngine engine, TemplateClass tc, int javaLineNumber, String message) {
+        this(engine, null, tc, javaLineNumber, -1, message);
     }
 
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
-    private void resolveTemplateLineNumber() {
+    private static int resolveTemplateLineNumber(int javaLineNumber, int templateLineNumber, String javaSource, TemplateClass templateClass) {
         if (javaLineNumber != -1 && templateLineNumber == -1) {
-            String[] lines = getJavaSource().split("(\\r\\n|\\n\\r|\\n|\\r)");
+            String[] lines = getJavaSource(javaSource, templateClass).split("(\\r\\n|\\n\\r|\\n|\\r)");
             if (javaLineNumber < lines.length) {
                 String errorLine = lines[javaLineNumber - 1];
                 Matcher m = P.matcher(errorLine);
                 if (m.matches()) {
-                    templateLineNumber = Integer.parseInt(m.group(1));
+                    return  Integer.parseInt(m.group(1));
                 }
             }
         }
+        return templateLineNumber;
+    }
+
+    private static F.T2<String, Integer> parse(String message, boolean logJava, boolean logTmpl, int javaLineNumber, int templateLineNumber, String javaSource, String templateSource, TemplateClass templateClass) {
+        javaSource = getJavaSource(javaSource, templateClass);
+        String tmplSource = getTemplateSource(templateSource, templateClass);
+        templateLineNumber = resolveTemplateLineNumber(javaLineNumber, templateLineNumber, javaSource, templateClass);
+        if (!logJava && !logTmpl) {
+            return new F.T2(message, templateLineNumber);
+        }
+        TextBuilder tb = new TextBuilder();
+        tb.pn(message);
+        // log java source anyway if template line number is not resolved
+        if ((logJava || templateLineNumber < 0) && !S.isEmpty(javaSource)) {
+            tb.p("\nRelevant Java source lines:\n-------------------------------------------------\n");
+            String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+            int start = 0, end = lines.length;
+            if (javaLineNumber > -1) {
+                start = Math.max(0, javaLineNumber - 6);
+                end = Math.min(end, javaLineNumber + 6);
+            }
+            for (int line = start;line < end; ++line) {
+                if ((line + 1) == javaLineNumber) tb.p(">> ");
+                else tb.p("   ");
+                tb.p(line+1).p(": ").p(lines[line]).p("\n");
+            }
+        }
+
+        if (logTmpl && !S.isEmpty(tmplSource)) {
+            tb.p("\nRelevant template source lines:\n-------------------------------------------------\n");
+            String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+            int start = 0, end = lines.length ;
+            if (templateLineNumber > -1) {
+                start = Math.max(0, templateLineNumber - 6);
+                end = Math.min(end, templateLineNumber + 6);
+            }
+            for (int line = start;line < end; ++line) {
+                if ((line + 1) == templateLineNumber) tb.p(">> ");
+                else tb.p("   ");
+                tb.p(line+1).p(": ").p(lines[line]).p("\n");
+            }
+        }
+        return new F.T2(tb.toString(), templateLineNumber);
+    }
+
+    private static String getJavaSource(String javaSource, TemplateClass templateClass) {
+        if (null != javaSource) return javaSource;
+        return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
     }
 
     public String getJavaSource() {
         if (null != javaSource) return javaSource;
         return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
+    }
+
+    private static String getTemplateSource(String templateSource, TemplateClass templateClass) {
+        if (null != templateSource) return templateSource;
+        return templateClass.templateResource.asTemplateContent();
     }
 
     public String getTemplateSource() {
@@ -90,9 +195,16 @@ public class RythmException extends FastRuntimeException {
         return templateClass.getKey().toString();
     }
 
+    public void clearDetailErrorMessage() {
+        errorMessage = super.getMessage();
+    }
+
     @Override
     public String getMessage() {
         return errorMessage;
     }
 
+    public String getSimpleMessage() {
+        return super.getMessage();
+    }
 }

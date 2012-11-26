@@ -25,7 +25,7 @@ public class ExecMacroToken extends CodeToken {
     public void output() {
         CodeBuilder cb = ctx.getCodeBuilder();
         if (!cb.hasMacro(s)) {
-            throw new ParseException(ctx.getTemplateClass(), line, "Cannot find macro definition for \"%s\"", s);
+            throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Cannot find macro definition for \"%s\"", s);
         }
         List<TextBuilder> list = cb.getMacro(s);
         for (TextBuilder tb: list) {

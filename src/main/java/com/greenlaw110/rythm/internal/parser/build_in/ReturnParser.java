@@ -25,7 +25,7 @@ public class ReturnParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @return, correct usage: @return()");
+                    raiseParseException("error parsing @return, correct usage: @return()");
                 }
                 step(r.stringMatched().length());
                 return new CodeToken("if (true) {return this;}", ctx());

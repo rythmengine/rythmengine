@@ -24,7 +24,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    throw new ParseException(ctx().getTemplateClass(), ctx().currentLine(), "error parsing @debug, correct usage: @__exitIfNoClass__(My.Class.Name)");
+                    raiseParseException("error parsing @debug, correct usage: @__exitIfNoClass__(My.Class.Name)");
                 }
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);

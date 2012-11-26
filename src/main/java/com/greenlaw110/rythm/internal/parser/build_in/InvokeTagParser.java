@@ -196,7 +196,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             if (!enableCallback) {
                 raiseParseException(ctx, "callback extension only apply to tag invocation with body");
             }
-            argList = ArgsParser.parseArgDeclaration(param);
+            argList = ArgsParser.parseArgDeclaration(ctx.currentLine(), param);
         }
 
         private String cacheKey = null;
