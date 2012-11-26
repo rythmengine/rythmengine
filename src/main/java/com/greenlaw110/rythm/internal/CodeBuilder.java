@@ -725,4 +725,18 @@ public class CodeBuilder extends TextBuilder {
         p("\n\t\treturn this;\n\t}\n");
     }
 
+    private Set<String> varNames = new HashSet<String>();
+    public String newVarName() {
+        int i = 0;
+        while (true) {
+            String name = "__v" + i;
+            if (!varNames.contains(name)) {
+                varNames.add(name);
+                return name;
+            } else {
+                i += new Random().nextInt(100000);
+            }
+        }
+    }
+
 }

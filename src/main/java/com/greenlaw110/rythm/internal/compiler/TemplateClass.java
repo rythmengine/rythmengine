@@ -231,7 +231,7 @@ public class TemplateClass {
     /**
      * The ITemplate instance
      */
-    public TemplateBase templateInstance;
+    private TemplateBase templateInstance;
 
     /**
      * specify the dialect for the template
@@ -318,6 +318,7 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
+                templateInstance.setTemplateClass(this);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
@@ -333,7 +334,6 @@ public class TemplateClass {
                 engine().classes.getByClassName(pc.getName());
             }
         }
-        templateInstance.setTemplateClass(this);
         return templateInstance;
     }
 

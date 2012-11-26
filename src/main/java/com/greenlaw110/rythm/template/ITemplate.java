@@ -88,6 +88,11 @@ public interface ITemplate extends Cloneable {
         public Context() {
             escapeStack = new Stack<Escape>();
         }
+
+        public Context(Context clone) {
+            escapeStack = new Stack<Escape>();
+            escapeStack.addAll(clone.escapeStack);
+        }
     }
 
     public static enum Escape {

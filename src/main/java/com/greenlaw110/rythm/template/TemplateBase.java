@@ -19,6 +19,7 @@ import java.io.*;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -190,8 +191,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (null != caller) {
             tmpl._caller = (TextBuilder)caller;
         }
-        tmpl.__ctx = new Context();
-        tmpl.__ctx.init(tmpl);
+        tmpl.__ctx = new Context(__ctx);
         //if (null != out) tmpl._out = out;
         if (null != _out) tmpl._out = new StringBuilder();
         tmpl._properties = new HashMap<String, Object>(_properties.size());
@@ -518,44 +518,206 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
     protected boolean _logTime = false;
 
-    protected int _sizeOf(Collection c) {
-        return c.size();
+    protected static class _Itr<T> implements Iterable<T> {
+        private Object _o;
+        private int _size = -1;
+        private Iterator<T> iterator = null;
+        private int cursor = 0;
+        public _Itr(T[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return ((T[])_o)[cursor++];  //To change body of implemented methods use File | Settings | File Templates.
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(int[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Integer)((int[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(long[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Long)((long[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(float[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Float)((float[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(double[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Double)((double[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(short[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Short)((short[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(char[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Character)((char[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(byte[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Byte)((byte[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+        public _Itr(boolean[] ta) {
+            _o = ta;
+            _size = ta.length;
+            iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return cursor < _size;
+                }
+
+                @Override
+                public T next() {
+                    return (T)((Boolean)((boolean[])_o)[cursor++]);
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+
+        public _Itr(Collection<T> tc) {
+            _o = tc;
+            _size = tc.size();
+            iterator = tc.iterator();
+        }
+
+        public int size() {
+            return _size;
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return iterator;
+        }
     }
 
-    protected int _sizeOf(Object[] oa) {
-        return oa.length;
-    }
-
-    protected int _sizeOf(int[] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(long[] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(float[] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(double[] a) {
-        return a.length;
-    }
-    protected int _sizeOf(boolean [] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(char[] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(short[] a) {
-        return a.length;
-    }
-
-    protected int _sizeOf(Iterable<?> itr) {
-        int i = 0;
-        for (Object o: itr) i++;
-        return i;
-    }
 }

@@ -15,6 +15,9 @@ import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ForEachParser extends KeywordParserFactory {
     private static final ILogger logger = Logger.get(ForEachParser.class);
 
@@ -79,11 +82,35 @@ public class ForEachParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String s = "@args String[] sa\n@if(sa.length == 1){ good! } else if (sa.length > 1) { great! } else { empty !} ";
+        String s = "@args List<String> sa\n@for(String s: sa) @s @ else empty !@  ";
         RythmEngine re = new RythmEngine();
         re.recordJavaSourceOnRuntimeError = true;
         re.recordTemplateSourceOnRuntimeError = true;
-        System.out.println(re.render(s, new String[]{}, "x"));
+        List<String> sa = new ArrayList<String>();
+        System.out.println(re.render(s, sa, null));
+
+        sa.add("yy");
+        System.out.println(re.render(s, sa, null));
+
+        s = "@args String[] sa\n@for(String s: sa) @s @ else empty! @";
+        System.out.println(re.render(s, new String[]{"a"}, "ss"));
+
+        System.out.println(re.render(s, new String[]{}, "ss"));
+
+        s = "@args int[] sa\n@for(int s: sa) @s @ else empty! @";
+        System.out.println(re.render(s, new int[]{5}, "ss"));
+
+        System.out.println(re.render(s, new int[]{}, "ss"));
+
+        s = "@args Float[] sa\n@for(Float s: sa) @s @ else empty! @";
+        System.out.println(re.render(s, new Float[]{5.0f}, "ss"));
+
+        System.out.println(re.render(s, new Float[]{}, "ss"));
+
+        s = "@args String x\n@cache() { abc }";
+        for (int i = 0; i < 3; ++i) {
+            System.out.println(re.render(s));
+        }
     }
 
 }

@@ -52,8 +52,12 @@ public class ForEachCodeToken extends BlockCodeToken {
         String prefix = "_".equals(varname) ? "" : varname;
         String curClassName = ctx.getCodeBuilder().includingClassName();
         int bodySize = closePos - openPos;
-        p("if (_sizeOf(").p(iterable).p(") > 0) {");
-        p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(iterable);
+        String varName = ctx.getCodeBuilder().newVarName();
+        p("_Itr<").p(type).p("> ").p(varName).p(" = new _Itr(").p(iterable).p(");");
+        pline();
+        p("if (").p(varName).p(".size() > 0) {");
+        pline();
+        p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(varName);
         p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(");
         p(curClassName).p(".this,").p(bodySize).p("){");
         pline();

@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.exception;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -33,7 +34,7 @@ public class RythmException extends FastRuntimeException {
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
         boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
         boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
-        F.T2<String, Integer> t2 = parse(message, logJava, logTmpl, javaLineNumber, templateLineNumber, javaSource, templateSource, null);
+        F.T2<String, Integer> t2 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
         this.engine = engine;
         this.templateName = templateName;
         this.javaSource = javaSource;
@@ -57,7 +58,7 @@ public class RythmException extends FastRuntimeException {
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
         boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
         boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
-        F.T2<String, Integer> t2 = parse(message, logJava, logTmpl, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
+        F.T2<String, Integer> t2 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
         this.engine = engine;
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
@@ -129,6 +130,7 @@ public class RythmException extends FastRuntimeException {
     }
 
     private static F.T2<String, Integer> parse(String message, boolean logJava, boolean logTmpl, int javaLineNumber, int templateLineNumber, String javaSource, String templateSource, TemplateClass templateClass) {
+        //Logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>> logJava: %s", logJava);
         javaSource = getJavaSource(javaSource, templateClass);
         String tmplSource = getTemplateSource(templateSource, templateClass);
         templateLineNumber = resolveTemplateLineNumber(javaLineNumber, templateLineNumber, javaSource, templateClass);

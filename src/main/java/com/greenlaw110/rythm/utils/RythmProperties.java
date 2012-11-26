@@ -108,7 +108,7 @@ public class RythmProperties extends Properties {
         Object o = get(key);
         if (null == o) {
             Boolean b = getAsBoolean("rythm.cache.enabled", false);
-            return b ? SimpleCacheService.INSTANCE : new NoCacheService();
+            return b ? SimpleCacheService.INSTANCE : NoCacheService.INSTANCE;
         }
         if (o instanceof ICacheService) return (ICacheService)o;
         String s = o.toString();

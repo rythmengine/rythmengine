@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
@@ -106,11 +107,8 @@ public class AssignParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new AssignParser().reg(new Rythm());
-        if (r.search("@assign(\"JS\", false){..}")) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-        }
+        String s = "@assign(\"x\") {abc} @x.getClass()";
+        System.out.println(new RythmEngine().render(s));
     }
 
 }

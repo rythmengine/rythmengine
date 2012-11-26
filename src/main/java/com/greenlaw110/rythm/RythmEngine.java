@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.cache.ICacheService;
+import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
@@ -812,7 +813,7 @@ public class RythmEngine {
      * @param args
      */
     public void cache(String key, Object o, int ttl, Object... args) {
-        if (mode.isDev() && cacheOnProdOnly) return;
+        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return;
         Serializable value = null == o ? "" : (o instanceof Serializable ? (Serializable)o : o.toString());
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
@@ -837,6 +838,7 @@ public class RythmEngine {
      * @param args
      */
     public void cache(String key, Object o, String duration, Object... args) {
+        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return;
         int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
         cache(key, o, ttl, args);
     }
@@ -849,6 +851,7 @@ public class RythmEngine {
      * @return
      */
     public Serializable cached(String key, Object... args) {
+        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return null;
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
             for (Object arg : args) {
