@@ -36,7 +36,7 @@ public class StringTokenParser extends ParserBase {
         if (s.length() == 0) return null;
         ctx.step(s.length());
         s = s.replace(String.format("%s%s", a, a), a).replace("\\", "\\\\");
-        return new Token(s, ctx);
+        return new Token.StringToken(s, ctx);
     }
 
     public static void main(String[] args) {

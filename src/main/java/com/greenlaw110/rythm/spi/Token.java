@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
@@ -15,6 +16,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Token extends TextBuilder {
+
+    public static class StringToken extends Token {
+        public StringToken(String s, IContext ctx) {
+            super(s, ctx);
+        }
+
+        public StringToken(String s, IContext context, boolean disableCompactMode) {
+            super(s, context, disableCompactMode);
+        }
+
+        public StringToken mergeWith(BlockToken.LiteralBlock block) {
+            StringToken merged = new StringToken(s, ctx, disableCompactMode);
+            merged.line = line;
+            merged.s += "{";
+            return merged;
+        }
+
+        public StringToken mergeWith(StringToken st) {
+            StringToken merged = new StringToken(s, ctx, disableCompactMode);
+            merged.line = line;
+            String s = st.s;
+            s = st.compact(s);
+            merged.s += s;
+            return merged;
+        }
+    }
+
     protected static final ILogger logger = Logger.get(Token.class);
     protected String s;
     protected IContext ctx;

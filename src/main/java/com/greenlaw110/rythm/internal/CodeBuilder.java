@@ -6,12 +6,14 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
+import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
 import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -716,7 +718,27 @@ public class CodeBuilder extends TextBuilder {
         StringBuilder sb = new StringBuilder();
         StringBuilder old = out();
         setOut(sb);
-        for (TextBuilder b : builders) {
+        // try merge strings
+        List<TextBuilder> merged = new ArrayList<TextBuilder>();
+        Token.StringToken curTk = new Token.StringToken("", parser);
+        for (int i = 0; i < builders.size(); ++i) {
+            TextBuilder tb = builders.get(i);
+            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock) {
+                if (tb instanceof Token.StringToken) {
+                    Token.StringToken tk = (Token.StringToken)tb;
+                    curTk = curTk.mergeWith(tk);
+                } else {
+                    BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock)tb;
+                    curTk = curTk.mergeWith(bk);
+                }
+            } else {
+                if (null != curTk) merged.add(curTk);
+                curTk = new Token.StringToken("", parser);
+                merged.add(tb);
+            }
+        }
+        if (null != curTk) merged.add(curTk);
+        for (TextBuilder b : merged) {
             b.build();
         }
         buildBody = sb.toString();

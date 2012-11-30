@@ -1,3 +1,2 @@
 @args String who
-@{who = null}
 <h1>Hello @who.toString()!</h1>

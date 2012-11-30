@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.spi.IParserFactory;
+import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 /**
@@ -24,11 +23,14 @@ public class BraceParser implements IParserFactory {
                 char c = remain().charAt(0);
                 if ('{' == c) {
                     step(1);
-                    return new BlockToken("{", ctx());
+                    return new BlockToken.LiteralBlock(ctx());
                 } else if ('}' == c) {
                     step(1);
+                    IBlockHandler bh = ctx().currentBlock();
+                    if (null == bh) raiseParseException("no open block found");
+                    boolean isLiteral = bh instanceof BlockToken.LiteralBlock;
                     String s = ctx().closeBlock();
-                    return new CodeToken(s, ctx());
+                    return isLiteral ? new Token.StringToken(s, ctx()) : new CodeToken(s, ctx());
                 }
                 return null;
             }

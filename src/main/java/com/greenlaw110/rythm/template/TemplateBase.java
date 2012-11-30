@@ -704,9 +704,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(Collection<T> tc) {
+        public _Itr(Iterable<T> tc) {
             _o = tc;
-            _size = tc.size();
+            if (tc instanceof Collection) {
+                _size = ((Collection)tc).size();
+            } else {
+                int i = 0;
+                for (Iterator itr = tc.iterator();itr.hasNext();itr.next()) { i++;}
+                _size = i;
+            }
+
             iterator = tc.iterator();
         }
 

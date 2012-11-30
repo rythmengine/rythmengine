@@ -62,6 +62,7 @@ public class RythmException extends FastRuntimeException {
         this.engine = engine;
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
+        this.javaSource = tc.javaSource;
         this.templateLineNumber = t2._2;
         this.originalMessage = message;
         this.errorMessage = t2._1;
@@ -75,7 +76,7 @@ public class RythmException extends FastRuntimeException {
         String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
         int start = 0, end = lines.length;
         int javaLineNumber = this.javaLineNumber;
-        if (javaLineNumber > -1) {
+        if (javaLineNumber > -1 && javaLineNumber < lines.length) {
             start = Math.max(0, javaLineNumber - 6);
             end = Math.min(end, javaLineNumber + 6);
         }
@@ -94,7 +95,7 @@ public class RythmException extends FastRuntimeException {
         tb.p("Relevant template source lines:\n-------------------------------------------------\n");
         String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
         int start = 0, end = lines.length ;
-        if (templateLineNumber > -1) {
+        if (templateLineNumber > -1 && templateLineNumber < lines.length) {
             start = Math.max(0, templateLineNumber - 6);
             end = Math.min(end, templateLineNumber + 6);
         }
@@ -139,6 +140,7 @@ public class RythmException extends FastRuntimeException {
         }
         TextBuilder tb = new TextBuilder();
         tb.pn(message);
+        tb.p("\nTemplate: ").p(templateClass.getKey()).p("\n");
         // log java source anyway if template line number is not resolved
         if ((logJava || templateLineNumber < 0) && !S.isEmpty(javaSource)) {
             tb.p("\nRelevant Java source lines:\n-------------------------------------------------\n");

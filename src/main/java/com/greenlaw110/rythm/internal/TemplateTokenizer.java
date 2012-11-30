@@ -36,7 +36,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
                 //logger.warn("fail-through parser reached. is there anything wrong in your template? line: %s", ctx.currentLine());
                 String oneStep = p.getRemain().substring(0, 1);
                 p.step(1);
-                return new Token(oneStep, p);
+                return new Token.StringToken(oneStep, p);
             }
         });
 //        Parsers.add(new CommentParser(ctx));
@@ -77,7 +77,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             public void remove() {
                 throw new UnsupportedOperationException();
             }
-            
+
         };
     }
 }

@@ -82,6 +82,18 @@ public class ForEachParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
+        test2();
+    }
+
+    private static void test2() {
+        RythmEngine re = new RythmEngine();
+        re.recordJavaSourceOnRuntimeError = true;
+        re.recordTemplateSourceOnRuntimeError = true;
+        String s = "<a href=\"#\">";
+        System.out.println(re.render(s));
+    }
+
+    private static void test1() {
         String s = "@args List<String> sa\n@for(String s: sa) @s @ else empty !@  ";
         RythmEngine re = new RythmEngine();
         re.recordJavaSourceOnRuntimeError = true;

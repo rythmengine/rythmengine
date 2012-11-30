@@ -6,6 +6,17 @@ import com.greenlaw110.rythm.spi.Token;
 
 public class BlockToken extends Token implements IBlockHandler {
 
+    public static class LiteralBlock extends BlockToken {
+        public LiteralBlock(IContext context) {
+            super("{", context);
+        }
+
+        @Override
+        public String closeBlock() {
+            return "}";
+        }
+    }
+
     public BlockToken(String s, IContext context) {
         super(s, context);
         context.openBlock(this);
