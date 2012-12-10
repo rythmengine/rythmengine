@@ -16,7 +16,7 @@ public class SimpleRythm extends DialectBase {
     protected Class<?>[] buildInParserClasses() {
         // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{AssignParser.class, BreakParser.class, BraceParser.class, ContinueParser.class,
+        return new Class<?>[]{AssignParser.class, BreakParser.class,  ContinueParser.class,
                 CommentParser.class, DebugParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, BraceParser.class,
                 InvokeParser.class, InvokeTagParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class,
                 ImportParser.class, NoSIMParser.class, RawParser.class, ReturnParser.class, SimpleParser.class,
