@@ -28,13 +28,14 @@ public class IncludeParser extends KeywordParserFactory {
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @include statement. Correct usage: @include(\"foo.bar, a.b.c, ...\")");
                 }
+                int lineNo = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(3);
                 if (S.isEmpty(s)) {
                     raiseParseException("Error parsing @include statement. Correct usage: @include(\"foo.bar, a.b.c, ...\")");
                 }
                 s = S.stripBraceAndQuotation(s);
-                String code = ctx().getCodeBuilder().addIncludes(s, ctx().currentLine());
+                String code = ctx().getCodeBuilder().addIncludes(s, lineNo);
                 return new CodeToken(code, ctx());
             }
         };
