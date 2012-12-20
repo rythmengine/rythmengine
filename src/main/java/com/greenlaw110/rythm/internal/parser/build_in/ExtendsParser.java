@@ -64,7 +64,11 @@ public class ExtendsParser extends KeywordParserFactory {
                 return new Directive(s, ctx()) {
                     @Override
                     public void call() {
-                        builder().setExtended(sExtend, params, lineNo);
+                        try {
+                            builder().setExtended(sExtend, params, lineNo);
+                        } catch (NoClassDefFoundError e) {
+                            raiseParseException("error adding includes: " + e.getMessage() + "\n possible cause: lower/upper case issue on windows platform");
+                        }
                     }
                 };
             }

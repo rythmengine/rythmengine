@@ -35,8 +35,13 @@ public class IncludeParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @include statement. Correct usage: @include(\"foo.bar, a.b.c, ...\")");
                 }
                 s = S.stripBraceAndQuotation(s);
-                String code = ctx().getCodeBuilder().addIncludes(s, lineNo);
-                return new CodeToken(code, ctx());
+                try {
+                    String code = ctx().getCodeBuilder().addIncludes(s, lineNo);
+                    return new CodeToken(code, ctx());
+                } catch (NoClassDefFoundError e) {
+                    raiseParseException("error adding includes: " + e.getMessage() + "\n possible cause: lower/upper case issue on windows platform");
+                    return null;
+                }
             }
         };
     }

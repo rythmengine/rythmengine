@@ -484,7 +484,11 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 Regex r = new Regex(String.format(patternStr(), dialect().a()));
                 if (!r.search(remain())) return null;
                 String tagName = r.stringMatched(2);
-                tagName = testTag(tagName);
+                try {
+                    tagName = testTag(tagName);
+                } catch (NoClassDefFoundError e) {
+                    raiseParseException("Error load tag class: " + e.getMessage() + "\nPossible cause: lower or upper case issue on windows platform");
+                }
                 if (null == tagName) return null;
                 else tagName = new StringBuilder("\"").append(tagName).append("\"").toString();
                 String s = r.stringMatched();

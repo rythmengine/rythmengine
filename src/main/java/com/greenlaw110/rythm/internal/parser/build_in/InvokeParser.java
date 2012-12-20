@@ -37,7 +37,7 @@ public class InvokeParser extends KeywordParserFactory {
                 }
                 String matched = r.stringMatched();
                 step(matched.length());
-                boolean ignoreNonExistsTag = matched.indexOf("ignoreNonExistsTag") != -1;
+                //boolean ignoreNonExistsTag = matched.indexOf("ignoreNonExistsTag") != -1;
                 String invocation = r.stringMatched(3);
                 invocation = S.stripBrace(invocation);
                 // get tag name
@@ -54,11 +54,13 @@ public class InvokeParser extends KeywordParserFactory {
                 Matcher m0 = InvokeTagParser.P_HEREDOC_SIMBOL.matcher(s);
                 Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
+                    TextBuilder tb = InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m0.group(1).length());
-                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    return tb;
                 } else if (m1.matches()) {
+                    TextBuilder tb = InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m1.group(1).length());
-                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    return tb;
                 } else {
                     return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                 }
