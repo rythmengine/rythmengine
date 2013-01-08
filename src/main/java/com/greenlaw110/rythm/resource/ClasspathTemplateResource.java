@@ -31,6 +31,23 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
         // strip leading slash so path will work with classes in a JAR file
         while (path.startsWith("/")) path = path.substring(1);
         url = cl.getResource(path);
+//        if (null == url) {
+//            final String[] suffixes = {
+//                ".rythm",
+//                ".html",
+//                ".json",
+//                ".xml",
+//                ".csv",
+//                ".tag",
+//                ".txt"
+//            };
+//
+//            for (String s: suffixes) {
+//                String p = path + s;
+//                url = cl.getResource(p);
+//                if (null != url) break;
+//            }
+//        }
         key = path;
     }
 
@@ -100,4 +117,6 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
         ClasspathTemplateResource cr = new ClasspathTemplateResource("abc23.x");
         System.out.println(cr.isValid());
     }
+
+
 }

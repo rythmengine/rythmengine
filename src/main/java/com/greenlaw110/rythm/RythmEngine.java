@@ -29,6 +29,7 @@ import java.io.FileFilter;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -43,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0.0-x";
+    public static final String version = "1.0";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -135,7 +136,7 @@ public class RythmEngine {
 
     public File tmpDir;
     public File templateHome;
-    public File tagHome;
+    //public File tagHome;
     private File preCompiledHome;
     public File preCompiledHome() {
         return preCompiledHome;
@@ -175,14 +176,16 @@ public class RythmEngine {
     }
 
     public RythmEngine(File templateHome) {
-        this(templateHome, null);
-    }
-
-    public RythmEngine(File templateHome, File tagHome) {
+        //this(templateHome, null);
         init();
         this.templateHome = templateHome;
-        this.tagHome = tagHome;
     }
+
+//    public RythmEngine(File templateHome, File tagHome) {
+//        init();
+//        this.templateHome = templateHome;
+//        this.tagHome = tagHome;
+//    }
 
     public RythmEngine(Properties userConfiguration) {
         init(userConfiguration);
@@ -212,6 +215,15 @@ public class RythmEngine {
         setConf("rythm.mode", Rythm.Mode.prod);
         setConf("rythm.loader", "file");
     }
+
+    private File defaultRoot() {
+        try {
+            return new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public void init() {
         init(null);
@@ -256,8 +268,8 @@ public class RythmEngine {
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         logger.debug(">>>>temp dir is: %s", tmpDir);
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
-        templateHome = configuration.getAsFile("rythm.root", null);
-        tagHome = configuration.getAsFile("rythm.tag.root", null);
+        templateHome = configuration.getAsFile("rythm.root", defaultRoot());
+        //tagHome = configuration.getAsFile("rythm.tag.root", null);
         tagFileFilter = configuration.getAsFileFilter("rythm.tag.fileNameFilter", new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -308,9 +320,9 @@ public class RythmEngine {
             }
         }
 
-        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
-            loadTags();
-        }
+//        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
+//            loadTags();
+//        }
 
         logger.info("Rythm started in %s mode", mode);
     }
@@ -379,9 +391,9 @@ public class RythmEngine {
         logger.info("tags loaded from %s", tagHome);
     }
 
-    private void loadTags() {
-        loadTags(tagHome);
-    }
+//    private void loadTags() {
+//        loadTags(tagHome);
+//    }
 
     static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
     @SuppressWarnings("unchecked")

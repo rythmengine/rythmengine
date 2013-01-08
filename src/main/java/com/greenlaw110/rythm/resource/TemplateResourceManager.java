@@ -60,7 +60,9 @@ public class TemplateResourceManager {
 
         // try build-in loader
         resource = new FileTemplateResource(str, engine);
-        if (!resource.isValid()) resource = new ClasspathTemplateResource(str, engine);
+        if (!resource.isValid()) {
+            resource = new ClasspathTemplateResource(str, engine);
+        }
         return cache(resource);
     }
 }

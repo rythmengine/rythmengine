@@ -7,6 +7,7 @@
     <property name="src_issue_57" location="Issue57"/>
     <property name="src_issue_71" location="Issue71"/>
     <property name="src_issue_60" location="Issue60"/>
+    <property name="src_issue_81" location="Issue81"/>
     <property name="src_issue_88" location="Issue88"/>
     <property name="src_issue_88a" location="Issue88a"/>
     <property name="src_java_tag" location="JavaTag"/>
@@ -18,7 +19,7 @@
         <pathelement location="${lib}/pat-1.5.3.jar"/>
         <pathelement location="${lib}/org.eclipse.jdt.core-3.7.1.v_B76_R37x.jar"/>
         <pathelement location="${lib}/commons-lang3-3.1.jar"/>
-        <pathelement location="${lib}/rythm-1.0.0-20121210.jar"/>
+        <pathelement location="${lib}/rythm-1.0.jar"/>
     </path>
 
     <target name="init">
@@ -103,6 +104,20 @@
         </java>
     </target>
 
+    <target name="compile_issue_81" depends="init">
+        <javac srcdir="${src_issue_81}" destdir="${classes}" includeantruntime="true">
+            <classpath refid="project.class.path"/>
+        </javac>
+        <copy file="${src_issue_81}/foo.txt" todir="${classes}"/>
+        <copy file="${src_issue_81}/bar.txt" todir="${classes}"/>
+    </target>
+    <target name="issue_81" depends="compile_issue_81">
+        <java classname="Issue81" logError="true" fork="false">
+            <classpath location="classes"/>
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+
     <target name="compile_issue_88" depends="init">
         <javac srcdir="${src_issue_88}" destdir="${classes}" includeantruntime="true">
             <classpath refid="project.class.path"/>
@@ -144,7 +159,7 @@
         </java>
     </target>
 
-    <target name="all" depends="hello_world, issue_22, issue_88, java_tag">
+    <target name="all" depends="hello_world, issue_22, issue_81, issue_88, java_tag">
     </target>
 
     <target name="clean">

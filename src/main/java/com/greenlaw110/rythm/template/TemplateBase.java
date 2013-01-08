@@ -380,7 +380,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             __parent.setLayoutContent(toString());
             __parent.addAllLayoutSections(layoutSections);
             __parent.addAllRenderProperties(renderProperties);
-            __parent._properties.putAll(_properties);
+            __parent.setRenderArgs(_properties);
+            //__parent._properties.putAll(_properties);
             return __parent.render();
         } else {
             return toString();

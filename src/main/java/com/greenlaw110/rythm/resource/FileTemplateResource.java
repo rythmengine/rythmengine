@@ -36,7 +36,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public FileTemplateResource(String path, RythmEngine engine) {
         super(engine);
         File home = engine().templateHome;
-        File tagHome = engine().tagHome;
+        //File tagHome = engine().tagHome;
         File f = null;
         if (null != home) {
             f = new File(home, path);
@@ -51,14 +51,14 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         file = f;
         key = path;
 
-        if (null != tagHome && isValid()) {
-            // set tag name if this file is found under tag home
-            String tagPath = tagHome.getAbsolutePath();
-            String filePath = f.getAbsolutePath();
-            if (filePath.startsWith(tagPath)) {
-                this.tagName = retrieveTagName(tagHome, f);
-            }
-        }
+//        if (null != tagHome && isValid()) {
+//            // set tag name if this file is found under tag home
+//            String tagPath = tagHome.getAbsolutePath();
+//            String filePath = f.getAbsolutePath();
+//            if (filePath.startsWith(tagPath)) {
+//                this.tagName = retrieveTagName(tagHome, f);
+//            }
+//        }
     }
 
     public FileTemplateResource(File templateFile) {
@@ -68,18 +68,18 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public FileTemplateResource(File templateFile, RythmEngine engine) {
         super(engine);
         File home = engine().templateHome;
-        File tagHome = engine().tagHome;
+        //File tagHome = engine().tagHome;
         file = templateFile;
         key = file.getPath();
 
-        if (null != tagHome && isValid()) {
-            // set tag name if this file is found under tag home
-            String tagPath = tagHome.getAbsolutePath();
-            String filePath = file.getAbsolutePath();
-            if (filePath.startsWith(tagPath)) {
-                this.tagName = retrieveTagName(tagHome, file);
-            }
-        }
+//        if (null != tagHome && isValid()) {
+//            // set tag name if this file is found under tag home
+//            String tagPath = tagHome.getAbsolutePath();
+//            String filePath = file.getAbsolutePath();
+//            if (filePath.startsWith(tagPath)) {
+//                this.tagName = retrieveTagName(tagHome, file);
+//            }
+//        }
     }
 
     private static String retrieveTagName(File tagHome, File tagFile) {
@@ -158,40 +158,41 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         if (engine.tags.containsKey(tagName)) return null;
         tagName = tagName.replace('.', '/');
         final String[] suffixes = {
+                ".rythm",
                 ".html",
                 ".json",
-                ".tag"
+                ".xml",
+                ".csv",
+                ".tag",
+                ".txt",
+                ""
         };
         File tagFile = null;
-        File[] roots = {engine.tagHome, engine.templateHome};
-        for (String suffix: suffixes) {
+        for (String suffix : suffixes) {
             String name = tagName + suffix;
 
-            for (File root: roots) {
-                if (null == root) continue;
-                tagFile = new File(root, name);
-                if (tagFile.canRead()) {
+            tagFile = new File(engine.templateHome, name);
+            ITemplateResource tr = tagFile.canRead() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
+            if (tr.isValid()) {
+                try {
+                    TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
+                    if (null == tc) {
+                        tc = new TemplateClass(tr, engine);
+                    }
                     try {
-                        FileTemplateResource tr = new FileTemplateResource(tagFile, engine);
-                        TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
-                        if (null == tc) {
-                            tc = new TemplateClass(tr, engine);
-                        }
-                        try {
-                            ITag tag = (ITag)tc.asTemplate();
-                            if (null != tag) {
-                                String fullName = getFullTagName(tc, engine);
-                                tc.setFullName(fullName);
-                                engine.registerTag(fullName, tag);
-                                return tc;
-                            }
-                        } catch (Exception e) {
+                        ITag tag = (ITag) tc.asTemplate();
+                        if (null != tag) {
+                            String fullName = getFullTagName(tc, engine);
+                            tc.setFullName(fullName);
+                            engine.registerTag(fullName, tag);
                             return tc;
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        // ignore
+                        return tc;
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // ignore
                 }
             }
         }

@@ -109,6 +109,15 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     public static void main(String[] args) {
+        String ps = String.format(new ExpressionParser().patternStr(), "@");
+        Regex r =  new Regex(ps);
+        String s = "@(camp)@x";
+        p(s, r);
+        r = new Regex(String.format("^(%s(?@())*).*", "@"));
+        p(s, r);
+    }
+
+    public static void main1(String[] args) {
         String ps = "^(@[a-zA-Z][a-zA-Z$_\\.]+\\s*(?@())*).*";
         Regex r = new Regex(ps);
         String s = "@xyz(bar='c', foo=bar.length(), zee=component[foo], \"hello\");";

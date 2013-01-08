@@ -67,21 +67,21 @@ public class CodeBuilder extends TextBuilder {
         }
 
         private static String defVal(String type) {
-            if (type.equals("boolean"))
+            if (type.equalsIgnoreCase("boolean"))
                 return "false";
-            else if (type.equals("int"))
+            else if (type.equalsIgnoreCase("int"))
                 return "0";
-            else if (type.equals("long"))
+            else if (type.equalsIgnoreCase("long"))
                 return "0L";
-            else if (type.equals("char"))
+            else if (type.equals("char") || type.equals("Character"))
                 return "(char)0";
-            else if (type.equals("byte"))
+            else if (type.equalsIgnoreCase("byte"))
                 return "(byte)0";
-            else if (type.equals("short"))
+            else if (type.equalsIgnoreCase("short"))
                 return "(short)0";
-            else if (type.equals("float"))
+            else if (type.equalsIgnoreCase("float"))
                 return "0f";
-            else if (type.equals("double"))
+            else if (type.equalsIgnoreCase("double"))
                 return "0d";
 
             return "null";
@@ -595,11 +595,16 @@ public class CodeBuilder extends TextBuilder {
         // -- output setRenderArgs method
         pn();
         ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
+        p2tn("super.setRenderArgs(args);");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
+//            p2t("System.err.println(\"checking ").p(argName).pn("...\");");
             p2t("if (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
         }
-        p2t("super.setRenderArgs(args);\n\t}\n");
+//        for (String argName : renderArgs.keySet()) {
+//            p2t("System.err.println(\"").p(argName).p("=\" + this.").p(argName).pn(");");
+//        }
+        p2tn("}");
 
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
