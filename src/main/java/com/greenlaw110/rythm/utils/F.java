@@ -813,6 +813,12 @@ public class F {
         }
     }
 
+    private static boolean eq(Object a, Object b) {
+        if (a == b) return true;
+        if (null == a) return null == b;
+        return a.equals(b);
+    }
+
     public static class Tuple<A, B> {
 
         final public A _1;
@@ -821,6 +827,24 @@ public class F {
         public Tuple(A _1, B _2) {
             this._1 = _1;
             this._2 = _2;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof Tuple) {
+                Tuple that = (Tuple)o;
+                return eq(that._1, _1) && eq(that._2, _2);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int i = 17;
+            if (null != _1) i = i*31 + _1.hashCode();
+            if (null != _2) i = i*31 + _2.hashCode();
+            return i;
         }
 
         @Override
@@ -857,6 +881,25 @@ public class F {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof T3) {
+                T3 that = (T3)o;
+                return eq(that._1, _1) && eq(that._2, _2) && eq(that._3, _3);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int i = 17;
+            if (null != _1) i = i*31 + _1.hashCode();
+            if (null != _2) i = i*31 + _2.hashCode();
+            if (null != _3) i = i*31 + _3.hashCode();
+            return i;
+        }
+
+        @Override
         public String toString() {
             return "T3(_1: " + _1 + ", _2: " + _2 + ", _3:" + _3 + ")";
         }
@@ -878,6 +921,26 @@ public class F {
             this._2 = _2;
             this._3 = _3;
             this._4 = _4;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof T4) {
+                T4 that = (T4)o;
+                return eq(that._1, _1) && eq(that._2, _2) && eq(that._3, _3) && eq(that._4, _4);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int i = 17;
+            if (null != _1) i = i*31 + _1.hashCode();
+            if (null != _2) i = i*31 + _2.hashCode();
+            if (null != _3) i = i*31 + _3.hashCode();
+            if (null != _4) i = i*31 + _4.hashCode();
+            return i;
         }
 
         @Override
@@ -906,6 +969,26 @@ public class F {
             this._5 = _5;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof T5) {
+                T5 that = (T5)o;
+                return eq(that._1, _1) && eq(that._2, _2) && eq(that._3, _3) && eq(that._4, _4) && eq(that._5, _5);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int i = 17;
+            if (null != _1) i = i*31 + _1.hashCode();
+            if (null != _2) i = i*31 + _2.hashCode();
+            if (null != _3) i = i*31 + _3.hashCode();
+            if (null != _4) i = i*31 + _4.hashCode();
+            if (null != _5) i = i*31 + _5.hashCode();
+            return i;
+        }
         @Override
         public String toString() {
             return "T5(_1: " + _1 + ", _2: " + _2 + ", _3:" + _3 + ", _4:" + _4 + ", _5:" + _5 + ")";

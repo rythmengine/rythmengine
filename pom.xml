@@ -50,7 +50,7 @@
         </license>
     </licenses>
 
-    <!-- see http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
+    <!-- see http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ 
     <repositories>
         <repository>
             <id>com.google.code.maven-play-plugin</id>
@@ -61,6 +61,7 @@
             </snapshots>
         </repository>
     </repositories>
+    -->
 
     <build>
         <plugins>
@@ -118,7 +119,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.maven-play-plugin.com.javaregex.pat</groupId>
+            <groupId>com.javaregex.pat</groupId>
             <artifactId>pat</artifactId>
             <version>1.5.3</version>
         </dependency>
