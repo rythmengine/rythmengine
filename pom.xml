@@ -24,11 +24,17 @@
     <groupId>com.greenlaw110.rythm</groupId>
     <artifactId>rythm</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
     <url>http://rythmengine.com/</url>
+    
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
     <scm>
         <url>http://github.com/greenlaw110/Rythm</url>
@@ -119,7 +125,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.javaregex.pat</groupId>
+            <groupId>com.stevesoft.pat</groupId>
             <artifactId>pat</artifactId>
             <version>1.5.3</version>
         </dependency>

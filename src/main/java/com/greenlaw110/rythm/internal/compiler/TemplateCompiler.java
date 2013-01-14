@@ -32,9 +32,11 @@ import java.util.StringTokenizer;
 public class TemplateCompiler {
 
     private ILogger logger = Logger.get(TemplateCompiler.class);
+
     private RythmEngine engine() {
         return classCache.engine;
     }
+
     Map<String, Boolean> packagesCache = new HashMap<String, Boolean>();
 
     // -- util methods
@@ -61,7 +63,7 @@ public class TemplateCompiler {
         this.settings.put(CompilerOptions.OPTION_Encoding, "UTF-8");
         this.settings.put(CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE);
         String javaVersion = CompilerOptions.VERSION_1_5;
-        if(System.getProperty("java.version").startsWith("1.6")) {
+        if (System.getProperty("java.version").startsWith("1.6")) {
             javaVersion = CompilerOptions.VERSION_1_6;
         } else if (System.getProperty("java.version").startsWith("1.7")) {
             javaVersion = CompilerOptions.VERSION_1_7;
@@ -193,7 +195,6 @@ public class TemplateCompiler {
 
                     // TemplateClass exists
                     if (templateClass != null) {
-
                         if (templateClass.javaByteCode != null) {
                             ClassFileReader classFileReader = new ClassFileReader(templateClass.javaByteCode, fileName, true);
                             return new NameEnvironmentAnswer(classFileReader, null);
@@ -253,7 +254,7 @@ public class TemplateCompiler {
             public void acceptResult(CompilationResult result) {
                 // If error
                 if (result.hasErrors()) {
-                    for (IProblem problem: result.getErrors()) {
+                    for (IProblem problem : result.getErrors()) {
                         int line = problem.getSourceLineNumber();
                         int column = problem.getSourceStart();
                         String message = problem.getMessage();
