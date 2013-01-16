@@ -37,8 +37,9 @@
     </parent>
 
     <scm>
-        <url>http://github.com/greenlaw110/Rythm</url>
-        <connection>scm:git:git@github.com/greenlaw110/Rythm.git</connection>
+        <connection>scm:git:git://github.com/greenlaw110/Rythm.git</connection>
+        <developerConnection>scm:git:git@github.com:greenlaw110/Rythm.git</developerConnection>
+        <url>git://github.com/greenlaw110/Rythm.git</url>
     </scm>
 
     <properties>
@@ -173,5 +174,20 @@
             </build>
         </profile>
     </profiles>
+    
+    <!--
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Staging Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Nexus Snapshots Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
+    </distributionManagement>
+    -->
 
 </project>

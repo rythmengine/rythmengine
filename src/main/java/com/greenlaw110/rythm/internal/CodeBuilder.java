@@ -594,17 +594,20 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output setRenderArgs method
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(java.util.Map<String, Object> args) {");
+        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void setRenderArgs(java.util.Map<String, Object> args) {");
+        p2tn("if (null == args) throw new NullPointerException();\n\t\tif (args.isEmpty()) return;");
         p2tn("super.setRenderArgs(args);");
+        boolean first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-//            p2t("System.err.println(\"checking ").p(argName).pn("...\");");
-            p2t("if (null != args && args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
+            if (first) {first = false; p2t("");}
+            else {p2t("else ");}
+            p("if (args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
         }
 //        for (String argName : renderArgs.keySet()) {
 //            p2t("System.err.println(\"").p(argName).p("=\" + this.").p(argName).pn(");");
 //        }
-        p2tn("}");
+        ptn("}");
 
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
@@ -614,10 +617,13 @@ public class CodeBuilder extends TextBuilder {
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
                 p2tn("int _p = 0, l = args.length;");
-                int i = userDefinedArgNumber;
+                int i = userDefinedArgNumber; 
+                first = true;
                 for (String argName : renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
-                    p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    if (first) {first = false; p2t("");}
+                    else {p2t("else ");};
+                    p("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
@@ -629,9 +635,14 @@ public class CodeBuilder extends TextBuilder {
         // -- output setRenderArg by name
         pn();
         ptn("@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
+        if (true) {
+            first = true;
+            for (String argName : renderArgs.keySet()) {
+                RenderArgDeclaration arg = renderArgs.get(argName);
+                if (first) {first = false;p2t("");}
+                else {p2t("else ");};
+                p("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
+            }
         }
         p2t("super.setRenderArg(name, arg);\n\t}\n");
 
@@ -639,11 +650,16 @@ public class CodeBuilder extends TextBuilder {
         pn();
         ptn("@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
         p2tn("int _p = 0;");
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
-                    .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                    .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
+        if (true) {
+            first = true;
+            for (String argName : renderArgs.keySet()) {
+                RenderArgDeclaration arg = renderArgs.get(argName);
+                if (first) {first = false; p2t("");}
+                else {p2t("else ");}
+                p("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
+                        .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
+                        .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
+            }
         }
         // the first argument has a default name "arg"
         p2tn("if(0 == pos) setRenderArg(\"arg\", arg);");
