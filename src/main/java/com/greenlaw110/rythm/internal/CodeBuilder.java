@@ -618,12 +618,9 @@ public class CodeBuilder extends TextBuilder {
             {
                 p2tn("int _p = 0, l = args.length;");
                 int i = userDefinedArgNumber; 
-                first = true;
                 for (String argName : renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
-                    if (first) {first = false; p2t("");}
-                    else {p2t("else ");};
-                    p("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
