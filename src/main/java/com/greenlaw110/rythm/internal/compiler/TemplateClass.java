@@ -14,7 +14,6 @@ import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
-import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
@@ -34,12 +33,16 @@ public class TemplateClass {
      * Store root level template class, e.g. the one that is not an embedded class
      */
     private TemplateClass root;
+
     public TemplateClass root() {
         return root;
     }
 
-    private TemplateClass() {}
+    private TemplateClass() {
+    }
+
     private boolean inner = false;
+
     public static TemplateClass createInnerClass(String className, byte[] byteCode, TemplateClass parent) {
         TemplateClass tc = new TemplateClass();
         tc.name = className;
@@ -50,9 +53,13 @@ public class TemplateClass {
         tc.version = parent.version();
         return tc;
     }
-    public boolean isInner() {return inner;}
+
+    public boolean isInner() {
+        return inner;
+    }
 
     private RythmEngine engine = null;
+
     private RythmEngine engine() {
         return null == engine ? Rythm.engine() : engine;
     }
@@ -61,30 +68,39 @@ public class TemplateClass {
      * The fully qualified class name
      */
     private String name;
+
     public String name0() {
         return name;
     }
+
     public String name() {
         //return isInner() ? name : name + "v" + version;
         RythmEngine e = engine();
-        String n =  (!e.reloadByIncClassVersion() || isInner()) ? name : name + "v" + version;
+        String n = (!e.reloadByIncClassVersion() || isInner()) ? name : name + "v" + version;
         return n;
     }
+
     private long version;
+
     public long version() {
         return root().version;
     }
+
     public void setVersion(int v) {
-        version = (long)v;
+        version = (long) v;
     }
+
     public TemplateClass extendedTemplateClass;
     private Set<TemplateClass> includedTemplateClasses = new HashSet<TemplateClass>();
+
     public void addIncludeTemplateClass(TemplateClass tc) {
         includedTemplateClasses.add(tc);
         includeTagTypes.putAll(tc.includeTagTypes);
     }
+
     public String includeTemplateClassNames = null;
     private static final String NO_INCLUDE_CLASS = "NO_INCLUDE_CLASS";
+
     public String refreshIncludeTemplateClassNames() {
         if (includedTemplateClasses.size() == 0) {
             includeTemplateClassNames = NO_INCLUDE_CLASS;
@@ -92,7 +108,7 @@ public class TemplateClass {
         }
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for (TemplateClass tc: includedTemplateClasses) {
+        for (TemplateClass tc : includedTemplateClasses) {
             if (!first) {
                 sb.append(",");
             } else {
@@ -103,13 +119,17 @@ public class TemplateClass {
         includeTemplateClassNames = sb.toString();
         return sb.toString();
     }
+
     private Map<String, String> includeTagTypes = new HashMap<String, String>();
+
     public void setTagType(String tagName, String type) {
         includeTagTypes.put(tagName, type);
     }
+
     public String getTagType(String tagName) {
         return includeTagTypes.get(tagName);
     }
+
     public boolean returnObject(String tagName) {
         String retType = includeTagTypes.get(tagName);
         if (null != retType) {
@@ -118,51 +138,60 @@ public class TemplateClass {
         if (null != extendedTemplateClass) return extendedTemplateClass.returnObject(tagName);
         return true;
     }
+
     public String serializeIncludeTagTypes() {
         if (includeTagTypes.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         boolean empty = true;
-        for (String tagName: includeTagTypes.keySet()) {
+        for (String tagName : includeTagTypes.keySet()) {
             if (!empty) sb.append(";");
             else empty = false;
             sb.append(tagName).append(":").append(includeTagTypes.get(tagName));
         }
         return sb.toString();
     }
+
     public void deserializeIncludeTagTypes(String s) {
         includeTagTypes = new HashMap<String, String>();
         if (S.isEmpty(s)) return;
         String[] sa = s.split(";");
-        for (String s0: sa) {
+        for (String s0 : sa) {
             String[] sa0 = s0.split(":");
             if (sa0.length != 2) throw new IllegalArgumentException("Unknown include tag types string: " + s);
             includeTagTypes.put(sa0[0], sa0[1]);
         }
     }
+
     /**
      * If not null then this template is a tag
      */
     public String tagName() {
         return null != templateResource ? templateResource.tagName() : null;
     }
+
     transient private String fullName;
+
     public void setFullName(String fn) {
         fullName = fn;
     }
+
     public String getFullName() {
         if (null == fullName) return tagName();
         return fullName;
     }
+
     /**
      * the template resource
      */
     public ITemplateResource templateResource;
+
     /**
      * The template source
      */
     public String getTemplateSource() {
         return getTemplateSource(false);
     }
+
     public String getTemplateSource(boolean includeRoot) {
         if (null != templateResource) return templateResource.asTemplateContent();
         if (!includeRoot) return "";
@@ -172,12 +201,14 @@ public class TemplateClass {
         }
         return null == parent ? "" : parent.getTemplateSource();
     }
+
     /**
      * Is this template resource coming from a literal String or from a loaded resource like file
      */
     public boolean isStringTemplate() {
         return templateResource instanceof StringTemplateResource;
     }
+
     /**
      * The Java source
      */
@@ -218,7 +249,7 @@ public class TemplateClass {
 
     /**
      * CodeBuilder to generate java source code
-     *
+     * <p/>
      * Could be used to merge state into including template class codeBuilder
      */
     public CodeBuilder codeBuilder;
@@ -253,6 +284,7 @@ public class TemplateClass {
 
     /**
      * Construct a TemplateClass instance using template source content or file path
+     *
      * @param template
      */
     public TemplateClass(String template, RythmEngine engine) {
@@ -290,6 +322,7 @@ public class TemplateClass {
 
     /**
      * Return string representation of the template
+     *
      * @return
      */
     public Object getKey() {
@@ -299,7 +332,7 @@ public class TemplateClass {
     @SuppressWarnings("unchecked")
     private Class<?> getJavaClass() throws Exception {
         Class<?> c = engine().classLoader.loadClass(name(), true);
-        if (null == javaClass) javaClass = (Class<ITemplate>)c;
+        if (null == javaClass) javaClass = (Class<ITemplate>) c;
         return c;
     }
 
@@ -311,7 +344,7 @@ public class TemplateClass {
     };
 
     private ITemplate templateInstance_() {
-        if (!isValid) return  NULL_TEMPLATE;
+        if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
                 if (Logger.isTraceEnabled()) logger.trace("About to new template instance");
@@ -350,11 +383,13 @@ public class TemplateClass {
     private boolean refreshing = false;
     private boolean compiling = false;
     private Object refreshLock = new Object();
+
     private boolean refreshing() {
         synchronized (refreshLock) {
             return refreshing || compiling;
         }
     }
+
     private void refreshing(boolean b) {
         synchronized (refreshLock) {
             refreshing = b;
@@ -397,8 +432,10 @@ public class TemplateClass {
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
-        if (null == dialect) codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, null);
-        else codeBuilder = dialect.createCodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
+        if (null == dialect)
+            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, null);
+        else
+            codeBuilder = dialect.createCodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();
@@ -410,7 +447,7 @@ public class TemplateClass {
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
      */
-    public boolean  refresh(boolean forceRefresh) {
+    public boolean refresh(boolean forceRefresh) {
         if (refreshing()) return false;
         if (inner) return false;
         try {
@@ -459,7 +496,7 @@ public class TemplateClass {
             boolean includedTemplateChanged = false;
             if (includedTemplateClasses.size() == 0 && !S.isEmpty(includeTemplateClassNames) && !NO_INCLUDE_CLASS.equals(includeTemplateClassNames)) {
                 // just loaded from persistent store
-                for (String tcName: includeTemplateClassNames.split(",")) {
+                for (String tcName : includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;
                     tcName = tcName.trim();
                     String fullName = engine().testTag(tcName, this);
@@ -475,7 +512,7 @@ public class TemplateClass {
                     includedTemplateClasses.add(tc);
                 }
             }
-            for (TemplateClass tc: includedTemplateClasses) {
+            for (TemplateClass tc : includedTemplateClasses) {
                 if (tc.refresh(forceRefresh)) {
                     includedTemplateChanged = true;
                     break;
@@ -518,6 +555,7 @@ public class TemplateClass {
 
     /**
      * Is this class already compiled but not defined ?
+     *
      * @return if the class is compiled but not defined
      */
     public boolean isDefinable() {
@@ -532,7 +570,7 @@ public class TemplateClass {
         enhancedByteCode = null;
         javaSource = null;
         templateInstance = null;
-        for (TemplateClass tc: embeddedClasses) {
+        for (TemplateClass tc : embeddedClasses) {
             tc.reset();
             engine().classes.remove(tc);
         }
@@ -544,6 +582,7 @@ public class TemplateClass {
 
     /**
      * Compile the class from Java source
+     *
      * @return the bytes that comprise the class file
      */
     public byte[] compile() {
@@ -587,6 +626,7 @@ public class TemplateClass {
 
     private boolean enhancing = false;
     private transient List<TemplateClass> embeddedClasses = new ArrayList<TemplateClass>();
+
     /**
      * Used to instruct embedded class byte code needs to be enhanced, but for now
      * let's just use the java byte code as the enhanced bytecode
@@ -595,6 +635,7 @@ public class TemplateClass {
         enhancedByteCode = javaByteCode;
         root.embeddedClasses.add(this);
     }
+
     public byte[] enhance() {
         if (enhancing) throw new IllegalStateException("reenter enhance() call");
         enhancing = true;
@@ -604,7 +645,7 @@ public class TemplateClass {
                 bytes = javaByteCode;
                 if (null == bytes) bytes = compile();
                 long start = System.currentTimeMillis();
-                for (ITemplateClassEnhancer en: engine().templateClassEnhancers) {
+                for (ITemplateClassEnhancer en : engine().templateClassEnhancers) {
                     try {
                         bytes = en.enhance(name(), bytes);
                     } catch (Exception e) {
@@ -617,7 +658,7 @@ public class TemplateClass {
                 enhancedByteCode = bytes;
                 engine().classCache.cacheTemplateClass(this);
             }
-            for (TemplateClass embedded: embeddedClasses) {
+            for (TemplateClass embedded : embeddedClasses) {
                 embedded.enhancedByteCode = null;
                 embedded.enhance();
             }
@@ -657,6 +698,7 @@ public class TemplateClass {
 
     /**
      * Call back when a class is compiled.
+     *
      * @param code The bytecode.
      */
     public void compiled(byte[] code) {
@@ -676,7 +718,7 @@ public class TemplateClass {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o instanceof TemplateClass) {
-            TemplateClass that = (TemplateClass)o;
+            TemplateClass that = (TemplateClass) o;
             return that.getKey().equals(getKey());
         }
         return false;

@@ -13,6 +13,7 @@ import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.*;
@@ -44,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0";
+    public static final String version = "1.0-SNAPSHOT";
     public static String pluginVersion = "";
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -252,8 +253,13 @@ public class RythmEngine {
 
         if (null != conf) configuration.putAll(conf);
 
-        ILoggerFactory fact = configuration.getAs("rythm.logger.factory", null, ILoggerFactory.class);
-        if (null != fact) Logger.registerLoggerFactory(fact);
+        boolean disableLogging = configuration.getAsBoolean("rythm.logger.disabled", false);
+        if (disableLogging) {
+            Logger.registerLoggerFactory(new NullLogger.Factory());
+        } else {
+            ILoggerFactory fact = configuration.getAs("rythm.logger.factory", null, ILoggerFactory.class);
+            if (null != fact) Logger.registerLoggerFactory(fact);
+        }
 
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
         recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", false);
