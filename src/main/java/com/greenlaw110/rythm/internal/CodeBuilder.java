@@ -723,7 +723,7 @@ public class CodeBuilder extends TextBuilder {
                     b.build();
                 }
             }
-            p("\ncatch(Exception __e){\nthrow new RuntimeException(__e);}\n}");
+            p("\n}catch(Exception __e){\nthrow new RuntimeException(__e);}\n}");
         }
     }
 
