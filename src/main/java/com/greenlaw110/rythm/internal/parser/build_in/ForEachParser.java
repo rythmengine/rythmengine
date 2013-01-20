@@ -9,6 +9,7 @@ import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.S;
@@ -29,11 +30,11 @@ public class ForEachParser extends KeywordParserFactory {
                 if (!r.search(remain)) {
                     r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                     if (!r.search(remain)) {
-                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");
                     }
                     String s = r.stringMatched(2);
                     step(r.stringMatched().length());
-                    return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
+                    return new BlockCodeToken("for " + s + "{\n\t" + SecureExecutingService.INTERRUPT_CODE, ctx()) {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);

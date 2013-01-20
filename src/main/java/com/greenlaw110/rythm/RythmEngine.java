@@ -16,6 +16,8 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.security.RythmSecurityManager;
+import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
@@ -37,11 +39,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 20/01/12
- * Time: 8:13 PM
- * To change this template use File | Settings | File Templates.
+ * A Rythm Template Engine
  */
 public class RythmEngine {
 
@@ -80,6 +78,12 @@ public class RythmEngine {
     public IByteCodeHelper byteCodeHelper = null;
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
+    private SecurityManager sm = null;
+    /**
+     * Indicate template should be executed in a secure mode
+     */
+    private boolean secure = false;
+    private SecureExecutingService secureExecutor = null;
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
     public boolean playHost = false;
@@ -325,6 +329,14 @@ public class RythmEngine {
                 logger.warn("invalid resource loader class");
             }
         }
+        
+        sm = configuration.getAs("rythm.securityManager", null, SecurityManager.class);
+        secure = configuration.getAsBoolean("rythm.secure", false);
+        if (secure) {
+            long timeout = configuration.getAsLong("rythm.timeout", 1000L);
+            int poolSize = configuration.getAsInt("rythm.pool.size", 10);
+            secureExecutor = new SecureExecutingService(poolSize, sm, timeout);
+        }
 
 //        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
 //            loadTags();
@@ -485,7 +497,8 @@ public class RythmEngine {
 
     private String renderTemplate(ITemplate t) {
         // inject implicity render args
-        return t.render();
+        if (!secure) return t.render();
+        else return secureExecutor.execute(t);
     }
 
     public String render(String template, Object... args) {
@@ -882,6 +895,7 @@ public class RythmEngine {
 
     public void shutdown() {
         if (null != cacheService) cacheService.shutdown();
+        if (null != secureExecutor) secureExecutor.shutdown();
     }
 
     // -- SPI interface

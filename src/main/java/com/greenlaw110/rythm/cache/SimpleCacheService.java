@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.cache;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.RythmThreadFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,8 +19,14 @@ import java.util.concurrent.*;
 public class SimpleCacheService implements ICacheService {
 
     public static final SimpleCacheService INSTANCE = new SimpleCacheService();
+    
+    private static class TimerThreadFactory extends RythmThreadFactory {
+        private TimerThreadFactory() {
+            super("rythm-timer");
+        }
+    }
 
-    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory());
     private boolean started = false;
 
     private SimpleCacheService() {
@@ -116,5 +123,10 @@ public class SimpleCacheService implements ICacheService {
     @Override
     public void shutdown() {
         scheduler.shutdown();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        shutdown();
     }
 }

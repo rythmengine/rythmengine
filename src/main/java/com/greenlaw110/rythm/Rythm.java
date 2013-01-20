@@ -132,14 +132,12 @@ public class Rythm {
     }
 
     public static void main(String[] args) {
-        String template = "@args java.util.List<String> users, String title, String name; @each String u: users @u @ title: @title name: @name ";
-        List<String> l = new ArrayList<String>();
-        l.add("green");l.add("cherry");
-        ITemplate t = engine.getTemplate(template);
-        t.setRenderArg("users", l);
-        t.setRenderArg(2, "Green");
-        t.setRenderArg(1, "Mr.");
-        System.out.println(t.render());
+        Properties p = new Properties();
+        p.put("rythm.secure", Boolean.TRUE);
+        Rythm.init(p);
+        String template = "XYZ@{for(;;){if (0 > (1 + new Random().nextInt(100))) break;}}ABC";
+        String s = Rythm.render(template);
+        System.out.println(s);
     }
 
     public static void main2(String[] args) {
