@@ -63,10 +63,10 @@ public class SecureThreadFactory extends RythmThreadFactory {
     }
     
     static void shutdown() {
-        for (Thread t: runners.values()) {
-            t.stop();
-        }
-        runners.clear();
+//        for (Thread t: runners.values()) {
+//            t.stop();
+//        }
+//        runners.clear();
     }
 
 }

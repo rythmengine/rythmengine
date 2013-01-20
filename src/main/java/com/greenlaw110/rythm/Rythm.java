@@ -6,7 +6,6 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
-import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.IRythmListener;
@@ -49,6 +48,18 @@ public class Rythm {
     public static RythmEngine engine() {
         checkInit();
         return engine;
+    }
+    
+    public static RythmEngine enterSandbox() {
+        return engine().enterSandbox();
+    }
+    
+    public static boolean sandbox() {
+        return engine.sandbox();
+    }
+    
+    public static RythmEngine quitSandbox() {
+        return engine().resetSandbox();
     }
 
     public static void registerLoggerFactory(ILoggerFactory fact) {
@@ -132,12 +143,11 @@ public class Rythm {
     }
 
     public static void main(String[] args) {
-        Properties p = new Properties();
-        p.put("rythm.secure", Boolean.TRUE);
-        Rythm.init(p);
-        String template = "XYZ@{for(;;){if (0 > (1 + new Random().nextInt(100))) break;}}ABC";
+        Rythm.enterSandbox();
+        String template = "XYZ@*{for(;;){if (0 > (1 + new Random().nextInt(100))) break;}}*@ABC";
         String s = Rythm.render(template);
         System.out.println(s);
+        engine.shutdown();
     }
 
     public static void main2(String[] args) {

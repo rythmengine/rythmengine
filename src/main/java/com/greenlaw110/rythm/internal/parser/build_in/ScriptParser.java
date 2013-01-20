@@ -1,8 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.IO;
@@ -51,6 +53,7 @@ public class ScriptParser extends ParserBase {
             sb.append(line).append(" //line: ").append(curLine++).append("\n");
         }
         if (!lastLine.trim().endsWith(";")) sb.append(";");
+        String code = sb.toString();
         return new CodeToken(sb.toString(), ctx);
     }
 

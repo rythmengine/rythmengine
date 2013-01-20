@@ -21,6 +21,7 @@ import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
 import com.greenlaw110.rythm.utils.IImportProvider;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import com.stevesoft.pat.Regex;
 
 import java.util.*;
 
@@ -777,6 +778,44 @@ public class CodeBuilder extends TextBuilder {
                 i += new Random().nextInt(100000);
             }
         }
+    }
+
+    public static final String INTERRUPT_CODE = "\n{if (Thread.interrupted()) throw new RuntimeException(\"interrupted\");}\n";
+
+    private static final Regex R_FOR_0 = new Regex("([\\s;]for\\s*(?@())\\s*\\{)", "${1}" + INTERRUPT_CODE);
+    private static final Regex R_FOR_1 = new Regex("([\\s;]for\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \\}");
+    
+    private static final Regex R_WHILE_0 = new Regex("([\\s;]while\\s*(?@())\\s*\\{)", "${1}" + INTERRUPT_CODE);
+    private static final Regex R_WHILE_1 = new Regex("([\\s;]while\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \\}");
+
+    private static final Regex R_DO_0 = new Regex("([\\s;]do\\s*\\{)", "${1}" + INTERRUPT_CODE);
+    private static final Regex R_DO_1 = new Regex("([\\s;]do\\s*)([^\\{\\}]+[\\s;]while[\\s\\(])", "${1} \\{" + INTERRUPT_CODE + "${2}");
+
+    public static String preventInfiniteLoop(String code) {
+        code = R_FOR_0.replaceAll(code);
+        code = R_FOR_1.replaceAll(code);
+        code = R_WHILE_0.replaceAll(code);
+        code = R_WHILE_1.replaceAll(code);
+        code = R_DO_0.replaceAll(code);
+        code = R_DO_1.replaceAll(code);
+        return code;
+    }
+
+    public static void main(String[] args) {
+        String s = "public void foo() {\n\tfor(;;)\n\tabc; \n\nfor(String s: myStrs){\n\txyz;\n}";
+        s = R_FOR_0.replaceAll(s);
+        //System.out.println(s);
+        s = R_FOR_1.replaceAll(s);
+        //System.out.println(s);
+        s = "... while(true){\n\txyz\n}\n\nwhile(true) abc;";
+        s = R_WHILE_0.replaceAll(s);
+        s = R_WHILE_1.replaceAll(s);
+        System.out.println(s);
+        
+        s = "... do {;} while(true); \n\n do ; while(true);";
+        s = R_DO_0.replaceAll(s);
+        s = R_DO_1.replaceAll(s);
+        System.out.println(s);
     }
 
 }

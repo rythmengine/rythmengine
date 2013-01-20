@@ -16,7 +16,6 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.security.RythmSecurityManager;
 import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
@@ -45,6 +44,26 @@ public class RythmEngine {
 
     public static final String version = "1.0-SNAPSHOT";
     public static String pluginVersion = "";
+    
+    private static final InheritableThreadLocal<Stack<Boolean>> sandboxMode = new InheritableThreadLocal<Stack<Boolean>>() {
+        @Override
+        protected Stack<Boolean> initialValue() {
+            Stack<Boolean> stack = new Stack<Boolean>();
+            stack.push(false);
+            return stack;
+        }
+    };
+    public static boolean sandbox() {
+        return sandboxMode.get().peek();
+    }
+    public RythmEngine enterSandbox() {
+        sandboxMode.get().push(true);
+        return this;
+    }
+    public RythmEngine resetSandbox() {
+        sandboxMode.get().pop();
+        return this;
+    }
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
 
@@ -79,10 +98,6 @@ public class RythmEngine {
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
     private SecurityManager sm = null;
-    /**
-     * Indicate template should be executed in a secure mode
-     */
-    private boolean secure = false;
     private SecureExecutingService secureExecutor = null;
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
@@ -331,12 +346,9 @@ public class RythmEngine {
         }
         
         sm = configuration.getAs("rythm.securityManager", null, SecurityManager.class);
-        secure = configuration.getAsBoolean("rythm.secure", false);
-        if (secure) {
-            long timeout = configuration.getAsLong("rythm.timeout", 1000L);
-            int poolSize = configuration.getAsInt("rythm.pool.size", 10);
-            secureExecutor = new SecureExecutingService(poolSize, sm, timeout);
-        }
+        long timeout = configuration.getAsLong("rythm.timeout", 1000L);
+        int poolSize = configuration.getAsInt("rythm.pool.size", 10);
+        secureExecutor = new SecureExecutingService(poolSize, sm, timeout);
 
 //        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
 //            loadTags();
@@ -497,8 +509,8 @@ public class RythmEngine {
 
     private String renderTemplate(ITemplate t) {
         // inject implicity render args
-        if (!secure) return t.render();
-        else return secureExecutor.execute(t);
+        if (sandbox()) return secureExecutor.execute(t);
+        else return t.render();
     }
 
     public String render(String template, Object... args) {

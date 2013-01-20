@@ -34,7 +34,7 @@ public class ForEachParser extends KeywordParserFactory {
                     }
                     String s = r.stringMatched(2);
                     step(r.stringMatched().length());
-                    return new BlockCodeToken("for " + s + "{\n\t" + SecureExecutingService.INTERRUPT_CODE, ctx()) {
+                    return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);

@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.stevesoft.pat.Regex;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,10 +15,6 @@ import java.util.concurrent.*;
  * the SecurityManager in the executing thread
  */
 public class SecureExecutingService {
-    public static final String INTERRUPT_CODE = "\n{if (Thread.interrupted()) throw new RuntimeException(\"interrupted\");}\n";
-    public static String noInfiniteLoop(String code) {
-        return code;
-    }
     private static ILogger logger = Logger.get(SecureExecutingService.class);
     private ScheduledExecutorService scheduler = null;
     private long timeout = 1000;
