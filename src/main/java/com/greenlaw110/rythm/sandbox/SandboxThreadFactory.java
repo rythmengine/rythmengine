@@ -1,6 +1,5 @@
-package com.greenlaw110.rythm.security;
+package com.greenlaw110.rythm.sandbox;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 
 import java.util.UUID;
@@ -10,11 +9,11 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Create secure template executing thread
  */
-public class SecureThreadFactory extends RythmThreadFactory {
+class SandboxThreadFactory extends RythmThreadFactory {
     private SecurityManager sm;
     private String password = null;
     
-    public SecureThreadFactory(SecurityManager sm) {
+    public SandboxThreadFactory(SecurityManager sm) {
         super("rythm-executor");
         if (null == sm) {
             String pass = UUID.randomUUID().toString();
@@ -24,12 +23,12 @@ public class SecureThreadFactory extends RythmThreadFactory {
         this.sm = sm;
     }
 
-    static ConcurrentMap<String, SecureThread> runners = new ConcurrentHashMap<String, SecureThread>();
+    static ConcurrentMap<String, SandboxThread> runners = new ConcurrentHashMap<String, SandboxThread>();
     
-    static class SecureThread extends Thread {
+    static class SandboxThread extends Thread {
         private SecurityManager sm;
-        private SecureThreadFactory fact;
-        public SecureThread(SecureThreadFactory fact, SecurityManager sm, ThreadGroup group, Runnable target, String name, long stackSize) {
+        private SandboxThreadFactory fact;
+        public SandboxThread(SandboxThreadFactory fact, SecurityManager sm, ThreadGroup group, Runnable target, String name, long stackSize) {
             super(group, target, name, stackSize);
             this.sm = sm;
             this.fact = fact;
@@ -59,7 +58,7 @@ public class SecureThreadFactory extends RythmThreadFactory {
 
     @Override
     protected Thread newThread0(ThreadGroup g, Runnable r, String name, long stackSize) {
-        return new SecureThread(this, sm, g, r, name, stackSize);
+        return new SandboxThread(this, sm, g, r, name, stackSize);
     }
     
     static void shutdown() {

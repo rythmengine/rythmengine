@@ -9,7 +9,6 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
-import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.template.ITemplate;

@@ -1,26 +1,22 @@
-package com.greenlaw110.rythm.security;
+package com.greenlaw110.rythm.sandbox;
 
-import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
-import com.stevesoft.pat.Regex;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.*;
 
 /**
  * A secure executing service run template in a separate thread in case there are infinite loop, and also set
  * the SecurityManager in the executing thread
  */
-public class SecureExecutingService {
-    private static ILogger logger = Logger.get(SecureExecutingService.class);
+public class SandboxExecutingService {
+    private static ILogger logger = Logger.get(SandboxExecutingService.class);
     private ScheduledExecutorService scheduler = null;
     private long timeout = 1000;
 
-    public SecureExecutingService(int poolSize, SecurityManager sm, long timeout) {
-        scheduler = new ScheduledThreadPoolExecutor(poolSize, new SecureThreadFactory(sm), new ThreadPoolExecutor.AbortPolicy());
+    public SandboxExecutingService(int poolSize, SecurityManager sm, long timeout) {
+        scheduler = new ScheduledThreadPoolExecutor(poolSize, new SandboxThreadFactory(sm), new ThreadPoolExecutor.AbortPolicy());
         this.timeout = timeout;
     }
 
@@ -67,7 +63,7 @@ public class SecureExecutingService {
     }
 
     public void shutdown() {
-        SecureThreadFactory.shutdown();
+        SandboxThreadFactory.shutdown();
         scheduler.shutdownNow();
     }
 

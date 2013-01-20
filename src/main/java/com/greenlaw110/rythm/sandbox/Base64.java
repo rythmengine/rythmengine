@@ -1,9 +1,9 @@
-package com.greenlaw110.rythm.security;
+package com.greenlaw110.rythm.sandbox;
 
 /**
  * Source code come from http://examples.oreilly.com/9781565924024/files/oreilly/jonathan/util/Base64.java
  */
-public class Base64 {
+class Base64 {
 
     public static String encode(byte[] raw) {
       StringBuffer encoded = new StringBuffer();

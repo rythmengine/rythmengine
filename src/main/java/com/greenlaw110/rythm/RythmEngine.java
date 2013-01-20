@@ -16,7 +16,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.security.SecureExecutingService;
+import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
 import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
@@ -98,7 +98,7 @@ public class RythmEngine {
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
     private SecurityManager sm = null;
-    private SecureExecutingService secureExecutor = null;
+    private SandboxExecutingService secureExecutor = null;
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
     public boolean playHost = false;
@@ -348,7 +348,7 @@ public class RythmEngine {
         sm = configuration.getAs("rythm.securityManager", null, SecurityManager.class);
         long timeout = configuration.getAsLong("rythm.timeout", 1000L);
         int poolSize = configuration.getAsInt("rythm.pool.size", 10);
-        secureExecutor = new SecureExecutingService(poolSize, sm, timeout);
+        secureExecutor = new SandboxExecutingService(poolSize, sm, timeout);
 
 //        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
 //            loadTags();

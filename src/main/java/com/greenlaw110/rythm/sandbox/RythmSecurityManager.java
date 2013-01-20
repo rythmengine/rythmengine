@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.security;
+package com.greenlaw110.rythm.sandbox;
 
 import java.io.FileDescriptor;
 import java.net.InetAddress;
@@ -12,7 +12,7 @@ import java.security.Permission;
 public class RythmSecurityManager extends SecurityManager {
 
     public static boolean isRythmThread() {
-        return (Thread.currentThread() instanceof SecureThreadFactory.SecureThread);
+        return (Thread.currentThread() instanceof SandboxThreadFactory.SandboxThread);
     }
     
     private SecurityManager osm;
@@ -62,7 +62,7 @@ public class RythmSecurityManager extends SecurityManager {
 
     @Override
     public void checkAccess(Thread t) {
-        if (! (t instanceof SecureThreadFactory.SecureThread)) checkRythm();
+        if (! (t instanceof SandboxThreadFactory.SandboxThread)) checkRythm();
         if (null != osm) osm.checkAccess(t);
     }
 

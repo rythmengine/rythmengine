@@ -1,19 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.security.SecureExecutingService;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.Token;
-import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
-
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Free Java code parser.
