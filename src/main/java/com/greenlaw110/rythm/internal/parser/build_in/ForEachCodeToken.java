@@ -1,7 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.utils.S;
+import com.stevesoft.pat.Regex;
 
 public class ForEachCodeToken extends BlockCodeToken {
 
@@ -25,17 +30,43 @@ public class ForEachCodeToken extends BlockCodeToken {
      */
     public ForEachCodeToken(String type, String varname, String iterable, IContext context) {
         super(null, context);
-        if (null == type || null == iterable) throw new NullPointerException();
+        if (null == iterable) throw new NullPointerException();
         this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname;
         this.iterable = iterable;
         line--;
         openPos = context.cursor();
+        IContext ctx = context;
         ctx.pushBreak(IContext.Break.RETURN);
         ctx.pushContinue(IContext.Continue.RETURN);
+        CodeBuilder cb = context.getCodeBuilder();
+        if (S.isEmpty(type)) {
+            String itrType = cb.getRenderArgType(iterable);
+            if (null != itrType) {
+                Regex r = new Regex(".*((?@<>))");
+                if (r.search(itrType)) {type = r.stringMatched(1);}
+                this.type = S.strip(type, "<", ">");
+                boolean key = iterable.endsWith("keySet()");
+                boolean val = iterable.endsWith("values()");
+                if (key || val) {
+                    r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
+                    if (r.search(this.type)) {
+                        if (key) this.type = r.stringMatched(1);
+                        else this.type = r.stringMatched(2);
+                    } else {
+                        throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Invalid for loop iterator type declaration: %s", itrType);
+                    }
+                }
+                if (S.isEqual(this.type, this.varname)) this.varname = "_";
+            } else {
+                this.type = "Object";
+            }
+        }
+        context.getCodeBuilder().addRenderArgsIfNotDeclared(line, "Iterable<?>", iterable);
     }
 
     private String ObjectType(String type) {
+        if (null == type) return "Object";
         if ("int".equals(type)) return "Integer";
         if ("float".equals(type)) return "Float";
         if ("double".equals(type)) return "Double";

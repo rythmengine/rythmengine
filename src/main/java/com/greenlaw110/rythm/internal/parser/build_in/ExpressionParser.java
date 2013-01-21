@@ -1,11 +1,14 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
 import com.greenlaw110.rythm.internal.TemplateParser;
+import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
@@ -21,28 +24,31 @@ import com.stevesoft.pat.Regex;
 public class ExpressionParser extends CaretParserFactoryBase {
 
     private static class ExpressionToken extends CodeToken {
-        private static void assertSimple(String symbol, IContext context) {
-            boolean isSimple = symbol.indexOf(".") == -1 && symbol.indexOf("[") == -1;
-            if (!isSimple) throw new TemplateParser.NotSIMTemplate();
+        private static void assertBasic(String symbol, IContext context) {
+            boolean isSimple = Patterns.VarName.matches(symbol);
+            IContext ctx = context;
+            if (!isSimple) {
+                throw new TemplateParser.ComplexExpressionException(ctx.getEngine(), ctx.getTemplateClass(), ctx.currentLine());
+            }
         }
 
         public ExpressionToken(String s, IContext context) {
             super(s, context);
-            if (context.getDialect() instanceof SimpleRythm) {
+            if (context.getDialect() instanceof BasicRythm) {
                 s = S.stripBrace(s);
-                // simple rythm dialect support only simple expression
+                // basic rythm dialect support only simple expression
                 int pos = s.indexOf("("); // find out the method name
                 if (pos != -1) {
                     String methodName = s.substring(0, pos);
-                    assertSimple(methodName, context);
+                    assertBasic(methodName, context);
                 } else {
                     // find out array
                     pos = s.indexOf("[");
                     if (pos != -1) {
                         s = s.substring(0, pos);
                     }
-                    assertSimple(s, context);
-                    context.getCodeBuilder().addRenderArgs(context.currentLine(), pos == -1 ? "Object" : "Object[]", s);
+                    assertBasic(s, context);
+                    context.getCodeBuilder().addRenderArgsIfNotDeclared(context.currentLine(), pos == -1 ? "Object" : "Object[]", s);
                 }
             }
         }
@@ -111,10 +117,12 @@ public class ExpressionParser extends CaretParserFactoryBase {
     public static void main(String[] args) {
         String ps = String.format(new ExpressionParser().patternStr(), "@");
         Regex r =  new Regex(ps);
-        String s = "@(camp)@x";
+        String s = "@(camp ) @x";
         p(s, r);
         r = new Regex(String.format("^(%s(?@())*).*", "@"));
         p(s, r);
+        s = new RythmEngine().render(s, "abc", "123");
+        System.out.println(s);
     }
 
     public static void main1(String[] args) {

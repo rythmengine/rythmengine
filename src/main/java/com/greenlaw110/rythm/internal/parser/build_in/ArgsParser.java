@@ -68,7 +68,7 @@ public class ArgsParser extends KeywordParserFactory {
                 remain = remain();
                 r = reg(dialect());
                 int step = 0;
-                final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
+                //final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
                 while (r.search(remain)) {
                     String matched = r.stringMatched();
                     if (matched.startsWith("\n") || matched.startsWith("\r")) {
@@ -78,7 +78,8 @@ public class ArgsParser extends KeywordParserFactory {
                     String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
                     String defVal = r.stringMatched(6);
-                    ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
+                    //ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
+                    ctx().getCodeBuilder().addRenderArgs(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                 }
                 step(step);
                 // strip off the following ";" symbol and line breaks
@@ -94,9 +95,9 @@ public class ArgsParser extends KeywordParserFactory {
                 return new Directive("", ctx()) {
                     @Override
                     public void call() {
-                        for (CodeBuilder.RenderArgDeclaration rd: ral) {
-                            builder().addRenderArgs(rd);
-                        }
+//                        for (CodeBuilder.RenderArgDeclaration rd: ral) {
+//                            builder().addRenderArgs(rd);
+//                        }
                     }
                 };
             }

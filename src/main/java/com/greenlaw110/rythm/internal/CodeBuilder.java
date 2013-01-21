@@ -441,6 +441,12 @@ public class CodeBuilder extends TextBuilder {
     public void setLogTime() {
         logTime = true;
     }
+    
+    public String getRenderArgType(String name) {
+        RenderArgDeclaration rad = renderArgs.get(name);
+        if (null != rad) return rad.type;
+        else return null;
+    }
 
     public void addRenderArgs(RenderArgDeclaration declaration) {
         renderArgs.put(declaration.name, declaration);
@@ -448,6 +454,12 @@ public class CodeBuilder extends TextBuilder {
 
     public void addRenderArgs(int lineNo, String type, String name) {
         renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
+    }
+    
+    public void addRenderArgsIfNotDeclared(int lineNo, String type, String name) {
+        if (!renderArgs.containsKey(name)) {
+            renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
+        }
     }
 
     private Map<String, List<TextBuilder>> macros = new HashMap<String, List<TextBuilder>>();

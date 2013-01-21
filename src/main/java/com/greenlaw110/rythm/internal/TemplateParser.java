@@ -5,7 +5,6 @@ import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IBlockHandler;
@@ -32,7 +31,10 @@ public class TemplateParser implements IContext {
     public static class ExitInstruction extends FastRuntimeException {
     }
 
-    public static class NotSIMTemplate extends FastRuntimeException {
+    public static class ComplexExpressionException extends ParseException {
+        public ComplexExpressionException(RythmEngine engine, TemplateClass tc, int line) {
+            super(engine, tc, line, "Complex expression not allowed in basic rythm mode");
+        }
     }
 
     void parse() {
@@ -45,8 +47,11 @@ public class TemplateParser implements IContext {
             }
         } catch (ExitInstruction e) {
             // ignore, just break the parsing process
-        } catch (NotSIMTemplate e) {
-            logger.error("NotSIMTemplate captured");
+        } catch (ComplexExpressionException e) {
+            if (null != cb.dialect) {
+                throw e;
+            }
+            // try the next dialect if not specified
             cb.rewind();
             cursor = 0;
             dm.pushDef();

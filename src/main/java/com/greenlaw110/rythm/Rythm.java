@@ -9,6 +9,7 @@ import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.IRythmListener;
+import com.greenlaw110.rythm.utils.NamedParams;
 
 import java.io.File;
 import java.util.*;
@@ -147,11 +148,9 @@ public class Rythm {
     }
 
     public static void main(String[] args) {
-        Rythm.enterSandbox();
-        String template = "XYZ@*{for(;;){if (0 > (1 + new Random().nextInt(100))) break;}}*@ABC";
-        String s = Rythm.render(template);
-        System.out.println(s);
-        engine.shutdown();
+        String[] sa = {"fee", "baa"};
+        System.out.println(substitute("@for(sa){@_}", Arrays.asList(sa)));
+        System.out.println(render("@args List<String> sa\n@for(sa){@(_.length())@_sep}", Arrays.asList(sa)));
     }
 
     public static void main2(String[] args) {
