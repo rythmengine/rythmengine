@@ -713,7 +713,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pInlineTags() {
         pn();
         for (InlineTag tag : inlineTags) {
-            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\ntry{");
+            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\ntry{\n");
             boolean isVoid = tag.autoRet;
             StringBuilder sb = out();
             if (!isVoid) {

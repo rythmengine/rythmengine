@@ -35,6 +35,10 @@ public interface IDialect {
     void begin(IContext ctx);
 
     void end(IContext ctx);
+    
+    boolean enableScripting();
+    
+    boolean enableFreeForLoop();
 
     CodeBuilder createCodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine);
 }

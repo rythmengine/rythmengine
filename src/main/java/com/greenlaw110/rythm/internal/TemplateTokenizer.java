@@ -21,11 +21,12 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     private IContext ctx;
     private List<IParser> parsers = new ArrayList<IParser>();
     private int lastCursor = 0;
+    
     public TemplateTokenizer(String template, IContext context) {
         ctx = context;
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));
-        parsers.add(new ScriptParser(ctx));
+        if (ctx.getDialect().enableScripting()) parsers.add(new ScriptParser(ctx));
         parsers.add(new StringTokenParser(ctx));
         // add a fail through parser to prevent unlimited loop
         parsers.add(new ParserBase(ctx) {
@@ -39,16 +40,8 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
                 return new Token.StringToken(oneStep, p);
             }
         });
-//        Parsers.add(new CommentParser(ctx));
-//        Parsers.add(new ArgParser(ctx));
-//        Parsers.add(new DialectParser(ctx));
-//        Parsers.add(new ImportParser(ctx));
-//        Parsers.add(new ForParser(ctx));
-//        Parsers.add(new IfElseParser(ctx));
-//        Parsers.add(new BlockCloseParser(ctx));
-//        Parsers.add(new EvaluatorParser(ctx));
-//        Parsers.add(new StringTokenParser(ctx));
     }
+    
     @Override
     public Iterator<TextBuilder> iterator() {
         return new Iterator<TextBuilder>() {
@@ -68,9 +61,6 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
                     }
                 }
                 throw new RuntimeException("Internal error");
-//                String s = ctx.getRemain();
-//                ctx.step(s.length());
-//                return new Token(s, ctx);
             }
 
             @Override

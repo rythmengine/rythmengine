@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
@@ -25,6 +26,9 @@ public class ForEachParser extends KeywordParserFactory {
                 Regex r = reg(dialect());
                 String remain = remain();
                 if (!r.search(remain)) {
+                    if (!ctx().getDialect().enableFreeForLoop()) {
+                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...}");
+                    }
                     r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                     if (!r.search(remain)) {
                         raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");

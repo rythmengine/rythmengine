@@ -6,36 +6,29 @@ import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.template.ToStringTemplateBase;
 
 /**
- * ToString mode is a very limited subset of Rythm which has only basic Rythm features:
+ * Basic Rythm is a very limited subset of Rythm which has only basic Rythm features:
  * <ul>
- * <li>Expression evaluation and escaping</li>
- * <li>if-elseif-else</li>
+ * <li>Expression evaluation (nullable express also supported) and escaping</li>
+ * <li>if-elseif-else, and for(T e: Iterable<T>)</></li>
  * </ul>
  * 
- * Specifically, argument declaration and scripting is disabled in ToString mode; @for loop is not allowed in ToString mode also
+ * Specifically, argument declaration and scripting is disabled in ToString mode; @for(; ;) is not allowed in Basic
+ * mode to prevent infinite loop
  */
-public class ToString extends BasicRythm {
+public class BasicRythm extends SimpleRythm {
 
     @Override
     public String id() {
-        return "rythm-toString";
+        return "rythm-basic";
     }
 
-    public String a() {
-        return "@";
-    }
-
-    protected Class type = null;
-
-    public ToString(Class type) {
-        if (null == type) throw new NullPointerException();
-        this.type = type;
+    public BasicRythm() {
     }
 
     protected Class<?>[] buildInParserClasses() {
         // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{EscapeParser.class, ElseIfParser.class, BraceParser.class, ExpressionParser.class, IfParser.class, RawParser.class, TimestampParser.class};
+        return new Class<?>[]{BreakParser.class, ContinueParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, BraceParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class, RawParser.class, TimestampParser.class};
     }
 
     @Override
@@ -43,13 +36,10 @@ public class ToString extends BasicRythm {
         String[] forbidden = {
             "@args",
             "@assign",
-            "@break",
-            "@continue",
             "@debug",
             "@doLayout",
             "@doBody",
             "@extends",
-            "@for",
             "@section",
             "@render",
             "@import",
@@ -82,10 +72,7 @@ public class ToString extends BasicRythm {
     }
 
     @Override
-    public void begin(IContext ctx) {
-        CodeBuilder cb = ctx.getCodeBuilder();
-        cb.addRenderArgs(ctx.currentLine(), type.getName(), "_");
-        cb.setSimpleTemplate(0);
-        cb.setExtended(ToStringTemplateBase.class);
+    public boolean enableFreeForLoop() {
+        return false;
     }
 }

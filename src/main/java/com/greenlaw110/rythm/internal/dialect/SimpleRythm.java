@@ -3,10 +3,20 @@ package com.greenlaw110.rythm.internal.dialect;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.spi.IContext;
 
+/**
+ * Simple Rythm mode is a subset of Rythm mode which has most Rythm feature except the template layout/extend features:
+ * <ul>
+ * <li>Extends a layout template or declare template section</li>
+ * <li>Render sub template sections/content</li>
+ * <li>@Designate inti code section to be put into parent template</li>
+ * <li>Include another template at parsing time</li>
+ * <li>Set/get template variable to be passed to parent template</li>
+ * </ul>
+ */
 public class SimpleRythm extends DialectBase {
 
     public String id() {
-        return "simple_rythm";
+        return "rythm-simple";
     }
 
     public String a() {
@@ -16,17 +26,12 @@ public class SimpleRythm extends DialectBase {
     protected Class<?>[] buildInParserClasses() {
         // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{AssignParser.class, BreakParser.class,  ContinueParser.class,
-                CommentParser.class, DebugParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, BraceParser.class,
-                InvokeParser.class, InvokeTagParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class,
-                ImportParser.class, NoSIMParser.class, RawParser.class, ReturnParser.class, SimpleParser.class,
-                TimestampParser.class, VerbatimParser.class};
+        return new Class<?>[]{AssignParser.class, ArgsParser.class, BreakParser.class, ContinueParser.class, CacheParser.class, CommentParser.class, CompactParser.class, DebugParser.class, DefTagParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, ExecParser.class, ExpandParser.class, ExitIfNoClassParser.class, BraceParser.class, LogTimeParser.class, InvokeParser.class, InvokeMacroParser.class, InvokeTagParser.class, MacroParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, IfParser.class, ImportParser.class, NoCompactParser.class, NoSIMParser.class, RawParser.class, ReturnParser.class, SimpleParser.class, TimestampParser.class, VerbatimParser.class};
     }
 
     @Override
     public boolean isMyTemplate(String template) {
         String[] forbidden = {
-            "@args",
             "@extends",
             "@section",
             "@render",
@@ -36,13 +41,6 @@ public class SimpleRythm extends DialectBase {
             "@set",
             "@get",
             "@init",
-            "@expand",
-            "@exec",
-            "@macro",
-            "@compact",
-            "@nocompact",
-            "@def ",
-            "@tag ",
             "@nosim"
         };
         for (String s: forbidden) {

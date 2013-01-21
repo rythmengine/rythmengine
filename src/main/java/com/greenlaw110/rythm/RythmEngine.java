@@ -8,6 +8,7 @@ import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.AutoToString;
+import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -520,6 +521,20 @@ public class RythmEngine {
 
     public String renderStr(String template, Object... args) {
         return renderString(template, args);
+    }
+    
+    public String substitute(String template, Object... args) {
+        TemplateClass tc = classes.getByTemplate(template);
+        if (null == tc) {
+            tc = new TemplateClass(new StringTemplateResource(template), this, new BasicRythm());
+        }
+        ITemplate t = tc.asTemplate();
+        if (1 == args.length && args[0] instanceof Map) {
+            t.setRenderArgs((Map<String, Object>) args[0]);
+        } else {
+            t.setRenderArgs(args);
+        }
+        return t.render();
     }
 
     public String toString(String template, Object obj) {

@@ -109,6 +109,10 @@ public class Rythm {
     public static String render(File file, Object... args) {
         return engine().render(file, args);
     }
+    
+    public static String substitute(String template, Object... args) {
+        return engine().substitute(template, args);
+    }
 
     public static String toString(String template, Object obj) {
         return engine().toString(template, obj);

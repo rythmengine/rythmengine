@@ -130,6 +130,16 @@ public abstract class DialectBase implements IDialect {
     }
 
     @Override
+    public boolean enableScripting() {
+        return true;
+    }
+
+    @Override
+    public boolean enableFreeForLoop() {
+        return true;
+    }
+
+    @Override
     public CodeBuilder createCodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine) {
         return new CodeBuilder(template, className, tagName, templateClass, engine, this);
     }

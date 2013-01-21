@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parse @raw() {...}
+ * Parse @escape("JS") {...}
  */
 public class EscapeParser extends KeywordParserFactory {
 
