@@ -52,7 +52,7 @@ public class VerbatimParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new VerbatimParser().reg(new Rythm());
+        Regex r = new VerbatimParser().reg(Rythm.INSTANCE);
         String s = "@verbatim(){\n\tHello world!\n@each X {abc;} \n} xyz";
         if (r.search(s)) {
             String s0 = r.stringMatched(3);

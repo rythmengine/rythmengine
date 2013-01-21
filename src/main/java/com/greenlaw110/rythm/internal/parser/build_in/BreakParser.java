@@ -45,7 +45,7 @@ public class BreakParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new BreakParser().reg(new Rythm());
+        Regex r = new BreakParser().reg(Rythm.INSTANCE);
         String s = "@break()\n\tdd";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

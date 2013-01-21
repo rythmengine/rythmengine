@@ -47,7 +47,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = "@__exitIfNoClass__(java.lang.String)\nabc";
         ExitIfNoClassParser ap = new ExitIfNoClassParser();
-        Regex r = ap.reg(new Rythm());
+        Regex r = ap.reg(Rythm.INSTANCE);
         if (r.search(s)) {
             System.out.println("m: " + r.stringMatched());
             System.out.println("1: " + r.stringMatched(1));

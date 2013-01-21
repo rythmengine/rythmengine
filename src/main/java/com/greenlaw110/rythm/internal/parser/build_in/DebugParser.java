@@ -46,7 +46,7 @@ public class DebugParser  extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = "@debug (\"sss\", 1)\naba";
         DebugParser ap = new DebugParser();
-        Regex r = ap.reg(new Rythm());
+        Regex r = ap.reg(Rythm.INSTANCE);
         if (r.search(s)) {
             p(r);
         }

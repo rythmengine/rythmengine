@@ -9,7 +9,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 
 public class UnitTest extends org.junit.Assert {
     
-    protected DialectBase d = new Rythm();
+    protected DialectBase d = (DialectBase)Rythm.INSTANCE;
     protected MockContext c;
     protected MockCodeBuilder b;
     

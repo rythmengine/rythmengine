@@ -56,7 +56,7 @@ public class ExecParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         ExecParser p = new ExecParser();
-        Regex r = p.reg(new Rythm());
+        Regex r = p.reg(Rythm.INSTANCE);
         String s = "@exec(\"x.y.z\") \n@sayHi(\"green\")";
         if (r.search(s)) {
             p(r);

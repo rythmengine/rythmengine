@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.parser;
 
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.spi.IParserFactory;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -27,7 +28,7 @@ public class ParserDispatcher extends ParserBase {
     }
 
     public TextBuilder go() {
-        DialectBase d = dialect();
+        DialectBase d = (DialectBase)dialect();
         IContext c = ctx();
         Matcher m = P.matcher(remain());
         if (m.matches()) {

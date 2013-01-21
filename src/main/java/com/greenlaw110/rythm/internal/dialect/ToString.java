@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.dialect;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.ToStringTemplateBase;
 
 /**
@@ -16,10 +17,16 @@ import com.greenlaw110.rythm.template.ToStringTemplateBase;
  */
 public class ToString extends BasicRythm {
 
+    public static final String ID = "rythm-toString";
+    
     @Override
     public String id() {
-        return "rythm-toString";
+        return ID;
     }
+
+    public static final IDialect INSTANCE = new ToString();
+    
+    protected ToString() {}
 
     public String a() {
         return "@";
@@ -85,7 +92,7 @@ public class ToString extends BasicRythm {
     public void begin(IContext ctx) {
         CodeBuilder cb = ctx.getCodeBuilder();
         cb.addRenderArgs(ctx.currentLine(), type.getName(), "_");
-        cb.setSimpleTemplate(0);
+        //cb.setSimpleTemplate(0);
         cb.setExtended(ToStringTemplateBase.class);
     }
 }

@@ -104,7 +104,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected RawData _render(String template, Object... args) {
         if (null == template) return new RawData("");
         try {
-            return S.raw(engine.enterSandbox().render(template, args));
+            return S.raw(engine.sandbox().render(template, args));
         } finally {
             engine.resetSandbox();
         }
@@ -113,7 +113,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected RawData _render(String template) {
         if (null == template) return new RawData("");
         try {
-            return S.raw(engine.enterSandbox().render(template, _properties));
+            return S.raw(engine.sandbox().render(template, _properties));
         } finally {
             engine.resetSandbox();
         }
@@ -364,10 +364,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 }
             } catch (RuntimeException e) {
                 // try to restart engine
-                try {
-                    engine.restart(e);
-                } catch (RuntimeException e0) {
-                    // ignore it because we already thrown it out
+                if (!Rythm.insideSandbox()) {
+                    try {
+                        engine.restart(e);
+                    } catch (RuntimeException e0) {
+                        // ignore it because we already thrown it out
+                    }
                 }
                 throw e;
             }

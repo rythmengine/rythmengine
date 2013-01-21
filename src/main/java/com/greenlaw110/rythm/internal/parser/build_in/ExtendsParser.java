@@ -88,7 +88,7 @@ public class ExtendsParser extends KeywordParserFactory {
     }
 
     private static void test1() {
-        Regex r = new ExtendsParser().reg(new Rythm());
+        Regex r = new ExtendsParser().reg(Rythm.INSTANCE);
         String line = "@extends(\"_panel.html\", a:5, b=foo.bar(4)[1]);";
         if (!r.search(line)) {
             throw new RuntimeException("1");
@@ -142,7 +142,7 @@ public class ExtendsParser extends KeywordParserFactory {
     }
 
     public static void test0() {
-        Regex r = new ExtendsParser().reg(new Rythm());
+        Regex r = new ExtendsParser().reg(Rythm.INSTANCE);
         String s = "@extends('ab/cd.foo', 'a': 6, \"b\"=null); acd";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

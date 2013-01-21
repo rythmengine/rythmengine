@@ -5,6 +5,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
+import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
@@ -106,7 +107,7 @@ public class ArgsParser extends KeywordParserFactory {
 
     public static List<CodeBuilder.RenderArgDeclaration> parseArgDeclaration(int lineNo, String s) {
         final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
-        Regex r = new ArgsParser().reg((DialectBase)com.greenlaw110.rythm.Rythm.getDialectManager().get());
+        Regex r = new ArgsParser().reg(DialectManager.current());
         while (r.search(s)) {
             String matched = r.stringMatched();
             if (matched.startsWith("\n") || matched.startsWith("\r")) {

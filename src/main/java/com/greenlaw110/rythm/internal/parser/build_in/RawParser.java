@@ -47,7 +47,7 @@ public class RawParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Pattern p = new RawParser().ptn(new Rythm());
+        Pattern p = new RawParser().ptn(Rythm.INSTANCE);
         Matcher m = p.matcher("@raw() {\n" +
                 "    @body\n" +
                 "}");

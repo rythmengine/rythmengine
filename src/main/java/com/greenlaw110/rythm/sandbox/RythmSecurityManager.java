@@ -52,7 +52,9 @@ public class RythmSecurityManager extends SecurityManager {
     }
     
     private void checkRythm() {
-        if (!released && isRythmThread()) throw new SecurityException("illegal access to protected resource");
+        if (!released && isRythmThread()) {
+            throw new SecurityException("illegal access to protected resource");
+        }
     }
     @Override
     public void checkCreateClassLoader() {

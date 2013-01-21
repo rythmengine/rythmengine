@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.dialect;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.ToStringTemplateBase;
 
 /**
@@ -17,12 +18,16 @@ import com.greenlaw110.rythm.template.ToStringTemplateBase;
  */
 public class BasicRythm extends SimpleRythm {
 
+    public static final String ID = "rythm-basic";
+
     @Override
     public String id() {
-        return "rythm-basic";
+        return ID;
     }
 
-    public BasicRythm() {
+    public static final IDialect INSTANCE = new BasicRythm();
+    
+    protected BasicRythm() {
     }
 
     protected Class<?>[] buildInParserClasses() {

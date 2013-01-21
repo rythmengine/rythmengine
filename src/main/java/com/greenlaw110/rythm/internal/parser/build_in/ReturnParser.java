@@ -41,15 +41,8 @@ public class ReturnParser extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = "@return \naba";
         ReturnParser ap = new ReturnParser();
-        Regex r = ap.reg(new Rythm());
-        if (r.search(s)) {
-            System.out.println("m: " + r.stringMatched());
-            System.out.println("1: " + r.stringMatched(1));
-            System.out.println("2: " + r.stringMatched(2));
-            System.out.println("3: " + r.stringMatched(3));
-            System.out.println("4: " + r.stringMatched(4));
-            System.out.println("5: " + r.stringMatched(5));
-        }
+        Regex r = ap.reg(Rythm.INSTANCE);
+        p(s, r);
     }
 
 }

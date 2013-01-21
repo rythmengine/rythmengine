@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
 
 import java.util.logging.LoggingMXBean;
@@ -22,16 +23,16 @@ public abstract class ParserBase implements IParser {
         return Pattern.compile(regex, Pattern.DOTALL);
     }
 
-    private final DialectBase d_;
+    private final IDialect d_;
     private final IContext c_;
 
     protected ParserBase(IContext context) {
         if (null == context) throw new NullPointerException();
-        d_ = (DialectBase) context.getDialect();
+        d_ = context.getDialect();
         c_ = context;
     }
 
-    protected final DialectBase dialect() {
+    protected final IDialect dialect() {
         return d_;
     }
 

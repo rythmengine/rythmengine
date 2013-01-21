@@ -255,11 +255,6 @@ public class TemplateClass {
     public CodeBuilder codeBuilder;
 
     /**
-     * Indicate this template class represent a simple template
-     */
-    public boolean simpleTemplate;
-
-    /**
      * The ITemplate instance
      */
     private TemplateBase templateInstance;
@@ -303,9 +298,6 @@ public class TemplateClass {
         this(engine);
         if (null == resource) throw new NullPointerException();
         templateResource = resource;
-        if (resource instanceof StringTemplateResource) {
-            simpleTemplate = true;
-        }
         if (!noRefresh) refresh();
     }
 
@@ -313,9 +305,6 @@ public class TemplateClass {
         this(engine);
         if (null == resource) throw new NullPointerException();
         templateResource = resource;
-        if (resource instanceof StringTemplateResource) {
-            simpleTemplate = true;
-        }
         this.dialect = dialect;
         if (!noRefresh) refresh();
     }
@@ -439,7 +428,7 @@ public class TemplateClass {
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();
-        if (Rythm.sandbox()) {
+        if (engine().insideSandbox()) {
             javaSource = CodeBuilder.preventInfiniteLoop(javaSource);
         }
         if (logger.isTraceEnabled()) {

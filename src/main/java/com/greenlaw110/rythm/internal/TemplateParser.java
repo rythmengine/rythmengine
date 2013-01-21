@@ -31,42 +31,48 @@ public class TemplateParser implements IContext {
     public static class ExitInstruction extends FastRuntimeException {
     }
 
-    public static class ComplexExpressionException extends ParseException {
-        public ComplexExpressionException(RythmEngine engine, TemplateClass tc, int line) {
-            super(engine, tc, line, "Complex expression not allowed in basic rythm mode");
+    public static class ScriptingDisabledException extends RewindableException {
+        public ScriptingDisabledException(IContext ctx) {
+            super(ctx, "Scripting not allowed in current dialect[%s]", ctx.getDialect());
+        }
+    }
+    
+    private static abstract class RewindableException extends ParseException {
+        public RewindableException(IContext ctx, String msg, Object... args) {
+            super(ctx.getEngine(), ctx.getTemplateClass(), ctx.currentLine(), msg, args);
+        }
+    }
+
+    public static class ComplexExpressionException extends RewindableException {
+        public ComplexExpressionException(IContext ctx) {
+            super(ctx, "Complex expression not allowed in current dialect[%s]", ctx.getDialect());
         }
     }
 
     void parse() {
         DialectManager dm = cb.engine.getDialectManager();
-        dm.beginParse(this);
-        try {
-            TemplateTokenizer tt = new TemplateTokenizer(template, this);
-            for (TextBuilder builder: tt) {
-                cb.addBuilder(builder);
-            }
-        } catch (ExitInstruction e) {
-            // ignore, just break the parsing process
-        } catch (ComplexExpressionException e) {
-            if (null != cb.dialect) {
-                throw e;
-            }
-            // try the next dialect if not specified
-            cb.rewind();
-            cursor = 0;
-            dm.pushDef();
+        while (true) {
+            dm.beginParse(this);
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(template, this);
-                for (TextBuilder builder: tt) {
+                for (TextBuilder builder : tt) {
                     cb.addBuilder(builder);
                 }
-            } catch (ExitInstruction e0) {
-                // ignore just break
-            } finally {
-                dm.pop();
+                dm.endParse(this);
+                break;
+            } catch (ExitInstruction e) {
+                dm.endParse(this);
+                break;
+            } catch (RewindableException e) {
+                if (null != cb.requiredDialect) {
+                    dm.endParse(this);
+                    throw e;
+                }
+                continue;
+            } catch (RuntimeException e) {
+                dm.endParse(this);
+                throw e;
             }
-        } finally {
-            dm.endParse(this);
         }
     }
 
@@ -80,12 +86,14 @@ public class TemplateParser implements IContext {
         return cb;
     }
 
+    private IDialect dialect = null;
+
     public IDialect getDialect() {
-        return cb.engine.getDialectManager().get();
+        return dialect;
     }
 
-    public void setDialect(String dialect) {
-        throw new UnsupportedOperationException();
+    public void setDialect(IDialect dialect) {
+        this.dialect = dialect;
     }
 
     @Override
@@ -142,7 +150,8 @@ public class TemplateParser implements IContext {
 
     @Override
     public String closeBlock() throws ParseException {
-        if (blocks.isEmpty()) throw new ParseException(getEngine(), cb.getTemplateClass(), currentLine(), "No open block found");
+        if (blocks.isEmpty())
+            throw new ParseException(getEngine(), cb.getTemplateClass(), currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return null == bh ? "" : bh.closeBlock();
     }
@@ -273,12 +282,17 @@ public class TemplateParser implements IContext {
         return inBodyStack2.pop();
     }
 
+    public void shutdown() {
+        dialect = null;
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;
         totalLines = template.split("(\\r\\n|\\n|\\r)").length + 1;
         cb = null;
     }
+
     public static void main(String[] args) {
         TemplateParser tp = new TemplateParser("\nHello \n\r\nworld!");
         System.out.println(tp.totalLines);

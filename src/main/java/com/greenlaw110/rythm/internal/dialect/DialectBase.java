@@ -12,7 +12,7 @@ import java.util.*;
 
 public abstract class DialectBase implements IDialect {
 
-    public DialectBase() {
+    protected DialectBase() {
         registerBuildInParsers();
     }
 

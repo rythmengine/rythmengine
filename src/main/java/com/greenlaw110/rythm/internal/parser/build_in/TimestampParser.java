@@ -41,7 +41,7 @@ public class TimestampParser extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = "@ts() \naba";
         TimestampParser ap = new TimestampParser();
-        Regex r = ap.reg(new Rythm());
+        Regex r = ap.reg(Rythm.INSTANCE);
         if (r.search(s)) {
             p(r, 5);
         }

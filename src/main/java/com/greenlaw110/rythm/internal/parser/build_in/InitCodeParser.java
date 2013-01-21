@@ -54,7 +54,7 @@ public class InitCodeParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new InitCodeParser().reg(new Rythm());
+        Regex r = new InitCodeParser().reg(Rythm.INSTANCE);
         String s = "@init ( ) {\n\tHello world!\n@each X {abc;} \n} xyz";
         if (r.search(s)) {
             String s0 = r.stringMatched(3);

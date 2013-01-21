@@ -92,7 +92,7 @@ public class DefTagParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         DefTagParser tp = new DefTagParser();
-        Regex r = tp.reg(new Rythm());
+        Regex r = tp.reg(Rythm.INSTANCE);
         String s = "@tag Map<String, Map<String, Map<String, Long>>> myTag(String x, Map<String, Map<String, Map<String, Long>>> y) {\\n y.name: x\\n}";
         p(s, r, 9);
     }

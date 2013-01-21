@@ -54,7 +54,7 @@ public class InvokeMacroParser extends CaretParserFactoryBase {
 
     public static void main(String[] args) {
         InvokeMacroParser P = new InvokeMacroParser();
-        Regex r = new Regex(String.format(P.patternStr(), new Rythm().a()));
+        Regex r = new Regex(String.format(P.patternStr(), Rythm.INSTANCE.a()));
         String s = "@ab ( )";
         p(s, r);
     }

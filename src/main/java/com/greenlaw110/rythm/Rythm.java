@@ -4,12 +4,12 @@ import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.sandbox.Sandbox;
 import com.greenlaw110.rythm.spi.ExtensionManager;
 import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.IRythmListener;
-import com.greenlaw110.rythm.utils.NamedParams;
 
 import java.io.File;
 import java.util.*;
@@ -51,18 +51,14 @@ public class Rythm {
         return engine;
     }
     
-    public static RythmEngine enterSandbox() {
-        return engine().enterSandbox();
+    public static boolean insideSandbox() {
+        return RythmEngine.insideSandbox();
     }
     
-    public static boolean sandbox() {
-        return engine.sandbox();
+    public static Sandbox sandbox() {
+        return engine().sandbox();
     }
     
-    public static RythmEngine quitSandbox() {
-        return engine().resetSandbox();
-    }
-
     public static void registerLoggerFactory(ILoggerFactory fact) {
         Logger.registerLoggerFactory(fact);
     }

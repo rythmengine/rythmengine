@@ -1,100 +1,105 @@
 package com.greenlaw110.rythm.internal.dialect;
 
+import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParserFactory;
+import com.greenlaw110.rythm.utils.S;
 
 import java.util.*;
 
 public class DialectManager {
     protected ILogger logger = Logger.get(DialectManager.class);
-    IDialect def = null;
-    public DialectManager() {
-        def = new Rythm();
-    }
-    static ThreadLocal<Stack<IDialect>> threadLocal = new ThreadLocal<Stack<IDialect>>(); static {
-        Stack<IDialect> stack = new Stack<IDialect>();
-        stack.push(new Rythm());
-        threadLocal.set(stack);
-    }
-    static IDialect[] dialects = {
-        new SimpleRythm(),
-        new Rythm()
+    final static IDialect[] defDialects = {
+        BasicRythm.INSTANCE,
+        SimpleRythm.INSTANCE,
+        Rythm.INSTANCE
     };
-    private Stack<IDialect> dialectStack() {
-        Stack<IDialect> stack = threadLocal.get();
-        if (null == stack) {
-            stack = new Stack<IDialect>();
-            threadLocal.set(stack);
+    public static IDialect getById(String id) {
+        for (IDialect d : defDialects) {
+            if (S.isEqual(id, d.id())) return d;
         }
-        return stack;
-    }
-    public IDialect get() {
-        Stack<IDialect> stack = dialectStack();
-        return stack.empty() ? null : stack.peek();
-    }
-    public void pushDef() {
-        dialectStack().push(def);
-    }
-    public void push(IDialect dialect) {
-        dialectStack().push(dialect);
-    }
-    public IDialect pop(){
-        Stack<IDialect> stack = dialectStack();
-        return stack.empty() ? null : stack.pop();
-    }
-    public IDialect get(String id) {
-        if (null == id || "rythm".equalsIgnoreCase(id)) return def;
         return null;
     }
+    private static int indexOf(IDialect dialect) {
+        if (null == dialect) throw new NullPointerException();
+        for (int i = 0; i < defDialects.length; ++i) {
+            if (S.isEqual(dialect.id(), defDialects[i].id())) return i;
+        }
+        return -1;
+    }
+    private static IDialect nextAvailable(IDialect d) {
+        if (null == d) return defDialects[0];
+        int i = indexOf(d) + 1;
+        if (i >= defDialects.length) return null;
+        return defDialects[i];
+    }
+    private static final InheritableThreadLocal<Stack<IDialect>> cur = new InheritableThreadLocal<Stack<IDialect>>() {
+        @Override
+        protected Stack<IDialect> initialValue() {
+            return new Stack<IDialect>();
+        }
+    };
+    public static void push(IDialect dialect) {
+        if (null == dialect) throw new NullPointerException();
+        cur.get().push(dialect);
+    }
+    public static IDialect current() {
+        return cur.get().peek();
+    }
+    public static IDialect pop() {
+        return cur.get().pop();
+    }
     public void beginParse(IContext ctx) {
-        IDialect d = ctx.getCodeBuilder().dialect;
-        if (null != d) {
-            push(d);
-            d.begin(ctx);
-        } else {
-            String template = ctx.getRemain();
-            for (IDialect d0: dialects) {
-                if (d0.isMyTemplate(template)) {
-                    push(d0);
-                    d0.begin(ctx);
-                    d = d0;
-                    break;
+        CodeBuilder cb = ctx.getCodeBuilder();
+        IDialect d = cb.requiredDialect;
+        if (null == d) {
+            d = ctx.getDialect();
+            if (null != d) {
+                // try the next available
+                d = nextAvailable(d);
+                if (null == d) throw new NullPointerException("No dialect can process the template");
+            } else {
+                // guess the most capable
+                String template = ctx.getRemain();
+                for (IDialect d0: defDialects) {
+                    if (d0.isMyTemplate(template)) {
+                        d = d0;
+                        break;
+                    }
                 }
             }
         }
-        d = get();
-        List<IParserFactory> l = externalParsers.get(d);
-        if (null != l) {
-            for (IParserFactory pf: l) {
-                d.registerParserFactory(pf);
-            }
-        }
+        ctx.setDialect(d);
+        push(d);
+        d.begin(ctx);
     }
 
     public void endParse(IContext ctx) {
-        IDialect d = pop();
+        IDialect d = ctx.getDialect();
         d.end(ctx);
+        pop();
     }
 
-    static Map<String, IDialect> dialectIdMap = new HashMap<String, IDialect>(); static {
-        for (IDialect dialect: dialects) {
-            dialectIdMap.put(dialect.id(), dialect);
+    private void registerParserFactories(IDialect dialect, IParserFactory ... factories) {
+        for (IParserFactory pf: factories) {
+            dialect.registerParserFactory(pf);
         }
     }
-
-    private Map<IDialect, List<IParserFactory>> externalParsers = new HashMap<IDialect, List<IParserFactory>>() ;
-    public void registerExternalParsers(String dialect, IParserFactory... factories) {
-        if (null == dialect) dialect = "rythm";
-        IDialect d = dialectIdMap.get(dialect);
-        if (null == d) {
-            throw new IllegalArgumentException("dialect not found: " + dialect);
-        }
-        externalParsers.put(d, Arrays.asList(factories));
-        for (IParserFactory f: factories) {
-            def.registerParserFactory(f);
+    public void registerExternalParsers(String dialectId, IParserFactory... factories) {
+        if (null == dialectId) {
+            for (IDialect d: defDialects) {
+                registerParserFactories(d, factories);
+            }
+        } else {
+            IDialect d = getById(dialectId);
+            if (null != d) {
+                registerParserFactories(d, factories);
+            } else {
+                throw new IllegalArgumentException("Cannot find dialect by Id: " + dialectId);
+            }
         }
     }
 }

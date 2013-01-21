@@ -63,7 +63,7 @@ public class CompactParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Pattern p = new CompactParser().ptn(new Rythm());
+        Pattern p = new CompactParser().ptn(Rythm.INSTANCE);
         Matcher m = p.matcher("@compact() {\n" +
                 "    @body\n" +
                 "}");

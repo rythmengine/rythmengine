@@ -41,10 +41,11 @@ public class SandboxExecutingService {
             if (o instanceof RuntimeException) throw (RuntimeException)o;
             if (o instanceof Exchanger) throw new RuntimeException((Exception)o);
             return (null == o) ? "" : o.toString(); 
-        } catch (TimeoutException te) {
+        } catch (RuntimeException e) {
             f.cancel(true);
-            throw new RuntimeException(te);
+            throw e;
         } catch (Exception e) {
+            f.cancel(true);
             throw new RuntimeException(e);
         }
     }

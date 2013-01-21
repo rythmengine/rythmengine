@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
@@ -65,8 +66,10 @@ public class ForEachParser extends KeywordParserFactory {
                     } else {
                         type = r.stringMatched(6);
                         varname = r.stringMatched(7);
-                        if (null == varname) varname = type;
-                        type = null;
+                        if (null == varname) {
+                            varname = type;
+                            type = null;
+                        }
                     }
                     if (S.isEmpty(iterable)) {
                         raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
@@ -89,25 +92,26 @@ public class ForEachParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s(\\s+|\\s*\\(\\s*)(((" + Patterns.Type + ")?)(\\s+(" + Patterns.VarName + "))?)\\s*(\\:?)\\s*(" + Patterns.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
+        return "^(%s%s(\\s*\\(\\s*)(((" + Patterns.Type + ")?)(\\s+(" + Patterns.VarName + "))?)\\s*(\\:?)\\s*(" + Patterns.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
     }
 
     public static void main(String[] args) {
-        //test3();
-        Regex r = new Regex(".*((?@<>))");
-        String s = "Map<String, Object>";
-        //if (r.search(s)) {p(r, 10);}
-        r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
-        s = "Map[], Set<Map<String, Object>>";
-        p(s, r);
+        test3();
+//        Regex r = new Regex(".*((?@<>))");
+//        String s = "Map<String, Object>";
+//        //if (r.search(s)) {p(r, 10);}
+//        r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
+//        s = "Map[], Set<Map<String, Object>>";
+//        p(s, r);
     }
     
     private static void test3() {
         Regex r0 = new Regex("");
         ForEachParser p = new ForEachParser();
-        Regex r = p.reg(new BasicRythm());
-        String s = "@for(sa){@_}";
-        if (r.search(s)) p(r, 15);
+        Regex r = p.reg(BasicRythm.INSTANCE);
+        String s = "@for(String s: client.cc.keySet()){}";
+        //if (r.search(s)) p(r, 15);
+        Rythm.render(s);
     }
 
     private static void test2() {

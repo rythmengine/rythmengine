@@ -159,7 +159,7 @@ public class CacheParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new CacheParser().reg(new Rythm());
+        Regex r = new CacheParser().reg(Rythm.INSTANCE);
         String s = "@cacheFor(\"1m\", 1, bar.foo())ab";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

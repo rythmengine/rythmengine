@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
@@ -29,6 +30,9 @@ public class ScriptParser extends ParserBase {
         //if (ctx.currentBlock() == null) return null;
         Regex r = new Regex(String.format(PTN, a(), a()));
         if (!r.search(ctx.getRemain())) return null;
+        if (!ctx.getDialect().enableScripting()) {
+            throw new TemplateParser.ScriptingDisabledException(ctx);
+        }
         String s = r.stringMatched(1);
         int curLine = ctx.currentLine();
         ctx.step(s.length());

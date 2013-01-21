@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 /**
  * parse @__simple__: mark the current template is simple template
  */
+@Deprecated
 public class SimpleParser extends KeywordParserFactory {
 
     @Override
@@ -30,7 +31,7 @@ public class SimpleParser extends KeywordParserFactory {
                     raiseParseException("bad @__simple__ statement");
                 }
                 step(r.stringMatched().length());
-                ctx().getCodeBuilder().setSimpleTemplate(ctx().currentLine());
+                //ctx().getCodeBuilder().setSimpleTemplate(ctx().currentLine());
                 return new CodeToken("", ctx());
             }
         };
@@ -42,7 +43,7 @@ public class SimpleParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new SimpleParser().reg(new Rythm());
+        Regex r = new SimpleParser().reg(Rythm.INSTANCE);
         if (r.search("@__simple__() ad")) {
             p(r, 3);
         }

@@ -43,7 +43,7 @@ public class ContinueParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new ContinueParser().reg(new Rythm());
+        Regex r = new ContinueParser().reg(Rythm.INSTANCE);
         String s = "@continue()\n\tdd";
         if (r.search(s)) {
             System.out.println(r.stringMatched());

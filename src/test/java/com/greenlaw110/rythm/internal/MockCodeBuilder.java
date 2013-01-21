@@ -6,7 +6,7 @@ import com.greenlaw110.rythm.utils.S;
 public class MockCodeBuilder extends CodeBuilder {
 
     public MockCodeBuilder(String template, String className, String tagName) {
-        super(template, className, tagName, null, null, new Rythm());
+        super(template, className, tagName, null, null, Rythm.INSTANCE);
     }
 
     public boolean hasImport(String importStr) {

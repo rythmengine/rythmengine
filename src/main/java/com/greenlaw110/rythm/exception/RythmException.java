@@ -63,6 +63,7 @@ public class RythmException extends FastRuntimeException {
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
         this.javaSource = tc.javaSource;
+        this.templateSource = tc.getTemplateSource();
         this.templateLineNumber = t2._2;
         this.originalMessage = message;
         this.errorMessage = t2._1;

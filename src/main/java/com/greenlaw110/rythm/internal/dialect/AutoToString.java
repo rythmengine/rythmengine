@@ -5,6 +5,7 @@ import com.greenlaw110.rythm.internal.AutoToStringCodeBuilder;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.ToStringTemplateBase;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
@@ -18,24 +19,21 @@ import java.util.regex.Pattern;
  */
 public class AutoToString extends ToString {
 
+    public static final String ID = "rythm-autoToString";
+
     @Override
     public String id() {
-        return "autoToString";
+        return ID;
     }
+
+    public static final IDialect INSTANCE = new AutoToString();
+    protected AutoToString() {}
 
     public AutoToStringData meta = null;
 
     public AutoToString(Class type, AutoToStringData data) {
         super(type);
         meta = data;
-    }
-
-    @Override
-    public void begin(IContext ctx) {
-        CodeBuilder cb = ctx.getCodeBuilder();
-        cb.addRenderArgs(ctx.currentLine(), type.getName(), "_");
-        cb.setSimpleTemplate(0);
-        cb.setExtended(ToStringTemplateBase.class);
     }
 
     @Override

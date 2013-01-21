@@ -77,7 +77,7 @@ public class SectionParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new SectionParser().reg(new Rythm());
+        Regex r = new SectionParser().reg(Rythm.INSTANCE);
         if (r.search("@section(\"JS\") \nab")) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));

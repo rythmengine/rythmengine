@@ -54,7 +54,7 @@ public class ExpandParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         ExpandParser p = new ExpandParser();
-        Regex r = p.reg(new Rythm());
+        Regex r = p.reg(Rythm.INSTANCE);
         String s = "@expand(\"x.y.z\") \n@sayHi(\"green\")";
         if (r.search(s)) {
             p(r);

@@ -45,7 +45,7 @@ public class LogTimeParser extends KeywordParserFactory {
     public static void main(String[] args) {
         String s = "@__logTime__()\nabc";
         LogTimeParser ap = new LogTimeParser();
-        Regex r = ap.reg(new Rythm());
+        Regex r = ap.reg(Rythm.INSTANCE);
         if (r.search(s)) {
             p(r);
 

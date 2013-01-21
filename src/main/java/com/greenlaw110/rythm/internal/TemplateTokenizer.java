@@ -26,7 +26,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         ctx = context;
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));
-        if (ctx.getDialect().enableScripting()) parsers.add(new ScriptParser(ctx));
+        parsers.add(new ScriptParser(ctx));
         parsers.add(new StringTokenParser(ctx));
         // add a fail through parser to prevent unlimited loop
         parsers.add(new ParserBase(ctx) {

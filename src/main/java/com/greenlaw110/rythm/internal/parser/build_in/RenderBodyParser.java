@@ -68,7 +68,7 @@ public class RenderBodyParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new RenderBodyParser().reg(new Rythm());
+        Regex r = new RenderBodyParser().reg(Rythm.INSTANCE);
         if (r.search("@renderBody(ab: 1, foo.bar())"));
         p(r, 6);
     }

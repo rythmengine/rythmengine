@@ -17,6 +17,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.sandbox.Sandbox;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
 import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
@@ -54,16 +55,17 @@ public class RythmEngine {
             return stack;
         }
     };
-    public static boolean sandbox() {
+    public static boolean insideSandbox() {
         return sandboxMode.get().peek();
     }
-    public RythmEngine enterSandbox() {
+    public void enterSandbox() {
         sandboxMode.get().push(true);
-        return this;
     }
-    public RythmEngine resetSandbox() {
+    public void resetSandbox() {
         sandboxMode.get().pop();
-        return this;
+    }
+    public Sandbox sandbox() {
+        return new Sandbox(this);
     }
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -510,7 +512,7 @@ public class RythmEngine {
 
     private String renderTemplate(ITemplate t) {
         // inject implicity render args
-        if (sandbox()) return secureExecutor.execute(t);
+        if (insideSandbox()) return secureExecutor.execute(t);
         else return t.render();
     }
 
@@ -526,7 +528,7 @@ public class RythmEngine {
     public String substitute(String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
-            tc = new TemplateClass(new StringTemplateResource(template), this, new BasicRythm());
+            tc = new TemplateClass(new StringTemplateResource(template), this, BasicRythm.INSTANCE);
         }
         ITemplate t = tc.asTemplate();
         if (1 == args.length && args[0] instanceof Map) {

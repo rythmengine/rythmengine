@@ -70,7 +70,7 @@ public interface IContext {
      */
     String closeBlock() throws ParseException;
 
-    void setDialect(String dialect);
+    void setDialect(IDialect dialect);
     IDialect getDialect();
 
     /**

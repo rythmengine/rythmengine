@@ -4,6 +4,9 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.internal.dialect.BasicRythm;
+import com.greenlaw110.rythm.internal.dialect.DialectManager;
+import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
@@ -145,24 +148,16 @@ public class CodeBuilder extends TextBuilder {
         return templateClass;
     }
 
-    /*
-    * Simple template
-    * 1. does not have global render args,
-    * 2. does not extends layout template
-    */
-    private boolean simpleTemplate = false;
-
-    public void setSimpleTemplate(int lineNo) {
-        if (null != this.extended) {
-            throw new ParseException(engine, templateClass, lineNo, "Simple template does not allow to extend layout template");
-        }
-        //if (true) throw new RuntimeException(this.template());
-        simpleTemplate = true;
+    private boolean simpleTemplate() {
+        return parser.getDialect() instanceof SimpleRythm;
+    }
+    private boolean basicTemplate() {   
+        return parser.getDialect() instanceof BasicRythm;
     }
 
-    transient public IDialect dialect = null;
+    transient public IDialect requiredDialect = null;
 
-    public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine, IDialect dialect) {
+    public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine, IDialect requiredDialect) {
         tmpl = template;
         this.tagName = (null == tagName) ? className : tagName;
         className = className.replace('/', '.');
@@ -173,10 +168,9 @@ public class CodeBuilder extends TextBuilder {
             pName = className.substring(0, i);
         }
         this.engine = null == engine ? Rythm.engine : engine;
-        this.dialect = dialect;
+        this.requiredDialect = requiredDialect;
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
-        this.simpleTemplate = templateClass.simpleTemplate;
     }
 
     /**
@@ -199,7 +193,6 @@ public class CodeBuilder extends TextBuilder {
         this.builders.clear();
         this.parser = null;
         this.templateClass = null;
-        this.simpleTemplate = false;
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
         this.logTime = false;
@@ -221,7 +214,6 @@ public class CodeBuilder extends TextBuilder {
         this.extendDeclareLineNo = 0;
         this.renderArgs.clear();
         this.builders.clear();
-        this.simpleTemplate = false;
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
         this.logTime = false;
@@ -375,7 +367,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
-        if (simpleTemplate) {
+        if (simpleTemplate()) {
             throw new ParseException(engine, templateClass, lineNo, "Simple template does not allow to extend layout template");
         }
         if (null != this.extended) {
@@ -512,14 +504,14 @@ public class CodeBuilder extends TextBuilder {
         try {
             parser.parse();
             invokeDirectives();
-            if (!simpleTemplate) addDefaultRenderArgs();
+            if (!basicTemplate()) addDefaultRenderArgs();
             pPackage();
             pImports();
             pClassOpen();
             pTagImpl();
             pInitCode();
             pSetup();
-            if (!simpleTemplate) pExtendInitArgCode();
+            if (!simpleTemplate()) pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
             for (ITemplateClassEnhancer enhancer : engine.templateClassEnhancers) {
@@ -531,6 +523,8 @@ public class CodeBuilder extends TextBuilder {
         } catch (NotRythmTemplateException e) {
             isNotRythmTemplate = true;
             return this;
+        } finally {
+            parser.shutdown();
         }
     }
 
@@ -624,7 +618,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
-        int userDefinedArgNumber = simpleTemplate ? renderArgs.size() : (renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size()));
+        int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
             pn();
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");

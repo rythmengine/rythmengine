@@ -53,7 +53,7 @@ public class MacroParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new MacroParser().reg(new Rythm());
+        Regex r = new MacroParser().reg(Rythm.INSTANCE);
         if (r.search("@macro(\"JS\") abc")) {
             p(r);
         }

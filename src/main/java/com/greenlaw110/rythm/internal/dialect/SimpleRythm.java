@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal.dialect;
 
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.spi.IDialect;
 
 /**
  * Simple Rythm mode is a subset of Rythm mode which has most Rythm feature except the template layout/extend features:
@@ -15,9 +16,15 @@ import com.greenlaw110.rythm.spi.IContext;
  */
 public class SimpleRythm extends DialectBase {
 
+    public static final String ID = "rythm-simple";
+
     public String id() {
-        return "rythm-simple";
+        return ID;
     }
+    
+    public static final IDialect INSTANCE = new SimpleRythm();
+    
+    protected SimpleRythm() {}
 
     public String a() {
         return "@";
@@ -52,6 +59,6 @@ public class SimpleRythm extends DialectBase {
 
     @Override
     public void begin(IContext ctx) {
-        ctx.getCodeBuilder().setSimpleTemplate(0);
+        //ctx.getCodeBuilder().setSimpleTemplate(0);
     }
 }

@@ -62,7 +62,7 @@ public class EscapeParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        Regex r = new EscapeParser().reg(new Rythm());
+        Regex r = new EscapeParser().reg(Rythm.INSTANCE);
         if (r.search("@escape(JS) \nab")) {
             System.out.println(r.stringMatched());
             System.out.println(r.stringMatched(1));
