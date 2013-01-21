@@ -31,18 +31,24 @@ public class TemplateParser implements IContext {
     public static class ExitInstruction extends FastRuntimeException {
     }
 
-    public static class ScriptingDisabledException extends RewindableException {
-        public ScriptingDisabledException(IContext ctx) {
-            super(ctx, "Scripting not allowed in current dialect[%s]", ctx.getDialect());
-        }
-    }
-    
     private static abstract class RewindableException extends ParseException {
         public RewindableException(IContext ctx, String msg, Object... args) {
             super(ctx.getEngine(), ctx.getTemplateClass(), ctx.currentLine(), msg, args);
         }
     }
 
+    public static class NoFreeLoopException extends RewindableException {
+        public NoFreeLoopException(IContext ctx) {
+            super(ctx, "Free loop style (@for(;;)) not allowed in current dialect[%s]", ctx.getDialect());
+        }
+    }
+    
+    public static class ScriptingDisabledException extends RewindableException {
+        public ScriptingDisabledException(IContext ctx) {
+            super(ctx, "Scripting not allowed in current dialect[%s]", ctx.getDialect());
+        }
+    }
+    
     public static class ComplexExpressionException extends RewindableException {
         public ComplexExpressionException(IContext ctx) {
             super(ctx, "Complex expression not allowed in current dialect[%s]", ctx.getDialect());
@@ -53,6 +59,8 @@ public class TemplateParser implements IContext {
         DialectManager dm = cb.engine.getDialectManager();
         while (true) {
             dm.beginParse(this);
+            cursor = 0;
+            cb.rewind();
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(template, this);
                 for (TextBuilder builder : tt) {

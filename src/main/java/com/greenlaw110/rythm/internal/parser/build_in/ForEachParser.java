@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -24,11 +25,11 @@ public class ForEachParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
-                Regex r = reg(dialect());
+                Regex r;
                 String remain = remain();
-                if (!r.search(remain)) {
+                if (remain.contains(";")) {
                     if (!ctx().getDialect().enableFreeForLoop()) {
-                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...}");
+                        throw new TemplateParser.NoFreeLoopException(ctx());
                     }
                     r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                     if (!r.search(remain)) {
@@ -55,6 +56,10 @@ public class ForEachParser extends KeywordParserFactory {
                         }
                     };
                 } else {
+                    r = reg(dialect());
+                    if (!r.search(remain)) {
+                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                    }
                     String s = r.stringMatched(1);
                     step(s.length());
                     String type = null;
@@ -109,9 +114,9 @@ public class ForEachParser extends KeywordParserFactory {
         Regex r0 = new Regex("");
         ForEachParser p = new ForEachParser();
         Regex r = p.reg(BasicRythm.INSTANCE);
-        String s = "@for(String s: client.cc.keySet()){}";
+        String s = "abc@for(s: Arrays.asList(\"1,2\".split(\",\"))){@s -}";
         //if (r.search(s)) p(r, 15);
-        Rythm.render(s);
+        System.out.println(Rythm.render(s));
     }
 
     private static void test2() {

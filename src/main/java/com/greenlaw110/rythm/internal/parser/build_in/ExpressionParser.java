@@ -23,14 +23,15 @@ import com.stevesoft.pat.Regex;
  */
 public class ExpressionParser extends CaretParserFactoryBase {
 
-    private static class ExpressionToken extends CodeToken {
-        private static void assertBasic(String symbol, IContext context) {
-            boolean isSimple = Patterns.VarName.matches(symbol);
-            IContext ctx = context;
-            if (!isSimple) {
-                throw new TemplateParser.ComplexExpressionException(ctx);
-            }
+    public static void assertBasic(String symbol, IContext context) {
+        boolean isSimple = Patterns.VarName.matches(symbol);
+        IContext ctx = context;
+        if (!isSimple) {
+            throw new TemplateParser.ComplexExpressionException(ctx);
         }
+    }
+
+    private static class ExpressionToken extends CodeToken {
 
         public ExpressionToken(String s, IContext context) {
             super(s, context);

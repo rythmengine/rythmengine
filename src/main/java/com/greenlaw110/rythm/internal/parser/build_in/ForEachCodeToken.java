@@ -62,7 +62,10 @@ public class ForEachCodeToken extends BlockCodeToken {
                 this.type = "Object";
             }
         }
-        if (ctx.getDialect() instanceof BasicRythm) context.getCodeBuilder().addRenderArgsIfNotDeclared(line, "Iterable<?>", iterable);
+        if (ctx.getDialect() instanceof BasicRythm) {
+            ExpressionParser.assertBasic(iterable, context);
+            context.getCodeBuilder().addRenderArgsIfNotDeclared(line, "Iterable<?>", iterable);
+        }
     }
 
     private String ObjectType(String type) {
