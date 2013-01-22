@@ -1,0 +1,2 @@
+@args boolean en
+@if(en){Hello}else{Hola}, @render
