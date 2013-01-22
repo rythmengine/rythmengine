@@ -4,3 +4,8 @@
 bin
 stocks.rythm.html
 target
+*.eml
+*.iml
+lib
+out
+.idea
