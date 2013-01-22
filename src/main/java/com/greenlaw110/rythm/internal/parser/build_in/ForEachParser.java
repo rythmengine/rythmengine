@@ -90,7 +90,11 @@ public class ForEachParser extends KeywordParserFactory {
 
     public static void main(String[] args) {
         //test3();
-        System.out.println(Rythm.render("@for (s: ar){current val is @s}", Arrays.asList(new String[]{"1", "a"})));
+        String campaign = "abc";
+        List<String> targets = new ArrayList<String>(Arrays.asList("FACEBOOK,MOBILE".split(",")));
+        String s = Rythm.substitute("Campaign launch fee - @campaign on (@for(channels){@(_)@_utils.sep(\" and \")}) channels", campaign, targets);
+        System.out.println(s);
+        //System.out.println(Rythm.render("@for (s: ar){current val is @s}", Arrays.asList(new String[]{"1", "a"})));
     }
     
     private static void test3() {

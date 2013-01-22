@@ -24,6 +24,7 @@ import com.stevesoft.pat.Regex;
 public class ExpressionParser extends CaretParserFactoryBase {
 
     public static void assertBasic(String symbol, IContext context) {
+        if (symbol.contains("_utils.sep(\"")) return;// Rythm builtin expression TODO: generalize
         boolean isSimple = Patterns.VarName.matches(symbol);
         IContext ctx = context;
         if (!isSimple) {
