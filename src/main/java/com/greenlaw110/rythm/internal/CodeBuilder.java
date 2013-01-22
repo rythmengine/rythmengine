@@ -501,6 +501,11 @@ public class CodeBuilder extends TextBuilder {
 
     @Override
     public TextBuilder build() {
+        long start = 0L;
+        if (logger.isTraceEnabled()) {
+            logger.trace("Begin to build %s", templateClass.getKey());
+            start = System.currentTimeMillis();
+        }
         try {
             parser.parse();
             invokeDirectives();
@@ -525,6 +530,9 @@ public class CodeBuilder extends TextBuilder {
             return this;
         } finally {
             parser.shutdown();
+            if (logger.isTraceEnabled()) {
+                logger.trace("%sms to build %s", System.currentTimeMillis() - start, templateClass.getKey());
+            }
         }
     }
 
@@ -607,9 +615,7 @@ public class CodeBuilder extends TextBuilder {
         boolean first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            if (first) {first = false; p2t("");}
-            else {p2t("else ");}
-            p("if (args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
+            p2t("if (args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
         }
 //        for (String argName : renderArgs.keySet()) {
 //            p2t("System.err.println(\"").p(argName).p("=\" + this.").p(argName).pn(");");

@@ -34,7 +34,6 @@ public class ForEachCodeToken extends BlockCodeToken {
         this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname;
         this.iterable = iterable;
-        line--;
         openPos = context.cursor();
         IContext ctx = context;
         ctx.pushBreak(IContext.Break.RETURN);

@@ -16,7 +16,9 @@ import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ForEachParser extends KeywordParserFactory {
@@ -25,18 +27,17 @@ public class ForEachParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
-                Regex r;
+                Regex r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                 String remain = remain();
-                if (remain.contains(";")) {
+                if (!r.search(remain)) {
+                    raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");
+                }
+                step(r.stringMatched().length());
+                String s = r.stringMatched(2);
+                if (s.contains(";")) {
                     if (!ctx().getDialect().enableFreeForLoop()) {
                         throw new TemplateParser.NoFreeLoopException(ctx());
                     }
-                    r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
-                    if (!r.search(remain)) {
-                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");
-                    }
-                    String s = r.stringMatched(2);
-                    step(r.stringMatched().length());
                     return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
                         @Override
                         public void openBlock() {
@@ -57,28 +58,13 @@ public class ForEachParser extends KeywordParserFactory {
                     };
                 } else {
                     r = reg(dialect());
-                    if (!r.search(remain)) {
+                    if (!r.search(S.stripBrace(s))) {
                         raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
                     }
-                    String s = r.stringMatched(1);
-                    step(s.length());
-                    String type = null;
-                    String varname = null;
-                    String iterable = r.stringMatched(10);
-                    if (S.isEmpty(iterable)) {
-                        // the for(iterable) {} mode
-                        iterable = r.stringMatched(4);
-                    } else {
-                        type = r.stringMatched(6);
-                        varname = r.stringMatched(7);
-                        if (null == varname) {
-                            varname = type;
-                            type = null;
-                        }
-                    }
-                    if (S.isEmpty(iterable)) {
-                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
-                    }
+                    String iterable = r.stringMatched(6);
+                    String varname = r.stringMatched(5);
+                    String type = r.stringMatched(2);
+                    if (null != type) type = type.trim();
                     return new ForEachCodeToken(type, varname, iterable, ctx());
                 }
             }
@@ -92,31 +78,33 @@ public class ForEachParser extends KeywordParserFactory {
 
     // match for(int i=0; i<100;++i) {
     protected String patternStr2() {
-        return "^%s%s\\s*((?@()))\\s*\\{?\\s*";
+        return "^%s%s\\s*((?@()))\\s*\\{";
     }
 
     @Override
     protected String patternStr() {
-        return "^(%s%s(\\s*\\(\\s*)(((" + Patterns.Type + ")?)(\\s+(" + Patterns.VarName + "))?)\\s*(\\:?)\\s*(" + Patterns.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
+        //return "^(%s%s(\\s*\\(\\s*)(((" + Patterns.Type + "\\s+)?)((" + Patterns.VarName + "))?)\\s*([\\:]?)\\s*(" + Patterns.Expression2 + ")(\\s*\\)?[\\s\\r\\n]*|[\\s\\r\\n]+)\\{?[\\s\\r\\n]*).*";
+        //return "^(((" + Patterns.Type + ")\\s+)?(" + Patterns.VarName + ")\\s*\\:\\s*)?(" + Patterns.Expression2 + ")$";
+        return "^((([a-zA-Z0-9_\\.]+)(\\s*\\[\\s*\\]|\\s*(?@<>))?\\s+)?(" + Patterns.VarName + ")\\s*\\:\\s*)?(" + Patterns.Expression2 + ")$";
     }
 
     public static void main(String[] args) {
-        test3();
-//        Regex r = new Regex(".*((?@<>))");
-//        String s = "Map<String, Object>";
-//        //if (r.search(s)) {p(r, 10);}
-//        r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
-//        s = "Map[], Set<Map<String, Object>>";
-//        p(s, r);
+        //test3();
+        System.out.println(Rythm.render("@for (s: ar){current val is @s}", Arrays.asList(new String[]{"1", "a"})));
     }
     
     private static void test3() {
         Regex r0 = new Regex("");
         ForEachParser p = new ForEachParser();
         Regex r = p.reg(BasicRythm.INSTANCE);
-        String s = "abc@for(s: Arrays.asList(\"1,2\".split(\",\"))){@s -}";
-        //if (r.search(s)) p(r, 15);
-        System.out.println(Rythm.render(s));
+        String s = "@for(play.libs.F.T2<String, String> tab: tabs) {}";
+        s = "play.libs.F.T2 [] tab: tabs";
+        //s = "String s: sa";
+        //s = "sa";
+        //s = "@for(int i = 0; i < 5; ++i){:@(i+1) }";
+        //s = "x : component.get(\"options\").split(\"-\\\\*\\\\!\\\\*-\")";
+        if (r.search(s)) p(r, 8);
+        //System.out.println(Rythm.render(s));
     }
 
     private static void test2() {
