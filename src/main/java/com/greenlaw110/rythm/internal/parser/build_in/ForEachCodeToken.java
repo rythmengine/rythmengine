@@ -94,18 +94,18 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varUtils = prefix + "_utils";
         
         String varItr = cb.newVarName();
-        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).pn(");");
-        p("int ").p(varSize).p(" = ").p(varItr).pn(".size();");
-        p("if (").p(varSize).pn(" > 0) {");
-        p("int ").p(varId).pn(" = -1;");
-        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).pn(") {");
-        p(varId).pn("++;");
-        p("boolean ").p(varIsOdd).p(" = ").p(varId).pn(" % 2 == 1;");
-        p("String ").p(varParity).p(" = ").p(varIsOdd).pn(" ? \"odd\" : \"even\";");
-        p("boolean ").p(varIsFirst).p(" = ").p(varId).pn(" == 0;");
-        p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).pn(" - 1;");
-        p("String ").p(varSep).p(" = ").p(varIsLast).pn(" ? \"\" : \",\";");
-        p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).pn(");");
+        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).p(");");pline();
+        p("int ").p(varSize).p(" = ").p(varItr).p(".size();");pline();
+        p("if (").p(varSize).p(" > 0) {");pline();
+        p("int ").p(varId).p(" = 0;");pline();
+        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).p(") {");pline();
+        p(varId).p("++;");pline();
+        p("boolean ").p(varIsOdd).p(" = ").p(varId).p(" % 2 == 1;");pline();
+        p("String ").p(varParity).p(" = ").p(varIsOdd).p(" ? \"odd\" : \"even\";");pline();
+        p("boolean ").p(varIsFirst).p(" = ").p(varId).p(" == 1;");pline();
+        p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");pline();
+        p("String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");pline();
+        p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).p(");");pline();
     }
     public void output1() {
         String prefix = "_".equals(varname) ? "" : varname;
