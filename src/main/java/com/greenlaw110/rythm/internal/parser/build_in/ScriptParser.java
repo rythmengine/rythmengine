@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -50,7 +52,8 @@ public class ScriptParser extends ParserBase {
         }
         if (!lastLine.trim().endsWith(";")) sb.append(";");
         String code = sb.toString();
-        return new CodeToken(sb.toString(), ctx);
+        checkRestrictedClass(code);
+        return new CodeToken(code, ctx);
     }
 
     public static void main(String[] args) {

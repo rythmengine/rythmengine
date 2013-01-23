@@ -99,6 +99,7 @@ public class RythmEngine {
     public boolean logRenderTime = false;
     private SecurityManager sm = null;
     SandboxExecutingService secureExecutor = null;
+    public Set<String> restrictedClasses = new HashSet<String>();
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
     public boolean playHost = false;
@@ -349,6 +350,15 @@ public class RythmEngine {
         long timeout = configuration.getAsLong("rythm.timeout", 1000L);
         int poolSize = configuration.getAsInt("rythm.pool.size", 10);
         secureExecutor = new SandboxExecutingService(poolSize, sm, timeout);
+        String s = configuration.getProperty("rythm.restrictedClasses", "");
+        s += ";com.greenlaw110.rythm.Rythm;com.greenlaw110.rythm.RythmEngine;java.io;java.nio;java.security;java.rmi;java.net;java.awt;java.applet";
+        String[] sa = s.split("[\\s;:,]+");
+        restrictedClasses.clear();
+        for (int i = 0, j = sa.length; i < j; ++i) {
+            s = sa[i].trim();
+            if (!"".equals(s)) restrictedClasses.add(s);
+        }
+        
 
 //        if (null != tagHome && configuration.getAsBoolean("rythm.tag.autoscan", true)) {
 //            loadTags();

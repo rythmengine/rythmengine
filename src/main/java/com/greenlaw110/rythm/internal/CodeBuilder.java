@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
@@ -558,30 +559,40 @@ public class CodeBuilder extends TextBuilder {
     protected void pPackage() {
         if (!S.isEmpty(pName)) p("package ").p(pName).pn(";");
     }
+    
+    private void pImport(String s, boolean sandbox) {
+        if (S.isEmpty(s)) return;
+        if (sandbox) {
+            String s0 = Sandbox.hasAccessToRestrictedClasses(engine, s);
+            if (null != s0) return;
+        }
+        p("import ").p(s).pn(';');
+    }
 
     // print imports
     protected void pImports() {
+        boolean sandbox = Rythm.insideSandbox();
         for (String s : imports) {
-            if (!S.isEmpty(s)) p("import ").p(s).pn(';');
+            pImport(s, sandbox);
         }
         for (String s : globalImports) {
-            if (!S.isEmpty(s)) p("import ").p(s).pn(';');
+            pImport(s, sandbox);
         }
         if (null != importProvider) {
             for (String s : importProvider.imports()) {
-                if (!S.isEmpty(s)) p("import ").p(s).pn(';');
+                pImport(s, sandbox);
             }
         }
 
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         if (null != p) {
             for (String s : p.getImplicitImportStatements()) {
-                p("import ").p(s).pn(';');
+                pImport(s, sandbox);
             }
         }
         // common imports
         pn("import java.util.*;");
-        pn("import java.io.*;");
+        if (!sandbox) pn("import java.io.*;");
     }
 
     protected void pClassOpen() {

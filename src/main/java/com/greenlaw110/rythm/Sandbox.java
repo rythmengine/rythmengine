@@ -41,4 +41,11 @@ public class Sandbox {
         }
     }
     
+    public static String hasAccessToRestrictedClasses(RythmEngine engine, String code) {
+        for (String s: engine.restrictedClasses) {
+            if (code.contains(s)) return s;
+        }
+        return null;
+    }
+    
 }

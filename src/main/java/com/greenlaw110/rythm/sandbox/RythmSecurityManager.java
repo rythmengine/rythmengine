@@ -35,7 +35,7 @@ public class RythmSecurityManager extends SecurityManager {
         code = hash(password);
     }
     
-    void unlock(String password) {
+    public void unlock(String password) {
         if (code.equals(hash(password))) {
             released = true;
         } else {
@@ -43,7 +43,7 @@ public class RythmSecurityManager extends SecurityManager {
         }
     }
     
-    void lock(String password) {
+    public void lock(String password) {
         if (code.equals(hash(password))) {
             released = false;
         } else {
@@ -53,7 +53,7 @@ public class RythmSecurityManager extends SecurityManager {
     
     private void checkRythm() {
         if (!released && isRythmThread()) {
-            throw new SecurityException("illegal access to protected resource");
+            throw new SecurityException("Access to protected resource is restricted in Sandbox mode");
         }
     }
     @Override

@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
 import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
@@ -36,6 +37,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
 
         public ExpressionToken(String s, IContext context) {
             super(s, context);
+            checkRestrictedClass(ctx, s);
             if (context.getDialect() instanceof BasicRythm) {
                 s = S.stripBrace(s);
                 // basic rythm dialect support only simple expression

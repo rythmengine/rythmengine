@@ -34,9 +34,9 @@ public class ArgsParser extends KeywordParserFactory {
                 final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
                 s = s.replaceAll("[\\n\\r]+", ",");
                 while (r.search(s)) {
-                    String matched = r.stringMatched();
-                    String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
+                    checkRestrictedClass(type);
+                    String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
                     ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                 }
@@ -76,8 +76,9 @@ public class ArgsParser extends KeywordParserFactory {
                         break;
                     }
                     step += matched.length();
-                    String name = r.stringMatched(4);
                     String type = r.stringMatched(2);
+                    checkRestrictedClass(type);
+                    String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
                     //ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                     ctx().getCodeBuilder().addRenderArgs(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));

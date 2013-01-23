@@ -42,6 +42,7 @@ public class ImportParser extends KeywordParserFactory {
                     //String imports = s.replaceFirst(String.format("%s%s[\\s]+", a(), keyword()), "").replaceFirst("(;|\\r?\\n)+$", "");
                     line = m.group(2);
                 }
+                checkRestrictedClass(line);
                 /**
                  * We need to make sure import path added to template class
                  * to support call tag using import paths. That why we move

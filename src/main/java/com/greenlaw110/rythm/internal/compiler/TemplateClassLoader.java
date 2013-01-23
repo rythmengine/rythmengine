@@ -1,11 +1,14 @@
 package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.IHotswapAgent;
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.sandbox.RythmSecurityManager;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.IO;
+import sun.audio.AudioPlayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -189,9 +192,32 @@ public class TemplateClassLoader extends ClassLoader {
 //        }
     }
 
+    private static final ThreadLocal<String> sandboxPassword = new ThreadLocal<String>();
+    public static void setSandboxPassword(String password) {
+        sandboxPassword.set(password);
+    }
 
     @Override
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        // init secure context for sandbox
+        SecurityManager sm;
+        RythmSecurityManager rsm = null;
+        String pass = null;
+        if (Rythm.insideSandbox()) {
+            sm = System.getSecurityManager();
+            if (null != sm && sm instanceof RythmSecurityManager) {
+                rsm = (RythmSecurityManager)sm;
+                pass = sandboxPassword.get();
+            }
+        }
+        
+        // check if the class is restricted when run in sandbox mode
+        if (Rythm.insideSandbox()) {
+            if (engine.restrictedClasses.contains(name)) {
+                throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
+            }
+        }
+
         TemplateClass tc = engine.classes.clsNameIdx.get(name);
         if (null == tc) {
             // it's not a template class, let's try to find already loaded one
@@ -211,7 +237,19 @@ public class TemplateClassLoader extends ClassLoader {
         }
 
         // Delegate to the classic classloader
-        return super.loadClass(name, resolve);
+        boolean unlockSM = engine.isDevMode() && null != rsm;
+        try {
+            // release sandbox password if running inside sandbox in order to load 
+            // application classes when running is dev mode
+            if (unlockSM) {
+                rsm.unlock(pass);
+            }
+            return super.loadClass(name, resolve);
+        } finally {
+            if (unlockSM) {
+                rsm.lock(pass);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -358,54 +396,7 @@ public class TemplateClassLoader extends ClassLoader {
             currentState = new TemplateClassloaderState();
         } else {
             if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
-//            int sigChecksum = tc.sigChecksum;
-//            tc.enhance();
-//            if (sigChecksum != tc.sigChecksum) {
-//                throw new RuntimeException("Signature change !");
-//            }
-////            bCache.cacheBytecode(tc.enhancedByteCode, tc.name(), tc.javaSource);
-//            IHotswapAgent agent = engine.hotswapAgent;
-//            if (null != agent) {
-//                List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
-//                if (null == tc.javaClass) {
-//                    tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), tc.enhancedByteCode, 0, tc.enhancedByteCode.length, protectionDomain);
-//                    resolveClass(tc.javaClass);
-//                }
-//                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
-//                /*
-//                List<TemplateClass> allEmbedded = engine.classes.getEmbeddedClasses(tc.name0());
-//                for (TemplateClass ec: allEmbedded) {
-//                    if (null == ec.javaSource || null == ec.enhancedByteCode) {
-//                        // strange , how come we reach this block?
-//                        if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
-//                        else throw new RuntimeException(String.format("Unexpected: template class[%s] not valid", ec.getKey()));
-//                    }
-//                    newDefinitions.add(new ClassDefinition(ec.javaClass, ec.enhancedByteCode));
-//                }
-//                */
-//                currentState = new TemplateClassloaderState();//show others that we have changed..
-//                try {
-//                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
-//                } catch (Throwable e) {
-//                    engine.classes.remove(tc);
-//                    throw new ClassReloadException("Need reload", e);
-//                }
-//            } else {
-//                if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
-//            }
         }
-//        // Now check if there is new classCache or removed classCache
-//        int hash = computePathHash();
-//        if (hash != this.pathHash) {
-//            // Remove class for deleted files !!
-//            for (TemplateClass tc0 : engine.classes.all()) {
-//                if (!tc0.templateResource.isValid()) {
-//                    engine.classes.remove(tc0);
-//                    currentState = new TemplateClassloaderState();//show others that we have changed..
-//                }
-//            }
-//            throw new RuntimeException("Path has changed");
-//        }
     }
 
     /**

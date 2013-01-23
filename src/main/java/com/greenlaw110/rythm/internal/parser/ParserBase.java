@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.internal.parser;
 
+import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
@@ -70,6 +72,15 @@ public abstract class ParserBase implements IParser {
 
     protected final void raiseParseException(String msg, Object ... args) {
         CaretParserFactoryBase.raiseParseException(ctx(), msg, args);
+    }
+    
+    protected final void checkRestrictedClass(String code) {
+        if (Rythm.insideSandbox()) {
+            String s = Sandbox.hasAccessToRestrictedClasses(ctx().getEngine(), code);
+            if (null != s) {
+                raiseParseException("Access to restricted class [%s] is blocked in sandbox mode", s);
+            }
+        }
     }
 
 }

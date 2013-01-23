@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.sandbox;
 
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
+import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,7 @@ class SandboxThreadFactory extends RythmThreadFactory {
             SecurityManager osm = System.getSecurityManager();
             SecurityManager nsm = sm;
             if (osm != nsm) System.setSecurityManager(nsm);
+            TemplateClassLoader.setSandboxPassword(fact.password);
             try {
                 super.run();
             } finally {
