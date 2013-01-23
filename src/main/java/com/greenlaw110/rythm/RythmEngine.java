@@ -511,10 +511,8 @@ public class RythmEngine {
     }
 
     private String renderTemplate(ITemplate t) {
-        // inject implicity render args
-        //if (insideSandbox()) return secureExecutor.execute(t);
-        //else return t.render();
-        return t.render();
+        if (insideSandbox()) return secureExecutor.execute(t);
+        else return t.render();
     }
 
     public String render(String template, Object... args) {
