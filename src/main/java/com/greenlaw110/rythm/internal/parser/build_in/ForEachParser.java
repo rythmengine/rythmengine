@@ -89,18 +89,17 @@ public class ForEachParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        //test3();
+        List<String> sl = Arrays.asList("a,b,c".split(","));
+        String s;
+        s = Rythm.render("@for(s:sl){|\n\n|@s, [@s_index], [@s_isOdd], [@s_parity], \n[@s_isFirst], [@s_isLast], [@s_sep], \n[@s_utils.sep(\" and \")]}", sl);
+        System.out.println(s);
+    }
+    
+    private static void test4() {
         String campaign = "abc";
         List<String> targets = new ArrayList<String>(Arrays.asList("FACEBOOK,MOBILE".split(",")));
         String s = Rythm.substitute("Campaign launch fee - @campaign on (@for(channels){@(_)@_utils.sep(\" and \")}) channels", campaign, targets);
         System.out.println(s);
-        //System.out.println(Rythm.render("@for (s: ar){current val is @s}", Arrays.asList(new String[]{"1", "a"})));
-    }
-    
-    private static void foo(String s) {
-        int l = s.length();
-        if (l % 20 > 10) {
-        }
     }
     
     private static void test3() {

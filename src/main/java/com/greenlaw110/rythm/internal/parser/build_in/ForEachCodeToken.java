@@ -36,8 +36,8 @@ public class ForEachCodeToken extends BlockCodeToken {
         this.iterable = iterable;
         openPos = context.cursor();
         IContext ctx = context;
-        ctx.pushBreak(IContext.Break.RETURN);
-        ctx.pushContinue(IContext.Continue.RETURN);
+        ctx.pushBreak(IContext.Break.BREAK);
+        ctx.pushContinue(IContext.Continue.CONTINUE);
         CodeBuilder cb = context.getCodeBuilder();
         if (S.isEmpty(type)) {
             String itrType = cb.getRenderArgType(iterable);
@@ -103,7 +103,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         p("boolean ").p(varIsOdd).p(" = ").p(varId).pn(" % 2 == 1;");
         p("String ").p(varParity).p(" = ").p(varIsOdd).pn(" ? \"odd\" : \"even\";");
         p("boolean ").p(varIsFirst).p(" = ").p(varId).pn(" == 0;");
-        p("boolean ").p(varIsLast).p(" = ++").p(varId).p(" >= ").p(varSize).pn(";");
+        p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).pn(" - 1;");
         p("String ").p(varSep).p(" = ").p(varIsLast).pn(" ? \"\" : \",\";");
         p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).pn(");");
     }
