@@ -70,13 +70,8 @@ public class TextBuilder implements Cloneable {
     }
 
     private void p_(Object o) {
-        String s = toString(o);
-        if (null != _out) _out.append(s);
-        else _caller.p(s);
-    }
-
-    protected String toString(Object o) {
-        return null == o ? "" : o.toString();
+        if (null != _out) _out.append(o.toString());
+        else _caller.p(o);
     }
 
     public final TextBuilder p(Object o) {

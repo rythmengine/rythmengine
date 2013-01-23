@@ -97,6 +97,12 @@ public class ForEachParser extends KeywordParserFactory {
         //System.out.println(Rythm.render("@for (s: ar){current val is @s}", Arrays.asList(new String[]{"1", "a"})));
     }
     
+    private static void foo(String s) {
+        int l = s.length();
+        if (l % 20 > 10) {
+        }
+    }
+    
     private static void test3() {
         Regex r0 = new Regex("");
         ForEachParser p = new ForEachParser();

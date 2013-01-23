@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 @SuppressWarnings("rawtypes")
+@Deprecated
 public class Each {
 
     public static final Each INSTANCE = new Each();
@@ -31,7 +32,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -44,7 +45,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -57,7 +58,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -70,7 +71,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -83,7 +84,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -96,7 +97,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -109,7 +110,7 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
     }
 
@@ -126,22 +127,22 @@ public class Each {
             boolean isFirst = (i == (start + 1));
             boolean isLast = !it.hasNext();
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(i, size, isFirst, isLast))) break;
+            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
         }
         //p(body.toString());
     }
 
     public static interface IBody<E>  {
         public static class LoopUtils {
-            private final int id;
+            //private final int id;
             private final boolean isFirst;
             private final boolean isLast;
-            private final int size;
-            public LoopUtils(int id, int size, boolean isFirst, boolean isLast) {
-                this.id = id;
+            //private final int size;
+            public LoopUtils(/*int id, int size,*/ boolean isFirst, boolean isLast) {
+                //this.id = id;
                 this.isFirst = isFirst;
                 this.isLast = isLast;
-                this.size = size;
+                //this.size = size;
             }
             public String sep(String sep) {
                 return postSep(sep);

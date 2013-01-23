@@ -82,6 +82,32 @@ public class ForEachCodeToken extends BlockCodeToken {
 
     @Override
     public void output() {
+        String prefix = "_".equals(varname) ? "" : varname + "";
+        CodeBuilder cb = ctx.getCodeBuilder();
+        String varId = prefix + "_index";
+        String varIsOdd = prefix + "_isOdd";
+        String varSize = prefix + "_size";
+        String varParity = prefix + "_parity";
+        String varIsFirst = prefix + "_isFirst";
+        String varIsLast = prefix + "_isLast";
+        String varSep = prefix + "_sep";
+        String varUtils = prefix + "_utils";
+        
+        String varItr = cb.newVarName();
+        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).pn(");");
+        p("int ").p(varSize).p(" = ").p(varItr).pn(".size();");
+        p("if (").p(varSize).pn(" > 0) {");
+        p("int ").p(varId).pn(" = -1;");
+        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).pn(") {");
+        p(varId).pn("++;");
+        p("boolean ").p(varIsOdd).p(" = ").p(varId).pn(" % 2 == 1;");
+        p("String ").p(varParity).p(" = ").p(varIsOdd).pn(" ? \"odd\" : \"even\";");
+        p("boolean ").p(varIsFirst).p(" = ").p(varId).pn(" == 0;");
+        p("boolean ").p(varIsLast).p(" = ++").p(varId).p(" >= ").p(varSize).pn(";");
+        p("String ").p(varSep).p(" = ").p(varIsLast).pn(" ? \"\" : \",\";");
+        p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).pn(");");
+    }
+    public void output1() {
         String prefix = "_".equals(varname) ? "" : varname;
         String curClassName = ctx.getCodeBuilder().includingClassName();
         int bodySize = closePos - openPos;
@@ -103,6 +129,9 @@ public class ForEachCodeToken extends BlockCodeToken {
 
     @Override
     public String closeBlock() {
+        return "\n\t}\n}\n}\n";
+    }
+    public String closeBlock1() {
         ctx.popBreak();
         closePos = ctx.cursor();
         return "\n\t return true;\n\t}});\n}\n";
