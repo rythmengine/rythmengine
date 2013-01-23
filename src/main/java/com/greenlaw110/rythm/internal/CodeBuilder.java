@@ -792,10 +792,10 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    public static final String INTERRUPT_CODE = "\n{if (Thread.interrupted()) throw new RuntimeException(\"interrupted\");}\n";
+    public static final String INTERRUPT_CODE = "\n{if (Thread.interrupted()) throw new RuntimeException(\"interrupted\");}";
 
-    private static final Regex R_FOR_0 = new Regex("([\\s;]for\\s*(?@())\\s*\\{)", "${1}" + INTERRUPT_CODE);
-    private static final Regex R_FOR_1 = new Regex("([\\s;]for\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \\}");
+    private static final Regex R_FOR_0 = new Regex("([\\s;]for\\s*(?@())\\s*\\{(\\s*//\\s*line:\\s*[0-9]+)?)", "${1}" + INTERRUPT_CODE + "${2}" + "\n");
+    private static final Regex R_FOR_1 = new Regex("([\\s;]for\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \n\\}");
     
     private static final Regex R_WHILE_0 = new Regex("([\\s;]while\\s*(?@())\\s*\\{)", "${1}" + INTERRUPT_CODE);
     private static final Regex R_WHILE_1 = new Regex("([\\s;]while\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \\}");
@@ -814,11 +814,17 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        String s = "public void foo() {\n\tfor(;;)\n\tabc; \n\nfor(String s: myStrs){\n\txyz;\n}";
+        String s = "public void foo() {\n\tfor(;;) abc;\n\nfor(String s: myStrs){ // line: 109\n\txyz;\n}";
+        if (R_FOR_0.search(s)) {
+            for (int i = 0; i < 10; ++i) {
+                //System.out.println(i + R_FOR_0.stringMatched(i));
+            }
+        }
         s = R_FOR_0.replaceAll(s);
-        //System.out.println(s);
+        System.out.println(s);
         s = R_FOR_1.replaceAll(s);
-        //System.out.println(s);
+        System.out.println(s);
+        if (true) return;
         s = "... while(true){\n\txyz\n}\n\nwhile(true) abc;";
         s = R_WHILE_0.replaceAll(s);
         s = R_WHILE_1.replaceAll(s);

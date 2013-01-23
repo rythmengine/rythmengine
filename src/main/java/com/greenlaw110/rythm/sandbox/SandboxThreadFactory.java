@@ -23,7 +23,7 @@ class SandboxThreadFactory extends RythmThreadFactory {
         this.sm = sm;
     }
 
-    static ConcurrentMap<String, SandboxThread> runners = new ConcurrentHashMap<String, SandboxThread>();
+    //static ConcurrentMap<String, SandboxThread> runners = new ConcurrentHashMap<String, SandboxThread>();
     
     static class SandboxThread extends Thread {
         private SecurityManager sm;
@@ -32,7 +32,7 @@ class SandboxThreadFactory extends RythmThreadFactory {
             super(group, target, name, stackSize);
             this.sm = sm;
             this.fact = fact;
-            runners.put(name, this);
+            //runners.put(name, this);
         }
         @Override
         public void run() {

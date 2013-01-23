@@ -38,7 +38,7 @@ public class ForEachParser extends KeywordParserFactory {
                     if (!ctx().getDialect().enableFreeForLoop()) {
                         throw new TemplateParser.NoFreeLoopException(ctx());
                     }
-                    return new BlockCodeToken("for " + s + "{\n\t", ctx()) {
+                    return new BlockCodeToken("for " + s + "{ //line: " + ctx().currentLine() + "\n\t", ctx()) {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);

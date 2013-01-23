@@ -103,20 +103,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     
     protected RawData _render(String template, Object... args) {
         if (null == template) return new RawData("");
-        try {
-            return S.raw(engine.sandbox().render(template, args));
-        } finally {
-            engine.resetSandbox();
-        }
+        return S.raw(engine.sandbox().render(template, args));
     }
 
     protected RawData _render(String template) {
         if (null == template) return new RawData("");
-        try {
-            return S.raw(engine.sandbox().render(template, _properties));
-        } finally {
-            engine.resetSandbox();
-        }
+        return S.raw(engine.sandbox().render(template, _properties));
     }
 
     protected final void setLayoutContent(String body) {

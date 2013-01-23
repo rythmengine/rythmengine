@@ -1,7 +1,7 @@
-package com.greenlaw110.rythm.sandbox;
+package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
+import com.greenlaw110.rythm.template.ITemplate;
 
 import java.io.File;
 
@@ -10,8 +10,10 @@ import java.io.File;
  */
 public class Sandbox {
     RythmEngine engine;
-    public Sandbox(RythmEngine engine) {
+    SandboxExecutingService secureExecutor = null;
+    public Sandbox(RythmEngine engine, SandboxExecutingService executor) {
         this.engine = engine;
+        this.secureExecutor = executor;
     }
     private RythmEngine engine() {
         if (null != engine) return engine;
@@ -21,9 +23,10 @@ public class Sandbox {
         RythmEngine eng = engine();
         eng.enterSandbox();
         try {
-            return engine().render(template, args);
+            ITemplate t = engine().getTemplate(template, args);
+            return secureExecutor.execute(t);
         } finally {
-            eng.resetSandbox();
+            eng.leaveSandbox();
         }
     }
 
@@ -31,9 +34,10 @@ public class Sandbox {
         RythmEngine eng = engine();
         eng.enterSandbox();
         try {
-            return engine().render(file, args);
+            ITemplate t = engine().getTemplate(file, args);
+            return secureExecutor.execute(t);
         } finally {
-            eng.resetSandbox();
+            eng.leaveSandbox();
         }
     }
     

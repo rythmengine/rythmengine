@@ -17,7 +17,6 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.sandbox.Sandbox;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
 import com.greenlaw110.rythm.spi.*;
 import com.greenlaw110.rythm.template.ITemplate;
@@ -47,25 +46,23 @@ public class RythmEngine {
     public static final String version = "1.0-SNAPSHOT";
     public static String pluginVersion = "";
     
-    private static final InheritableThreadLocal<Stack<Boolean>> sandboxMode = new InheritableThreadLocal<Stack<Boolean>>() {
+    private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
         @Override
-        protected Stack<Boolean> initialValue() {
-            Stack<Boolean> stack = new Stack<Boolean>();
-            stack.push(false);
-            return stack;
+        protected Boolean initialValue() {
+            return false;
         }
     };
     public static boolean insideSandbox() {
-        return sandboxMode.get().peek();
+        return sandboxMode.get();
     }
-    public void enterSandbox() {
-        sandboxMode.get().push(true);
+    void enterSandbox() {
+        sandboxMode.set(true);
     }
-    public void resetSandbox() {
-        sandboxMode.get().pop();
+    void leaveSandbox() {
+        sandboxMode.set(false);
     }
     public Sandbox sandbox() {
-        return new Sandbox(this);
+        return new Sandbox(this, secureExecutor);
     }
 
     Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
@@ -101,7 +98,7 @@ public class RythmEngine {
     public IHotswapAgent hotswapAgent = null;
     public boolean logRenderTime = false;
     private SecurityManager sm = null;
-    private SandboxExecutingService secureExecutor = null;
+    SandboxExecutingService secureExecutor = null;
     private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
     public boolean playHost = false;
@@ -511,8 +508,7 @@ public class RythmEngine {
     }
 
     private String renderTemplate(ITemplate t) {
-        if (insideSandbox()) return secureExecutor.execute(t);
-        else return t.render();
+        return t.render();
     }
 
     public String render(String template, Object... args) {
