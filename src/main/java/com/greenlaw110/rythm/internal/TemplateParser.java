@@ -62,7 +62,7 @@ public class TemplateParser implements IContext {
             cursor = 0;
             cb.rewind();
             try {
-                TemplateTokenizer tt = new TemplateTokenizer(template, this);
+                TemplateTokenizer tt = new TemplateTokenizer(this);
                 for (TextBuilder builder : tt) {
                     cb.addBuilder(builder);
                 }

@@ -387,6 +387,7 @@ public class CodeBuilder extends TextBuilder {
             this.templateClass.extendedTemplateClass = tc;
             this.engine.addExtendRelationship(tc, this.templateClass);
             this.extendArgs = args;
+            this.extendDeclareLineNo = lineNo;
         }
     }
 
@@ -427,6 +428,7 @@ public class CodeBuilder extends TextBuilder {
         this.templateClass.extendedTemplateClass = tc;
         this.engine.addExtendRelationship(tc, this.templateClass);
         this.extendArgs = args;
+        this.extendDeclareLineNo = lineNo;
     }
 
     protected boolean logTime = false;
@@ -694,12 +696,14 @@ public class CodeBuilder extends TextBuilder {
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
             InvokeTagParser.ParameterDeclaration pd = extendArgs.pl.get(i);
             if (S.isEmpty(pd.nameDef)) {
-                p2t("__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).pn(");");
+                p2t("__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
             } else {
-                p2t("__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).pn(");");
+                p2t("__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).p(");");
             }
             if (extendDeclareLineNo != -1) {
                 p(" //line: ").pn(extendDeclareLineNo);
+            } else {
+                pn();
             }
         }
         ptn("}");

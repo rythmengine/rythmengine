@@ -22,7 +22,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     private List<IParser> parsers = new ArrayList<IParser>();
     private int lastCursor = 0;
     
-    public TemplateTokenizer(String template, IContext context) {
+    public TemplateTokenizer(IContext context) {
         ctx = context;
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));

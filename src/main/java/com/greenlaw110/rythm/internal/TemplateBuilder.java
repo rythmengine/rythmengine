@@ -53,8 +53,6 @@ public class TemplateBuilder extends TextBuilder {
                     return (TemplateBuilder)p(S.escapeJson(o));
                 case JS:
                     return (TemplateBuilder)p(S.escapeJavaScript(o));
-                case JAVA:
-                    return (TemplateBuilder)p(S.escapeJava(o));
                 case CSV:
                     return (TemplateBuilder)p(S.escapeCsv(o));
                 case XML:

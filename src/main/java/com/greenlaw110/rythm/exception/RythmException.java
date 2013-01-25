@@ -27,6 +27,8 @@ public class RythmException extends FastRuntimeException {
     public String javaSource;
     public String templateSource;
     public String templateName;
+    public String templateSourceInfo;
+    public String javaSourceInfo;
     private RythmEngine engine;
 
     public RythmException(RythmEngine engine, Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
@@ -34,15 +36,17 @@ public class RythmException extends FastRuntimeException {
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
         boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
         boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
-        F.T2<String, Integer> t2 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
+        F.T4<String, Integer, String, String> t4 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
         this.engine = engine;
         this.templateName = templateName;
         this.javaSource = javaSource;
         this.templateSource = templateSource;
         this.javaLineNumber = javaLineNumber;
-        this.templateLineNumber = t2._2;
+        this.templateLineNumber = t4._2;
         this.originalMessage = message;
-        this.errorMessage = t2._1;
+        this.errorMessage = t4._1;
+        this.templateSourceInfo = t4._3;
+        this.javaSourceInfo = t4._4;
     }
 
     public RythmException(RythmEngine engine, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
@@ -58,18 +62,21 @@ public class RythmException extends FastRuntimeException {
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
         boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
         boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
-        F.T2<String, Integer> t2 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
+        F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
         this.engine = engine;
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
         this.javaSource = tc.javaSource;
         this.templateSource = tc.getTemplateSource();
-        this.templateLineNumber = t2._2;
+        this.templateLineNumber = t4._2;
         this.originalMessage = message;
-        this.errorMessage = t2._1;
+        this.errorMessage = t4._1;
+        this.templateSourceInfo = t4._3;
+        this.javaSourceInfo = t4._4;
     }
 
     public String javaSourceInfo() {
+        if (null != javaSourceInfo) return javaSourceInfo;
         String javaSource = getJavaSource();
         if (S.isEmpty(javaSource)) return "No java source available";
         TextBuilder tb = new TextBuilder();
@@ -86,10 +93,12 @@ public class RythmException extends FastRuntimeException {
             else tb.p("   ");
             tb.p(line + 1).p(": ").p(lines[line]).p("\n");
         }
-        return tb.toString();
+        javaSourceInfo = tb.toString();
+        return javaSourceInfo;
     }
 
     public String templateSourceInfo() {
+        if (null != templateSourceInfo) return templateSourceInfo;
         String tmplSource = getTemplateSource();
         if (S.isEmpty(tmplSource)) return "No template source available";
         TextBuilder tb = new TextBuilder();
@@ -105,7 +114,8 @@ public class RythmException extends FastRuntimeException {
             else tb.p("   ");
             tb.p(line+1).p(": ").p(lines[line]).p("\n");
         }
-        return tb.toString();
+        templateSourceInfo = tb.toString();
+        return templateSourceInfo;
     }
 
     public RythmException(RythmEngine engine, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
@@ -131,48 +141,55 @@ public class RythmException extends FastRuntimeException {
         return templateLineNumber;
     }
 
-    private static F.T2<String, Integer> parse(String message, boolean logJava, boolean logTmpl, int javaLineNumber, int templateLineNumber, String javaSource, String templateSource, TemplateClass templateClass) {
+    private static F.T4<String, Integer, String, String> parse(String message, boolean logJava, boolean logTmpl, int javaLineNumber, int templateLineNumber, String javaSource, String templateSource, TemplateClass templateClass) {
         //Logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>> logJava: %s", logJava);
         javaSource = getJavaSource(javaSource, templateClass);
         String tmplSource = getTemplateSource(templateSource, templateClass);
+        String tmplSourceInfo = null;
+        String javaSourceInfo = null;
         templateLineNumber = resolveTemplateLineNumber(javaLineNumber, templateLineNumber, javaSource, templateClass);
         if (!logJava && !logTmpl) {
-            return new F.T2(message, templateLineNumber);
+            return new F.T4(message, templateLineNumber, tmplSourceInfo, javaSourceInfo);
         }
         TextBuilder tb = new TextBuilder();
         tb.pn(message);
         tb.p("\nTemplate: ").p(templateClass.getKey()).p("\n");
+        if (logTmpl && !S.isEmpty(tmplSource)) {
+            TextBuilder tbTmpl = new TextBuilder();
+            tbTmpl.p("\nRelevant template source lines:\n-------------------------------------------------\n");
+            String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
+            int start = 0, end = lines.length;
+            if (templateLineNumber > -1) {
+                start = Math.max(0, templateLineNumber - 6);
+                end = Math.min(end, templateLineNumber + 6);
+            }
+            for (int line = start; line < end; ++line) {
+                if ((line + 1) == templateLineNumber) tbTmpl.p(">> ");
+                else tbTmpl.p("   ");
+                tbTmpl.p(line + 1).p(": ").p(lines[line]).p("\n");
+            }
+            tmplSourceInfo = tbTmpl.toString();
+        }
         // log java source anyway if template line number is not resolved
         if ((logJava || templateLineNumber < 0) && !S.isEmpty(javaSource)) {
-            tb.p("\nRelevant Java source lines:\n-------------------------------------------------\n");
+            TextBuilder tbJava = new TextBuilder();
+            tbJava.p("\nRelevant Java source lines:\n-------------------------------------------------\n");
             String[] lines = javaSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
             int start = 0, end = lines.length;
             if (javaLineNumber > -1) {
                 start = Math.max(0, javaLineNumber - 6);
                 end = Math.min(end, javaLineNumber + 6);
             }
-            for (int line = start;line < end; ++line) {
-                if ((line + 1) == javaLineNumber) tb.p(">> ");
-                else tb.p("   ");
-                tb.p(line+1).p(": ").p(lines[line]).p("\n");
+            for (int line = start; line < end; ++line) {
+                if ((line + 1) == javaLineNumber) tbJava.p(">> ");
+                else tbJava.p("   ");
+                tbJava.p(line + 1).p(": ").p(lines[line]).p("\n");
             }
+            javaSourceInfo = tbJava.toString();
         }
-
-        if (logTmpl && !S.isEmpty(tmplSource)) {
-            tb.p("\nRelevant template source lines:\n-------------------------------------------------\n");
-            String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
-            int start = 0, end = lines.length ;
-            if (templateLineNumber > -1) {
-                start = Math.max(0, templateLineNumber - 6);
-                end = Math.min(end, templateLineNumber + 6);
-            }
-            for (int line = start;line < end; ++line) {
-                if ((line + 1) == templateLineNumber) tb.p(">> ");
-                else tb.p("   ");
-                tb.p(line+1).p(": ").p(lines[line]).p("\n");
-            }
-        }
-        return new F.T2(tb.toString(), templateLineNumber);
+        tb.pn(tmplSourceInfo);
+        tb.pn(javaSourceInfo);
+        return new F.T4(tb.toString(), templateLineNumber, tmplSourceInfo, javaSourceInfo);
     }
 
     private static String getJavaSource(String javaSource, TemplateClass templateClass) {

@@ -121,12 +121,6 @@ public interface ITemplate extends Cloneable {
                 return S.escapeJson(s);
             }
         },
-        JAVA {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeJava(s);
-            }
-        },
         XML {
             @Override
             protected RawData apply_(String s) {

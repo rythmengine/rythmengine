@@ -18,8 +18,6 @@ public abstract class ParserBase implements IParser {
 
     protected ILogger logger = Logger.get(IParser.class);
 
-    public static final String R_VARNAME = "[a-zA-Z][a-zA-Z0-9_]*";
-
     public static final Pattern pattern(String regex, Object ... args) {
         if (0 < args.length) regex = String.format(regex, args);
         return Pattern.compile(regex, Pattern.DOTALL);

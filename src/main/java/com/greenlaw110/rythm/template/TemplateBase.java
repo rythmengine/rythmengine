@@ -41,6 +41,21 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected RythmEngine r() {
         return engine;
     }
+    
+    private Writer w;
+    private OutputStream os;
+    
+    public void setWriter(Writer writer) {
+        if (null == writer) throw new NullPointerException();
+        if (null != os) throw new IllegalStateException("Cannot set writer to template when outputstream is presented");
+        this.w = writer;
+    }
+    
+    public void setOutputStream(OutputStream os) {
+        if (null == os) throw new NullPointerException();
+        if (null != os) throw new IllegalStateException("Cannot set output stream to template when writer is presented");
+        this.os = os;
+    }
 
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
@@ -333,7 +348,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                             }
                             RythmException re = new RythmException(engine, e, tc, se.getLineNumber(), -1, msg);
                             if (engine.logSourceInfoOnRuntimeError) {
-                                Logger.error("Error executing template: %2$s. \n%1$s\n%2$s", re.javaSourceInfo(), re.templateSourceInfo(), msg);
+                                Logger.error("Error executing template: %2$s. \n%1$s\n%2$s", re.templateSourceInfo(), re.javaSourceInfo(), msg);
                             }
                             int lineNo = re.templateLineNumber;
                             String key = tc.getKey().toString();

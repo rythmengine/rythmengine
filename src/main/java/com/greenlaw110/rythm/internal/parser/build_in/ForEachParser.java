@@ -89,6 +89,9 @@ public class ForEachParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
+        Rythm.render("abc\ndds\n@for(dd, dd{}\nadfs");
+    }
+    private static void test5() {
         List<String> sl = Arrays.asList("a,b,c".split(","));
         String s;
         s = Rythm.render("@for(s:sl){|\n\n|@s, [@s_index], [@s_isOdd], [@s_parity], \n[@s_isFirst], [@s_isLast], [@s_sep], \n[@s_utils.sep(\" and \")]}", sl);
