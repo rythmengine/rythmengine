@@ -14,17 +14,14 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.greenlaw110.rythm</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-b1-SNAPSHOT</version>
+    <version>1.0-b1</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
@@ -108,7 +105,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${basedir}/lib"/>
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" todir="${basedir}/lib" />
                             </target>
                         </configuration>
                     </execution>
