@@ -106,7 +106,7 @@
     <dependencies>
         <dependency>
             <groupId>com.greenlaw110.rythm</groupId>
-            <artifactId>rythm</artifactId>
+            <artifactId>rythm-engine</artifactId>
             <version>1.0-b1</version>
         </dependency>
     </dependencies>
