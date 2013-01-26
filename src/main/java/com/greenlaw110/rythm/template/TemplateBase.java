@@ -60,7 +60,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
     protected RythmEngine _engine() {
-        return null == engine ? Rythm.engine : engine;
+        return null == engine ? Rythm.engine() : engine;
     }
 
     protected void _invokeTag(String name) {

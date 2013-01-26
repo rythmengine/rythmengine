@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -181,8 +182,15 @@ public class Token extends TextBuilder {
         if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
             if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
             else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            return;
+        } else {
+            RythmEngine engine = null == ctx ? com.greenlaw110.rythm.Rythm.engine() : ctx.getEngine();
+            String s = processExtensions(engine);
+            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+            pline();
         }
+    }
+    private String processExtensions(RythmEngine engine) {
         String s0 = s;
         boolean outerBracketsStripped = false;
         s = stripOuterBrackets(s);
@@ -256,18 +264,14 @@ public class Token extends TextBuilder {
             s = String.format("(%s)", s);
         }
         s = compact(s);
-        boolean processed = false;
-        for (IExpressionProcessor p: ctx.getEngine().getExtensionManager().expressionProcessors()) {
-            if (p.process(s, this)) {
-                processed = true;
-                break;
+        for (IExpressionProcessor p: engine.getExtensionManager().expressionProcessors()) {
+            String result = p.process(s, this);
+            if (null != result) {
+                // remove line breaks so that we can easily handle line numbers
+                return S.removeAllLineBreaks(result);
             }
         }
-        if (!processed) {
-            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            pline();
-        }
+        return s;
     }
 
     public Token ptline(String msg, Object ... args) {
@@ -346,6 +350,11 @@ public class Token extends TextBuilder {
 
     protected String compact(String s) {
         return compactMode() ? compact_(s) : s;
+    }
+    
+    public static String processRythmExpression(String s, RythmEngine eninge) {
+        Token token = new Token(s, (IContext)null);
+        return token.processExtensions(eninge);
     }
 
     public static void main(String[] args) {

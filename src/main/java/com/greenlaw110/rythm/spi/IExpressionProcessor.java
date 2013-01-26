@@ -9,10 +9,14 @@ package com.greenlaw110.rythm.spi;
  */
 public interface IExpressionProcessor {
     /**
-     * Process the expression. Return true if processed false otherwise
+     * Process the expression. Return processed result if processed null otherwise
      * @param exp
      * @param token
      * @return
      */
-    boolean process(String exp, Token token);
+    String process(String exp, Token token);
+
+    public interface IResult {
+        String get();
+    }    
 }

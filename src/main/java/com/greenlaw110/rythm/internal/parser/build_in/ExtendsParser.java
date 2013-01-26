@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
@@ -56,7 +57,7 @@ public class ExtendsParser extends KeywordParserFactory {
                     //r = argsPattern;
                     r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
                     while (r.search(s)) {
-                        params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
+                        params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), ctx().getEngine());
                     }
                 }
 
@@ -122,7 +123,7 @@ public class ExtendsParser extends KeywordParserFactory {
             s = s.replaceFirst(",\\s*", "");
             r = argsPattern;
             while (r.search(s)) {
-                params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5));
+                params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), new RythmEngine());
             }
         }
         System.out.println(s);

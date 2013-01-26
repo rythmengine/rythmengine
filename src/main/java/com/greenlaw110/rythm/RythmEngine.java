@@ -472,12 +472,11 @@ public class RythmEngine {
         if (mode.isDev()) cceCounter.remove();
         return t;
     }
-
-    @SuppressWarnings("unchecked")
-    public ITemplate getTemplate(String template, Object... args) {
+    
+    private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
-            tc = new TemplateClass(template, this);
+            tc = new TemplateClass(template, this, dialect);
         }
         ITemplate t = tc.asTemplate();
         try {
@@ -502,11 +501,16 @@ public class RythmEngine {
                     throw ce;
                 }
                 restart(ce);
-                return getTemplate(template, args);
+                return getTemplate(template, args, dialect);
             }
             throw ce;
         }
         return t;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ITemplate getTemplate(String template, Object... args) {
+        return getTemplate(null, template, args);
     }
 
     public void preprocess(ITemplate t) {
@@ -531,16 +535,12 @@ public class RythmEngine {
     }
     
     public String substitute(String template, Object... args) {
-        TemplateClass tc = classes.getByTemplate(template);
-        if (null == tc) {
-            tc = new TemplateClass(new StringTemplateResource(template), this, BasicRythm.INSTANCE);
-        }
-        ITemplate t = tc.asTemplate();
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
-        } else {
-            t.setRenderArgs(args);
-        }
+        ITemplate t = getTemplate(template, args, BasicRythm.INSTANCE);
+        return t.render();
+    }
+    
+    public String substitute(File template, Object... args) {
+        ITemplate t = getTemplate(template, args, BasicRythm.INSTANCE);
         return t.render();
     }
 
@@ -927,9 +927,17 @@ public class RythmEngine {
         return cacheService.get(key);
     }
 
+    interface IShutdownListener {
+        void onShutdown();
+    }
+    private IShutdownListener shutdownListener = null;
+    void setShutdownListener(IShutdownListener listener) {
+        this.shutdownListener = listener; 
+    }
     public void shutdown() {
         if (null != cacheService) cacheService.shutdown();
         if (null != secureExecutor) secureExecutor.shutdown();
+        if (null != shutdownListener) shutdownListener.onShutdown();
     }
 
     // -- SPI interface

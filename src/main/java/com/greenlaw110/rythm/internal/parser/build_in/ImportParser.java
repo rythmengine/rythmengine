@@ -55,7 +55,7 @@ public class ImportParser extends KeywordParserFactory {
                     if (S.isEmpty(imp)) continue;
                     if ("static".equals(imp)) statik = true;
                     else {
-                        cb.addImport(statik ? "static " + imp : imp);
+                        cb.addImport(statik ? "static " + imp : imp, ctx().currentLine() - 1);
                         statik = false;
                     }
                 }

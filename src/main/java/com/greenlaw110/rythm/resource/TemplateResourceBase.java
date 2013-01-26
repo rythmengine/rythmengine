@@ -29,7 +29,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     }
 
     protected RythmEngine engine() {
-        return null == engine ? Rythm.engine : engine;
+        return null == engine ? Rythm.engine() : engine;
     }
 
     @Override

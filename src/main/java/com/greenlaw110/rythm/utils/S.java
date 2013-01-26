@@ -234,6 +234,17 @@ public class S {
     }
 
     /**
+     * Remove all line breaks from string representation of specified object O 
+     * 
+     * @param o
+     * @return
+     */
+    public static String removeAllLineBreaks(Object o) {
+        String s = str(o);
+        return s.replaceAll("[\n\r]+", " ");
+    }
+
+    /**
      * Return a {@link ITemplate.RawData} type wrapper of 
      * an object without any escaping.
      * 

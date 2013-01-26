@@ -8,7 +8,6 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.sandbox.RythmSecurityManager;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.IO;
-import sun.audio.AudioPlayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -54,7 +53,7 @@ public class TemplateClassLoader extends ClassLoader {
             /**
              * @return true if file has changed on disk
              */
-            public boolean fileNotChanges( ) {
+            public boolean fileNotChanges() {
                 return size == file.length() && lastModified == file.lastModified();
             }
 
@@ -67,7 +66,7 @@ public class TemplateClassLoader extends ClassLoader {
 
         public synchronized int computePathHash(File... paths) {
             StringBuffer buf = new StringBuffer();
-            for (File file: paths) {
+            for (File file : paths) {
                 scan(buf, file);
             }
             // TODO: should use better hashing-algorithm.. MD5? SHA1?
@@ -78,7 +77,7 @@ public class TemplateClassLoader extends ClassLoader {
         private void scan(StringBuffer buf, File current) {
             if (!current.isDirectory()) {
                 if (current.getName().endsWith(".java")) {
-                    buf.append( getClassDefsForFile(current));
+                    buf.append(getClassDefsForFile(current));
                 }
 
             } else if (!current.getName().startsWith(".")) {
@@ -93,10 +92,10 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
 
-        private String getClassDefsForFile( File file ) {
+        private String getClassDefsForFile(File file) {
 
-            FileWithClassDefs fileWithClassDefs = classDefsInFileCache.get( file );
-            if( fileWithClassDefs != null && fileWithClassDefs.fileNotChanges() ) {
+            FileWithClassDefs fileWithClassDefs = classDefsInFileCache.get(file);
+            if (fileWithClassDefs != null && fileWithClassDefs.fileNotChanges()) {
                 // found the file in cache and it has not changed on disk
                 return fileWithClassDefs.getClassDefs();
             }
@@ -116,19 +115,20 @@ public class TemplateClassLoader extends ClassLoader {
             String classDefs = buf.toString();
 
             // store it in cache
-            classDefsInFileCache.put( file, new FileWithClassDefs(file, classDefs));
+            classDefsInFileCache.put(file, new FileWithClassDefs(file, classDefs));
             return classDefs;
         }
     }
+
     private final ClassStateHashCreator classStateHashCreator = new ClassStateHashCreator();
 
     /**
      * Each unique instance of this class represent a State of the TemplateClassLoader.
      * When some classCache is reloaded, them the TemplateClassLoader get a new state.
-     *
+     * <p/>
      * This makes it easy for other parts of Play to cache stuff based on the
      * the current State of the TemplateClassLoader..
-     *
+     * <p/>
      * They can store the reference to the current state, then later, before reading from cache,
      * they could check if the state of the TemplateClassLoader has changed..
      */
@@ -153,7 +153,9 @@ public class TemplateClassLoader extends ClassLoader {
         public int hashCode() {
             return (int) (currentStateValue ^ (currentStateValue >>> 32));
         }
-    }    /**
+    }
+
+    /**
      * A representation of the current state of the TemplateClassLoader.
      * It gets a new value each time the state of the classloader changes.
      */
@@ -178,7 +180,7 @@ public class TemplateClassLoader extends ClassLoader {
     public TemplateClassLoader(ClassLoader parent, RythmEngine engine) {
         super(parent);
         this.engine = engine;
-        for (TemplateClass tc: engine.classes.all()) {
+        for (TemplateClass tc : engine.classes.all()) {
             tc.uncompile();
         }
         pathHash = computePathHash();
@@ -193,6 +195,7 @@ public class TemplateClassLoader extends ClassLoader {
     }
 
     private static final ThreadLocal<String> sandboxPassword = new ThreadLocal<String>();
+
     public static void setSandboxPassword(String password) {
         sandboxPassword.set(password);
     }
@@ -206,11 +209,11 @@ public class TemplateClassLoader extends ClassLoader {
         if (Rythm.insideSandbox()) {
             sm = System.getSecurityManager();
             if (null != sm && sm instanceof RythmSecurityManager) {
-                rsm = (RythmSecurityManager)sm;
+                rsm = (RythmSecurityManager) sm;
                 pass = sandboxPassword.get();
             }
         }
-        
+
         // check if the class is restricted when run in sandbox mode
         if (Rythm.insideSandbox()) {
             if (engine.restrictedClasses.contains(name)) {
@@ -255,7 +258,7 @@ public class TemplateClassLoader extends ClassLoader {
     @SuppressWarnings("unchecked")
     private Class<?> loadTemplateClass(String name) {
         Class<?> maybeAlreadyLoaded = findLoadedClass(name);
-        if(maybeAlreadyLoaded != null) {
+        if (maybeAlreadyLoaded != null) {
             return maybeAlreadyLoaded;
         }
         long start = System.currentTimeMillis();
@@ -272,7 +275,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
             if (bc != null) {
                 //templateClass.enhancedByteCode = bc;
-                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
@@ -285,7 +288,7 @@ public class TemplateClassLoader extends ClassLoader {
 
             if (templateClass.javaByteCode != null || templateClass.compile() != null) {
                 templateClass.enhance();
-                templateClass.javaClass = (Class<ITemplate>)defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
                 resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
                     templateClass.javaPackage = templateClass.javaClass.getPackage();
@@ -331,7 +334,7 @@ public class TemplateClassLoader extends ClassLoader {
                         throw new RuntimeException("Cannot find bytecode cache for inner class: " + name);
                     }
                 }
-                tc.javaClass = (Class<ITemplate>)defineClass(tc.name(), bc, 0, bc.length, protectionDomain);
+                tc.javaClass = (Class<ITemplate>) defineClass(tc.name(), bc, 0, bc.length, protectionDomain);
                 return tc.javaClass;
             }
         }

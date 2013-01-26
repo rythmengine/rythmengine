@@ -286,6 +286,15 @@ public class TemplateClass {
         this(engine.resourceManager.get(template), engine);
     }
 
+    /**
+     * Construct a TemplateClass instance using template source content or file path
+     *
+     * @param template
+     */
+    public TemplateClass(String template, RythmEngine engine, IDialect dialect) {
+        this(engine.resourceManager.get(template), engine, dialect);
+    }
+
     public TemplateClass(ITemplateResource resource, RythmEngine engine) {
         this(resource, engine, false);
     }

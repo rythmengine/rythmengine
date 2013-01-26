@@ -18,7 +18,7 @@ public class ExtensionManager {
     }
 
     RythmEngine engine() {
-        return null == engine ? Rythm.engine : engine;
+        return null == engine ? Rythm.engine() : engine;
     }
 
     public ExtensionManager registerUserDefinedParsers(IParserFactory... parsers) {

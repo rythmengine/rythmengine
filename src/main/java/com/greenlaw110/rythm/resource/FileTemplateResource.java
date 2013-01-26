@@ -67,7 +67,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     public FileTemplateResource(File templateFile, RythmEngine engine) {
         super(engine);
-        File home = engine().templateHome;
+        //File home = engine().templateHome;
         //File tagHome = engine().tagHome;
         file = templateFile;
         key = file.getPath();
@@ -141,7 +141,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     }
 
     public static String getFullTagName(TemplateClass tc, RythmEngine engine) {
-        if (null == engine) engine = Rythm.engine;
+        if (null == engine) engine = Rythm.engine();
         String key = tc.getKey().toString();
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
         if (null != engine.templateHome && key.startsWith(engine.templateHome.getPath())) {
@@ -154,7 +154,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     }
 
     public static TemplateClass tryLoadTag(String tagName, RythmEngine engine) {
-        if (null == engine) engine = Rythm.engine;
+        if (null == engine) engine = Rythm.engine();
         if (engine.tags.containsKey(tagName)) return null;
         tagName = tagName.replace('.', '/');
         final String[] suffixes = {

@@ -168,7 +168,7 @@ public class CodeBuilder extends TextBuilder {
             cName = className.substring(i + 1);
             pName = className.substring(0, i);
         }
-        this.engine = null == engine ? Rythm.engine : engine;
+        this.engine = null == engine ? Rythm.engine() : engine;
         this.requiredDialect = requiredDialect;
         this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
@@ -196,6 +196,7 @@ public class CodeBuilder extends TextBuilder {
         this.templateClass = null;
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
+        this.importLineMap.clear();
         this.logTime = false;
         this.macros.clear();
         this.macroStack.clear();
@@ -217,6 +218,7 @@ public class CodeBuilder extends TextBuilder {
         this.builders.clear();
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
+        this.importLineMap.clear();
         this.logTime = false;
         this.macros.clear();
         this.macroStack.clear();
@@ -231,6 +233,7 @@ public class CodeBuilder extends TextBuilder {
         }
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
+        this.importLineMap.putAll(codeBuilder.importLineMap);
     }
 
     public String className() {
@@ -253,12 +256,15 @@ public class CodeBuilder extends TextBuilder {
         importProvider = provider;
     }
 
-    public void addImport(String imprt) {
+    private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
+    
+    public void addImport(String imprt, int lineNo) {
         if (!globalImports.contains(imprt)) imports.add(imprt);
         if (imprt.endsWith(".*")) {
             imprt = imprt.substring(0, imprt.lastIndexOf(".*"));
             templateClass.importPaths.add(imprt);
         }
+        importLineMap.put(imprt, lineNo);
     }
 
     public static class InlineTag {
@@ -568,7 +574,10 @@ public class CodeBuilder extends TextBuilder {
             String s0 = Sandbox.hasAccessToRestrictedClasses(engine, s);
             if (null != s0) return;
         }
-        p("import ").p(s).pn(';');
+        p("import ").p(s).p(';');
+        Integer I = importLineMap.get(s);
+        if (null != I) p(" //line: ").pn(I);
+        else p("\n");
     }
 
     // print imports

@@ -21,31 +21,17 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.greenlaw110.rythm</groupId>
-    <artifactId>rythm-engine</artifactId>
+    <groupId>com.greenlaw110.rythm.sample</groupId>
+    <artifactId>helloworld</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
-    <name>Rythm Template Engine</name>
-    <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
-    <url>http://rythmengine.com/</url>
-    
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
-
-    <scm>
-        <connection>scm:git:git://github.com/greenlaw110/Rythm.git</connection>
-        <developerConnection>scm:git:git@github.com:greenlaw110/Rythm.git</developerConnection>
-        <url>git://github.com/greenlaw110/Rythm.git</url>
-    </scm>
+    <name>Rythm Template Engine - Hello world sample</name>
+    <description>Hello world!</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <maven.test.skip>true</maven.test.skip> <!-- until tests are fixed -->
     </properties>
 
@@ -118,37 +104,16 @@
     </build>
 
     <dependencies>
-        <!-- TODO - maybe change to ecj (and deploy it) -->
         <dependency>
-            <groupId>org.eclipse.jdt.core.compiler</groupId>
-            <artifactId>ecj</artifactId>
-            <version>3.7.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.stevesoft.pat</groupId>
-            <artifactId>pat</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
+            <groupId>com.greenlaw110.rythm</groupId>
+            <artifactId>rythm</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
     <profiles>
         <profile>
             <id>dist</id>
-
             <build>
                 <plugins>
                     <plugin>
