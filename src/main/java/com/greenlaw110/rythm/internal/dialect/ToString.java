@@ -39,24 +39,15 @@ public class ToString extends BasicRythm {
         this.type = type;
     }
 
-    protected Class<?>[] buildInParserClasses() {
-        // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
-        // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{EscapeParser.class, ElseIfParser.class, BraceParser.class, ExpressionParser.class, IfParser.class, RawParser.class, TimestampParser.class};
-    }
-
     @Override
     public boolean isMyTemplate(String template) {
         String[] forbidden = {
             "@args",
             "@assign",
-            "@break",
-            "@continue",
             "@debug",
             "@doLayout",
             "@doBody",
             "@extends",
-            "@for",
             "@section",
             "@render",
             "@import",

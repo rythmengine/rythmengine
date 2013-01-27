@@ -65,6 +65,10 @@ public enum Keyword implements IKeyword {
      */
     IF,
     /**
+     * the negative IF
+     */
+    IFNOT,
+    /**
      * import java packages/classes
      */
     IMPORT,

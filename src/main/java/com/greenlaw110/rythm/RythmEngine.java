@@ -281,10 +281,11 @@ public class RythmEngine {
             if (null != fact) Logger.registerLoggerFactory(fact);
         }
 
+        mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
-        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", false);
+        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", mode.isDev());
         recordTemplateSourceOnError = configuration.getAsBoolean("rythm.recordTemplateSourceOnError", true);
-        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", false);
+        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", mode.isDev());
         recordTemplateSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordTemplateSourceOnRuntimeError", true);
         logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
@@ -302,7 +303,6 @@ public class RythmEngine {
                 return true; // by default accept all files
             }
         });
-        mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
         loadPreCompiled = configuration.getAsBoolean("rythm.loadPreCompiled", false);
