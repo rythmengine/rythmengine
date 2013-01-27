@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="hello-world" default="run" basedir=".">
+
+    <property file="build.properties"/>
+    
+    <path id="rythm.jars">
+        <fileset dir="${rythm.lib}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${classes}"/>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac srcdir="${src}" destdir="${classes}" includeantruntime="false">
+            <classpath refid="rythm.jars" />
+        </javac>
+    </target>
+
+    <target name="run" depends="compile">
+        <java classname="HelloWorld">
+            <classpath location="classes"/>
+            <classpath refid="rythm.jars"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.classes}"/>
+        <delete dir="${build.output}"/>
+    </target>
+
+</project>
