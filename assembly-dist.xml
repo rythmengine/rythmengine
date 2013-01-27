@@ -27,7 +27,7 @@ under the License.
     </formats>
 
     <includeSiteDirectory>false</includeSiteDirectory>
-    <includeBaseDirectory>false</includeBaseDirectory>
+    <includeBaseDirectory>true</includeBaseDirectory>
 
     <fileSets>
         <fileSet>

@@ -28,8 +28,7 @@
     </target>
 
     <target name="clean">
-        <delete dir="${build.classes}"/>
-        <delete dir="${build.output}"/>
+        <delete dir="${classes}"/>
     </target>
 
 </project>
