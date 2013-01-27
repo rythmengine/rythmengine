@@ -1,3 +1,0 @@
-@extends(bar)
-@args String name
-@name!

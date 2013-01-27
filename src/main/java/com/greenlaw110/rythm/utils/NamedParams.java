@@ -15,7 +15,10 @@ public class NamedParams {
             v = val;
         }
     }
+
+    public static Pair pair(String k, Object v) {return new Pair(k, v);}
     public static Pair p(String k, Object v) {return new Pair(k, v);}
+    
     public static Map<String, Object> from(Pair... pairs) {
         Map<String, Object> map = new HashMap<String, Object>(pairs.length);
         for (Pair p: pairs) {
