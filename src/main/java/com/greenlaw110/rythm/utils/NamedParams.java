@@ -35,5 +35,6 @@ public class NamedParams {
     }
 
     public static void main(String[] args) {
+        System.out.println(Rythm.render("green@rythmengine.com"));
     }
 }

@@ -4,12 +4,20 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.utils.S;
 
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
 
 public interface ITemplate extends Cloneable {
+
+    void setOutputStream(OutputStream os);
+    
+    void setWriter(Writer writer);
+
     /**
      * Set renderArgs in name-value pair
      * @param args
@@ -44,6 +52,10 @@ public interface ITemplate extends Cloneable {
      * @return
      */
     String render();
+    
+    void render(OutputStream os);
+    
+    void render(Writer w);
 
     /**
      * Must be called before real render() happened.

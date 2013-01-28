@@ -48,13 +48,196 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public void setWriter(Writer writer) {
         if (null == writer) throw new NullPointerException();
         if (null != os) throw new IllegalStateException("Cannot set writer to template when outputstream is presented");
+        if (null != this.w) throw new IllegalStateException("Cannot set writer to template when an writer is presented");
         this.w = writer;
     }
     
     public void setOutputStream(OutputStream os) {
         if (null == os) throw new NullPointerException();
-        if (null != os) throw new IllegalStateException("Cannot set output stream to template when writer is presented");
+        if (null != w) throw new IllegalStateException("Cannot set output stream to template when writer is presented");
+        if (null != this.os) throw new IllegalStateException("Cannot set output stream to template when an outputstream is presented");
         this.os = os;
+    }
+    
+    private boolean appendToBuffer() {
+        return null != __parent || (null == w && null == os);
+    }
+    
+    private boolean appendToWriter() {
+        return (null == __parent && null != w);
+    }
+    
+    private boolean appendToOutputStream() {
+        return (null == __parent && null != os);
+    }
+
+    @Override
+    protected void append(StringWrapper wrapper) {
+        if (appendToBuffer()) {
+            super.append(wrapper);
+            return;
+        }
+        
+        if (appendToOutputStream()) {
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(wrapper.toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(Object o) {
+        if (appendToBuffer()) super.append(o);
+        
+        StringWrapper wrapper = new StringWrapper(o.toString());
+        if (appendToOutputStream()) {
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(wrapper.toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(char c) {
+        if (appendToBuffer()) super.append(c);
+        
+        if (appendToOutputStream()) {
+            try {
+                os.write(c);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(c);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(int i) {
+        if (appendToBuffer()) super.append(i);
+        
+        if (appendToOutputStream()) {
+            StringWrapper wrapper = new StringWrapper(String.valueOf(i));
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(String.valueOf(i));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(long l) {
+        if (appendToBuffer()) super.append(l);
+
+        if (appendToOutputStream()) {
+            StringWrapper wrapper = new StringWrapper(String.valueOf(l));
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(String.valueOf(l));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(float f) {
+        if (appendToBuffer()) super.append(f);
+
+        if (appendToOutputStream()) {
+            StringWrapper wrapper = new StringWrapper(String.valueOf(f));
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(String.valueOf(f));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(double d) {
+        if (appendToBuffer()) super.append(d);
+
+        if (appendToOutputStream()) {
+            StringWrapper wrapper = new StringWrapper(String.valueOf(d));
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(String.valueOf(d));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    protected void append(boolean b) {
+        if (appendToBuffer()) super.append(b);
+
+        if (appendToOutputStream()) {
+            StringWrapper wrapper = new StringWrapper(String.valueOf(b));
+            try {
+                os.write(wrapper.toBinary());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if (appendToWriter()) {
+            try {
+                w.write(String.valueOf(b));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     protected Map<String, Object> _properties = new HashMap<String, Object>();
@@ -217,6 +400,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.tmpCaller = null;
         tmpl.tmpOut = null;
         tmpl._logTime = _logTime;
+        tmpl.w = null;
+        tmpl.os = null;
         return tmpl;
     }
 
@@ -246,6 +431,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             if (null != caller) return caller.getTemplateClass(true);
         }
         return tc;
+    }
+    
+    public final void render(OutputStream os) {
+        setOutputStream(os);
+        render();
+    }
+    
+    public final void render(Writer w) {
+        setWriter(w);
+        render();
     }
 
     @Override
@@ -393,7 +588,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     protected String internalRender() {
         internalBuild();
-        if (null != __parent) {
+        if (null != __parent && __parent != this) {
             __parent.setLayoutContent(toString());
             __parent.addAllLayoutSections(layoutSections);
             __parent.addAllRenderProperties(renderProperties);

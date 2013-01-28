@@ -24,8 +24,6 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     protected Body _context;
 
-    private String fullName;
-
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
@@ -56,11 +54,22 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public void call() {
         if (null != _context) {
             _out = new StringBuilder();
-            _context.p(S.raw(render()));
+            _context.p(S.raw(renderWithParent()));
         } else if (null != _caller && null != _out) {
-            _caller.p(S.raw(render())); // a real tag
+            _caller.p(S.raw(renderWithParent())); // a real tag
         } else {
             render(); // an normal template
+        }
+    }
+    
+    // make sure it does not write to OutputStream or Writer
+    private String renderWithParent() {
+        if (null != __parent) return render();
+        __parent = this;
+        try {
+            return render();
+        } finally {
+            __parent = null;
         }
     }
 

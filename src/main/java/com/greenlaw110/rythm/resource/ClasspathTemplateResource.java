@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.IO;
 
 import java.net.URL;
@@ -92,7 +93,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof ClasspathTemplateResource) {
-            ClasspathTemplateResource that = (ClasspathTemplateResource)obj;
+            ClasspathTemplateResource that = (ClasspathTemplateResource) obj;
             return that.getKey().equals(this.getKey());
         }
         return false;
@@ -110,7 +111,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
     @Override
     public String getSuggestedClassName() {
-        return path2CN(url.getPath());
+        return path2CN(key);
     }
 
     public static void main(String[] args) {

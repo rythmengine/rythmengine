@@ -6,7 +6,6 @@ import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
-import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
@@ -152,7 +151,8 @@ public class CodeBuilder extends TextBuilder {
     private boolean simpleTemplate() {
         return parser.getDialect() instanceof SimpleRythm;
     }
-    private boolean basicTemplate() {   
+
+    private boolean basicTemplate() {
         return parser.getDialect() instanceof BasicRythm;
     }
 
@@ -257,7 +257,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
-    
+
     public void addImport(String imprt, int lineNo) {
         if (!globalImports.contains(imprt)) imports.add(imprt);
         if (imprt.endsWith(".*")) {
@@ -442,7 +442,7 @@ public class CodeBuilder extends TextBuilder {
     public void setLogTime() {
         logTime = true;
     }
-    
+
     public String getRenderArgType(String name) {
         RenderArgDeclaration rad = renderArgs.get(name);
         if (null != rad) return rad.type;
@@ -456,7 +456,7 @@ public class CodeBuilder extends TextBuilder {
     public void addRenderArgs(int lineNo, String type, String name) {
         renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
     }
-    
+
     public void addRenderArgsIfNotDeclared(int lineNo, String type, String name) {
         if (!renderArgs.containsKey(name)) {
             renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
@@ -567,7 +567,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pPackage() {
         if (!S.isEmpty(pName)) p("package ").p(pName).pn(";");
     }
-    
+
     private void pImport(String s, boolean sandbox) {
         if (S.isEmpty(s)) return;
         if (sandbox) {
@@ -652,7 +652,7 @@ public class CodeBuilder extends TextBuilder {
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
                 p2tn("int _p = 0, l = args.length;");
-                int i = userDefinedArgNumber; 
+                int i = userDefinedArgNumber;
                 for (String argName : renderArgs.keySet()) {
                     RenderArgDeclaration arg = renderArgs.get(argName);
                     p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
@@ -671,8 +671,13 @@ public class CodeBuilder extends TextBuilder {
             first = true;
             for (String argName : renderArgs.keySet()) {
                 RenderArgDeclaration arg = renderArgs.get(argName);
-                if (first) {first = false;p2t("");}
-                else {p2t("else ");};
+                if (first) {
+                    first = false;
+                    p2t("");
+                } else {
+                    p2t("else ");
+                }
+                ;
                 p("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
             }
         }
@@ -686,8 +691,12 @@ public class CodeBuilder extends TextBuilder {
             first = true;
             for (String argName : renderArgs.keySet()) {
                 RenderArgDeclaration arg = renderArgs.get(argName);
-                if (first) {first = false; p2t("");}
-                else {p2t("else ");}
+                if (first) {
+                    first = false;
+                    p2t("");
+                } else {
+                    p2t("else ");
+                }
                 p("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
                         .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                         .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
@@ -746,24 +755,72 @@ public class CodeBuilder extends TextBuilder {
         pt("@Override public java.lang.String getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
+    public String buildBody = null;
+
+    transient Map<Token.StringToken, String> consts = new HashMap<Token.StringToken, String>();
+    
+    private boolean outputMode = RythmEngine.isOutputMode();
+
+    private Token.StringToken addConst(Token.StringToken st) {
+        if (!outputMode) return st;
+        if (consts.containsKey(st)) {
+            st.constId = consts.get(st);
+            return st;
+        } else {
+            String id = this.newVarName();
+            st.constId = id;
+            consts.put(st, id);
+            return st;
+        }
+    }
+    
+    private List<TextBuilder> mergeStringTokens(List<TextBuilder> builders) {
+        List<TextBuilder> merged = new ArrayList<TextBuilder>();
+        Token.StringToken curTk = new Token.StringToken("", parser);
+        for (int i = 0; i < builders.size(); ++i) {
+            TextBuilder tb = builders.get(i);
+            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock) {
+                if (tb instanceof Token.StringToken) {
+                    Token.StringToken tk = (Token.StringToken) tb;
+                    curTk = curTk.mergeWith(tk);
+                } else {
+                    BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock) tb;
+                    curTk = curTk.mergeWith(bk);
+                }
+            } else {
+                if (null != curTk && curTk.s().length() > 0) {
+                    curTk = addConst(curTk);
+                    merged.add(curTk);
+                }
+                curTk = new Token.StringToken("", parser);
+                merged.add(tb);
+            }
+        }
+        if (null != curTk && curTk.s().length() > 0) {
+            curTk = addConst(curTk);
+            merged.add(curTk);
+        }
+        return merged;
+    }
+
     protected void pInlineTags() {
         pn();
         for (InlineTag tag : inlineTags) {
-            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature).p("{\ntry{\n");
+            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature);
+            p("{\ncom.greenlaw110.rythm.template.TemplateBase oldParent = this.__parent;\ntry{\nthis.__parent = this;\n");
             boolean isVoid = tag.autoRet;
             StringBuilder sb = out();
             if (!isVoid) {
                 p(tag.body);
             } else {
-                for (TextBuilder b : tag.builders) {
+                List<TextBuilder> merged = mergeStringTokens(tag.builders);
+                for (TextBuilder b : merged) {
                     b.build();
                 }
             }
-            p("\n}catch(Exception __e){\nthrow new RuntimeException(__e);}\n}");
+            p("\n}catch(Exception __e){\nthrow new RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
         }
     }
-
-    public String buildBody = null;
 
     protected void pBuild() {
         pn();
@@ -774,25 +831,7 @@ public class CodeBuilder extends TextBuilder {
         StringBuilder old = out();
         setOut(sb);
         // try merge strings
-        List<TextBuilder> merged = new ArrayList<TextBuilder>();
-        Token.StringToken curTk = new Token.StringToken("", parser);
-        for (int i = 0; i < builders.size(); ++i) {
-            TextBuilder tb = builders.get(i);
-            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock) {
-                if (tb instanceof Token.StringToken) {
-                    Token.StringToken tk = (Token.StringToken)tb;
-                    curTk = curTk.mergeWith(tk);
-                } else {
-                    BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock)tb;
-                    curTk = curTk.mergeWith(bk);
-                }
-            } else {
-                if (null != curTk) merged.add(curTk);
-                curTk = new Token.StringToken("", parser);
-                merged.add(tb);
-            }
-        }
-        if (null != curTk) merged.add(curTk);
+        List<TextBuilder> merged = mergeStringTokens(this.builders);
         for (TextBuilder b : merged) {
             b.build();
         }
@@ -800,9 +839,34 @@ public class CodeBuilder extends TextBuilder {
         setOut(old);
         p(buildBody);
         p("\n\t\treturn this;\n\t}\n");
+
+        // print out consts
+        for (Token.StringToken st : consts.keySet()) {
+            pConst(st);
+        }
+    }
+
+    private void pConst(Token.StringToken st) {
+        String constId = st.constId;
+        String s = st.s(), s0 = s;
+        if (st.compactMode()) {
+            s0 = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+        } else {
+            s0 = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
+        }
+        np("private static final StringWrapper ").p(constId).p(" = new StringWrapper(\"").p(s0).p("\", new byte[]{");
+        StringWrapper sw = new StringWrapper(s);
+        byte[] ba = sw.toBinary();
+        for (int i = 0; i < ba.length; ++i) {
+            p(String.valueOf(ba[i]));
+            if (i < ba.length - 1) p(",");
+        }
+        p("});");
+        p("// line:").pn(st.getLineNo());
     }
 
     private Set<String> varNames = new HashSet<String>();
+
     public String newVarName() {
         int i = 0;
         while (true) {
@@ -820,7 +884,7 @@ public class CodeBuilder extends TextBuilder {
 
     private static final Regex R_FOR_0 = new Regex("([\\s;]for\\s*(?@())\\s*\\{(\\s*//\\s*line:\\s*[0-9]+)?)", "${1}" + INTERRUPT_CODE + "${2}" + "\n");
     private static final Regex R_FOR_1 = new Regex("([\\s;]for\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \n\\}");
-    
+
     private static final Regex R_WHILE_0 = new Regex("([\\s;]while\\s*(?@())\\s*\\{)", "${1}" + INTERRUPT_CODE);
     private static final Regex R_WHILE_1 = new Regex("([\\s;]while\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \\}");
 
@@ -838,26 +902,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        String s = "public void foo() {\n\tfor(;;) abc;\n\nfor(String s: myStrs){ // line: 109\n\txyz;\n}";
-        if (R_FOR_0.search(s)) {
-            for (int i = 0; i < 10; ++i) {
-                //System.out.println(i + R_FOR_0.stringMatched(i));
-            }
-        }
-        s = R_FOR_0.replaceAll(s);
-        System.out.println(s);
-        s = R_FOR_1.replaceAll(s);
-        System.out.println(s);
-        if (true) return;
-        s = "... while(true){\n\txyz\n}\n\nwhile(true) abc;";
-        s = R_WHILE_0.replaceAll(s);
-        s = R_WHILE_1.replaceAll(s);
-        System.out.println(s);
-        
-        s = "... do {;} while(true); \n\n do ; while(true);";
-        s = R_DO_0.replaceAll(s);
-        s = R_DO_1.replaceAll(s);
-        System.out.println(s);
+        System.out.println(Rythm.render("hello @who", "whole"));
     }
 
 }

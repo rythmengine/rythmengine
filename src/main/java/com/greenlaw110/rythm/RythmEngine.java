@@ -27,10 +27,7 @@ import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.*;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -283,9 +280,9 @@ public class RythmEngine {
 
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
         pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
-        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", mode.isDev());
+        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", true);
         recordTemplateSourceOnError = configuration.getAsBoolean("rythm.recordTemplateSourceOnError", true);
-        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", mode.isDev());
+        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", true);
         recordTemplateSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordTemplateSourceOnRuntimeError", true);
         logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
@@ -473,6 +470,17 @@ public class RythmEngine {
         return t;
     }
     
+    private final static InheritableThreadLocal<Boolean> outputMode = new InheritableThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+    
+    public final static boolean isOutputMode() {
+        return outputMode.get();
+    }
+    
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
@@ -501,7 +509,7 @@ public class RythmEngine {
                     throw ce;
                 }
                 restart(ce);
-                return getTemplate(template, args, dialect);
+                return getTemplate(dialect, template, args);
             }
             throw ce;
         }
@@ -521,13 +529,21 @@ public class RythmEngine {
         }
     }
 
-    private String renderTemplate(ITemplate t) {
-        return t.render();
-    }
-
     public String render(String template, Object... args) {
         ITemplate t = getTemplate(template, args);
-        return renderTemplate(t);
+        return t.render();
+    }
+    
+    public void render(OutputStream os, String template, Object... args) {
+        outputMode.set(true);
+        ITemplate t = getTemplate(template, args);
+        t.render(os);
+    }
+    
+    public void render(Writer w, String template, Object... args) {
+        outputMode.set(true);
+        ITemplate t = getTemplate(template, args);
+        t.render(w);
     }
 
     public String renderStr(String template, Object... args) {
@@ -535,7 +551,7 @@ public class RythmEngine {
     }
     
     public String substitute(String template, Object... args) {
-        ITemplate t = getTemplate(template, args, BasicRythm.INSTANCE);
+        ITemplate t = getTemplate(BasicRythm.INSTANCE, template, args);
         return t.render();
     }
     
@@ -558,7 +574,7 @@ public class RythmEngine {
     }
 
     public String toString(Object obj) {
-        return toString(obj, ToStringOption.defaultOption, (ToStringStyle)null);
+        return toString(obj, ToStringOption.defaultOption, (ToStringStyle) null);
     }
 
     public String toString(Object obj, ToStringOption option, ToStringStyle style) {
@@ -596,7 +612,19 @@ public class RythmEngine {
 
     public String render(File file, Object... args) {
         ITemplate t = getTemplate(file, args);
-        return renderTemplate(t);
+        return t.render();
+    }
+
+    public void render(OutputStream os, File file, Object... args) {
+        outputMode.set(true);
+        ITemplate t = getTemplate(file, args);
+        t.render(os);
+    }
+
+    public void render(Writer w, File file, Object... args) {
+        outputMode.set(true);
+        ITemplate t = getTemplate(file, args);
+        t.render(w);
     }
 
     public Set<String> nonExistsTemplates = new HashSet<String>();

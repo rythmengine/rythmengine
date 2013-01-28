@@ -40,6 +40,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         File f = null;
         if (null != home) {
             f = new File(home, path);
+        } else {
         }
 //        if (null == f || !f.canRead()) {
 //            // try tag home
@@ -132,7 +133,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     @Override
     public String getSuggestedClassName() {
-        return path2CN(file.getPath());
+        return path2CN(key);
     }
 
     @Override

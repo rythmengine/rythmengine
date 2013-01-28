@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class Token extends TextBuilder {
 
     public static class StringToken extends Token {
+        public String constId = null;
         public StringToken(String s, IContext ctx) {
             super(s, ctx);
         }
@@ -29,18 +30,57 @@ public class Token extends TextBuilder {
 
         public StringToken mergeWith(BlockToken.LiteralBlock block) {
             StringToken merged = new StringToken(s, ctx, disableCompactMode);
-            merged.line = line;
+            merged.line = block.line;
             merged.s += "{";
             return merged;
         }
 
         public StringToken mergeWith(StringToken st) {
             StringToken merged = new StringToken(s, ctx, disableCompactMode);
-            merged.line = line;
+            merged.line = st.line;
             String s = st.s;
             s = st.compact(s);
             merged.s += s;
             return merged;
+        }
+
+        @Override
+        public boolean compactMode() {
+            return super.compactMode();
+        }
+        
+        public int getLineNo() {
+            return line;
+        }
+        
+        public String s() {
+            return s;
+        }
+
+        @Override
+        protected void output() {
+            if (RythmEngine.isOutputMode()) {
+                if (null == constId) return;
+                p("p(").p(constId).p(");");
+                pline();
+            } else {
+                super.output();
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return s.hashCode() + (compactMode() ? 1 : -1);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj instanceof StringToken) {
+                StringToken st = (StringToken)obj;
+                return st.compactMode() == compactMode() && st.s.equals(s);
+            }
+            return false;
         }
     }
 
@@ -360,46 +400,5 @@ public class Token extends TextBuilder {
     public static void main(String[] args) {
         String s = "try {_.bindModel(_.campaign.designer.componentPanel.data, \n$('#panDesigner .design-panel.component')[0]);}";
         System.out.println(compact_(s));
-    }
-
-    public static void main1(String[] args) {
-//        Token t = new Token("(S?.escape())", null);
-//        t.outputExpression();
-//        System.out.println(t.out());
-
-//        Pattern p = Pattern.compile(String.format(".*\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
-//        Pattern p2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "format", ".*"));
-//        String s = "((a.b?:far).format(\"EEEE',' MMMM dd',' yyyy\", 10, true))";
-//        Matcher m = p.matcher(s);
-//        if (m.matches()) {
-//            String signature = m.group(1);
-//            m = p2.matcher(s);
-//            s = m.replaceAll("");
-//            System.out.println("s: " + s + ", signature: " + signature);
-//        }
-
-//        Pattern p = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", "JavaExtensions", "format", ".*"));
-//        String s = "JavaExtensions.format(abc, \"EEE\")";
-//        Matcher m = p.matcher(s);
-//        if (m.matches()) {
-//            System.out.println(m.group());
-//            System.out.println(m.group(1));
-//            //System.out.println(m.group(2));
-//        }
-//
-//        TextBuilder tb = new TextBuilder();
-//        tb.p(com.greenlaw110.rythm.utils.S.escape("<abcd>"));
-//        System.out.println(tb.toString());
-//        String waiveName = "S";
-//        String methodName = "format";
-//        String s = "abc?.format()";
-//        Pattern pattern1 = Pattern.compile(String.format(".*(?<!%s)(\\?\\.%s|\\.%s)\\s*\\(\\s*\\)\\s*$", waiveName, methodName, methodName));
-//        Matcher m = pattern1.matcher(s);
-//        if (m.matches()) {
-//            System.out.println(m.group());
-//            System.out.println(m.group(1));
-            //System.out.println(m.group(2));
-            //System.out.println(m.group(3));
-//        }
     }
 }
