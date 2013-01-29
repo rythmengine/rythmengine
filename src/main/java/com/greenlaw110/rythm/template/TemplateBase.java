@@ -9,7 +9,6 @@ import com.greenlaw110.rythm.internal.compiler.ClassReloadException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.S;
@@ -72,7 +71,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(StringWrapper wrapper) {
+    protected void append(StrBuf wrapper) {
         if (appendToBuffer()) {
             super.append(wrapper);
             return;
@@ -98,7 +97,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected void append(Object o) {
         if (appendToBuffer()) super.append(o);
         
-        StringWrapper wrapper = new StringWrapper(o.toString());
+        StrBuf wrapper = new StrBuf(o.toString());
         if (appendToOutputStream()) {
             try {
                 os.write(wrapper.toBinary());
@@ -140,7 +139,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.append(i);
         
         if (appendToOutputStream()) {
-            StringWrapper wrapper = new StringWrapper(String.valueOf(i));
+            StrBuf wrapper = new StrBuf(String.valueOf(i));
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {
@@ -161,7 +160,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.append(l);
 
         if (appendToOutputStream()) {
-            StringWrapper wrapper = new StringWrapper(String.valueOf(l));
+            StrBuf wrapper = new StrBuf(String.valueOf(l));
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {
@@ -182,7 +181,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.append(f);
 
         if (appendToOutputStream()) {
-            StringWrapper wrapper = new StringWrapper(String.valueOf(f));
+            StrBuf wrapper = new StrBuf(String.valueOf(f));
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {
@@ -203,7 +202,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.append(d);
 
         if (appendToOutputStream()) {
-            StringWrapper wrapper = new StringWrapper(String.valueOf(d));
+            StrBuf wrapper = new StrBuf(String.valueOf(d));
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {
@@ -224,7 +223,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.append(b);
 
         if (appendToOutputStream()) {
-            StringWrapper wrapper = new StringWrapper(String.valueOf(b));
+            StrBuf wrapper = new StrBuf(String.valueOf(b));
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {

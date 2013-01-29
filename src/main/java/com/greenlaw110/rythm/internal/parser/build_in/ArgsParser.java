@@ -10,6 +10,7 @@ import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -31,20 +32,21 @@ public class ArgsParser extends KeywordParserFactory {
              */
             public TextBuilder go2(String s) {
                 Regex r = reg(dialect());
-                final List<CodeBuilder.RenderArgDeclaration> ral = new ArrayList<CodeBuilder.RenderArgDeclaration>();
+                final List<F.T4<Integer, String, String, String>> ral = new ArrayList();
                 s = s.replaceAll("[\\n\\r]+", ",");
+                int line = ctx.currentLine();
                 while (r.search(s)) {
                     String type = r.stringMatched(2);
                     checkRestrictedClass(type);
                     String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
-                    ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
+                    ral.add(new F.T4(line, type, name, defVal));
                 }
                 return new Directive("", ctx()) {
                     @Override
                     public void call() {
-                        for (CodeBuilder.RenderArgDeclaration rd: ral) {
-                            builder().addRenderArgs(rd);
+                        for (F.T4<Integer, String, String, String> rd: ral) {
+                            builder().addRenderArgs(rd._1, rd._2, rd._3, rd._4);
                         }
                     }
                 };
@@ -81,7 +83,7 @@ public class ArgsParser extends KeywordParserFactory {
                     String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
                     //ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
-                    ctx().getCodeBuilder().addRenderArgs(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
+                    ctx().getCodeBuilder().addRenderArgs(ctx().currentLine(), type, name, defVal);
                 }
                 step(step);
                 // strip off the following ";" symbol and line breaks
@@ -117,7 +119,7 @@ public class ArgsParser extends KeywordParserFactory {
             String name = r.stringMatched(4);
             String type = r.stringMatched(2);
             String defVal = r.stringMatched(5);
-            ral.add(new CodeBuilder.RenderArgDeclaration(lineNo, name, type, defVal));
+            ral.add(new CodeBuilder.RenderArgDeclaration(lineNo, type, name, defVal));
         }
         return ral;
     }

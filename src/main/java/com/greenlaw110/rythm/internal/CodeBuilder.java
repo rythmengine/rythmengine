@@ -32,18 +32,30 @@ import java.util.*;
 public class CodeBuilder extends TextBuilder {
 
     protected ILogger logger = Logger.get(CodeBuilder.class);
+    
+    private int renderArgCounter = 0;
 
-    public static class RenderArgDeclaration {
+    public static class RenderArgDeclaration implements Comparable<RenderArgDeclaration> {
+        public int no;
         public String name;
         public String type;
         public String defVal;
         public int lineNo;
-
-        public RenderArgDeclaration(int lineNo, String name, String type) {
-            this(lineNo, name, type, null);
+        
+        public RenderArgDeclaration(int lineNo, String type, String name) {
+            this(-1, lineNo, type, name);
+        }
+        
+        public RenderArgDeclaration(int lineNo, String type, String name, String defVal) {
+            this(-1, lineNo, type, name, defVal);
         }
 
-        public RenderArgDeclaration(int lineNo, String name, String type, String defVal) {
+        public RenderArgDeclaration(int no, int lineNo, String type, String name) {
+            this(no, lineNo, type, name, null);
+        }
+
+        public RenderArgDeclaration(int no, int lineNo, String type, String name, String defVal) {
+            this.no = no;
             this.lineNo = lineNo;
             this.name = name;
             this.type = typeTransform(type);
@@ -90,6 +102,12 @@ public class CodeBuilder extends TextBuilder {
 
             return "null";
         }
+
+        @Override
+        public int compareTo(RenderArgDeclaration o) {
+            return no - o.no;
+        }
+        
     }
 
     public RythmEngine engine;
@@ -207,7 +225,7 @@ public class CodeBuilder extends TextBuilder {
      * Rewind to the state when construction finished
      */
     public void rewind() {
-        out().ensureCapacity(0);
+        renderArgCounter = 0;
         this.initCode = null;
         this.extended = null;
         this.extendedTemplateClass = null;
@@ -234,6 +252,7 @@ public class CodeBuilder extends TextBuilder {
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
         this.importLineMap.putAll(codeBuilder.importLineMap);
+        renderArgCounter += codeBuilder.renderArgCounter;
     }
 
     public String className() {
@@ -453,13 +472,17 @@ public class CodeBuilder extends TextBuilder {
         renderArgs.put(declaration.name, declaration);
     }
 
+    public void addRenderArgs(int lineNo, String type, String name, String defVal) {
+        renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name, defVal));
+    }
+
     public void addRenderArgs(int lineNo, String type, String name) {
-        renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
+        renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name));
     }
 
     public void addRenderArgsIfNotDeclared(int lineNo, String type, String name) {
         if (!renderArgs.containsKey(name)) {
-            renderArgs.put(name, new RenderArgDeclaration(lineNo, name, type));
+            renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name));
         }
     }
 
@@ -617,6 +640,9 @@ public class CodeBuilder extends TextBuilder {
     protected void pRenderArgs() {
         pn();
         // -- output private members
+        if (renderArgs.isEmpty() && engine.enableTypeInference()) {
+            
+        }
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             pt("protected ").p(arg.type).p(" ").p(argName);
@@ -644,6 +670,9 @@ public class CodeBuilder extends TextBuilder {
 //        }
         ptn("}");
 
+        List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
+        Collections.sort(renderArgList);
+
         // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size()));
@@ -653,11 +682,10 @@ public class CodeBuilder extends TextBuilder {
             {
                 p2tn("int _p = 0, l = args.length;");
                 int i = userDefinedArgNumber;
-                for (String argName : renderArgs.keySet()) {
-                    RenderArgDeclaration arg = renderArgs.get(argName);
+                for (RenderArgDeclaration arg: renderArgList) {
                     p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                            .p(argName).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                            .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
                 }
             }
@@ -669,15 +697,14 @@ public class CodeBuilder extends TextBuilder {
         ptn("@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
         if (true) {
             first = true;
-            for (String argName : renderArgs.keySet()) {
-                RenderArgDeclaration arg = renderArgs.get(argName);
+            for (RenderArgDeclaration arg : renderArgList) {
                 if (first) {
                     first = false;
                     p2t("");
                 } else {
                     p2t("else ");
                 }
-                ;
+                String argName = arg.name;
                 p("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
             }
         }
@@ -689,8 +716,7 @@ public class CodeBuilder extends TextBuilder {
         p2tn("int _p = 0;");
         if (true) {
             first = true;
-            for (String argName : renderArgs.keySet()) {
-                RenderArgDeclaration arg = renderArgs.get(argName);
+            for (RenderArgDeclaration arg : renderArgList) {
                 if (first) {
                     first = false;
                     p2t("");
@@ -699,7 +725,7 @@ public class CodeBuilder extends TextBuilder {
                 }
                 p("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
                         .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                        .p(argName).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
+                        .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
             }
         }
         // the first argument has a default name "arg"
@@ -855,7 +881,7 @@ public class CodeBuilder extends TextBuilder {
             s0 = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
         }
         np("private static final StringWrapper ").p(constId).p(" = new StringWrapper(\"").p(s0).p("\", new byte[]{");
-        StringWrapper sw = new StringWrapper(s);
+        StrBuf sw = new StrBuf(s);
         byte[] ba = sw.toBinary();
         for (int i = 0; i < ba.length; ++i) {
             p(String.valueOf(ba[i]));
@@ -902,7 +928,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        System.out.println(Rythm.render("hello @who", "whole"));
+        System.out.println(Rythm.render("@args String what, String who\n@who @what", "do", "whole"));
     }
 
 }

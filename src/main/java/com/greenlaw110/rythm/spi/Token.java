@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -398,7 +399,7 @@ public class Token extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        String s = "try {_.bindModel(_.campaign.designer.componentPanel.data, \n$('#panDesigner .design-panel.component')[0]);}";
-        System.out.println(compact_(s));
+        String s = Rythm.render("@(123413413.9999999)");
+        System.out.println(s);
     }
 }

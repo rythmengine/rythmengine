@@ -70,6 +70,14 @@ public class ExtensionManager {
         return tagInvokeListeners;
     }
 
-
+    private List<ITemplatePreProcessor> preprocessors = new ArrayList<ITemplatePreProcessor>();
+    public ExtensionManager registerPreprocessor(ITemplatePreProcessor p) {
+        preprocessors.add(p);
+        return this;
+    }
+    
+    public Iterable<ITemplatePreProcessor> preProcessors() {
+        return preprocessors;
+    }
 
 }

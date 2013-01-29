@@ -106,6 +106,10 @@ public class RythmEngine {
     public boolean recordTemplateSourceOnRuntimeError = true;
     public boolean logSourceInfoOnRuntimeError = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
+    private boolean enableTypeInference = false;
+    public boolean enableTypeInference() {
+        return enableTypeInference;
+    }
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
      */
@@ -175,6 +179,10 @@ public class RythmEngine {
 
     public void clearListener() {
         listeners.clear();
+    }
+    
+    public void registerPreprocessor(ITemplatePreProcessor p) {
+        getExtensionManager().registerPreprocessor(p);
     }
 
     public final List<ITemplateClassEnhancer> templateClassEnhancers = new ArrayList<ITemplateClassEnhancer>();

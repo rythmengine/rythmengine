@@ -1,11 +1,13 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -47,12 +49,15 @@ public class IfParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String p = String.format(new IfParser().patternStr(), "@", "if");
-        System.out.println(p);
-
-        Regex r = new Regex(p);
-        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
-        p(s, r);
+//        String p = String.format(new IfParser().patternStr(), "@", "if");
+//        System.out.println(p);
+//
+//        Regex r = new Regex(p);
+//        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
+//        p(s, r);
+//        
+        String s = Rythm.render("@import java.math.*;@args BigDecimal a, BigDecimal b\n @(a * b)", 3222222, 1233333.223323);
+        System.out.println(s);
     }
 
 }
