@@ -10,25 +10,30 @@ import java.util.Map;
  */
 public class ParamTypeInferencer {
 
-    private static final ThreadLocal<Map<Object, String>> typeMap = new ThreadLocal<Map<Object, String>>() {
+    public static String typeTransform(String type) {
+        if (type.contains("boolean")) return type.replace("boolean", "Boolean");
+        else if (type.contains("int")) return type.replace("int", "Integer");
+        else if (type.contains("float")) return type.replace("float", "Float");
+        else if (type.contains("double")) return type.replace("double", "Double");
+        else if (type.contains("char")) return type.replace("char", "Character");
+        else if (type.contains("long")) return type.replace("long", "Long");
+        else if (type.contains("byte")) return type.replace("byte", "Byte");
+        else return type;
+    }
+    
+    private static final ThreadLocal<Map<String, String>> typeMap = new ThreadLocal<Map<String, String>>() {
         @Override
-        protected Map<Object, String> initialValue() {
-            return new HashMap<Object, String>();
+        protected Map<String, String> initialValue() {
+            return new HashMap<String, String>();
         }
     };
     
-    private RythmEngine engine;
-    
-    public ParamTypeInferencer(RythmEngine engine) {
-        this.engine = engine;
-    }
-    
-    public void registerParams(Object ... args) {
+    public static void registerParams(RythmEngine engine, Object... args) {
         if (!engine.enableTypeInference()) return;
         
         if (args.length == 0) return;
         
-        Map<Object, String> tMap = typeMap.get();
+        Map<String, String> tMap = typeMap.get();
         if (args.length == 1 && args[0] instanceof Map) {
             Map<String, Object> params = (Map)args[0];
             for (String name: params.keySet()) {
@@ -37,26 +42,37 @@ public class ParamTypeInferencer {
                 if (null == val) {
                     clsName = "Object";
                 } else {
-                    clsName = val.getClass().getName();
+                    Class c = val.getClass();
+                    clsName = c.getName();
+                    if (c.isArray()) {
+                        Class cc = c.getComponentType();
+                        while(cc.isArray()) cc = cc.getComponentType();
+                        String cName = cc.getName();
+                        String s = clsName;
+                        // now count the number of '[' to see how many dimension this array has
+                        int d = 0;
+                        for (int i = 0; i < s.length(); i++) {
+                            if (s.charAt(i) == '['){
+                                d++;
+                            } else {
+                                break;
+                            }
+                        }
+                        StringBuilder sb = new StringBuilder(cName);
+                        for (int i = 0; i < d; ++i) {
+                            sb.append("[]");
+                        }
+                        clsName = sb.toString();
+                    }
                 }
                 tMap.put(name, clsName);
             }
         } else {
-            for (int i = 0; i < args.length; ++i) {
-                Object name = Integer.valueOf(i);
-                String clsName;
-                Object val = args[i];
-                if (null == val) {
-                    clsName = "Object";
-                } else {
-                    clsName = val.getClass().getName();
-                }
-                tMap.put(name, clsName);
-            }
+            // Type inference support passing params as Map only
         }
     }
     
-    public static Map<Object, String> getTypeMap() {
+    public static Map<String, String> getTypeMap() {
         return typeMap.get();
     }
 

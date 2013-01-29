@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
@@ -20,10 +21,7 @@ import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.utils.IImplicitRenderArgProvider;
-import com.greenlaw110.rythm.utils.IImportProvider;
-import com.greenlaw110.rythm.utils.S;
-import com.greenlaw110.rythm.utils.TextBuilder;
+import com.greenlaw110.rythm.utils.*;
 import com.stevesoft.pat.Regex;
 
 import java.util.*;
@@ -58,7 +56,7 @@ public class CodeBuilder extends TextBuilder {
             this.no = no;
             this.lineNo = lineNo;
             this.name = name;
-            this.type = typeTransform(type);
+            this.type = ParamTypeInferencer.typeTransform(type);
             defVal = defValTransform(type, defVal);
             this.defVal = null == defVal ? defVal(type) : defVal;
         }
@@ -70,16 +68,6 @@ public class CodeBuilder extends TextBuilder {
             if ("float".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "f";
             if ("double".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "d";
             return defVal;
-        }
-
-        private static String typeTransform(String type) {
-            if ("boolean".equals(type)) return "Boolean";
-            else if ("int".equals(type)) return "Integer";
-            else if ("float".equals(type)) return "Float";
-            else if ("double".equals(type)) return "Double";
-            else if ("char".equals(type)) return "Character";
-            else if ("long".equals(type)) return "Long";
-            else return type;
         }
 
         private static String defVal(String type) {
@@ -641,7 +629,11 @@ public class CodeBuilder extends TextBuilder {
         pn();
         // -- output private members
         if (renderArgs.isEmpty() && engine.enableTypeInference()) {
-            
+            Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
+            for (String name : tMap.keySet()) {
+                String type = tMap.get(name);
+                addRenderArgs(-1, type, name);
+            }
         }
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -928,7 +920,9 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        System.out.println(Rythm.render("@args String what, String who\n@who @what", "do", "whole"));
+        System.setProperty("rythm.enableTypeInference", "true");
+        NamedParams np = NamedParams.instance;
+        System.out.println(Rythm.render("@(num + 3)", np.from(np.p("num", 5))));
     }
 
 }

@@ -275,6 +275,9 @@ public class RythmEngine {
                 }
             }
         }
+        
+        Properties sysProps = System.getProperties();
+        configuration.putAll(sysProps);
 
         if (null != conf) configuration.putAll(conf);
 
@@ -295,6 +298,7 @@ public class RythmEngine {
         logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
+        enableTypeInference = configuration.getAsBoolean("rythm.enableTypeInference", false);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
         logger.debug(">>>>no file write is: %s", noFileWrite);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
@@ -443,6 +447,8 @@ public class RythmEngine {
     static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File template, Object... args) {
+        ParamTypeInferencer.registerParams(this, args);
+    
         TemplateClass tc = classes.getByTemplate(resourceManager.get(template).getKey());
         if (null == tc) {
             tc = new TemplateClass(template, this);
@@ -490,6 +496,8 @@ public class RythmEngine {
     }
     
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
+        ParamTypeInferencer.registerParams(this, args);
+        
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
             tc = new TemplateClass(template, this, dialect);
