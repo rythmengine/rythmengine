@@ -33,7 +33,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         }
     }
 
-    private static class ExpressionToken extends CodeToken {
+    static class ExpressionToken extends CodeToken {
 
         public ExpressionToken(String s, IContext context) {
             super(s, context);
@@ -46,12 +46,20 @@ public class ExpressionParser extends CaretParserFactoryBase {
                 if (pos != -1) {
                     String methodName = s.substring(0, pos);
                 } else {
-                    // find out array
+                    // find out array and it's dimension
+                    int d = 0;
+                    for (int i = 0; i < s.length(); ++i) {
+                        if (s.charAt(i) == '[') d++;
+                    }
                     pos = s.indexOf("[");
                     if (pos != -1) {
                         s = s.substring(0, pos);
                     }
-                    context.getCodeBuilder().addRenderArgsIfNotDeclared(context.currentLine(), pos == -1 ? "Object" : "Object[]", s);
+                    String type = "Object";
+                    for (int i = 0; i < d; ++i) {
+                        type = type + "[]";
+                    }
+                    context.getCodeBuilder().addRenderArgsIfNotDeclared(context.currentLine(), type, s);
                 }
             }
         }
@@ -114,7 +122,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr() {
-        return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
+        return "^(%s[0-9a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
 
     public static void main(String[] args) {

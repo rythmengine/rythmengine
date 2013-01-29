@@ -921,8 +921,8 @@ public class CodeBuilder extends TextBuilder {
 
     public static void main(String[] args) {
         System.setProperty("rythm.enableTypeInference", "true");
-        NamedParams np = NamedParams.instance;
-        System.out.println(Rythm.render("@(num + 3)", np.from(np.p("num", 5))));
+        //NamedParams np = NamedParams.instance;
+        System.out.println(Rythm.render("@1 followed by @2 and @2 followed by @1", "foo", "bar"));
     }
 
 }

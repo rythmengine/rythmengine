@@ -28,6 +28,37 @@ public class ParamTypeInferencer {
         }
     };
     
+    private static String getTypeName(Object val) {
+        String clsName;
+        if (null == val) {
+            clsName = "Object";
+        } else {
+            Class c = val.getClass();
+            clsName = c.getName();
+            if (c.isArray()) {
+                Class cc = c.getComponentType();
+                while(cc.isArray()) cc = cc.getComponentType();
+                String cName = cc.getName();
+                String s = clsName;
+                // now count the number of '[' to see how many dimension this array has
+                int d = 0;
+                for (int i = 0; i < s.length(); i++) {
+                    if (s.charAt(i) == '['){
+                        d++;
+                    } else {
+                        break;
+                    }
+                }
+                StringBuilder sb = new StringBuilder(cName);
+                for (int i = 0; i < d; ++i) {
+                    sb.append("[]");
+                }
+                clsName = sb.toString();
+            }
+        }
+        return clsName;
+    }
+    
     public static void registerParams(RythmEngine engine, Object... args) {
         if (!engine.enableTypeInference()) return;
         
@@ -38,37 +69,14 @@ public class ParamTypeInferencer {
             Map<String, Object> params = (Map)args[0];
             for (String name: params.keySet()) {
                 Object val = params.get(name);
-                String clsName;
-                if (null == val) {
-                    clsName = "Object";
-                } else {
-                    Class c = val.getClass();
-                    clsName = c.getName();
-                    if (c.isArray()) {
-                        Class cc = c.getComponentType();
-                        while(cc.isArray()) cc = cc.getComponentType();
-                        String cName = cc.getName();
-                        String s = clsName;
-                        // now count the number of '[' to see how many dimension this array has
-                        int d = 0;
-                        for (int i = 0; i < s.length(); i++) {
-                            if (s.charAt(i) == '['){
-                                d++;
-                            } else {
-                                break;
-                            }
-                        }
-                        StringBuilder sb = new StringBuilder(cName);
-                        for (int i = 0; i < d; ++i) {
-                            sb.append("[]");
-                        }
-                        clsName = sb.toString();
-                    }
-                }
-                tMap.put(name, clsName);
+                tMap.put(name, getTypeName(val));
             }
         } else {
-            // Type inference support passing params as Map only
+            // suppose template variable is denoted with @1, @2 ...
+            for (int i = 0; i < args.length; ++i) {
+                String name = "_v_" + (i + 1); // start from 1 instead of 0
+                tMap.put(name, getTypeName(args[i]));
+            }
         }
     }
     
