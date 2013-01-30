@@ -300,9 +300,7 @@ public class RythmEngine {
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         enableTypeInference = configuration.getAsBoolean("rythm.enableTypeInference", false);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
-        logger.debug(">>>>no file write is: %s", noFileWrite);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
-        logger.debug(">>>>temp dir is: %s", tmpDir);
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", defaultRoot());
         //tagHome = configuration.getAsFile("rythm.tag.root", null);
@@ -373,7 +371,7 @@ public class RythmEngine {
 //            loadTags();
 //        }
 
-        logger.info("Rythm started in %s mode", mode);
+        logger.debug("Rythm started in %s mode", mode);
     }
 
     public void restart(RuntimeException cause) {
@@ -784,13 +782,13 @@ public class RythmEngine {
         return true;
     }
 
-    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
-        invokeTag(name, caller, params, body, context, false);
+    public void invokeTag(int line, String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
+        invokeTag(line, name, caller, params, body, context, false);
     }
 
     public Set<String> nonExistsTags = new HashSet<String>();
 
-    public void invokeTag(String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
+    public void invokeTag(int line, String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
         if (nonExistsTags.contains(name)) return;
         // try tag registry first
         ITag tag = tags.get(name);
@@ -881,7 +879,7 @@ public class RythmEngine {
             if (null != context) {
                 ((TagBase)tag).setBodyContext(context);
             }
-            tag.call();
+            tag.call(line);
         } finally {
             for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
                 try {

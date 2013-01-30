@@ -193,5 +193,5 @@ public interface ITag extends ITemplate {
 
     String getName();
 
-    void call();
+    void call(int line);
 }

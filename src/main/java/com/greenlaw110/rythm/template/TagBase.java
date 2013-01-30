@@ -24,6 +24,12 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     protected Body _context;
 
+    private int _line;    
+
+    protected int _line() {
+        return _line;
+    }
+
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
@@ -51,7 +57,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
     }
 
     @Override
-    public void call() {
+    public void call(int line) {
+        _line = line;
         if (null != _context) {
             _out = new StringBuilder();
             _context.p(S.raw(renderWithParent()));

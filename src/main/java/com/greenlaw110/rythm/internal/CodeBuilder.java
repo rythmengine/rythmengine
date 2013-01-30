@@ -874,7 +874,7 @@ public class CodeBuilder extends TextBuilder {
         } else {
             s0 = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
         }
-        np("private static final StringWrapper ").p(constId).p(" = new StringWrapper(\"").p(s0).p("\", new byte[]{");
+        np("private static final StrBuf ").p(constId).p(" = new StrBuf(\"").p(s0).p("\", new byte[]{");
         StrBuf sw = new StrBuf(s);
         byte[] ba = sw.toBinary();
         for (int i = 0; i < ba.length; ++i) {
@@ -924,7 +924,8 @@ public class CodeBuilder extends TextBuilder {
     public static void main(String[] args) {
         System.setProperty("rythm.enableTypeInference", "true");
         //NamedParams np = NamedParams.instance;
-        System.out.println(Rythm.render("@1 followed by @2 and @2 followed by @1", "foo", "bar"));
+        String s = "@args String attributes\n@attributes.raw()";
+        System.out.println(Rythm.render(s, "<html></html>"));
     }
 
 }

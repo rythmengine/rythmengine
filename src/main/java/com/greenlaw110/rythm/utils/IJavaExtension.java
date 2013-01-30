@@ -20,7 +20,6 @@ public interface IJavaExtension  {
     String methodName();
 
     static class VoidParameterExtension implements IJavaExtension {
-        private String waiveName = null;
         private String methodName = null;
         private String fullMethodName = null;
         private Pattern pattern1 = null;
@@ -29,11 +28,10 @@ public interface IJavaExtension  {
             this(waiveName, name, String.format("com.greenlaw110.rythm.utils.S.%s", name));
         }
         public VoidParameterExtension(String waiveName, String name, String fullName) {
-            this.waiveName = waiveName;
             methodName = name;
             fullMethodName = fullName;
-            pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\(\\s*\\)\\s*$", waiveName, methodName));
-            pattern2 = Pattern.compile(String.format("\\.%s\\s*\\(\\s*\\)\\s*$", methodName));
+            pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.(?i)%s\\s*\\(\\s*\\)\\s*$", waiveName, methodName));
+            pattern2 = Pattern.compile(String.format("\\.(?i)%s\\s*\\(\\s*\\)\\s*$", methodName));
         }
 
         @Override
@@ -57,9 +55,7 @@ public interface IJavaExtension  {
     }
 
     static class ParameterExtension implements IJavaExtension {
-        private String waiveName = null;
         private String methodName = null;
-        private String signature = null;
         private String fullMethodName = null;
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
@@ -67,9 +63,7 @@ public interface IJavaExtension  {
             this(waiveName, name, signature, String.format("com.greenlaw110.rythm.utils.S.%s", name));
         }
         public ParameterExtension(String waiveName, String name, String signature, String fullName) {
-            this.waiveName = waiveName;
             methodName = name;
-            this.signature = signature;
             fullMethodName = fullName;
             pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", waiveName, methodName, signature));
             pattern2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", methodName, signature));

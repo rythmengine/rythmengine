@@ -250,9 +250,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
                 if (ctx.peekInsideBody()) {
-                    p2t("_invokeTag(").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
                 } else {
-                    p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 }
                 pline();
                 p2tline("_r_s = sbNew.toString();");
@@ -277,9 +277,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 }
             } else {
                 if (ctx.peekInsideBody()) {
-                    p2t("_invokeTag(").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
                 } else {
-                    p2t("_invokeTag(").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 }
                 pline();
             }
@@ -360,7 +360,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
             }
-            p2t("_invokeTag(").p(tagName).p(", _pl,  new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
+            p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl,  new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
             pline();
             if (null != argList && !argList.isEmpty()) {
                 buildBodyArgList(argList);

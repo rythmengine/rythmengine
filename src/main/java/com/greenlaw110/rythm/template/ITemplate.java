@@ -81,8 +81,17 @@ public interface ITemplate extends Cloneable {
         public Stack<Escape> escapeStack;
         public void init(TemplateBase templateBase) {
             TemplateClass tc = templateBase.getTemplateClass(true);
-            if (tc.name().contains("html" + TemplateClass.CN_SUFFIX)) {
-                escapeStack.push(Escape.HTML);
+            String[] sa = {"html" + TemplateClass.CN_SUFFIX, "xml" + TemplateClass.CN_SUFFIX};
+            boolean escapeXml = false;
+            String nm = tc.name();
+            for (int i = 0; i < sa.length; ++i) {
+                if (nm.contains(sa[i])) {
+                    escapeXml = true;
+                    break;
+                }
+            }
+            if (escapeXml) {
+                escapeStack.push(Escape.XML);
             } else {
                 escapeStack.push(Escape.RAW);
             }

@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.exception.FastRuntimeException;
+import com.greenlaw110.rythm.template.ITemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -35,6 +36,10 @@ public class TextBuilder implements Cloneable {
     }
 
     protected TextBuilder _caller;
+    
+    protected ITemplate caller() {
+        return (ITemplate)_caller;
+    }
 
     public StringBuilder getOut() {
         return out();
@@ -70,7 +75,7 @@ public class TextBuilder implements Cloneable {
         _out = (null == caller) ? new StringBuilder() : null;
     }
     
-    protected static final class StrBuf {    
+    protected static final class StrBuf {
         private final String s_;
         private byte[] ba_;
         

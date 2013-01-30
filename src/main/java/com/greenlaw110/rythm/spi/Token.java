@@ -161,7 +161,7 @@ public class Token extends TextBuilder {
     }
     static {
         String[] sa = {
-            "raw", "escape", "escapeHtml", "escapeJavaScript", "escapeJson", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
+            "raw", "escape", "escapeHtml", "escapeJS", "escapeJavaScript", "escapeJSON", "escapeCsv", "escapeXml", "escapeJava", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
         };
         for (String s: sa) {
             addExtension(new IJavaExtension.VoidParameterExtension("S", s));
@@ -399,7 +399,7 @@ public class Token extends TextBuilder {
     }
 
     public static void main(String[] args) {
-        String s = Rythm.render("@(123413413.9999999)");
-        System.out.println(s);
+        System.setProperty("rythm.enableTypeInference", "true");
+        System.out.println(Rythm.render("@args String attributes\n@attributes.escapeJson()", "abc"));
     }
 }
