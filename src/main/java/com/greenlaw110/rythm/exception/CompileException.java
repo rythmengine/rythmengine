@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.exception;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.internal.parser.build_in.ExpressionParser;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +23,7 @@ public class CompileException extends RythmException {
     public static CompilerException compilerException(String className, int line, String message) {
         CompilerException e = new CompilerException();
         e.javaLineNumber = line;
-        e.message = message;
+        e.message = ExpressionParser.reversePositionPlaceHolder(message);
         e.className = className;
         return e;
     }

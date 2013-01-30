@@ -630,7 +630,9 @@ public class CodeBuilder extends TextBuilder {
         // -- output private members
         if (renderArgs.isEmpty() && engine.enableTypeInference()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
-            for (String name : tMap.keySet()) {
+            List<String> ls = new ArrayList<String>(tMap.keySet());
+            Collections.sort(ls);
+            for (String name : ls) {
                 String type = tMap.get(name);
                 addRenderArgs(-1, type, name);
             }

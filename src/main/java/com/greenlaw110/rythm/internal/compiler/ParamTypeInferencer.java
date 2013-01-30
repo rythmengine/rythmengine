@@ -65,6 +65,7 @@ public class ParamTypeInferencer {
         if (args.length == 0) return;
         
         Map<String, String> tMap = typeMap.get();
+        tMap.clear();
         if (args.length == 1 && args[0] instanceof Map) {
             Map<String, Object> params = (Map)args[0];
             for (String name: params.keySet()) {
@@ -74,7 +75,7 @@ public class ParamTypeInferencer {
         } else {
             // suppose template variable is denoted with @1, @2 ...
             for (int i = 0; i < args.length; ++i) {
-                String name = "_v_" + (i + 1); // start from 1 instead of 0
+                String name = "__v_" + (i + 1); // start from 1 instead of 0
                 tMap.put(name, getTypeName(args[i]));
             }
         }

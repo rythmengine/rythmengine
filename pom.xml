@@ -115,7 +115,6 @@
     </build>
 
     <dependencies>
-        <!-- TODO - maybe change to ecj (and deploy it) -->
         <dependency>
             <groupId>org.eclipse.jdt.core.compiler</groupId>
             <artifactId>ecj</artifactId>
@@ -132,6 +131,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.1.25</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

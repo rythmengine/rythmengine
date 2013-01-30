@@ -78,6 +78,16 @@ public class ExpressionParser extends CaretParserFactoryBase {
         }
     }
 
+    private static String processPositionPlaceHolder(String s) {
+        Regex r = new Regex("@([0-9]+)", "__v_${1}");
+        return r.replaceAll(s);
+    }
+    
+    public static String reversePositionPlaceHolder(String s) {
+        Regex r = new Regex("__v_([0-9]+)", "@${1}");
+        return r.replaceAll(s);
+    }
+
     @Override
     public IParser create(IContext ctx) {
 
@@ -94,7 +104,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         if (null == r1 || null == r2) {
             throw new DialectNotSupportException(dialect.id());
         }
-
+        
         return new ParserBase(ctx) {
 
             @Override
@@ -104,6 +114,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     s = r1.stringMatched(1);
                     if (null != s && !caret.equals(s.trim())) {
                         step(s.length());
+                        s = processPositionPlaceHolder(s);
                         s = s.replaceFirst(caret, "");
                         return new ExpressionToken(s, ctx());
                     }
@@ -113,6 +124,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
                     s = r2.stringMatched(1);
                     if (null != s && !"@".equals(s.trim())) {
                         step(s.length());
+                        s = processPositionPlaceHolder(s);
                         return new ExpressionToken(s.replaceFirst(caret, ""), ctx());
                     }
                 }
@@ -122,42 +134,15 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr() {
-        return "^(%s[a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
+        return "^(%s[0-9a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
 
     public static void main(String[] args) {
-        String ps = String.format(new ExpressionParser().patternStr(), "@");
-        Regex r = new Regex(ps);
-        String s = "@(camp ) @x";
-        p(s, r);
-        r = new Regex(String.format("^(%s(?@())*).*", "@"));
-        p(s, r);
-        s = new RythmEngine().render(s, "abc", "123");
+        System.setProperty("rythm.enableTypeInference", "true");
+        RythmEngine re = new RythmEngine();
+        String s = "@1.length() @(@1.length() + @5) b";
+        s = re.render(s, "foo", 4);
         System.out.println(s);
-    }
-
-    public static void main1(String[] args) {
-        String ps = "^(@[a-zA-Z][a-zA-Z$_\\.]+\\s*(?@())*).*";
-        Regex r = new Regex(ps);
-        String s = "@xyz(bar='c', foo=bar.length(), zee=component[foo], \"hello\");";
-        //String s = "@ is something";
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-        }
-
-        ps = String.format(new ExpressionParser().patternStr(), "@");
-        System.out.println(ps);
-        r = new Regex(ps);
-        //s = "@a.b() is something";
-        s = "@component.left()[3]()[] + 'c'";
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-        }
-
-        String m = "abd3_d90 (dsa)";
-        System.out.println(m.substring(0, m.indexOf("(")));
     }
 
 }

@@ -444,6 +444,31 @@ public class RythmEngine {
 //        loadTags(tagHome);
 //    }
 
+    private void setRenderArgs(ITemplate t, Object ... args) {
+        if (1 == args.length && args[0] instanceof Map) {
+            t.setRenderArgs((Map<String, Object>) args[0]);
+        } else {
+            t.setRenderArgs(args);
+        }
+        //if (mode.isDev()) cceCounter.remove();
+    }
+    
+    private void handleCCE(ClassCastException ce) {
+//        Integer I = cceCounter.get();
+//        if (null == I) {
+//            I = 0;
+//            cceCounter.set(1);
+//        } else {
+//            I++;
+//            cceCounter.set(I);
+//        }
+//        if (I > 2) {
+//            cceCounter.remove();
+//            throw ce;
+//        }
+//        restart(ce);
+    }
+
     static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File template, Object... args) {
@@ -455,32 +480,17 @@ public class RythmEngine {
         }
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
-        try {
-            if (1 == args.length && args[0] instanceof Map) {
-                t.setRenderArgs((Map<String, Object>) args[0]);
-            } else {
-                t.setRenderArgs(args);
-            }
-        } catch (ClassCastException ce) {
-            if (mode.isDev()) {
-                Integer I = cceCounter.get();
-                if (null == I) {
-                    I = 0;
-                    cceCounter.set(1);
-                } else {
-                    I++;
-                    cceCounter.set(I);
-                }
-                if (I > 2) {
-                    cceCounter.remove();
-                    throw ce;
-                }
-                restart(ce);
-                return getTemplate(template, args);
-            }
-            throw ce;
-        }
-        if (mode.isDev()) cceCounter.remove();
+        setRenderArgs(t, args);
+//        try {
+//            setRenderArgs(t, args);
+//        } catch (ClassCastException ce) {
+//            if (mode.isDev()) {
+//                handleCCE(ce);
+//                return getTemplate(template, args);
+//            }
+//            throw ce;
+//        }
+//        if (mode.isDev()) cceCounter.remove();
         return t;
     }
     
@@ -503,32 +513,16 @@ public class RythmEngine {
             tc = new TemplateClass(template, this, dialect);
         }
         ITemplate t = tc.asTemplate();
-        try {
-            if (1 == args.length && args[0] instanceof Map) {
-                t.setRenderArgs((Map<String, Object>) args[0]);
-            } else {
-                t.setRenderArgs(args);
-            }
-            if (mode.isDev()) cceCounter.remove();
-        } catch (ClassCastException ce) {
-            if (mode.isDev()) {
-                Integer I = cceCounter.get();
-                if (null == I) {
-                    I = 1;
-                    cceCounter.set(I);
-                } else {
-                    I++;
-                    cceCounter.set(I);
-                }
-                if (I > 2) {
-                    cceCounter.remove();
-                    throw ce;
-                }
-                restart(ce);
-                return getTemplate(dialect, template, args);
-            }
-            throw ce;
-        }
+        setRenderArgs(t, args);
+//        try {
+//            setRenderArgs(t, args);
+//        } catch (ClassCastException ce) {
+//            if (mode.isDev()) {
+//                handleCCE(ce);
+//                return getTemplate(dialect, template, args);
+//            }
+//            throw ce;
+//        }
         return t;
     }
 
@@ -613,16 +607,14 @@ public class RythmEngine {
 
     @SuppressWarnings("unchecked")
     public String renderString(String template, Object... args) {
+        ParamTypeInferencer.registerParams(this, args);
+
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
             tc = new TemplateClass(new StringTemplateResource(template), this);
         }
         ITemplate t = tc.asTemplate();
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
-        } else {
-            t.setRenderArgs(args);
-        }
+        setRenderArgs(t, args);
         return t.render();
     }
 
@@ -677,6 +669,8 @@ public class RythmEngine {
     private NonExistsTemplatesChecker nonExistsTemplatesChecker = null;
 
     public String renderIfTemplateExists(String template, Object... args) {
+        ParamTypeInferencer.registerParams(this, args);
+    
         if (nonExistsTemplates.contains(template)) return "";
         TemplateClass tc = classes.getByTemplate(template);
         if (null == tc) {
@@ -692,11 +686,7 @@ public class RythmEngine {
             }
         }
         ITemplate t = tc.asTemplate();
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
-        } else {
-            t.setRenderArgs(args);
-        }
+        setRenderArgs(t, args);
         return t.render();
     }
 

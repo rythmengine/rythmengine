@@ -33,7 +33,7 @@ public class BasicRythm extends SimpleRythm {
     protected Class<?>[] buildInParserClasses() {
         // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{BreakParser.class, ContinueParser.class, CommentParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, BraceParser.class, PositionPlaceHolderExpressionParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, IfNotParser.class, IfParser.class, RawParser.class, TimestampParser.class};
+        return new Class<?>[]{BreakParser.class, ContinueParser.class, CommentParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, BraceParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, IfNotParser.class, IfParser.class, RawParser.class, TimestampParser.class};
     }
 
     @Override
