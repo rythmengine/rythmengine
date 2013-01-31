@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RythmEngine {
 
-    public static final String version = "1.0-b1";
+    public static final String version = "1.0-b2";
     public static String pluginVersion = "";
     
     private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
