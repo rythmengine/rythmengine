@@ -21,7 +21,7 @@
     <groupId>com.greenlaw110.rythm</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-b2</version>
+    <version>1.0-b3-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
