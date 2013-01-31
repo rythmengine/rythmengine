@@ -60,7 +60,8 @@ public class Token extends TextBuilder {
 
         @Override
         protected void output() {
-            if (RythmEngine.isOutputMode()) {
+            RythmEngine.OutputMode mode = RythmEngine.outputMode();
+            if (mode.writeOutput()) {
                 if (null == constId) return;
                 p("p(").p(constId).p(");");
                 pline();

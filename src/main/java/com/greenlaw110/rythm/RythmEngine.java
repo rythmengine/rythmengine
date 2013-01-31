@@ -492,14 +492,27 @@ public class RythmEngine {
         return t;
     }
     
-    private final static InheritableThreadLocal<Boolean> outputMode = new InheritableThreadLocal<Boolean>() {
+    public static enum OutputMode {
+        os, writer, str {
+            @Override
+            public boolean writeOutput() {
+                return false;
+            }
+        };
+        
+        public boolean writeOutput() {
+            return true;
+        }
+    }
+    
+    private final static InheritableThreadLocal<OutputMode> outputMode = new InheritableThreadLocal<OutputMode>() {
         @Override
-        protected Boolean initialValue() {
-            return false;
+        protected OutputMode initialValue() {
+            return OutputMode.str;
         }
     };
     
-    public final static boolean isOutputMode() {
+    public final static OutputMode outputMode() {
         return outputMode.get();
     }
     
@@ -543,13 +556,13 @@ public class RythmEngine {
     }
     
     public void render(OutputStream os, String template, Object... args) {
-        outputMode.set(true);
+        outputMode.set(OutputMode.os);
         ITemplate t = getTemplate(template, args);
         t.render(os);
     }
     
     public void render(Writer w, String template, Object... args) {
-        outputMode.set(true);
+        outputMode.set(OutputMode.writer);
         ITemplate t = getTemplate(template, args);
         t.render(w);
     }
@@ -622,13 +635,13 @@ public class RythmEngine {
     }
 
     public void render(OutputStream os, File file, Object... args) {
-        outputMode.set(true);
+        outputMode.set(OutputMode.os);
         ITemplate t = getTemplate(file, args);
         t.render(os);
     }
 
     public void render(Writer w, File file, Object... args) {
-        outputMode.set(true);
+        outputMode.set(OutputMode.writer);
         ITemplate t = getTemplate(file, args);
         t.render(w);
     }

@@ -779,10 +779,10 @@ public class CodeBuilder extends TextBuilder {
 
     transient Map<Token.StringToken, String> consts = new HashMap<Token.StringToken, String>();
     
-    private boolean outputMode = RythmEngine.isOutputMode();
+    private RythmEngine.OutputMode outputMode = RythmEngine.outputMode();
 
     private Token.StringToken addConst(Token.StringToken st) {
-        if (!outputMode) return st;
+        if (!outputMode.writeOutput()) return st;
         if (consts.containsKey(st)) {
             st.constId = consts.get(st);
             return st;
@@ -874,14 +874,21 @@ public class CodeBuilder extends TextBuilder {
         } else {
             s0 = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
         }
-        np("private static final StrBuf ").p(constId).p(" = new StrBuf(\"").p(s0).p("\", new byte[]{");
+        np("private static final StrBuf ").p(constId).p(" = new StrBuf(\"").p(s0);
         StrBuf sw = new StrBuf(s);
-        byte[] ba = sw.toBinary();
-        for (int i = 0; i < ba.length; ++i) {
-            p(String.valueOf(ba[i]));
-            if (i < ba.length - 1) p(",");
+        if (outputMode == RythmEngine.OutputMode.os) {
+            p("\", new byte[]{");
+            byte[] ba = sw.toBinary();
+            for (int i = 0; i < ba.length; ++i) {
+                p(String.valueOf(ba[i]));
+                if (i < ba.length - 1) p(",");
+            }
+            p("});");
+        } else if (outputMode == RythmEngine.OutputMode.writer) {
+            p("\", null);");
+        } else {
+            throw new AssertionError("should not go here");
         }
-        p("});");
         p("// line:").pn(st.getLineNo());
     }
 
