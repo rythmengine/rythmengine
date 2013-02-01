@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
-import com.greenlaw110.rythm.internal.parser.build_in.BlockCloseParser;
-import com.greenlaw110.rythm.internal.parser.build_in.ScriptParser;
-import com.greenlaw110.rythm.internal.parser.build_in.StringTokenParser;
+import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.spi.IContext;
@@ -21,9 +20,14 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     private IContext ctx;
     private List<IParser> parsers = new ArrayList<IParser>();
     private int lastCursor = 0;
-    
+
     public TemplateTokenizer(IContext context) {
         ctx = context;
+        RythmEngine engine = ctx.getEngine();
+        if (engine.enableSmartEscape() && engine.getExtensionManager().hasTemplateLangs()) {
+            parsers.add(new LangBlockStartSensor(ctx));
+            parsers.add(new LangBlockEndSensor(ctx));
+        }
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));
         parsers.add(new ScriptParser(ctx));
@@ -32,7 +36,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         parsers.add(new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
-                TemplateParser p = (TemplateParser)ctx();
+                TemplateParser p = (TemplateParser) ctx();
                 if (lastCursor < p.cursor) return null;
                 //logger.warn("fail-through parser reached. is there anything wrong in your template? line: %s", ctx.currentLine());
                 String oneStep = p.getRemain().substring(0, 1);
@@ -41,7 +45,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             }
         });
     }
-    
+
     @Override
     public Iterator<TextBuilder> iterator() {
         return new Iterator<TextBuilder>() {
@@ -53,10 +57,10 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
 
             @Override
             public TextBuilder next() {
-                for (IParser p: parsers) {
+                for (IParser p : parsers) {
                     TextBuilder t = p.go();
                     if (null != t) {
-                        lastCursor = ((TemplateParser)ctx).cursor;
+                        lastCursor = ((TemplateParser) ctx).cursor;
                         return t;
                     }
                 }

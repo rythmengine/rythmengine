@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
@@ -26,6 +27,7 @@ public class TemplateParser implements IContext {
         this.template = cb.template();
         totalLines = StringUtils.countMatches(template, "\n") + 1;
         this.cb = cb;
+        pushLang(cb.templateDefLang);
     }
 
     public static class ExitInstruction extends FastRuntimeException {
@@ -288,6 +290,25 @@ public class TemplateParser implements IContext {
     public Boolean popInsideBody2() {
         if (inBodyStack2.empty()) return null;
         return inBodyStack2.pop();
+    }
+
+    private Stack<ILang> langStack = new Stack<ILang>();
+
+    @Override
+    public ILang peekLang() {
+        if (langStack.isEmpty()) return null;
+        return langStack.peek();
+    }
+
+    @Override
+    public void pushLang(ILang lang) {
+        langStack.push(lang);
+    }
+
+    @Override
+    public ILang popLang() {
+        if (langStack.isEmpty()) return null;
+        return langStack.pop();
     }
 
     public void shutdown() {

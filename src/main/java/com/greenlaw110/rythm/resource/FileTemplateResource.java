@@ -168,7 +168,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ".txt",
                 ""
         };
-        File tagFile = null;
+        File tagFile;
         for (String suffix : suffixes) {
             String name = tagName + suffix;
 

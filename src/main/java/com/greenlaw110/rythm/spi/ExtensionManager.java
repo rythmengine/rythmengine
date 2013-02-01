@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.ITagInvokeListener;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
@@ -78,6 +79,20 @@ public class ExtensionManager {
     
     public Iterable<ITemplatePreProcessor> preProcessors() {
         return preprocessors;
+    }
+
+    private List<ILang> templateLangList = new ArrayList<ILang>();
+    public ExtensionManager registerTemplateLang(ILang lang) {
+        templateLangList.add(lang);
+        return this;
+    }
+    
+    public Iterable<ILang> templateLangs() {
+        return templateLangList;
+    }
+    
+    public boolean hasTemplateLangs() {
+        return !templateLangList.isEmpty();
     }
 
 }

@@ -110,6 +110,10 @@ public class RythmEngine {
     public boolean enableTypeInference() {
         return enableTypeInference;
     }
+    private boolean enableSmartEscape = false;
+    public boolean enableSmartEscape() {
+        return enableSmartEscape;
+    }
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
      */
@@ -156,6 +160,12 @@ public class RythmEngine {
         return enableJavaExtensions;
     }
 
+    private ILang defaultLang = null;
+    
+    public ILang getDefaultLang() {
+        return defaultLang;
+    }
+    
     public File tmpDir;
     public File templateHome;
     //public File tagHome;
@@ -299,6 +309,8 @@ public class RythmEngine {
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         enableTypeInference = configuration.getAsBoolean("rythm.enableTypeInference", false);
+        enableSmartEscape = configuration.getAsBoolean("rythm.enableSmartEscape", true);
+        defaultLang = configuration.getAs("rythm.defLang", ILang.DefImpl.HTML, ILang.class);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
@@ -318,6 +330,16 @@ public class RythmEngine {
         if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
             logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
         }
+        
+        boolean disableBuiltInTemplateLang = configuration.getAsBoolean("rythm.disableBuildInTemplateLang", false);
+        if (!disableBuiltInTemplateLang){
+            ExtensionManager em = getExtensionManager();
+            em.registerTemplateLang(ILang.DefImpl.HTML);
+            em.registerTemplateLang(ILang.DefImpl.JS);
+            em.registerTemplateLang(ILang.DefImpl.JSON);
+            em.registerTemplateLang(ILang.DefImpl.CSV);
+            em.registerTemplateLang(ILang.DefImpl.CSS);
+        } 
 
         defaultTTL = configuration.getAsInt("rythm.cache.defaultTTL", 60 * 60);
         cacheService = configuration.getAsCacheService("rythm.cache.service");

@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
@@ -234,6 +235,10 @@ public class TemplateClass {
      */
     public Package javaPackage;
     /**
+     * The template lang could be HTML, JS, JSON etc
+     */
+    public ILang templateLang;
+    /**
      * Is this class compiled
      */
     boolean compiled;
@@ -341,7 +346,7 @@ public class TemplateClass {
         }
     };
 
-    private ITemplate templateInstance_() {
+    private ITemplate templateInstance_(ILang lang) {
         if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
@@ -349,7 +354,7 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
-                templateInstance.setTemplateClass(this);
+                templateInstance.setTemplateClass(this, lang);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
@@ -367,15 +372,21 @@ public class TemplateClass {
         }
         return templateInstance;
     }
-
-    public ITemplate asTemplate() {
+    
+    public ITemplate asTemplate(ILang lang) {
         RythmEngine e = engine();
         if (null == name || e.mode.isDev()) refresh();
-        return templateInstance_().cloneMe(engine(), null);
+        return templateInstance_(lang).cloneMe(engine(), null);
     }
 
+    public ITemplate asTemplate() {
+        return asTemplate((ILang)null);
+    }
+    
     public ITemplate asTemplate(ITemplate caller) {
-        return templateInstance_().cloneMe(engine(), caller);
+        TemplateBase tb = (TemplateBase)caller;
+        ITemplate.Context ctx = tb.__ctx;
+        return templateInstance_(ctx.langStack.peek()).cloneMe(engine(), caller);
     }
 
     private boolean refreshing = false;

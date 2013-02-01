@@ -12,6 +12,7 @@ import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.spi.IParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import com.stevesoft.pat.Regex;
 
 import java.util.logging.LoggingMXBean;
 import java.util.regex.Pattern;
@@ -92,4 +93,27 @@ public abstract class ParserBase implements IParser {
         }
     }
 
+
+    // -- for testing purpose
+    public static void p(int i, Regex r) {
+        if (0 == i) {
+            System.out.println(i + ": " + r.stringMatched());
+        } else {
+            System.out.println(i + ": " + r.stringMatched(i));
+        }
+    }
+    public static void p(String s, Regex r) {
+        if (r.search(s)) p(r);
+    }
+    public static void p(String s, Regex r, int max) {
+        if (r.search(s)) p(r, max);
+    }
+    public static void p(Regex r, int max) {
+        for (int i = 0; i < max; ++i) {
+            p(i, r);
+        }
+    }
+    public static void p(Regex r) {
+        p(r, 6);
+    }
 }

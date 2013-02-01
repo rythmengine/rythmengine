@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.Sandbox;
@@ -25,6 +26,8 @@ import com.greenlaw110.rythm.utils.*;
 import com.stevesoft.pat.Regex;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class CodeBuilder extends TextBuilder {
@@ -100,6 +103,7 @@ public class CodeBuilder extends TextBuilder {
 
     public RythmEngine engine;
     private boolean isNotRythmTemplate = false;
+    public ILang templateDefLang;
 
     public boolean isRythmTemplate() {
         return !isNotRythmTemplate;
@@ -176,8 +180,13 @@ public class CodeBuilder extends TextBuilder {
         }
         this.engine = null == engine ? Rythm.engine() : engine;
         this.requiredDialect = requiredDialect;
-        this.parser = new TemplateParser(this);
         this.templateClass = templateClass;
+        ILang lang = templateClass.templateLang;
+        if (null == lang) {
+            lang = ILang.DefImpl.probeFileName(templateClass.name(), this.engine.getDefaultLang());
+        }
+        this.templateDefLang = lang;
+        this.parser = new TemplateParser(this);
     }
 
     /**
@@ -207,6 +216,7 @@ public class CodeBuilder extends TextBuilder {
         this.macros.clear();
         this.macroStack.clear();
         this.buildBody = null;
+        this.templateDefLang = null;
     }
 
     /**
@@ -927,12 +937,13 @@ public class CodeBuilder extends TextBuilder {
         code = R_DO_1.replaceAll(code);
         return code;
     }
-
+    
     public static void main(String[] args) {
-        System.setProperty("rythm.enableTypeInference", "true");
-        //NamedParams np = NamedParams.instance;
-        String s = "@args String attributes\n@attributes.raw()";
-        System.out.println(Rythm.render(s, "<html></html>"));
+        String s = "<!-- @dsfs --> dfds -->dfs <!-- xx -->";
+        Pattern p = Pattern.compile("\\<\\!\\-\\-\\s*(@.*?)\\-\\-\\>");
+        Matcher m = p.matcher(s);
+        s = m.replaceAll("$1");
+        System.out.println(s);
     }
 
 }

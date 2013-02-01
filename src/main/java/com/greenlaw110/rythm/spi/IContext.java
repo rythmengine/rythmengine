@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.spi;
 
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
@@ -120,13 +121,17 @@ public interface IContext {
     Boolean peekCompact();
     Boolean popCompact();
 
-    public boolean insideBody();
-    public Boolean peekInsideBody();
-    public void pushInsideBody(Boolean b);
-    public Boolean popInsideBody();
+    boolean insideBody();
+    Boolean peekInsideBody();
+    void pushInsideBody(Boolean b);
+    Boolean popInsideBody();
 
-    public boolean insideBody2();
-    public Boolean peekInsideBody2();
-    public void pushInsideBody2(Boolean b);
-    public Boolean popInsideBody2();
+    boolean insideBody2();
+    Boolean peekInsideBody2();
+    void pushInsideBody2(Boolean b);
+    Boolean popInsideBody2();
+    
+    ILang peekLang();
+    void pushLang(ILang lang);
+    ILang popLang();
 }

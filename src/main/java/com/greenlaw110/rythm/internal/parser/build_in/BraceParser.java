@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.*;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 /**
@@ -20,7 +21,8 @@ public class BraceParser implements IParserFactory {
         return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
-                char c = remain().charAt(0);
+                String remain = remain();
+                char c = remain.charAt(0);
                 if ('{' == c) {
                     step(1);
                     return new BlockToken.LiteralBlock(ctx());

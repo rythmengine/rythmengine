@@ -10,6 +10,7 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -28,9 +29,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     protected transient RythmEngine engine = null;
     private transient TemplateClass templateClass = null;
-    public void setTemplateClass(TemplateClass templateClass) {
+    public void setTemplateClass(TemplateClass templateClass, ILang lang) {
         this.templateClass = templateClass;
-        __ctx.init(this);
+        __ctx.init(this, lang);
     }
 
     protected S s() {
@@ -238,7 +239,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
         }
     }
-
+    
     protected Map<String, Object> _properties = new HashMap<String, Object>();
 
     protected RythmEngine _engine() {
@@ -291,7 +292,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
                 __parent = (TemplateBase) pc.newInstance();
-                __parent.setTemplateClass(_engine().classes.getByClassName(pc.getName()));
+                //__parent.setTemplateClass(_engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -472,7 +473,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
             TemplateClass tc = engine.classes.getByClassName(getClass().getName());
             tc.refresh(true);
-            ITemplate t = tc.asTemplate();
+            ITemplate t = tc.asTemplate(__ctx.currentLang());
             return t.render();
         }
     }

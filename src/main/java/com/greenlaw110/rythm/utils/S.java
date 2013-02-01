@@ -4,6 +4,8 @@ import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.text.Normalizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A utility class to manipulate String instance. Commonly used in template engine process.
@@ -288,20 +290,21 @@ public class S {
      * 
      * <p>Note Object instance is converted to String before escaping</p>
      * 
-     * @param s
+     * @param o
      * @param escape
      * @return
      */
-    public static ITemplate.RawData escape(Object s, Object escape) {
-        if (isEmpty(s)) return ITemplate.RawData.NULL;
-        if (isEmpty(escape)) return escape(s);
+    public static ITemplate.RawData escape(Object o, Object escape) {
+        if (isEmpty(o)) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (isEmpty(escape)) return escape(o);
         String se = escape.toString();
-        if ("json".equalsIgnoreCase(se)) return escapeJson(s);
-        if ("xml".equalsIgnoreCase(se)) return escapeXml(s);
-        if ("javascript".equalsIgnoreCase(se) || "js".equalsIgnoreCase(se)) return escapeJavaScript(s);
-        if ("csv".equalsIgnoreCase(se)) return escapeCsv(s);
-        if ("html".equalsIgnoreCase(se)) return escapeHtml(s);
-        if ("raw".equalsIgnoreCase(se)) return raw(s);
+        if ("json".equalsIgnoreCase(se)) return escapeJson(o);
+        if ("xml".equalsIgnoreCase(se)) return escapeXml(o);
+        if ("javascript".equalsIgnoreCase(se) || "js".equalsIgnoreCase(se)) return escapeJavaScript(o);
+        if ("csv".equalsIgnoreCase(se)) return escapeCsv(o);
+        if ("html".equalsIgnoreCase(se)) return escapeHtml(o);
+        if ("raw".equalsIgnoreCase(se)) return raw(o);
         throw new IllegalArgumentException("Unknown escape scheme: " + se);
     }
 
@@ -316,6 +319,7 @@ public class S {
      */
     public static ITemplate.RawData escapeHTML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeHtml4(o.toString()));
     }
 
@@ -340,6 +344,7 @@ public class S {
      */
     public static ITemplate.RawData escapeCSV(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeCsv(o.toString()));
     }
 
@@ -367,6 +372,7 @@ public class S {
      */
     public static ITemplate.RawData escapeJSON(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         String s0 = o.toString();
         s0 = s0.replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
         return new ITemplate.RawData(s0);
@@ -396,6 +402,7 @@ public class S {
      */
     public static ITemplate.RawData escapeJavaScript(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeEcmaScript(o.toString()));
     }
 
@@ -433,6 +440,7 @@ public class S {
      */
     public static ITemplate.RawData escapeXML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
 
@@ -444,42 +452,48 @@ public class S {
      */
     public static ITemplate.RawData escapeXml(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
+    
+    public static ITemplate.RawData escapeRegex(Object o) {
+        if (null == o) return ITemplate.RawData.NULL;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        String s = o.toString();
+        return new ITemplate.RawData(s.replaceAll("([\\{\\}\\<\\>\\-\\\\])", "\\\\$1"));
+    }
 
-    public static final String strip(String s, String prefix, String postfix) {
-        if (null == s) return "";
+    public static final String strip(Object o, String prefix, String postfix) {
+        if (null == o) return "";
+        String s = o.toString();
         s = s.trim();
         if (s.startsWith(prefix)) s = s.substring(prefix.length());
         if (s.endsWith(postfix)) s = s.substring(0, s.length() - postfix.length());
         return s;
     }
 
-    public static final String stripBrace(String s) {
-        return strip(s, "(", ")");
+    public static final String stripBrace(Object o) {
+        return strip(o, "(", ")");
     }
 
-    public static final String stripQuotation(String s) {
-        if (null == s) return "";
-        s = s.trim();
-        if (s.startsWith("\"") || s.startsWith("'")) s = s.substring(1);
-        if (s.endsWith("\"") || s.endsWith("'")) s = s.substring(0, s.length() - 1);
-        return s;
+    public static final String stripQuotation(Object o) {
+        return strip(o, "\"", "\"");
     }
 
-    public static final String stripBraceAndQuotation(String s) {
-        s = stripBrace(s);
+    public static final String stripBraceAndQuotation(Object o) {
+        if (null == o) return "";
+        String s = stripBrace(o);
         s = stripQuotation(s);
         return s;
     }
 
-    public static String shrinkSpace(Object s) {
-        if (null == s) return  "";
-        return s.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
+    public static String shrinkSpace(Object o) {
+        if (null == o) return  "";
+        return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
     }
 
-    public static String pad(Object obj, Integer size) {
-        String str = null == obj ? "" : obj.toString();
+    public static String pad(Object o, Integer size) {
+        String str = null == o ? "" : o.toString();
         int t = size - str.length();
         for (int i = 0; i < t; i++) {
             str += "&nbsp;";
@@ -487,9 +501,9 @@ public class S {
         return str;
     }
 
-    public static String capitalizeWords(Object obj) {
-        if (null == obj) return "";
-        String source = obj.toString();
+    public static String capitalizeWords(Object o) {
+        if (null == o) return "";
+        String source = o.toString();
         char prevc = ' '; // first char of source is capitalized
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < source.length(); i++) {
@@ -504,19 +518,19 @@ public class S {
         return sb.toString();
     }
 
-    public static String noAccents(Object obj) {
-        if (null == obj) return "";
-        String string = obj.toString();
+    public static String noAccents(Object o) {
+        if (null == o) return "";
+        String string = o.toString();
         return Normalizer.normalize(string, Normalizer.Form.NFKC).replaceAll("[àáâãäåāąă]", "a").replaceAll("[çćčĉċ]", "c").replaceAll("[ďđð]", "d").replaceAll("[èéêëēęěĕė]", "e").replaceAll("[ƒſ]", "f").replaceAll("[ĝğġģ]", "g").replaceAll("[ĥħ]", "h").replaceAll("[ìíîïīĩĭįı]", "i").replaceAll("[ĳĵ]", "j").replaceAll("[ķĸ]", "k").replaceAll("[łľĺļŀ]", "l").replaceAll("[ñńňņŉŋ]", "n").replaceAll("[òóôõöøōőŏœ]", "o").replaceAll("[Þþ]", "p").replaceAll("[ŕřŗ]", "r").replaceAll("[śšşŝș]", "s").replaceAll("[ťţŧț]", "t").replaceAll("[ùúûüūůűŭũų]", "u").replaceAll("[ŵ]", "w").replaceAll("[ýÿŷ]", "y").replaceAll("[žżź]", "z").replaceAll("[æ]", "ae").replaceAll("[ÀÁÂÃÄÅĀĄĂ]", "A").replaceAll("[ÇĆČĈĊ]", "C").replaceAll("[ĎĐÐ]", "D").replaceAll("[ÈÉÊËĒĘĚĔĖ]", "E").replaceAll("[ĜĞĠĢ]", "G").replaceAll("[ĤĦ]", "H").replaceAll("[ÌÍÎÏĪĨĬĮİ]", "I").replaceAll("[Ĵ]", "J").replaceAll("[Ķ]", "K").replaceAll("[ŁĽĹĻĿ]", "L").replaceAll("[ÑŃŇŅŊ]", "N").replaceAll("[ÒÓÔÕÖØŌŐŎ]", "O").replaceAll("[ŔŘŖ]", "R").replaceAll("[ŚŠŞŜȘ]", "S").replaceAll("[ÙÚÛÜŪŮŰŬŨŲ]", "U").replaceAll("[Ŵ]", "W").replaceAll("[ÝŶŸ]", "Y").replaceAll("[ŹŽŻ]", "Z").replaceAll("[ß]", "ss");
     }
 
-    public static String slugify(Object obj) {
-        return slugify(obj, Boolean.TRUE);
+    public static String slugify(Object o) {
+        return slugify(o, Boolean.TRUE);
     }
 
-    public static String slugify(Object obj, Boolean lowercase) {
-        if (null == obj) return "";
-        String string = obj.toString();
+    public static String slugify(Object o, Boolean lowercase) {
+        if (null == o) return "";
+        String string = o.toString();
         string = noAccents(string);
         // Apostrophes.
         string = string.replaceAll("([a-z])'s([^a-z])", "$1s$2");
@@ -586,5 +600,16 @@ public class S {
         return result.toString();
     }
 
+    public static void main(String[] args) {
+        String s = "(\\<\\/\\s*style\\s*\\>).*";
+        System.out.println(s);
+        String s0 = "</style>ad";
+        Pattern p = Pattern.compile(s);
+        Matcher m = p.matcher(s0);
+        if (m.matches()) {
+            System.out.println(m.group(1));
+        }
+        System.out.println(m.matches());
+    }
 
 }
