@@ -539,14 +539,6 @@ public class S {
         return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("[ \\t\\x0B\\f]+", " ");
     }
 
-    public static String pad(Object o, Integer size) {
-        String str = null == o ? "" : o.toString();
-        int t = size - str.length();
-        for (int i = 0; i < t; i++) {
-            str += "&nbsp;";
-        }
-        return str;
-    }
 
     public static String capitalizeWords(Object o) {
         if (null == o) return "";
