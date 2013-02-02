@@ -76,6 +76,21 @@ public interface ILang {
     Set<ILang> allowedExternalLangs();
 
     /**
+     * Set the parent lang to the embedded lang
+     * 
+     * @param parent
+     */
+    void setParent(ILang parent);
+
+    /**
+     * Return parent lang or null if there is no parent
+     * set on it
+     * 
+     * @return
+     */
+    ILang getParent();
+
+    /**
      * Return a string that could be write into
      * the target java source code to create an instance
      * of this Lang
@@ -85,7 +100,7 @@ public interface ILang {
     String newInstanceStr();
     
     
-    public static class DefImpl implements ILang {
+    public static class DefImpl implements ILang, Cloneable {
 
         public static final DefImpl HTML = new DefImpl("HTML", "<!--", "-->", ITemplate.Escape.XML) {
             @Override
@@ -124,6 +139,8 @@ public interface ILang {
         private final String blockStart;
         private final String blockEnd;
         
+        private ILang parent;
+        
         protected DefImpl(String id, String commentStart, String commentEnd, ITemplate.Escape escape) {
             this(id, commentStart, commentEnd, escape, null, null);
         }
@@ -139,7 +156,10 @@ public interface ILang {
 
         @Override
         public String newInstanceStr() {
-            return ILang.class.getName() + ".DefImpl." + this.id;
+            StringBuilder sb = new StringBuilder();
+            String clsName = ILang.class.getName();
+            sb.append("(").append(clsName).append(")").append(clsName).append(".DefImpl.").append(this.id).append(".clone()");
+            return sb.toString();
         }
 
         @Override
@@ -173,6 +193,16 @@ public interface ILang {
         }
 
         @Override
+        public void setParent(ILang parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public ILang getParent() {
+            return parent;
+        }
+
+        @Override
         public Set<ILang> allowedExternalLangs() {
             return Collections.EMPTY_SET;
         }
@@ -180,6 +210,15 @@ public interface ILang {
         @Override
         public String toString() {
             return newInstanceStr();
+        }
+
+        @Override
+        public Object clone() {
+            try {
+                return super.clone();
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public static ILang probeFileName(String fileName, ILang def) {

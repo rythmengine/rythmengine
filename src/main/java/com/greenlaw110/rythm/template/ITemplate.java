@@ -97,15 +97,25 @@ public interface ITemplate extends Cloneable {
         }
 
         public ILang currentLang() {
-            return langStack.peek();
+            if (langStack.isEmpty()) {
+                return null;
+            } else {
+                return langStack.peek();
+            }
         }
 
         public void pushLang(ILang lang) {
+            ILang cur = currentLang();
+            if (null != cur) {
+                lang.setParent(cur);
+            }
             langStack.push(lang);
         }
 
         public ILang popLang() {
-            return langStack.pop();
+            ILang cur = langStack.pop();
+            cur.setParent(null);
+            return cur;
         }
 
         public Escape currentEscape() {

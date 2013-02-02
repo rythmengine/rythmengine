@@ -460,7 +460,7 @@ public class S {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         String s = o.toString();
-        return new ITemplate.RawData(s.replaceAll("([\\{\\}\\<\\>\\-\\\\])", "\\\\$1"));
+        return new ITemplate.RawData(s.replaceAll("([\\/\\*\\{\\}\\<\\>\\-\\\\\\!])", "\\\\$1"));
     }
 
     public static final String strip(Object o, String prefix, String postfix) {

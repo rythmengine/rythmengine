@@ -114,6 +114,11 @@ public class RythmEngine {
     public boolean enableSmartEscape() {
         return enableSmartEscape;
     }
+    
+    private boolean enableNaturalTemplate = true;
+    public boolean enableNaturalTemplate() {
+        return enableNaturalTemplate;
+    }
     /**
      * If this is set to true then @cacheFor() {} only effective on product mode
      */
@@ -310,6 +315,7 @@ public class RythmEngine {
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         enableTypeInference = configuration.getAsBoolean("rythm.enableTypeInference", false);
         enableSmartEscape = configuration.getAsBoolean("rythm.enableSmartEscape", true);
+        enableNaturalTemplate = configuration.getAsBoolean("rythm.enableNaturalTemplate", true);
         defaultLang = configuration.getAs("rythm.defLang", ILang.DefImpl.HTML, ILang.class);
         noFileWrite = configuration.getAsBoolean("rythm.noFileWrite", false);
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());

@@ -131,6 +131,10 @@ public interface IContext {
     void pushInsideBody2(Boolean b);
     Boolean popInsideBody2();
     
+    boolean insideDirectiveComment();
+    void enterDirectiveComment();
+    void leaveDirectiveComment();
+    
     ILang peekLang();
     void pushLang(ILang lang);
     ILang popLang();

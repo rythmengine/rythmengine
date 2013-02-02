@@ -28,6 +28,10 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             parsers.add(new LangBlockStartSensor(ctx));
             parsers.add(new LangBlockEndSensor(ctx));
         }
+        if (engine.enableNaturalTemplate() && engine.getExtensionManager().hasTemplateLangs()) {
+            parsers.add(new DirectiveCommentStartSensor(ctx));
+            parsers.add(new DirectiveCommentEndSensor(ctx));
+        }
         parsers.add(new ParserDispatcher(ctx));
         parsers.add(new BlockCloseParser(ctx));
         parsers.add(new ScriptParser(ctx));

@@ -60,6 +60,15 @@ public class TemplateParser implements IContext {
     void parse() {
         DialectManager dm = cb.engine.getDialectManager();
         while (true) {
+            this.breakStack.clear();
+            this.langStack.clear();
+            this.pushLang(cb.templateDefLang);
+            this.inBodyStack.clear();
+            this.inBodyStack2.clear();
+            this.compactStack.clear();
+            this.continueStack.clear();
+            this.insideDirectiveComment = false;
+            this.blocks.clear();
             dm.beginParse(this);
             cursor = 0;
             cb.rewind();
@@ -291,6 +300,23 @@ public class TemplateParser implements IContext {
         if (inBodyStack2.empty()) return null;
         return inBodyStack2.pop();
     }
+    
+    private boolean insideDirectiveComment = false;
+
+    @Override
+    public boolean insideDirectiveComment() {
+        return this.insideDirectiveComment;
+    }
+
+    @Override
+    public void enterDirectiveComment() {
+        insideDirectiveComment = true; 
+    }
+
+    @Override
+    public void leaveDirectiveComment() {
+        insideDirectiveComment = false;
+    }
 
     private Stack<ILang> langStack = new Stack<ILang>();
 
@@ -302,13 +328,22 @@ public class TemplateParser implements IContext {
 
     @Override
     public void pushLang(ILang lang) {
+        ILang cur = peekLang();
+        if (null != cur) {
+            lang.setParent(cur);
+        }
         langStack.push(lang);
     }
 
     @Override
     public ILang popLang() {
-        if (langStack.isEmpty()) return null;
-        return langStack.pop();
+        ILang cur = peekLang();
+        if (null == cur) {
+            return null;
+        }
+        cur.setParent(null);
+        langStack.pop();
+        return cur;
     }
 
     public void shutdown() {

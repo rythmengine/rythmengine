@@ -14,12 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Detect if a lang block is reached and put
+ * Detect if a lang block is ended put
  * instruction in template java source to switch
- * lang context
- * <p/>
- * <p>For example when &lt;script &gt; is reached
- * a instruction <code>pushLang(ILang lang)</code>
+ * back lang context
+ * 
+ * <p>For example when &lt;/script&gt; is reached
+ * a instruction <code>popLang()</code>
  * should be put in place</p>
  */
 public class LangBlockEndSensor extends ParserBase {
