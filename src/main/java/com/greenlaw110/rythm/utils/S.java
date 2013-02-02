@@ -455,7 +455,13 @@ public class S {
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
-    
+
+    /**
+     * Escape for regular expression 
+     * 
+     * @param o
+     * @return
+     */
     public static ITemplate.RawData escapeRegex(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -463,23 +469,57 @@ public class S {
         return new ITemplate.RawData(s.replaceAll("([\\/\\*\\{\\}\\<\\>\\-\\\\\\!])", "\\\\$1"));
     }
 
-    public static final String strip(Object o, String prefix, String postfix) {
+    /**
+     * Strip the prefix and suffix from an object's String representation and 
+     * return the result
+     * 
+     * <p>For example: </p>
+     * 
+     * <pre><code>Object o = "xxBByy";
+     * String s = S.strip(o, "xx", "yy")</code></pre>
+     * 
+     * <p>At the end above code, <code>s</code> should be "BB"</p>
+     * 
+     * @param o
+     * @param prefix
+     * @param suffix
+     * @return
+     */
+    public static final String strip(Object o, String prefix, String suffix) {
         if (null == o) return "";
         String s = o.toString();
         s = s.trim();
         if (s.startsWith(prefix)) s = s.substring(prefix.length());
-        if (s.endsWith(postfix)) s = s.substring(0, s.length() - postfix.length());
+        if (s.endsWith(suffix)) s = s.substring(0, s.length() - suffix.length());
         return s;
     }
 
+    /**
+     * Strip the brace from an object's string representation and return the result 
+     * 
+     * @param o
+     * @return
+     */
     public static final String stripBrace(Object o) {
         return strip(o, "(", ")");
     }
 
+    /**
+     * Strip the quotation mark from an object's string representation and return the result 
+     * 
+     * @param o
+     * @return
+     */
     public static final String stripQuotation(Object o) {
         return strip(o, "\"", "\"");
     }
 
+    /**
+     * Strip off both brace and quotation
+     * 
+     * @param o
+     * @return
+     */
     public static final String stripBraceAndQuotation(Object o) {
         if (null == o) return "";
         String s = stripBrace(o);
@@ -487,9 +527,16 @@ public class S {
         return s;
     }
 
+    /**
+     * Shrink spaces in an object's string representation by merge multiple
+     * spaces, tabs into one space, and multiple line breaks into one line break
+     * 
+     * @param o
+     * @return
+     */
     public static String shrinkSpace(Object o) {
         if (null == o) return  "";
-        return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("\\s+", "\\s");
+        return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("[ \\t\\x0B\\f]+", " ");
     }
 
     public static String pad(Object o, Integer size) {
