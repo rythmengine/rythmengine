@@ -658,6 +658,17 @@ public class CodeBuilder extends TextBuilder {
             if (arg.lineNo > -1) p(" //line: ").pn(arg.lineNo);
             else pn();
         }
+        
+        // -- output renderArgTypeMap method
+        pn();
+        ptn("protected Map<String, Class> renderArgTypeMap() {");
+        p2tn("Map<String, Class> m = new HashMap<String, Class>();");
+        for (String argName: renderArgs.keySet()) {
+            RenderArgDeclaration arg = renderArgs.get(argName);
+            p2t("m.put(\"").p(argName).p("\", ").p(arg.type).pn(".class);");
+        }
+        p2tn("return m;");
+        ptn("}");
 
         // -- output setRenderArgs method
         pn();
@@ -677,10 +688,10 @@ public class CodeBuilder extends TextBuilder {
         List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
         Collections.sort(renderArgList);
 
-        // -- output setRenderArgs method with args passed in positioned order
         IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
         int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
+            // -- output setRenderArgs method with args passed in positioned order
             pn();
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
@@ -692,6 +703,20 @@ public class CodeBuilder extends TextBuilder {
                             .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
                 }
+            }
+            ptn("}");
+
+            // -- output renderArgTypeArray method with args passed in positioned order
+            pn();
+            ptn("protected Class[] renderArgTypeArray() {");
+            {
+                p2t("return new Class[]{");
+                int i = userDefinedArgNumber;
+                for (RenderArgDeclaration arg: renderArgList) {
+                    p(arg.type).p(".class").p(", ");
+                    if (--i == 0) break;
+                }
+                pn("};");
             }
             ptn("}");
         }

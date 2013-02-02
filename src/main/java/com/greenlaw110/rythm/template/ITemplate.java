@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.template;
 import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.utils.JSONWrapper;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.OutputStream;
@@ -51,6 +52,13 @@ public interface ITemplate extends Cloneable {
      * @param arg
      */
     void setRenderArg(int position, Object arg);
+
+    /**
+     * Set renderArgs with a JSON data 
+     * 
+     * @param jsonData
+     */
+    void setRenderArg(JSONWrapper jsonData);
 
     /**
      * Render the output

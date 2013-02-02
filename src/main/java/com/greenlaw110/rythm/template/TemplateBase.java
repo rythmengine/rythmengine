@@ -1,5 +1,7 @@
 package com.greenlaw110.rythm.template;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
@@ -12,15 +14,13 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.utils.IO;
+import com.greenlaw110.rythm.utils.JSONWrapper;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.io.*;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 public abstract class TemplateBase extends TemplateBuilder implements ITemplate {
@@ -603,10 +603,62 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public TextBuilder build() {
         return this;
     }
+    
+    protected Class[] renderArgTypeArray() {
+        return null;
+    }
+    
+    protected Map<String, Class> renderArgTypeMap() {
+        return Collections.EMPTY_MAP;
+    }
 
     @Override
     public void setRenderArgs(Map<String, Object> args) {
         _properties.putAll(args);
+    }
+
+    @Override
+    public void setRenderArg(JSONWrapper jsonData) {
+        if (jsonData.isArray()) {
+            setJSONArray(jsonData.getArray());
+        } else {
+            setJSONObject(jsonData.getObject());
+        }
+    }
+    
+    private void setJSONArray(List<Object> jsonArray) {
+        Class[] types = renderArgTypeArray();
+        List<Object> args = new ArrayList<Object>(types.length);
+        int paraNo = jsonArray.size();
+        for (int i = 0; i < types.length; ++i) {
+            if (i >= paraNo) break;
+            Object o = jsonArray.get(i);
+            Class c = types[i];
+            Object p;
+            if (o instanceof List) {
+                p = JSON.parseArray(o.toString(), c);
+            } else {
+                p = JSON.parseObject(o.toString(), c);
+            }
+            setRenderArg(i, p);
+        }
+    }
+    
+    private void setJSONObject(Map<String, Object> jsonObject) {
+        Map<String, Class> types = renderArgTypeMap();
+        for (String nm : jsonObject.keySet()) {
+            if (types.containsKey(nm)) {
+                Class c = types.get(nm);
+                Object o = jsonObject.get(nm);
+                Object p;
+                if (o instanceof List) {
+                    p = JSON.parseArray(o.toString(), c);
+                } else {
+                    p = JSON.parseObject(o.toString(), c);
+                }
+                setRenderArg(nm, p);
+            }
+        }
     }
 
     protected void setRenderArgs(ITag.ParameterList params) {

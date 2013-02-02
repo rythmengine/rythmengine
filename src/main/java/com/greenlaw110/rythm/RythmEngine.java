@@ -471,8 +471,15 @@ public class RythmEngine {
 //    }
 
     private void setRenderArgs(ITemplate t, Object ... args) {
-        if (1 == args.length && args[0] instanceof Map) {
-            t.setRenderArgs((Map<String, Object>) args[0]);
+        if (1 == args.length) {
+            Object o0 = args[0];
+            if (o0 instanceof Map) {
+                t.setRenderArgs((Map<String, Object>) args[0]);
+            } else if (o0 instanceof JSONWrapper) {
+                t.setRenderArg((JSONWrapper)o0);
+            } else {
+                t.setRenderArgs(args);
+            }
         } else {
             t.setRenderArgs(args);
         }
