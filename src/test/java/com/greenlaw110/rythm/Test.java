@@ -12,7 +12,9 @@ import com.greenlaw110.rythm.utils.S;
  */
 public class Test {
     public static void main(String[] args) {
-        String s = "a\n\nb";
-        System.out.println(S.shrinkSpace(s));
+        String s = "abc xyz";
+        System.out.println(S.capitalizeWords(s));
+        System.out.println(S.capAll(s));
+        System.out.println(S.capFirst(s));
     }
 }

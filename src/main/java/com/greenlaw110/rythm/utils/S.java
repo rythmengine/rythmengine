@@ -540,6 +540,13 @@ public class S {
     }
 
 
+    /**
+     * Capitalize the first character of every word of the specified object's
+     * string representation. Words are separated by space
+     * 
+     * @param o
+     * @return
+     */
     public static String capitalizeWords(Object o) {
         if (null == o) return "";
         String source = o.toString();
@@ -557,27 +564,17 @@ public class S {
         return sb.toString();
     }
 
+    /**
+     * Replace accent character (usually found in European languages) of the String representation of a 
+     * give object to non-accent char. 
+     * 
+     * @param o
+     * @return
+     */
     public static String noAccents(Object o) {
         if (null == o) return "";
         String string = o.toString();
         return Normalizer.normalize(string, Normalizer.Form.NFKC).replaceAll("[àáâãäåāąă]", "a").replaceAll("[çćčĉċ]", "c").replaceAll("[ďđð]", "d").replaceAll("[èéêëēęěĕė]", "e").replaceAll("[ƒſ]", "f").replaceAll("[ĝğġģ]", "g").replaceAll("[ĥħ]", "h").replaceAll("[ìíîïīĩĭįı]", "i").replaceAll("[ĳĵ]", "j").replaceAll("[ķĸ]", "k").replaceAll("[łľĺļŀ]", "l").replaceAll("[ñńňņŉŋ]", "n").replaceAll("[òóôõöøōőŏœ]", "o").replaceAll("[Þþ]", "p").replaceAll("[ŕřŗ]", "r").replaceAll("[śšşŝș]", "s").replaceAll("[ťţŧț]", "t").replaceAll("[ùúûüūůűŭũų]", "u").replaceAll("[ŵ]", "w").replaceAll("[ýÿŷ]", "y").replaceAll("[žżź]", "z").replaceAll("[æ]", "ae").replaceAll("[ÀÁÂÃÄÅĀĄĂ]", "A").replaceAll("[ÇĆČĈĊ]", "C").replaceAll("[ĎĐÐ]", "D").replaceAll("[ÈÉÊËĒĘĚĔĖ]", "E").replaceAll("[ĜĞĠĢ]", "G").replaceAll("[ĤĦ]", "H").replaceAll("[ÌÍÎÏĪĨĬĮİ]", "I").replaceAll("[Ĵ]", "J").replaceAll("[Ķ]", "K").replaceAll("[ŁĽĹĻĿ]", "L").replaceAll("[ÑŃŇŅŊ]", "N").replaceAll("[ÒÓÔÕÖØŌŐŎ]", "O").replaceAll("[ŔŘŖ]", "R").replaceAll("[ŚŠŞŜȘ]", "S").replaceAll("[ÙÚÛÜŪŮŰŬŨŲ]", "U").replaceAll("[Ŵ]", "W").replaceAll("[ÝŶŸ]", "Y").replaceAll("[ŹŽŻ]", "Z").replaceAll("[ß]", "ss");
-    }
-
-    public static String slugify(Object o) {
-        return slugify(o, Boolean.TRUE);
-    }
-
-    public static String slugify(Object o, Boolean lowercase) {
-        if (null == o) return "";
-        String string = o.toString();
-        string = noAccents(string);
-        // Apostrophes.
-        string = string.replaceAll("([a-z])'s([^a-z])", "$1s$2");
-        string = string.replaceAll("[^\\w]", "-").replaceAll("-{2,}", "-");
-        // Get rid of any - at the start and end.
-        string.replaceAll("-+$", "").replaceAll("^-+", "");
-
-        return (lowercase ? string.toLowerCase() : string);
     }
 
     /**
@@ -610,15 +607,13 @@ public class S {
     }
 
     /**
-     * Capitalize all characters of an object's string representation
+     * Alias of {@link #capitalizeWords(Object)}
      * 
      * @param o
      * @return
      */
     public static String capAll(Object o) {
-        if (null == o) return "";
-        String string = o.toString();
-        return capitalizeWords(string);
+        return capitalizeWords(o);
     }
 
     /**
