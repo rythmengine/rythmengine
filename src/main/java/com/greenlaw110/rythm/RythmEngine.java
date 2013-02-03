@@ -28,6 +28,8 @@ import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.*;
 
 import java.io.*;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -42,6 +44,14 @@ public class RythmEngine {
 
     public static final String version = "1.0-b2";
     public static String pluginVersion = "";
+    
+    private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
+    public static void set(RythmEngine engine) {
+        _engine.set(engine);
+    }
+    public static RythmEngine get() {
+        return _engine.get();
+    }
     
     private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
         @Override
@@ -313,6 +323,10 @@ public class RythmEngine {
         logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
+        boolean disableBuiltInJavaExtensions = configuration.getAsBoolean("rythm.disableBuiltInJavaExtensions", false);
+        if (!disableBuiltInJavaExtensions) {
+            registerJavaExtension(S.class);
+        }
         enableTypeInference = configuration.getAsBoolean("rythm.enableTypeInference", false);
         enableSmartEscape = configuration.getAsBoolean("rythm.enableSmartEscape", true);
         enableNaturalTemplate = configuration.getAsBoolean("rythm.enableNaturalTemplate", true);
@@ -736,9 +750,53 @@ public class RythmEngine {
         return t.render();
     }
 
+    private List<IJavaExtension> javaExtensions = new ArrayList<IJavaExtension>();
+    
+    public Iterable<IJavaExtension> javaExtensions() {
+        return javaExtensions;
+    }
+    
+    public boolean isJavaExtension(String methodName) {
+        for (IJavaExtension ext : javaExtensions) {
+            if (S.isEqual(methodName, ext.methodName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // -- register java extension
-    public static void registerJavaExtension(IJavaExtension extension) {
-        Token.addExtension(extension);
+    public void registerJavaExtension(IJavaExtension extension) {
+        javaExtensions.add(extension);
+    }
+
+    /**
+     * Register application Java extensions
+     * 
+     * @param extensionClass
+     */
+    public void registerJavaExtension(Class<?> extensionClass) {
+        boolean classAnnotated = extensionClass.getAnnotation(JavaExtension.class) != null;
+        for (Method m : extensionClass.getDeclaredMethods()) {
+            int flag = m.getModifiers();
+            if (!Modifier.isPublic(flag) || !Modifier.isStatic(flag)) continue;
+            int len = m.getParameterTypes().length;
+            if (len <= 0) continue;
+            
+            if (!classAnnotated) {
+                boolean methodAnnotated = m.getAnnotation(JavaExtension.class) != null;
+                if (!methodAnnotated) continue;
+            }
+
+            String cn = extensionClass.getSimpleName();
+            String cn0 = extensionClass.getName();
+            String mn = m.getName();
+            if (len == 1) {
+                registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, String.format("%s.%s", cn0, mn)));
+            } else {
+                registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", String.format("%s.%s", cn0, mn)));
+            }
+        }
     }
 
     public static void registerGlobalImports(String imports) {

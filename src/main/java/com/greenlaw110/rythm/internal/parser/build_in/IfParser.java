@@ -30,8 +30,10 @@ public class IfParser extends KeywordParserFactory {
                 }
                 String s = r.stringMatched(1);
                 ctx.step(s.length());
-                s = r.stringMatched(2);
-                if (!s.endsWith("{")) s = "\n" + s + " {";
+                s = r.stringMatched(3);
+                s = ExpressionParser.processPositionPlaceHolder(s);
+                s = "\nif (com.greenlaw110.rythm.utils.Eval.eval(" + s + ")) {";
+                //if (!s.endsWith("{")) s = "\n" + s + " {";
                 return new IfBlockCodeToken(s, ctx);
             }
         };
@@ -49,15 +51,12 @@ public class IfParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-//        String p = String.format(new IfParser().patternStr(), "@", "if");
-//        System.out.println(p);
-//
-//        Regex r = new Regex(p);
-//        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
-//        p(s, r);
-//        
-        String s = Rythm.render("@import java.math.*;@args BigDecimal a, BigDecimal b\n @(a * b)", 3222222, 1233333.223323);
-        System.out.println(s);
+        String p = String.format(new IfParser().patternStr(), "@", "if");
+        System.out.println(p);
+
+        Regex r = new Regex(p);
+        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
+        p(s, r);
     }
 
 }

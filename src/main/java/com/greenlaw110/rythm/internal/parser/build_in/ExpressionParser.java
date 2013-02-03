@@ -78,7 +78,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         }
     }
 
-    private static String processPositionPlaceHolder(String s) {
+    public static String processPositionPlaceHolder(String s) {
         Regex r = new Regex("@([0-9]+)", "__v_${1}");
         return r.replaceAll(s);
     }

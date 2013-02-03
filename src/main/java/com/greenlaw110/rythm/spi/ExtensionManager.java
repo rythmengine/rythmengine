@@ -4,7 +4,6 @@ import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.ITagInvokeListener;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.exception.DialectNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +92,11 @@ public class ExtensionManager {
     
     public boolean hasTemplateLangs() {
         return !templateLangList.isEmpty();
+    }
+    
+    public ExtensionManager registerJavaExtensions(Class<? extends JavaExtension> c){
+        //TODO
+        return this;
     }
 
 }

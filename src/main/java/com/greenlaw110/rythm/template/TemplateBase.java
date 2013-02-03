@@ -445,6 +445,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     @Override
     public final String render() {
+        RythmEngine.set(_engine());
         try {
             long l = 0l;
             if (_logTime()) {

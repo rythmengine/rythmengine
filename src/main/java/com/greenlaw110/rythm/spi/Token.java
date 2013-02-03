@@ -148,29 +148,6 @@ public class Token extends TextBuilder {
         pp(s);
     }
 
-    static final List<IJavaExtension> extensions = new ArrayList<IJavaExtension>();
-    public static final void addExtension(IJavaExtension extension) {
-        extensions.add(extension);
-    }
-    public static boolean isJavaExtension(String methodName) {
-        for (IJavaExtension ext : extensions) {
-            if (S.isEqual(methodName, ext.methodName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    static {
-        String[] sa = {
-            "raw", "escape", "escapeHtml", "escapeJS", "escapeJavaScript", "escapeJSON", "escapeCsv", "escapeXml", "camelCase", "capAll", "capFirst", "slugify", "noAccents"
-        };
-        for (String s: sa) {
-            addExtension(new IJavaExtension.VoidParameterExtension("S", s));
-        }
-        addExtension(new IJavaExtension.ParameterExtension("S", "escape", ".+"));
-        //addExtension(new IJavaExtension.ParameterExtension("pad",  "[0-9]+"));
-    }
-
     private static final Regex R_ = new Regex("^\\s*(?@())\\s*$");
     private static String stripOuterBrackets(String s) {
         if (S.isEmpty(s)) return s;
@@ -249,7 +226,7 @@ public class Token extends TextBuilder {
         // try parse java extension first
         while(true) {
             boolean matched = false;
-            for(IJavaExtension e: extensions) {
+            for(IJavaExtension e: engine.javaExtensions()) {
                 Pattern p = e.pattern1();
                 Matcher m = p.matcher(s);
                 if (m.matches()) {
@@ -277,7 +254,7 @@ public class Token extends TextBuilder {
             String elvis = sa[1];
             while(true) {
                 boolean matched = false;
-                for(IJavaExtension e: extensions) {
+                for(IJavaExtension e: engine.javaExtensions()) {
                     Pattern p = e.pattern1();
                     Matcher m = p.matcher(s);
                     if (m.matches()) {

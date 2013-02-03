@@ -66,7 +66,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                 final List<String> statements = new ArrayList<String>();
                 while (r3.search(exp)) {
                     String s0 = r3.stringMatched().trim();
-                    if (Token.isJavaExtension(s0)) break;
+                    if (ctx().getEngine().isJavaExtension(s0)) break;
                     if (s0.endsWith("?.")) {
                         s0 = s0.replace("?.", "");
                         curExp.append(s0);
