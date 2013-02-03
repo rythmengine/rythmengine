@@ -578,6 +578,7 @@ public class S {
     }
 
     /**
+     * Make the first character be lowercase of the given object's string representation
      * 
      * @param o
      * @return
@@ -592,7 +593,7 @@ public class S {
     }
 
     /**
-     * Capitalize the first character of an object's string representation
+     * Make the first character be uppercase of the given object's string representation
      * 
      * @param o
      * @return
@@ -604,16 +605,6 @@ public class S {
             return string;
         }
         return ("" + string.charAt(0)).toUpperCase() + string.substring(1);
-    }
-
-    /**
-     * Alias of {@link #capitalizeWords(Object)}
-     * 
-     * @param o
-     * @return
-     */
-    public static String capAll(Object o) {
-        return capitalizeWords(o);
     }
 
     /**
