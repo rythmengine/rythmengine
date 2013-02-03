@@ -335,13 +335,6 @@ public class RythmEngine {
         tmpDir = noFileWrite ? null : configuration.getAsFile("rythm.tmpDir", IO.tmpDir());
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", defaultRoot());
-        //tagHome = configuration.getAsFile("rythm.tag.root", null);
-        tagFileFilter = configuration.getAsFileFilter("rythm.tag.fileNameFilter", new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return true; // by default accept all files
-            }
-        });
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
         reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
         loadPreCompiled = configuration.getAsBoolean("rythm.loadPreCompiled", false);
@@ -448,41 +441,6 @@ public class RythmEngine {
         }
     }
 
-    public void loadTags(File tagHome) {
-        tags.clear();
-        // code come from http://vafer.org/blog/20071112204524/
-        class FileTraversal {
-            public final void traverse(final File f) {
-                if (f.isDirectory()) {
-                    // aha, we don't want to traverse .svn
-                    if (".svn".equals(f.getName())) return;
-                    onDirectory(f);
-                    final File[] childs = f.listFiles();
-                    for (File child : childs) {
-                        traverse(child);
-                    }
-                    return;
-                }
-                onFile(f);
-            }
-
-            public void onDirectory(final File d) {
-            }
-
-            public void onFile(final File f) {
-                if (tagFileFilter.accept(f)) {
-                    ITag tag = (ITag) getTemplate(f);
-                    if (null != tag) registerTag(tag);
-                }
-            }
-        }
-        new FileTraversal().traverse(tagHome);
-        logger.info("tags loaded from %s", tagHome);
-    }
-
-//    private void loadTags() {
-//        loadTags(tagHome);
-//    }
 
     private void setRenderArgs(ITemplate t, Object ... args) {
         if (1 == args.length) {
