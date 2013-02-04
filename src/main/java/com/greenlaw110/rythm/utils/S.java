@@ -1,7 +1,7 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.spi.JavaExtension;
+import com.greenlaw110.rythm.spi.Transformer;
 import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -9,8 +9,6 @@ import java.text.*;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A utility class to manipulate String instance. Commonly used in template engine process.
@@ -258,7 +256,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData raw(Object o) {
         return new ITemplate.RawData(o);
     }
@@ -272,7 +270,7 @@ public class S {
      * @param s
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escape(Object s) {
         return escapeXml(s);
     }
@@ -301,7 +299,7 @@ public class S {
      * @param escape
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escape(Object o, Object escape) {
         if (isEmpty(o)) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -326,7 +324,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeHTML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -352,7 +350,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeCSV(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -381,7 +379,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeJSON(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -412,7 +410,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeJavaScript(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -435,7 +433,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeJS(Object o) {
         return escapeJavaScript(o);
     }
@@ -452,7 +450,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static ITemplate.RawData escapeXML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
         if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
@@ -562,7 +560,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static String capitalizeWords(Object o) {
         if (null == o) return "";
         String source = o.toString();
@@ -587,7 +585,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static String noAccents(Object o) {
         if (null == o) return "";
         String string = o.toString();
@@ -600,7 +598,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static String lowerFirst(Object o) {
         if (null == o) return "";
         String string = o.toString();
@@ -616,7 +614,7 @@ public class S {
      * @param o
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static String capFirst(Object o) {
         if (null == o) return "";
         String string = o.toString();
@@ -632,7 +630,7 @@ public class S {
      * @param obj
      * @return
      */
-    @JavaExtension
+    @Transformer
     public static String camelCase(Object obj) {
         if (null == obj) return "";
         String string = obj.toString();
@@ -645,7 +643,7 @@ public class S {
         return result.toString();
     }
     
-    @JavaExtension
+    @Transformer
     public static String format(Number number, String pattern, String lang) {
         if (null == lang) {
             lang = RythmEngine.get().configuration.getProperty("lang", "en");
@@ -654,22 +652,22 @@ public class S {
         return new DecimalFormat(pattern, symbols).format(number);
     }
 
-    @JavaExtension
+    @Transformer
     public static String format(Number number, String pattern) {
         return format(number, pattern, null);
     }
 
-    @JavaExtension
+    @Transformer
     public static String format(Date date) {
         return new SimpleDateFormat(I18N.getDateFormat()).format(date);
     }
 
-    @JavaExtension
+    @Transformer
     public static String format(Date date, String pattern) {
         return format(date, pattern, null);
     }
 
-    @JavaExtension
+    @Transformer
     public static String format(Date date, String pattern, String lang) {
         if (null == lang) {
             lang = RythmEngine.get().configuration.getProperty("lang", "en");
@@ -677,7 +675,7 @@ public class S {
         return new SimpleDateFormat(pattern, new Locale(lang)).format(date);
     }
 
-    @JavaExtension
+    @Transformer
     public static String format(Date date, String pattern, String lang, String timezone) {
         DateFormat df = new SimpleDateFormat(pattern, new Locale(lang));
         df.setTimeZone(TimeZone.getTimeZone(timezone));

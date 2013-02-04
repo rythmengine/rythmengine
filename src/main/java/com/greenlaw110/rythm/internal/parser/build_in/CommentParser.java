@@ -1,9 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.spi.IContext;
 import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
@@ -34,7 +36,12 @@ public class CommentParser extends CaretParserFactoryBase {
             }
 
             private Pattern inlineComment() {
-                return Pattern.compile(String.format("^(%s//.*?\n).*", a()), Pattern.DOTALL);
+                IContext ctx = ctx();
+                if (ctx.insideDirectiveComment()) {
+                    return Pattern.compile(String.format("^(%s//.*?)(%s|\n).*", a(), S.escapeRegex(ctx.peekLang().commentEnd())), Pattern.DOTALL);
+                } else {
+                    return Pattern.compile(String.format("^(%s//.*?)\n.*", a()), Pattern.DOTALL);
+                }
             }
             
             private Pattern blockComment() {
@@ -44,16 +51,8 @@ public class CommentParser extends CaretParserFactoryBase {
     }
 
     public static void main(String[] args) {
-        Pattern p = Pattern.compile(String.format("^(%s//.*?\n).*", "@"), Pattern.DOTALL);
-        Matcher m = p.matcher("@// abc.foo() @xyz, @if \n abcd adf @each ");
-        if (m.matches()) {
-            System.out.println(m.group(1));
-        }
-
-        p = Pattern.compile(String.format("^(%s\\*.*?\\*%s).*", "@", "@"), Pattern.DOTALL);
-        m = p.matcher("@* @args include @each @a.b() #\n@//abc\nadfd *@ Hello world @abcd");
-        if (m.matches()) {
-            System.out.println(m.group(1));
-        }
+        String t = "<!-- @import java.io.File -->";
+        String s = Rythm.render(t);
+        System.out.println(s);
     }
 }

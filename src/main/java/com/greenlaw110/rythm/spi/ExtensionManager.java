@@ -94,7 +94,7 @@ public class ExtensionManager {
         return !templateLangList.isEmpty();
     }
     
-    public ExtensionManager registerJavaExtensions(Class<? extends JavaExtension> c){
+    public ExtensionManager registerJavaExtensions(Class<? extends Transformer> c){
         //TODO
         return this;
     }

@@ -734,7 +734,7 @@ public class RythmEngine {
      * @param extensionClass
      */
     public void registerJavaExtension(Class<?> extensionClass) {
-        boolean classAnnotated = extensionClass.getAnnotation(JavaExtension.class) != null;
+        boolean classAnnotated = extensionClass.getAnnotation(Transformer.class) != null;
         for (Method m : extensionClass.getDeclaredMethods()) {
             int flag = m.getModifiers();
             if (!Modifier.isPublic(flag) || !Modifier.isStatic(flag)) continue;
@@ -742,7 +742,7 @@ public class RythmEngine {
             if (len <= 0) continue;
             
             if (!classAnnotated) {
-                boolean methodAnnotated = m.getAnnotation(JavaExtension.class) != null;
+                boolean methodAnnotated = m.getAnnotation(Transformer.class) != null;
                 if (!methodAnnotated) continue;
             }
 

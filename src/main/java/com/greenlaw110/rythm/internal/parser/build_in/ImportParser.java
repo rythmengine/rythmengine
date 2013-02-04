@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 
 public class ImportParser extends KeywordParserFactory {
 
-    private static final String R = "(%s%s[\\s]+([a-zA-Z0-9_\\.*,\\s]+)(;|\\r?\\n)+).*";
+    private static final String R = "(%s%s[\\s]+([a-zA-Z0-9_\\.*,\\s]+);?).*";
 
     public ImportParser() {
     }
@@ -23,7 +23,7 @@ public class ImportParser extends KeywordParserFactory {
         return R;
     }
 
-    public IParser create(IContext c) {
+    public IParser create(final IContext c) {
         return new ParserBase(c) {
             public TextBuilder go() {
                 String remain = remain();

@@ -1,8 +1,8 @@
 package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.spi.JavaExtension;
+import com.greenlaw110.rythm.spi.Transformer;
 
-@JavaExtension
+@Transformer
 public class Test {
 
     public static Integer dbl(Integer i) {

@@ -634,6 +634,11 @@ public class CodeBuilder extends TextBuilder {
     protected void pClassClose() {
         np("}").pn();
     }
+    
+    private static String toNonGeneric(String type) {
+        Regex regex = new Regex("(?@<>)", "");
+        return regex.replaceAll(type);
+    }
 
     protected void pRenderArgs() {
         pn();
@@ -665,7 +670,7 @@ public class CodeBuilder extends TextBuilder {
         p2tn("Map<String, Class> m = new HashMap<String, Class>();");
         for (String argName: renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("m.put(\"").p(argName).p("\", ").p(arg.type).pn(".class);");
+            p2t("m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
         }
         p2tn("return m;");
         ptn("}");
@@ -713,7 +718,7 @@ public class CodeBuilder extends TextBuilder {
                 p2t("return new Class[]{");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg: renderArgList) {
-                    p(arg.type).p(".class").p(", ");
+                    p(toNonGeneric(arg.type)).p(".class").p(", ");
                     if (--i == 0) break;
                 }
                 pn("};");
