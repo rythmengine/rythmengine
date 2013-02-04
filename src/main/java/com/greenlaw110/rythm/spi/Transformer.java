@@ -21,13 +21,11 @@ import java.lang.annotation.Target;
  * transformed into <code>S.format(dueDate, "dd/MM/yyyy")</code> in the generated
  * java source</p>
  * 
- * <p>Note, the above sample code shows a transformer named <code>format</code>, which is
+ * <p>Note, the above sample code demonstrates a transformer named <code>format</code>, which is
  * built into Rythm engine. However when you want to define your own transformer, you
- * need to use this <code>Transformer</code> annotation to mark on your </code></p>
- * 
- * <p>If you want all the public static methods of a class be registered
- * as java extensions, you can annotate <code>@Transformer</code>
- * to the class instead of methods</p>
+ * need to use this <code>Transformer</code> annotation to mark on your methods or classes.
+ * When the annotation is marked on a class, then all public static methods with return
+ * value and at least one parameter will be treated as transformer</p>
  * 
  * <p>You can register them to RythmEngine by {@link com.greenlaw110.rythm.RythmEngine#registerTransformer(Class)}
  * method</p>, once you have registered your Java extension methods, the template author can use them
