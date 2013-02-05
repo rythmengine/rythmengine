@@ -469,14 +469,33 @@ public enum RythmConfigurationKey {
         this.defVal = defVal;
     }
 
+    /**
+     * Return the key string 
+     * 
+     * @return
+     */
     public String getKey() {
         return key;
     }
 
+    /**
+     * Return default value of this setting. The configuration data map
+     * is passed in in case the default value be variable depending on
+     * another setting. For example, the default value of {@link #HOME_TMP tmp dir}
+     * setting depend on the value of {@link #ENGINE_MODE mode} setting
+     * 
+     * @param configuration
+     * @return
+     */
     protected Object getDefVal(Map<String, ?> configuration) {
         return defVal;
     }
 
+    /**
+     * Calling to this method is equals to calling {@link #getKey()}
+     * 
+     * @return
+     */
     @Override
     public String toString() {
         return key;
@@ -547,7 +566,7 @@ public enum RythmConfigurationKey {
 
     /**
      * Return configuration value from the configuration data map using the {@link #key}
-     * of this <code>RythmConfigurationKey</code> instance
+     * of this {@link RythmConfigurationKey setting} instance
      *
      * @param configuration
      * @param <T>
