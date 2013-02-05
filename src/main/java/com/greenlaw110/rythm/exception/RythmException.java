@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.exception;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.F;
@@ -34,8 +35,8 @@ public class RythmException extends FastRuntimeException {
     public RythmException(RythmEngine engine, Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
-        boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
-        boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
+        boolean logJava = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
+        boolean logTmpl = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
         this.engine = engine;
         this.templateName = templateName;
@@ -60,8 +61,8 @@ public class RythmException extends FastRuntimeException {
     public RythmException(RythmEngine engine, Throwable t, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
-        boolean logJava = isRuntime ? engine.recordJavaSourceOnRuntimeError : engine.recordJavaSourceOnError;
-        boolean logTmpl = isRuntime ? engine.recordTemplateSourceOnRuntimeError : engine.recordTemplateSourceOnError;
+        boolean logJava = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
+        boolean logTmpl = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
         this.engine = engine;
         this.javaLineNumber = javaLineNumber;

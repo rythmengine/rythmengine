@@ -2,6 +2,7 @@ package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.cache.ICacheService;
 import com.greenlaw110.rythm.cache.NoCacheService;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
@@ -38,83 +39,121 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A Rythm Template Engine
+ * A Rythm Template Engine is the entry to the Rythm templating system. It provides a set of
+ * APIs to render template. Each JVM allows multiple <code>RythmEngine</code> instance, with each
+ * one represent a set of configurations.
+ * 
+ * <p>The {@link Rythm} facade contains a default <code>RythmEngine</code> instance to make it
+ * easy to use for most cases</p>
  */
 public class RythmEngine {
 
+    /**
+     * Rythm Engine Version. Used along with 
+     * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#ENGINE_PLUGIN_VERSION plugin version} to
+     * check if the cached template bytecode need to be refreshed or not
+     * 
+     * TODO: use version marker and be substitute when build 
+     */
     public static final String version = "1.0-b2";
-    public static String pluginVersion = "";
     
     private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
+
+    /**
+     * Set the engine instance to a {@link ThreadLocal} variable, thus it is easy to 
+     * {@link #get() get} the current 
+     * <code>RythmEngine</code> dominating the rendering process.
+     * 
+     * <p><b>Note</b>, this method is NOT an API to be called by user application</p>
+     * 
+     * @param engine
+     */
     public static void set(RythmEngine engine) {
         _engine.set(engine);
     }
+
+    /**
+     * Get the current engine instance from a {@link ThreadLocal} variable which is
+     * {@link #set(RythmEngine) set} previously.
+     * 
+     * <p><b>Note</b>, this method is NOT an API to be called by user application</p>
+     * 
+     * @return
+     */
     public static RythmEngine get() {
         return _engine.get();
     }
     
-    private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return false;
-        }
-    };
+
+    /**
+     * Check if the current rendering is dominated by a {@link Sandbox}
+     * 
+     * <p><b>Note</b>, this method is NOT an API to be called by user application</p>
+     * 
+     * @return true if the current thread is running in Sandbox mode
+     */
     public static boolean insideSandbox() {
-        return sandboxMode.get();
+        return Sandbox.sandboxMode();
     }
-    void enterSandbox() {
-        sandboxMode.set(true);
-    }
-    void leaveSandbox() {
-        sandboxMode.set(false);
-    }
+
+    /**
+     * Create a {@link Sandbox} instance to render the template
+     * 
+     * @return
+     */
     public Sandbox sandbox() {
         return new Sandbox(this, secureExecutor);
     }
+    
+    private boolean precompiling = false;
 
-    Rythm.ReloadMethod reloadMethod = Rythm.ReloadMethod.RESTART;
-
-    public boolean reloadByRestart() {
-        return isDevMode() && reloadMethod == Rythm.ReloadMethod.RESTART;
+    /**
+     * Notify the engine that external precompile of the template is started
+     * 
+     * <p><b>Note</b>, this method is usually to be called by third party plugin based on 
+     * rythm engine, and should NOT be called by user application.</p>
+     */
+    public void startPrecompile() {
+        precompiling = true;
     }
 
-    public boolean reloadByIncClassVersion() {
-        return isDevMode() && (reloadMethod == Rythm.ReloadMethod.V_VERSION);
+    /**
+     * Notify the engine that external precompile of the template is stopped
+     * 
+     * <p><b>Note</b>, this method is usually to be called by third party plugin based on 
+     * rythm engine, and should NOT be called by user application.</p>
+     */
+    public void stopPrecompile() {
+        precompiling = false;
     }
 
-    public boolean loadPreCompiled() {
-        return loadPreCompiled;
+    /**
+     * Return true if precompile is in progress.
+     * 
+     * <p><b>Note</b>, this method is not an API for user application</p>
+     * 
+     * @return
+     */
+    public boolean isPrecompiling() {
+        return precompiling;
     }
 
-    public boolean classCacheEnabled() {
-        return preCompiling || loadPreCompiled() || (!noFileWrite && reloadByRestart());
-    }
-
-    public static String versionSignature() {
-        return version + "-" + pluginVersion;
+    public String versionSignature() {
+        return version + "-" + conf.pluginVersion();
     }
 
     private final ILogger logger = Logger.get(RythmEngine.class);
-    public Rythm.Mode mode;
+    public Rythm.Mode mode = null;
+    public RythmConfiguration conf = null;
     public final RythmProperties configuration = new RythmProperties();
     public final TemplateResourceManager resourceManager = new TemplateResourceManager(this);
     public final TemplateClassManager classes = new TemplateClassManager(this);
     public TemplateClassLoader classLoader = null;
     public TemplateClassCache classCache = new TemplateClassCache(this);
-    public IByteCodeHelper byteCodeHelper = null;
-    public IHotswapAgent hotswapAgent = null;
-    public boolean logRenderTime = false;
     private SecurityManager sm = null;
     SandboxExecutingService secureExecutor = null;
     public Set<String> restrictedClasses = new HashSet<String>();
-    private boolean loadPreCompiled = false;
     public boolean preCompiling = false;
-    public boolean playHost = false;
-    public boolean recordJavaSourceOnError = false;
-    public boolean recordTemplateSourceOnError = true;
-    public boolean recordJavaSourceOnRuntimeError = false;
-    public boolean recordTemplateSourceOnRuntimeError = true;
-    public boolean logSourceInfoOnRuntimeError = false;
     public IImplicitRenderArgProvider implicitRenderArgProvider = null;
     private boolean enableTypeInference = false;
     public boolean enableTypeInference() {
@@ -238,7 +277,7 @@ public class RythmEngine {
 //        this.tagHome = tagHome;
 //    }
 
-    public RythmEngine(Properties userConfiguration) {
+    public RythmEngine(Map<String, ?> userConfiguration) {
         init(userConfiguration);
     }
 
@@ -262,11 +301,6 @@ public class RythmEngine {
         configuration.put(key, val);
     }
 
-    private void loadDefConf() {
-        setConf("rythm.mode", Rythm.Mode.prod);
-        setConf("rythm.loader", "file");
-    }
-
     private File defaultRoot() {
         try {
             return new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
@@ -279,9 +313,12 @@ public class RythmEngine {
     public void init() {
         init(null);
     }
+    
+    private Map loadConfFromDisk() {
+        return null; //TODO
+    }
 
-    public void init(Properties conf) {
-        loadDefConf();
+    public void init(Map<String, ?> conf) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (null == cl) cl = Rythm.class.getClassLoader();
         URL url = cl.getResource("rythm.conf");
@@ -303,8 +340,9 @@ public class RythmEngine {
         
         Properties sysProps = System.getProperties();
         configuration.putAll(sysProps);
-
         if (null != conf) configuration.putAll(conf);
+        this.conf = new RythmConfiguration(conf);
+
 
         boolean disableLogging = configuration.getAsBoolean("rythm.logger.disabled", false);
         if (disableLogging) {
@@ -315,12 +353,6 @@ public class RythmEngine {
         }
 
         mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
-        pluginVersion = configuration.getProperty("rythm.pluginVersion", "");
-        recordJavaSourceOnError = configuration.getAsBoolean("rythm.recordJavaSourceOnError", true);
-        recordTemplateSourceOnError = configuration.getAsBoolean("rythm.recordTemplateSourceOnError", true);
-        recordJavaSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordJavaSourceOnRuntimeError", true);
-        recordTemplateSourceOnRuntimeError = configuration.getAsBoolean("rythm.recordTemplateSourceOnRuntimeError", true);
-        logSourceInfoOnRuntimeError = configuration.getAsBoolean("rythm.logSourceInfoOnRuntimeError", false);
         refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         boolean disableBuiltInJavaExtensions = configuration.getAsBoolean("rythm.disableBuiltInJavaExtensions", false);
@@ -336,13 +368,7 @@ public class RythmEngine {
         // if templateHome set to null then it assumes use ClasspathTemplateResource by default
         templateHome = configuration.getAsFile("rythm.root", defaultRoot());
         compactMode = configuration.getAsBoolean("rythm.compactOutput", isProdMode());
-        reloadMethod = configuration.getAsReloadMethod("rythm.reloadMethod", Rythm.ReloadMethod.RESTART);
-        loadPreCompiled = configuration.getAsBoolean("rythm.loadPreCompiled", false);
         preCompiledHome = configuration.getAsFile("rythm.preCompiled.root", null);
-        logRenderTime = configuration.getAsBoolean("rythm.logRenderTime", false);
-        if (Rythm.ReloadMethod.V_VERSION == reloadMethod) {
-            logger.warn("Rythm reload method set to increment class version, this will cause template class cache disabled.");
-        }
         
         boolean disableBuiltInTemplateLang = configuration.getAsBoolean("rythm.disableBuildInTemplateLang", false);
         if (!disableBuiltInTemplateLang){
@@ -373,9 +399,6 @@ public class RythmEngine {
         });
         //defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
         implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
-        byteCodeHelper = configuration.getAs("rythm.classLoader.byteCodeHelper", null, IByteCodeHelper.class);
-        hotswapAgent = configuration.getAs("rythm.classLoader.hotswapAgent", null, IHotswapAgent.class);
-        playHost = configuration.getAsBoolean("rythm.playHost", false);
 
         Object o = configuration.get("rythm.resource.loader");
         if (o instanceof ITemplateResourceLoader) {
@@ -908,10 +931,12 @@ public class RythmEngine {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
             String cn = tag.getClass().getName();
+            /*
             if (reloadByIncClassVersion() && -1 == cn.indexOf("$")) {
                 int pos = cn.lastIndexOf("v");
                 if (-1 < pos) cn = cn.substring(0, pos);
             }
+            */
             TemplateClass tc0 = classes.getByClassName(cn);
             if (null == tc0) {
                 System.out.println(tag.getClass());

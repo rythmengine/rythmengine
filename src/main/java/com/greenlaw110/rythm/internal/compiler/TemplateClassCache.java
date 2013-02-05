@@ -16,10 +16,24 @@ import java.util.HashSet;
 public class TemplateClassCache {
     private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
-    private RythmEngine engine = null;
+    private final RythmEngine engine;
 
     public TemplateClassCache(RythmEngine engine) {
+        if (null == engine) throw new NullPointerException();
         this.engine = engine;
+    }
+    
+    /**
+     * is class cache enabled on the {@link #engine} instance 
+     */
+    private boolean enabled() {
+        if (engine.mode.isDev() || engine.conf.loadPrecompiled()) {
+            return true;
+        }
+        if (engine.isPrecompiling() && !engine.conf.disableFileWrite()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -44,8 +58,7 @@ public class TemplateClassCache {
      * @param tc
      */
     public void loadTemplateClass(TemplateClass tc) {
-        if (!engine.classCacheEnabled()) {
-            // cannot handle the v version scheme
+        if (!enabled()) {
             return;
         }
         try {
@@ -67,7 +80,7 @@ public class TemplateClassCache {
             }
             
             //check hash only in non precompiled mode
-            if(!engine.loadPreCompiled()){
+            if(!engine.conf.loadPrecompiled()){
 	            String curHash = hash(tc);
 	            if (!curHash.equals(hash.toString())) {
 	                if (logger.isTraceEnabled()) {
@@ -150,7 +163,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClassSource(TemplateClass tc) {
-        if (!engine.classCacheEnabled() || engine.noFileWrite) {
+        if (!enabled()) {
             return;
         }
         try {
@@ -164,7 +177,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClass(TemplateClass tc) {
-        if (!engine.classCacheEnabled() || engine.noFileWrite) {
+        if (!enabled()) {
             return;
         }
         String hash = hash(tc);
@@ -260,7 +273,7 @@ public class TemplateClassCache {
             }
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((RythmEngine.versionSignature() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
+            messageDigest.update((engine.versionSignature() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {
@@ -281,7 +294,7 @@ public class TemplateClassCache {
     }
 
     private File getCacheFile(String fileName) {
-        if (engine.loadPreCompiled() || (engine.preCompiling && (null != engine.preCompiledHome() && engine.preCompiledHome().exists()))) {
+        if (engine.conf.loadPrecompiled() || (engine.preCompiling && (null != engine.preCompiledHome() && engine.preCompiledHome().exists()))) {
             return new File(engine.preCompiledHome(), fileName);
         } else {
             File f = new File(engine.tmpDir, fileName);

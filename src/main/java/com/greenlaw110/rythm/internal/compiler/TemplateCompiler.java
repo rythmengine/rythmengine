@@ -172,7 +172,7 @@ public class TemplateCompiler {
 
             private NameEnvironmentAnswer findStandType(final String name) throws ClassFormatException {
                 RythmEngine engine = engine();
-                IByteCodeHelper helper = engine.byteCodeHelper;
+                IByteCodeHelper helper = engine.conf.byteCodeHelper();
                 byte[] bytes = engine.classLoader.getClassDefinition(name);
                 if (null == bytes && null != helper) {
                     bytes = helper.findByteCode(name);

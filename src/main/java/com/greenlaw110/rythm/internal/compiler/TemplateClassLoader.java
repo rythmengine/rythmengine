@@ -398,7 +398,7 @@ public class TemplateClassLoader extends ClassLoader {
             engine.classes.remove(tc);
             currentState = new TemplateClassloaderState();
         } else {
-            if (engine.reloadByRestart()) throw new ClassReloadException("Need reload");
+            throw new ClassReloadException("Need reload");
         }
     }
 
@@ -431,7 +431,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
         if (newDefinitions.size() > 0) {
-            IHotswapAgent agent = engine.hotswapAgent;
+            IHotswapAgent agent = engine.conf.hotswapAgent();
             if (null != agent) {
                 try {
                     agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
@@ -467,7 +467,7 @@ public class TemplateClassLoader extends ClassLoader {
     int pathHash = 0;
 
     int computePathHash() {
-        return engine.noFileWrite ? 0 : classStateHashCreator.computePathHash(engine.tmpDir);
+        return engine.mode.isProd() ? 0 : classStateHashCreator.computePathHash(engine.tmpDir);
     }
 
 }

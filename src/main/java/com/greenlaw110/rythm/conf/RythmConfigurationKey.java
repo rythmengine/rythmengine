@@ -7,10 +7,12 @@ import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.IDurationParser;
+import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,19 +26,9 @@ import java.util.Map;
  * <code>built_in.transformer.disabled</code></li>
  * <li>When a key is ended with <code>.impl</code>, then you can either put an instance into
  * the configuration map or a string of the class name</li>
- * 
  * </ul>
  */
 public enum RythmConfigurationKey {
-
-    /**
-     * Enable built-in {@link com.greenlaw110.rythm.spi.Transformer transformer} implementations
-     * <p/>
-     * <p>Default value: <code>true</code></p>
-     *
-     * @see #FEATURE_TRANSFORMER_ENABLED
-     */
-    BUILT_IN_TRANSFORMER_ENABLED("built_in.transformer.enabled", true),
 
     /**
      * Enable built-in {@link com.greenlaw110.rythm.ILang template language} implementations
@@ -44,6 +36,15 @@ public enum RythmConfigurationKey {
      * <p>Default value: <code>true</code></p>
      */
     BUILT_IN_TEMPLATE_LANG_ENABLED("built_in.template_lang.enabled", true),
+
+    /**
+    * Enable built-in {@link com.greenlaw110.rythm.spi.Transformer transformer} implementations
+    * <p/>
+    * <p>Default value: <code>true</code></p>
+    *
+    * @see #FEATURE_TRANSFORMER_ENABLED
+    */
+    BUILT_IN_TRANSFORMER_ENABLED("built_in.transformer.enabled", true),
 
     /**
      * Enable disable {@link com.greenlaw110.rythm.cache.ICacheService cache service}. When this
@@ -198,12 +199,28 @@ public enum RythmConfigurationKey {
     ENGINE_LOAD_PRECOMPILED_ENABLED("engine.load_precompiled.enabled", false),
 
     /**
+     * Enable/disable write to file system. This option is used by rythm to check if
+     * it should write template class bytecode cache to disk or not. In some cases 
+     * you want to disable file write due the limit of the runtime environment, e.g.
+     * on GAE platform
+     * 
+     * <p>Default value: <code>true</code></p>
+     */
+    ENGINE_FILE_WRITE_ENABLED("engine.file_write.enabled", true),
+
+    /**
      * A special flag used when Rythm is working with rythm-plugin for Play!Framework. Usually
      * you should not touch this setting.
      * <p/>
      * <p>Default value: <code>false</code></p>
      */
-    ENGINE_PLAYFRAMEWORK("engine.playframework", false),
+    ENGINE_PLAYFRAMEWORK("engine.playframework.enabled", false),
+
+    /**
+     * Set by plugin of certain framework, e.g. play!framework. Used to determine whether it needs
+     * to refresh the cached template class bytecode. Default value: <code>""</code> (empty string)
+     */
+    ENGINE_PLUGIN_VERSION("engine.plugin.version", ""),
 
     /**
      * Enable disable {@link com.greenlaw110.rythm.spi.Transformer transformer}
@@ -336,6 +353,11 @@ public enum RythmConfigurationKey {
     },
 
     /**
+     * Enable disable log in Rythm. Default value: true
+     */
+    LOG_ENABLED("log.enabled", true),
+
+    /**
      * Configure the {@link com.greenlaw110.rythm.logger.ILoggerFactory logger factory} implementation.
      * When this configuration is not set, then a {@link com.greenlaw110.rythm.logger.JDKLogger.Factory} instance
      * is used to create the logger
@@ -359,7 +381,7 @@ public enum RythmConfigurationKey {
     LOG_SOURCE_TEMPLATE_ENABLED("log.source.template.enabled", true),
 
     /**
-     * Log time spent executing a template. The level used to log the time benchmark
+     * Log time spent executing a template. The level used to log the time logRenderTime
      * is {@link com.greenlaw110.rythm.logger.ILogger#debug(String, Object...)}
      * <p/>
      * <p>Default value: <code>false</code></p>
@@ -584,6 +606,17 @@ public enum RythmConfigurationKey {
         } else {
             return (T) o;
         }
+    }
+    
+    private static Map<String, RythmConfigurationKey> lookup = new HashMap<String, RythmConfigurationKey>(50); static {
+        for (RythmConfigurationKey k: values()) {
+            lookup.put(k.getKey().toLowerCase(), k);
+        }
+    }
+
+    public static RythmConfigurationKey valueOfIgnoreCase(String s) {
+        if (S.empty(s)) throw new IllegalArgumentException();
+        return lookup.get(s.trim());
     }
 
     public static void main(String[] args) {

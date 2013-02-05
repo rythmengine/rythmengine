@@ -421,7 +421,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     private boolean _logTime() {
-        return _logTime || engine.logRenderTime;
+        return _logTime || engine.conf.logRenderTime();
     }
 
     public TemplateClass getTemplateClass(boolean useCaller) {
@@ -543,9 +543,6 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                                 }
                             }
                             RythmException re = new RythmException(engine, e, tc, se.getLineNumber(), -1, msg);
-                            if (engine.logSourceInfoOnRuntimeError) {
-                                Logger.error("Error executing template: %2$s. \n%1$s\n%2$s", re.templateSourceInfo(), re.javaSourceInfo(), msg);
-                            }
                             int lineNo = re.templateLineNumber;
                             String key = tc.getKey().toString();
                             int i = key.indexOf('\n');

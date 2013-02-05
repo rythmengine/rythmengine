@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  * Define the data structure hold template class/template src/generated java src
  */
 public class TemplateClass {
-    private static AtomicLong nextVersion = new AtomicLong();
     private static final ILogger logger = Logger.get(TemplateClass.class);
 
     /**
@@ -51,7 +50,6 @@ public class TemplateClass {
         //tc.enhancedByteCode = byteCode;
         tc.inner = true;
         tc.root = parent.root();
-        tc.version = parent.version();
         return tc;
     }
 
@@ -75,20 +73,7 @@ public class TemplateClass {
     }
 
     public String name() {
-        //return isInner() ? name : name + "v" + version;
-        RythmEngine e = engine();
-        String n = (!e.reloadByIncClassVersion() || isInner()) ? name : name + "v" + version;
-        return n;
-    }
-
-    private long version;
-
-    public long version() {
-        return root().version;
-    }
-
-    public void setVersion(int v) {
-        version = (long) v;
+        return name;
     }
 
     public TemplateClass extendedTemplateClass;
@@ -405,15 +390,6 @@ public class TemplateClass {
         }
     }
 
-    private void addVersion() {
-        RythmEngine e = engine();
-        if (!e.reloadByIncClassVersion()) return;
-        TemplateClassManager tcc = engine().classes;
-        tcc.clsNameIdx.remove(name());
-        //List<TemplateClass> allEmbedded = tcc.getEmbeddedClasses(name0());
-        version = nextVersion.getAndIncrement();
-        tcc.clsNameIdx.put(name(), this);
-    }
 
     public boolean refresh() {
         return refresh(false);
@@ -421,7 +397,6 @@ public class TemplateClass {
 
     public void buildSourceCode(String includingClassName) {
         long start = System.currentTimeMillis();
-        addVersion();
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
@@ -437,7 +412,6 @@ public class TemplateClass {
 
     public void buildSourceCode() {
         long start = System.currentTimeMillis();
-        addVersion();
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
@@ -476,7 +450,6 @@ public class TemplateClass {
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
                 //name = templateResource.getSuggestedClassName();
-                if (e.reloadByIncClassVersion()) version = nextVersion.getAndIncrement();
                 engine().classes.add(this);
             }
 
@@ -531,7 +504,7 @@ public class TemplateClass {
                 }
             }
 
-            if (extendedTemplateChanged && engine().reloadByRestart() && !forceRefresh) {
+            if (extendedTemplateChanged && !forceRefresh) {
                 reset();
                 compiled = false;
                 engine().restart(new ClassReloadException("extended class changed"));
@@ -589,7 +562,7 @@ public class TemplateClass {
         embeddedClasses.clear();
         engine().classCache.deleteCache(this);
         engine().invalidate(this);
-        if (engine().reloadByIncClassVersion()) javaClass = null;
+        javaClass = null;
     }
 
     /**

@@ -167,7 +167,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     }
 
     private void appendIn(Class<?> c) {
-        if (engine.playHost) {
+        if (engine.conf.playFramework()) {
             appendMethodsIn(c);
             appendFieldsIn(c);
         } else {

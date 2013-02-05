@@ -58,27 +58,6 @@ public class Rythm {
         }
     }
 
-    /**
-     * A Type used to indicate the template reload approach used by the engine.
-     * 
-     * <p>Note this type is deprecated as {@link #V_VERSION is not used anymore}</p>
-     */
-    @Deprecated
-    public static enum ReloadMethod {
-        /**
-         * Reload template class by attaching a version number to the new template class
-         * name
-         */
-        V_VERSION,
-
-        /**
-         * Reload template class by restart engine and drop existing <code>ClassLoader</code>. The
-         * new template class will be loaded by an new @{@link com.greenlaw110.rythm.internal.compiler.TemplateClassLoader}
-         * instance
-         */
-        RESTART
-    }
-
     // the default engine instance
     static RythmEngine engine = null;
 

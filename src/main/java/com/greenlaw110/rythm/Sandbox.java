@@ -9,6 +9,19 @@ import java.io.File;
  * A wrapper of Rythm engine and make sure the rendering is happen in Sandbox mode
  */
 public class Sandbox {
+    
+    private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+
+    static boolean sandboxMode() {
+        return sandboxMode.get();
+    }
+
+
     RythmEngine engine;
     SandboxExecutingService secureExecutor = null;
     public Sandbox(RythmEngine engine, SandboxExecutingService executor) {
@@ -31,13 +44,12 @@ public class Sandbox {
     }
 
     public String render(File file, Object... args) {
-        RythmEngine eng = engine();
-        eng.enterSandbox();
+        sandboxMode.set(true);
         try {
             ITemplate t = engine().getTemplate(file, args);
             return secureExecutor.execute(t);
         } finally {
-            eng.leaveSandbox();
+            sandboxMode.set(false);
         }
     }
     
