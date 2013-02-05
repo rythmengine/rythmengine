@@ -6,11 +6,20 @@ import java.util.Collection;
  * Evaluate an object and return boolean value by convention
  */
 public class Eval {
+    public static boolean eval(byte b) {
+        return b != 0;
+    }
+    public static boolean eval(char c) {
+        return c != 0;
+    }
     public static boolean eval(boolean b) {
         return b;
     }
     public static boolean eval(int n) {
         return n != 0;
+    }
+    public static boolean eval(long l) {
+        return l != 0L;
     }
     public static boolean eval(float f) {
         return Math.abs(f) > 0.00000001;
