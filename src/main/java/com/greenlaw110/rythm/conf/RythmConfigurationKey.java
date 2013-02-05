@@ -15,18 +15,16 @@ import java.util.Map;
 
 /**
  * {@link com.greenlaw110.rythm.RythmEngine} configuration keys. General rules:
- * <p/>
+ * 
  * <ul>
- * <p/>
  * <li>When a key is ended with <code>.enabled</code>, then you should be able to set
  * the setting without <code>.enabled</code> or replace it with <code>.disabled</code>
  * but the value will be inverted. For example, <code>built_in.transformer.enabled</code>
  * is equal to <code>built_in.transformer</code> and invert to
  * <code>built_in.transformer.disabled</code></li>
- * <p/>
  * <li>When a key is ended with <code>.impl</code>, then you can either put an instance into
  * the configuration map or a string of the class name</li>
- * <p/>
+ * 
  * </ul>
  */
 public enum RythmConfigurationKey {
