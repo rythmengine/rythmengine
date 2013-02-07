@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm;
+package com.greenlaw110.rythm.extension;
 
 import com.greenlaw110.rythm.template.ITemplate;
 
@@ -7,7 +7,10 @@ import java.util.*;
 import static com.greenlaw110.rythm.internal.compiler.TemplateClass.CN_SUFFIX;
 
 /**
- * Specify a language (e.g. JavaScript) or a format (e.g. csv)
+ * Specify a language (e.g. JavaScript) or a format (e.g. csv). The information could be used by
+ * Rythm to support {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_NATURAL_TEMPLATE_ENABLED
+ * natural template feature} and 
+ * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED smart escape feature}
  */
 public interface ILang {
 

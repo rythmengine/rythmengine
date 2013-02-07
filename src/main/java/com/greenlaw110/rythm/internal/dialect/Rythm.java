@@ -1,7 +1,7 @@
 package com.greenlaw110.rythm.internal.dialect;
 
 import com.greenlaw110.rythm.internal.parser.build_in.*;
-import com.greenlaw110.rythm.spi.IDialect;
+import com.greenlaw110.rythm.internal.IDialect;
 
 public class Rythm extends DialectBase {
 

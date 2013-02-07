@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -35,31 +36,18 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     public FileTemplateResource(String path, RythmEngine engine) {
         super(engine);
-        File home = engine().templateHome;
+        File home = engine().conf().templateHome();
         //File tagHome = engine().tagHome;
         File f = null;
         if (null != home) {
             f = new File(home, path);
         } else {
         }
-//        if (null == f || !f.canRead()) {
-//            // try tag home
-//            if (null != tagHome) f = new File(tagHome, path);
-//        }
         if (null == f || !f.canRead()) {
             f = new File(path);
         }
         file = f;
         key = path;
-
-//        if (null != tagHome && isValid()) {
-//            // set tag name if this file is found under tag home
-//            String tagPath = tagHome.getAbsolutePath();
-//            String filePath = f.getAbsolutePath();
-//            if (filePath.startsWith(tagPath)) {
-//                this.tagName = retrieveTagName(tagHome, f);
-//            }
-//        }
     }
 
     public FileTemplateResource(File templateFile) {
@@ -144,9 +132,10 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public static String getFullTagName(TemplateClass tc, RythmEngine engine) {
         if (null == engine) engine = Rythm.engine();
         String key = tc.getKey().toString();
+        File home = engine.conf().templateHome();
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
-        if (null != engine.templateHome && key.startsWith(engine.templateHome.getPath())) {
-            key = key.replace(engine.templateHome.getPath(), "");
+        if (null != home && key.startsWith(home.getPath())) {
+            key = key.replace(home.getPath(), "");
         }
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
         int pos = key.lastIndexOf(".");
@@ -169,14 +158,15 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ""
         };
         File tagFile;
+        File home = engine.conf().templateHome();
         for (String suffix : suffixes) {
             String name = tagName + suffix;
 
-            tagFile = new File(engine.templateHome, name);
+            tagFile = new File(home, name);
             ITemplateResource tr = tagFile.canRead() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
             if (tr.isValid()) {
                 try {
-                    TemplateClass tc = engine.classes.getByTemplate(tr.getKey());
+                    TemplateClass tc = engine.classes().getByTemplate(tr.getKey());
                     if (null == tc) {
                         tc = new TemplateClass(tr, engine);
                     }

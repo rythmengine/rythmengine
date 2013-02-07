@@ -8,9 +8,10 @@ import java.io.Serializable;
 public interface ICacheService {
     /**
      * Store an item into the cache service by key and set ttl value
+     *
      * @param key
      * @param value
-     * @param ttl time to live of the cached item. Time unit is second.
+     * @param ttl   time to live of the cached item. Time unit is second.
      *              If set to negative number, then it will never expire.
      *              If set to zero then the default ttl value will be used
      */
@@ -18,6 +19,7 @@ public interface ICacheService {
 
     /**
      * Store an item into the cache by key and use default ttl
+     *
      * @param key
      * @param value
      */
@@ -25,6 +27,7 @@ public interface ICacheService {
 
     /**
      * Remove an item from cache service by key
+     *
      * @param key
      * @return the value associated with the key
      */
@@ -32,6 +35,7 @@ public interface ICacheService {
 
     /**
      * Return an item from the cache service by key
+     *
      * @param key
      * @return the value associated with the key
      */
@@ -39,6 +43,7 @@ public interface ICacheService {
 
     /**
      * Check if the cache contains key
+     *
      * @param key
      * @return
      */
@@ -51,6 +56,7 @@ public interface ICacheService {
 
     /**
      * Set default ttl value which will be used if user pass 0 as ttl or not specified ttl
+     *
      * @param ttl
      */
     void setDefaultTTL(int ttl);

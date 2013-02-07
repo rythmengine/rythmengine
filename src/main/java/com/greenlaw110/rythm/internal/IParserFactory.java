@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
 
 public interface IParserFactory {

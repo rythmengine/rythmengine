@@ -3,18 +3,15 @@ package com.greenlaw110.rythm.internal.parser;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.TemplateParser;
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
-import java.util.logging.LoggingMXBean;
 import java.util.regex.Pattern;
 
 public abstract class ParserBase implements IParser {

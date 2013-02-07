@@ -27,7 +27,6 @@ public class SimpleCacheService implements ICacheService {
     }
 
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory());
-    private boolean started = false;
 
     private SimpleCacheService() {
         scheduler.scheduleAtFixedRate(new Runnable(){

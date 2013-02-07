@@ -26,7 +26,6 @@ public class ToStringTest {
     }
 
     public static void main(String[] args) {
-        System.out.println(Rythm.engine().tmpDir);
         ToStringTest tst = new ToStringTest("bar", 5);
         String s = Rythm.toString(tst);
         System.out.println(s);

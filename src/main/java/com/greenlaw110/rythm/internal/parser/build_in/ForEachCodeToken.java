@@ -4,7 +4,7 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.spi.IContext;
+import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
 

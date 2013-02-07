@@ -1,13 +1,16 @@
-package com.greenlaw110.rythm;
+package com.greenlaw110.rythm.extension;
 
 /**
- * A <code>IByteCodeHelper</code> could be plugged into {@link RythmEngine} 
+ * A <code>IByteCodeHelper</code> could be plugged into {@link com.greenlaw110.rythm.RythmEngine} 
  * in memory compilation system to provide extra way to locate class byte
  * code.
  * 
  * <p>A usage example of <code>IByteCodeHelper</code> could be find in
  * Play!framework's Rythm plugin, which locates Play!Framework's 
  * application classes when compiling template classes</p>
+ * 
+ * <p>One {@link com.greenlaw110.rythm.RythmEngine engine instance} can have zero
+ * or one <code>IByteCodeHelper</code></p>
  */
 public interface IByteCodeHelper {
     /**

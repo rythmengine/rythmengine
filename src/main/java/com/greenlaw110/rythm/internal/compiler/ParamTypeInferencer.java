@@ -60,7 +60,7 @@ public class ParamTypeInferencer {
     }
     
     public static void registerParams(RythmEngine engine, Object... args) {
-        if (!engine.enableTypeInference()) return;
+        if (!engine.conf().enableTypeInference()) return;
         
         if (args.length == 0) return;
         

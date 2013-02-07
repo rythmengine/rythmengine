@@ -4,15 +4,11 @@ import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
-
-import java.util.Arrays;
-import java.util.regex.Matcher;
 
 /**
  * Parse @section mysection

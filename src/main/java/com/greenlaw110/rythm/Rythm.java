@@ -1,14 +1,14 @@
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.spi.ExtensionManager;
-import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.internal.ExtensionManager;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
-import com.greenlaw110.rythm.utils.IRythmListener;
+import com.greenlaw110.rythm.extension.IRythmListener;
 
 import java.io.File;
 import java.util.*;
@@ -62,11 +62,6 @@ public class Rythm {
     static RythmEngine engine = null;
 
     /**
-     * Version of the default engine
-     */
-    public static final String version = engine.version;
-
-    /**
      * Initialize default engine instance with specified properties
      * 
      * <p>Note this method can not be called more than once during a JVM lifecycle.
@@ -80,7 +75,7 @@ public class Rythm {
      * 
      * @param conf the configuration properties
      */
-    public static void init(Properties conf) {
+    public static void init(Map<String, ?> conf) {
         if (null != engine) throw new IllegalStateException("Rythm is already initialized");
         engine = new RythmEngine(conf);
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
@@ -94,7 +89,7 @@ public class Rythm {
     /**
      * Initialize default engine instance with default configuration.
      * 
-     * <p>Just like {@link #init(java.util.Properties)} method, this method cannot be called
+     * <p>Just like {@link #init(java.util.Map)} method, this method cannot be called
      * more than once</p>
      * 
      * <p>Note this default engine instance will be implicitly initialized with  
@@ -102,7 +97,7 @@ public class Rythm {
      * methods are called before calling any <code>init</code> methods</p>
      */
     public static void init() {
-        init((Properties)null);
+        init((Map)null);
     }
 
     /**
@@ -170,7 +165,7 @@ public class Rythm {
     }
 
     /**
-     * @see RythmEngine#registerListener(com.greenlaw110.rythm.utils.IRythmListener) 
+     * @see RythmEngine#registerListener(com.greenlaw110.rythm.extension.IRythmListener) 
      * 
      * @param listener
      */
@@ -179,7 +174,7 @@ public class Rythm {
     }
 
     /**
-     * @see RythmEngine#unregisterListener(com.greenlaw110.rythm.utils.IRythmListener) 
+     * @see RythmEngine#unregisterListener(com.greenlaw110.rythm.extension.IRythmListener) 
      * 
      * @param listener
      */
@@ -195,18 +190,18 @@ public class Rythm {
     }
 
     /**
-     * @see RythmEngine#registerTemplateClassEnhancer(com.greenlaw110.rythm.spi.ITemplateClassEnhancer) 
+     * @see RythmEngine#registerTemplateClassEnhancer(com.greenlaw110.rythm.extension.IByteCodeEnhancer) 
      * @param enhancer
      */
-    public static void registerTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
+    public static void registerTemplateClassEnhancer(IByteCodeEnhancer enhancer) {
         engine().registerTemplateClassEnhancer(enhancer);
     }
 
     /**
-     * @see RythmEngine#unregisterTemplateClassEnhancer(com.greenlaw110.rythm.spi.ITemplateClassEnhancer) 
+     * @see RythmEngine#unregisterTemplateClassEnhancer(com.greenlaw110.rythm.extension.IByteCodeEnhancer) 
      * @param enhancer
      */
-    public static void unregisterTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
+    public static void unregisterTemplateClassEnhancer(IByteCodeEnhancer enhancer) {
         engine().unregisterTemplateClassEnhancer(enhancer);
     }
 

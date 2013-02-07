@@ -1,10 +1,13 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.Sandbox;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ISourceCodeEnhancer;
 import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
@@ -16,13 +19,11 @@ import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
-import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
-import com.greenlaw110.rythm.utils.*;
+import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.*;
@@ -33,7 +34,7 @@ import java.util.regex.Pattern;
 public class CodeBuilder extends TextBuilder {
 
     protected ILogger logger = Logger.get(CodeBuilder.class);
-    
+
     private int renderArgCounter = 0;
 
     public static class RenderArgDeclaration implements Comparable<RenderArgDeclaration> {
@@ -42,11 +43,11 @@ public class CodeBuilder extends TextBuilder {
         public String type;
         public String defVal;
         public int lineNo;
-        
+
         public RenderArgDeclaration(int lineNo, String type, String name) {
             this(-1, lineNo, type, name);
         }
-        
+
         public RenderArgDeclaration(int lineNo, String type, String name, String defVal) {
             this(-1, lineNo, type, name, defVal);
         }
@@ -98,10 +99,17 @@ public class CodeBuilder extends TextBuilder {
         public int compareTo(RenderArgDeclaration o) {
             return no - o.no;
         }
-        
+
     }
 
-    public RythmEngine engine;
+    private RythmEngine engine;
+
+    public RythmEngine engine() {
+        return engine;
+    }
+
+    private RythmConfiguration conf;
+
     private boolean isNotRythmTemplate = false;
     public ILang templateDefLang;
 
@@ -162,7 +170,8 @@ public class CodeBuilder extends TextBuilder {
         return parser.getDialect() instanceof SimpleRythm;
     }
 
-    private boolean basicTemplate() {
+    // public because event handler needs this method
+    public boolean basicTemplate() {
         return parser.getDialect() instanceof BasicRythm;
     }
 
@@ -179,11 +188,12 @@ public class CodeBuilder extends TextBuilder {
             pName = className.substring(0, i);
         }
         this.engine = null == engine ? Rythm.engine() : engine;
+        this.conf = engine.conf();
         this.requiredDialect = requiredDialect;
         this.templateClass = templateClass;
         ILang lang = templateClass.templateLang;
         if (null == lang) {
-            lang = ILang.DefImpl.probeFileName(templateClass.name(), this.engine.getDefaultLang());
+            lang = ILang.DefImpl.probeFileName(templateClass.name(), this.engine.conf().defaultLang());
         }
         this.templateDefLang = lang;
         this.parser = new TemplateParser(this);
@@ -261,22 +271,16 @@ public class CodeBuilder extends TextBuilder {
         return null == includingCName ? cName : includingCName;
     }
 
-    private static Set<String> globalImports = new HashSet<String>();
+    private static ISourceCodeEnhancer importProvider = null;
 
-    public static void registerImports(String imports) {
-        globalImports.addAll(Arrays.asList(imports.split(",")));
-    }
-
-    private static IImportProvider importProvider = null;
-
-    public static void registerImportProvider(IImportProvider provider) {
+    public static void registerImportProvider(ISourceCodeEnhancer provider) {
         importProvider = provider;
     }
 
     private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
 
     public void addImport(String imprt, int lineNo) {
-        if (!globalImports.contains(imprt)) imports.add(imprt);
+        imports.add(imprt);
         if (imprt.endsWith(".*")) {
             imprt = imprt.substring(0, imprt.lastIndexOf(".*"));
             templateClass.importPaths.add(imprt);
@@ -401,7 +405,7 @@ public class CodeBuilder extends TextBuilder {
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
-            logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager.getFullTagName(extendedTemplateClass));
+            logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager().getFullTagName(extendedTemplateClass));
         } else {
             TemplateBase tb = (TemplateBase) engine.tags.get(fullName);
             TemplateClass tc = tb.getTemplateClass(false);
@@ -425,21 +429,21 @@ public class CodeBuilder extends TextBuilder {
             String me = templateClass.getKey().toString();
             int pos = me.lastIndexOf("/");
             if (-1 != pos) extended = me.substring(0, pos) + "/" + extended;
-            tc = engine.classes.getByTemplate(extended);
+            tc = engine.classes().getByTemplate(extended);
             if (null == tc) {
-                ITemplateResource resource = engine.resourceManager.getFileResource(extended);
+                ITemplateResource resource = engine.resourceManager().getFileResource(extended);
                 if (resource.isValid()) tc = new TemplateClass(resource, engine);
             }
         }
         if (null == tc && !extended.startsWith("/")) {
             // it's in class name style ?
             //if (!extended.endsWith(TemplateClass.CN_SUFFIX)) extended = extended + TemplateClass.CN_SUFFIX;
-            tc = engine.classes.getByClassName(extended);
+            tc = engine.classes().getByClassName(extended);
         }
         if (null == tc) {
-            tc = engine.classes.getByTemplate(origin);
+            tc = engine.classes().getByTemplate(origin);
             if (null == tc) {
-                ITemplateResource resource = engine.resourceManager.getFileResource(origin);
+                ITemplateResource resource = engine.resourceManager().getFileResource(origin);
                 if (resource.isValid()) tc = new TemplateClass(resource, engine);
             }
         }
@@ -537,9 +541,12 @@ public class CodeBuilder extends TextBuilder {
             start = System.currentTimeMillis();
         }
         try {
+            RythmEngine engine = engine();
+            RythmEvents.ON_PARSE.trigger(engine, this);
             parser.parse();
             invokeDirectives();
-            if (!basicTemplate()) addDefaultRenderArgs();
+            //if (!basicTemplate()) addDefaultRenderArgs();
+            RythmEvents.ON_BUILD_JAVA_SOURCE.trigger(engine, this);
             pPackage();
             pImports();
             pClassOpen();
@@ -549,10 +556,11 @@ public class CodeBuilder extends TextBuilder {
             if (!simpleTemplate()) pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
-            for (ITemplateClassEnhancer enhancer : engine.templateClassEnhancers) {
-                np(enhancer.sourceCode());
-            }
+//            for (IByteCodeEnhancer enhancer : engine.templateClassEnhancers) {
+//                np(enhancer.sourceCode());
+//            }
             pBuild();
+            RythmEvents.ON_CLOSING_JAVA_CLASS.trigger(engine, this);
             pClassClose();
             return this;
         } catch (NotRythmTemplateException e) {
@@ -574,23 +582,15 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private void addDefaultRenderArgs() {
-        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
-        if (null == p) return;
-        Map<String, ?> defArgs = p.getRenderArgDescriptions();
-        for (String name : defArgs.keySet()) {
-            Object o = defArgs.get(name);
-            String type = (o instanceof Class<?>) ? ((Class<?>) o).getName() : o.toString();
-            addRenderArgs(-1, type, name);
-        }
-    }
-
     protected void pPackage() {
         if (!S.isEmpty(pName)) p("package ").p(pName).pn(";");
     }
 
     private void pImport(String s, boolean sandbox) {
         if (S.isEmpty(s)) return;
+        if (s.startsWith("import ")) {
+            s = s.replaceFirst("import ", "");
+        }
         if (sandbox) {
             String s0 = Sandbox.hasAccessToRestrictedClasses(engine, s);
             if (null != s0) return;
@@ -607,21 +607,22 @@ public class CodeBuilder extends TextBuilder {
         for (String s : imports) {
             pImport(s, sandbox);
         }
-        for (String s : globalImports) {
-            pImport(s, sandbox);
-        }
-        if (null != importProvider) {
-            for (String s : importProvider.imports()) {
-                pImport(s, sandbox);
-            }
-        }
-
-        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
-        if (null != p) {
-            for (String s : p.getImplicitImportStatements()) {
-                pImport(s, sandbox);
-            }
-        }
+//        for (String s : globalImports) {
+//            pImport(s, sandbox);
+//        }
+// moved to event handler
+//        if (null != importProvider) {
+//            for (String s : importProvider.imports()) {
+//                pImport(s, sandbox);
+//            }
+//        }
+// replaced by importProvider
+//        IImplicitRenderArgProvider p = implicitRenderArgProvider;
+//        if (null != p) {
+//            for (String s : p.getImplicitImportStatements()) {
+//                pImport(s, sandbox);
+//            }
+//        }
         // common imports
         pn("import java.util.*;");
         if (!sandbox) pn("import java.io.*;");
@@ -634,7 +635,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pClassClose() {
         np("}").pn();
     }
-    
+
     private static String toNonGeneric(String type) {
         Regex regex = new Regex("(?@<>)", "");
         return regex.replaceAll(type);
@@ -643,7 +644,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pRenderArgs() {
         pn();
         // -- output private members
-        if (renderArgs.isEmpty() && engine.enableTypeInference()) {
+        if (renderArgs.isEmpty() && conf.enableTypeInference()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
             List<String> ls = new ArrayList<String>(tMap.keySet());
             Collections.sort(ls);
@@ -663,12 +664,12 @@ public class CodeBuilder extends TextBuilder {
             if (arg.lineNo > -1) p(" //line: ").pn(arg.lineNo);
             else pn();
         }
-        
+
         // -- output renderArgTypeMap method
         pn();
         ptn("protected Map<String, Class> renderArgTypeMap() {");
         p2tn("Map<String, Class> m = new HashMap<String, Class>();");
-        for (String argName: renderArgs.keySet()) {
+        for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
         }
@@ -693,8 +694,8 @@ public class CodeBuilder extends TextBuilder {
         List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
         Collections.sort(renderArgList);
 
-        IImplicitRenderArgProvider p = engine.implicitRenderArgProvider;
-        int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == p) ? 0 : p.getRenderArgDescriptions().size()));
+        ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
+        int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == ce) ? 0 : ce.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
             // -- output setRenderArgs method with args passed in positioned order
             pn();
@@ -702,7 +703,7 @@ public class CodeBuilder extends TextBuilder {
             {
                 p2tn("int _p = 0, l = args.length;");
                 int i = userDefinedArgNumber;
-                for (RenderArgDeclaration arg: renderArgList) {
+                for (RenderArgDeclaration arg : renderArgList) {
                     p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
@@ -717,7 +718,7 @@ public class CodeBuilder extends TextBuilder {
             {
                 p2t("return new Class[]{");
                 int i = userDefinedArgNumber;
-                for (RenderArgDeclaration arg: renderArgList) {
+                for (RenderArgDeclaration arg : renderArgList) {
                     p(toNonGeneric(arg.type)).p(".class").p(", ");
                     if (--i == 0) break;
                 }
@@ -818,7 +819,7 @@ public class CodeBuilder extends TextBuilder {
     public String buildBody = null;
 
     transient Map<Token.StringToken, String> consts = new HashMap<Token.StringToken, String>();
-    
+
     private RythmEngine.OutputMode outputMode = RythmEngine.outputMode();
 
     private Token.StringToken addConst(Token.StringToken st) {
@@ -833,7 +834,7 @@ public class CodeBuilder extends TextBuilder {
             return st;
         }
     }
-    
+
     private List<TextBuilder> mergeStringTokens(List<TextBuilder> builders) {
         List<TextBuilder> merged = new ArrayList<TextBuilder>();
         Token.StringToken curTk = new Token.StringToken("", parser);
@@ -967,7 +968,7 @@ public class CodeBuilder extends TextBuilder {
         code = R_DO_1.replaceAll(code);
         return code;
     }
-    
+
     public static void main(String[] args) {
         String s = "<!-- @dsfs --> dfds -->dfs <!-- xx -->";
         Pattern p = Pattern.compile("\\<\\!\\-\\-\\s*(@.*?)\\-\\-\\>");

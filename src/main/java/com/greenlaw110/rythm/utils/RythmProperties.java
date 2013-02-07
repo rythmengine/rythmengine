@@ -4,11 +4,11 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.cache.ICacheService;
 import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
+import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -193,8 +193,8 @@ public class RythmProperties extends Properties {
     }
 
     /**
-     * Return a {@link IDurationParser duration parser} instance by key. 
-     * If not found then {@link IDurationParser#DEFAULT_PARSER} will
+     * Return a {@link com.greenlaw110.rythm.extension.IDurationParser duration parser} instance by key. 
+     * If not found then {@link com.greenlaw110.rythm.extension.IDurationParser#DEFAULT_PARSER} will
      * be returned.
      * 
      * <p>The value stored in the properties could be either an instance

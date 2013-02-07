@@ -1,17 +1,14 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.template.ITemplate;
-import com.greenlaw110.rythm.utils.IJavaExtension;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -95,6 +92,8 @@ public class Token extends TextBuilder {
         if (disableCompactMode) return false;
         return (null == ctx ? true : ctx.compactMode());
     }
+    private RythmEngine engine = null;
+    private boolean transformEnabled = true;
     /*
      * Indicate whether token parse is good
      */
@@ -113,6 +112,8 @@ public class Token extends TextBuilder {
         this.s = s;
         line = -1;
         this.disableCompactMode = disableCompactMode;
+        this.engine = Rythm.engine();
+        this.transformEnabled = engine.conf().transformEnabled();
     }
 
     public Token(String s, IContext context) {
@@ -124,7 +125,9 @@ public class Token extends TextBuilder {
         this.s = s;
         ctx = context;
         line = (null == context) ? -1 : context.currentLine();
+        this.engine = ctx.getEngine();
         this.disableCompactMode = disableCompactMode;
+        this.transformEnabled = engine.conf().transformEnabled();
     }
 
     public boolean test(String line) {
@@ -198,20 +201,15 @@ public class Token extends TextBuilder {
     }
     protected final void outputExpression(boolean needsPrint) {
         if (S.isEmpty(s)) return;
-        if (null != ctx && !ctx.getCodeBuilder().engine.enableJavaExtensions()) {
-            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-        } else {
-            RythmEngine engine = null == ctx ? com.greenlaw110.rythm.Rythm.engine() : ctx.getEngine();
-            String s = processExtensions(engine);
-            if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-            pline();
-        }
+        String s = processExtensions(engine);
+        if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+        else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+        pline();
     }
     private String processExtensions(RythmEngine engine) {
+        if (!transformEnabled) return s;
         String s0 = s;
-        boolean outerBracketsStripped = false;
+        boolean outerBracketsStripped;
         s = stripOuterBrackets(s);
         outerBracketsStripped = s != s0;
         class Pair {

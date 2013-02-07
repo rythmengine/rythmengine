@@ -4,9 +4,7 @@ import com.greenlaw110.rythm.*;
 import com.greenlaw110.rythm.internal.AutoToStringCodeBuilder;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.template.ToStringTemplateBase;
+import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 

@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.IByteCodeHelper;
+import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -41,7 +41,7 @@ public class TemplateCompiler {
 
     // -- util methods
     private String getTemplateByClassName(String className) {
-        TemplateClass tc = engine().classes.getByClassName(className);
+        TemplateClass tc = engine().classes().getByClassName(className);
         return null == tc ? null : tc.getKey().toString();
     }
 
@@ -172,8 +172,8 @@ public class TemplateCompiler {
 
             private NameEnvironmentAnswer findStandType(final String name) throws ClassFormatException {
                 RythmEngine engine = engine();
-                IByteCodeHelper helper = engine.conf.byteCodeHelper();
-                byte[] bytes = engine.classLoader.getClassDefinition(name);
+                IByteCodeHelper helper = engine.conf().byteCodeHelper();
+                byte[] bytes = engine.classLoader().getClassDefinition(name);
                 if (null == bytes && null != helper) {
                     bytes = helper.findByteCode(name);
                 }
@@ -228,11 +228,11 @@ public class TemplateCompiler {
                     return packagesCache.get(name).booleanValue();
                 }
                 // Check if thera a .java or .class for this ressource
-                if (engine().classLoader.getClassDefinition(name) != null) {
+                if (engine().classLoader().getClassDefinition(name) != null) {
                     packagesCache.put(name, false);
                     return false;
                 }
-                if (engine().classes.getByClassName(name) != null) {
+                if (engine().classes().getByClassName(name) != null) {
                     packagesCache.put(name, false);
                     return false;
                 }

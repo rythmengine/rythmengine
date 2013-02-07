@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.dialect.DialectBase;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IKeyword;
-import com.greenlaw110.rythm.spi.IKeywordParserFactory;
+import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.IKeyword;
+import com.greenlaw110.rythm.internal.IKeywordParserFactory;
 import com.stevesoft.pat.Regex;
 
 import java.util.regex.Pattern;

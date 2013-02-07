@@ -1,14 +1,12 @@
 package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.spi.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.ArrayList;
@@ -24,11 +22,12 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     public TemplateTokenizer(IContext context) {
         ctx = context;
         RythmEngine engine = ctx.getEngine();
-        if (engine.enableSmartEscape() && engine.getExtensionManager().hasTemplateLangs()) {
+        RythmConfiguration conf = engine.conf();
+        if (conf.enableSmartEscape() && engine.getExtensionManager().hasTemplateLangs()) {
             parsers.add(new LangBlockStartSensor(ctx));
             parsers.add(new LangBlockEndSensor(ctx));
         }
-        if (engine.enableNaturalTemplate() && engine.getExtensionManager().hasTemplateLangs()) {
+        if (conf.enableNaturalTemplate() && engine.getExtensionManager().hasTemplateLangs()) {
             parsers.add(new DirectiveCommentStartSensor(ctx));
             parsers.add(new DirectiveCommentEndSensor(ctx));
         }

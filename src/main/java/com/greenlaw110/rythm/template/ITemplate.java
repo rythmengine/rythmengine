@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm.template;
 
-import com.greenlaw110.rythm.ILang;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.utils.JSONWrapper;
@@ -99,7 +99,7 @@ public interface ITemplate extends Cloneable {
         public void init(TemplateBase templateBase, ILang lang) {
             if (null == lang) {
                 TemplateClass tc = templateBase.getTemplateClass(true);
-                lang = ILang.DefImpl.probeFileName(tc.name(), templateBase._engine().getDefaultLang());
+                lang = ILang.DefImpl.probeFileName(tc.name(), templateBase._engine().conf().defaultLang());
             }
             langStack.push(lang);
         }

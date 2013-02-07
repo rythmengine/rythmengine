@@ -1,9 +1,12 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.ILang;
-import com.greenlaw110.rythm.ITagInvokeListener;
+import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.IRenderExceptionHandler;
+import com.greenlaw110.rythm.extension.ITagInvokeListener;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.extension.ITemplatePreProcessor;
+import com.greenlaw110.rythm.extension.Transformer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +43,13 @@ public class ExtensionManager {
         return this;
     }
 
-    private List<ITemplateExecutionExceptionHandler> exceptionHandlers = new ArrayList<ITemplateExecutionExceptionHandler>();
-    public ExtensionManager registerTemplateExecutionExceptionHandler(ITemplateExecutionExceptionHandler h) {
+    private List<IRenderExceptionHandler> exceptionHandlers = new ArrayList<IRenderExceptionHandler>();
+    public ExtensionManager registerTemplateExecutionExceptionHandler(IRenderExceptionHandler h) {
         if (!exceptionHandlers.contains(h)) exceptionHandlers.add(h);
         return this;
     }
 
-    public Iterable<ITemplateExecutionExceptionHandler> exceptionHandlers() {
+    public Iterable<IRenderExceptionHandler> exceptionHandlers() {
         return exceptionHandlers;
     }
 

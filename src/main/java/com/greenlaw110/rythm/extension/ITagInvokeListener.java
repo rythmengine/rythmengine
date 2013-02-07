@@ -1,11 +1,11 @@
-package com.greenlaw110.rythm;
+package com.greenlaw110.rythm.extension;
 
 import com.greenlaw110.rythm.runtime.ITag;
 
 /**
- * Listen tag invocation action event
+ * Listen to tag invocation event
  */
 public interface ITagInvokeListener {
     void onInvoke(ITag tag);
-    void tagInvoked(ITag tag);
+    void invoked(ITag tag);
 }

@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.utils.TextBuilder;
 

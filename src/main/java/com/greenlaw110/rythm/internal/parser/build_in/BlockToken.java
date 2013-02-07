@@ -1,8 +1,8 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.spi.IBlockHandler;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.Token;
+import com.greenlaw110.rythm.internal.IBlockHandler;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.Token;
 
 public class BlockToken extends Token implements IBlockHandler {
 

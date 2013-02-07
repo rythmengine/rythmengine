@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.conf;
 
-import com.greenlaw110.rythm.IByteCodeHelper;
-import com.greenlaw110.rythm.IHotswapAgent;
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.extension.IByteCodeHelper;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.template.ITemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
 import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
@@ -40,7 +40,11 @@ public class RythmConfiguration {
         Object o = data.get(key);
         if (null == o) {
             o = key.getConfiguration(raw);
-            data.put(key, o);
+            if (null != o) {
+                data.put(key, o);
+            } else {
+                data.put(key, ITemplate.RawData.NULL);
+            }
         }
         if (o == ITemplate.RawData.NULL) {
             return null;
@@ -60,6 +64,9 @@ public class RythmConfiguration {
      * @return
      */
     public <T> T get(String key) {
+        if (key.startsWith("rythm.")) {
+            key = key.replaceFirst("rythm.", "");
+        }
         RythmConfigurationKey rk = RythmConfigurationKey.valueOfIgnoreCase(key);
         if (null != rk) {
             return get(rk);
@@ -97,26 +104,11 @@ public class RythmConfiguration {
         return _byteCodeHelper;
     }
 
-    private IHotswapAgent _hotswapAgent = null;
-
-    /**
-     * Return {@link RythmConfigurationKey#ENGINE_CLASS_LOADER_HOTSWAP_AGENT_IMPL hotswap agent} 
-     * without lookup
-     * 
-     * @return
-     */
-    public IHotswapAgent hotswapAgent() {
-        if (null == _hotswapAgent) {
-            _hotswapAgent = get(ENGINE_CLASS_LOADER_HOTSWAP_AGENT_IMPL);
-        }
-        return _hotswapAgent;
-    }
-    
     private Boolean _play = false;
 
     /**
      * Return {@link RythmConfigurationKey#ENGINE_PLAYFRAMEWORK} without lookup
-     * 
+     *
      * @return
      */
     public boolean playFramework() {
@@ -125,13 +117,13 @@ public class RythmConfiguration {
         }
         return _play;
     }
-    
+
     private Boolean _logRenderTime = null;
 
     /**
      * Return {@link RythmConfigurationKey#LOG_TIME_RENDER_ENABLED} without
      * look up
-     * 
+     *
      * @return
      */
     public boolean logRenderTime() {
@@ -140,13 +132,13 @@ public class RythmConfiguration {
         }
         return _logRenderTime;
     }
-    
+
     private Boolean _loadPrecompiled = null;
 
     /**
      * Return {@link RythmConfigurationKey#ENGINE_LOAD_PRECOMPILED_ENABLED}
      * without lookup
-     * 
+     *
      * @return
      */
     public boolean loadPrecompiled() {
@@ -155,13 +147,27 @@ public class RythmConfiguration {
         }
         return _loadPrecompiled;
     }
-    
+
+    private Boolean _precompileMode = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#ENGINE_PRECOMPILE_MODE} without lookup
+     *
+     * @return
+     */
+    public boolean precompileMode() {
+        if (null == _precompileMode) {
+            _precompileMode = get(ENGINE_PRECOMPILE_MODE);
+        }
+        return _precompileMode;
+    }
+
     private Boolean _disableFileWrite = null;
 
     /**
      * Return inversed value of {@link RythmConfigurationKey#ENGINE_FILE_WRITE_ENABLED}
      * without lookup
-     * 
+     *
      * @return
      */
     public boolean disableFileWrite() {
@@ -170,5 +176,168 @@ public class RythmConfiguration {
             _disableFileWrite = !b;
         }
         return _disableFileWrite;
+    }
+
+    private Set<String> _restrictedClasses = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#SANDBOX_RESTRICTED_CLASS} without lookup
+     * <p/>
+     * <p>Note, the return value also contains rythm's built-in restricted classes</p>
+     *
+     * @return
+     */
+    public Set<String> restrictedClasses() {
+        if (null == _restrictedClasses) {
+            String s = get(SANDBOX_RESTRICTED_CLASS);
+            s += ";com.greenlaw110.rythm.Rythm;com.greenlaw110.rythm.RythmEngine;java.io;java.nio;java.security;java.rmi;java.net;java.awt;java.applet";
+            _restrictedClasses = new HashSet<String>(Arrays.asList(s.split(";")));
+        }
+        return new HashSet<String>(_restrictedClasses);
+    }
+
+    private Boolean _enableTypeInference = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#FEATURE_TYPE_INFERENCE_ENABLED} without
+     * lookup
+     *
+     * @return
+     */
+    public boolean enableTypeInference() {
+        if (null == _enableTypeInference) {
+            _enableTypeInference = get(FEATURE_TYPE_INFERENCE_ENABLED);
+        }
+        return _enableTypeInference;
+    }
+
+    private Boolean _enableSmartEscape = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED} without lookup
+     *
+     * @return
+     */
+    public boolean enableSmartEscape() {
+        if (null == _enableSmartEscape) {
+            _enableSmartEscape = get(FEATURE_SMART_ESCAPE_ENABLED);
+        }
+        return _enableSmartEscape;
+    }
+
+    private Boolean _enableNaturalTemplate = null;
+
+    public boolean enableNaturalTemplate() {
+        if (null == _enableNaturalTemplate) {
+            _enableNaturalTemplate = get(FEATURE_NATURAL_TEMPLATE_ENABLED);
+        }
+        return _enableNaturalTemplate;
+    }
+
+    private Boolean _cacheEnabled = null;
+
+    /**
+     * Return true if cache is not disabled for the engine instance. A cache is disabled when
+     * <ul>
+     * <li>{@link RythmConfigurationKey#CACHE_ENABLED} is <code>true</code> or</li>
+     * <li>{@link RythmConfigurationKey#CACHE_PROD_ONLY_ENABLED} is <code>true</code> and
+     * {@link RythmConfigurationKey#ENGINE_MODE} is {@link Rythm.Mode#dev}</li>
+     * </ul>
+     *
+     * @return
+     */
+    public boolean cacheEnabled() {
+        if (null == _cacheEnabled) {
+            boolean ce = get(CACHE_ENABLED);
+            Rythm.Mode mode = get(ENGINE_MODE);
+            boolean po = get(CACHE_PROD_ONLY_ENABLED);
+            if (!ce) {
+                _cacheEnabled = false;
+            } else {
+                if (mode.isDev() && po) {
+                    _cacheEnabled = false;
+                } else {
+                    _cacheEnabled = true;
+                }
+            }
+        }
+        return _cacheEnabled;
+    }
+
+    /**
+     * Return true if cache is disabled for the engine instance.
+     *
+     * @return
+     * @see #cacheEnabled()
+     */
+    public boolean cacheDisabled() {
+        return !cacheEnabled();
+    }
+
+    private Boolean _transformEnabled = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#FEATURE_TRANSFORM_ENABLED} without look up
+     *
+     * @return
+     */
+    public boolean transformEnabled() {
+        if (null == _transformEnabled) {
+            _transformEnabled = get(FEATURE_TRANSFORM_ENABLED);
+        }
+        return _transformEnabled;
+    }
+
+
+    private ILang _defaultLang = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#DEFAULT_TEMPLATE_LANG_IMPL} without lookup
+     *
+     * @return
+     */
+    public ILang defaultLang() {
+        if (null == _defaultLang) {
+            _defaultLang = get(DEFAULT_TEMPLATE_LANG_IMPL);
+        }
+        return _defaultLang;
+    }
+
+    private File _tmpDir = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#HOME_TMP} without lookup
+     *
+     * @return
+     */
+    public File tmpDir() {
+        if (null == _tmpDir) {
+            _tmpDir = get(HOME_TMP);
+        }
+        return _tmpDir;
+    }
+
+    private File _templateHome = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#HOME_TEMPLATE} without lookup
+     *
+     * @return
+     */
+    public File templateHome() {
+        if (null == _templateHome) {
+            _templateHome = get(RythmConfigurationKey.HOME_TEMPLATE);
+        }
+        return _templateHome;
+    }
+
+    /**
+     * Set template source home path
+     * 
+     * <p><b>Note</b>, this is not supposed to be used by user application or third party plugin</p>
+     */
+    public void setTemplateHome(File home) {
+        raw.put(HOME_TEMPLATE.getKey(), home);
+        data.put(HOME_TEMPLATE, home);
     }
 }

@@ -1,9 +1,12 @@
 package com.greenlaw110.rythm.internal.compiler;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.io.*;
@@ -17,23 +20,25 @@ public class TemplateClassCache {
     private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
     private final RythmEngine engine;
+    private final RythmConfiguration conf;
+    private final Rythm.Mode mode;
 
     public TemplateClassCache(RythmEngine engine) {
         if (null == engine) throw new NullPointerException();
         this.engine = engine;
+        this.conf = engine.conf();
+        this.mode = engine.mode();
     }
     
     /**
      * is class cache enabled on the {@link #engine} instance 
      */
     private boolean enabled() {
-        if (engine.mode.isDev() || engine.conf.loadPrecompiled()) {
+        if (mode.isDev() || conf.loadPrecompiled() || conf.precompileMode()) {
             return true;
+        } else {
+            return false;
         }
-        if (engine.isPrecompiling() && !engine.conf.disableFileWrite()) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -80,7 +85,7 @@ public class TemplateClassCache {
             }
             
             //check hash only in non precompiled mode
-            if(!engine.conf.loadPrecompiled()){
+            if(!conf.loadPrecompiled()){
 	            String curHash = hash(tc);
 	            if (!curHash.equals(hash.toString())) {
 	                if (logger.isTraceEnabled()) {
@@ -268,12 +273,12 @@ public class TemplateClassCache {
     String hash(TemplateClass tc) {
         try {
             StringBuffer enhancers = new StringBuffer();
-            for (ITemplateClassEnhancer plugin : engine.templateClassEnhancers) {
+            for (IByteCodeEnhancer plugin : engine.templateClassEnhancers) {
                 enhancers.append(plugin.getClass().getName());
             }
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((engine.versionSignature() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
+            messageDigest.update((engine.version() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {
@@ -294,10 +299,12 @@ public class TemplateClassCache {
     }
 
     private File getCacheFile(String fileName) {
-        if (engine.conf.loadPrecompiled() || (engine.preCompiling && (null != engine.preCompiledHome() && engine.preCompiledHome().exists()))) {
-            return new File(engine.preCompiledHome(), fileName);
+        RythmConfiguration conf = engine.conf();
+        if (conf.loadPrecompiled() || conf.precompileMode()) {
+            File precompileDir = conf.get(RythmConfigurationKey.HOME_PRECOMPILED);
+            return new File(precompileDir, fileName);
         } else {
-            File f = new File(engine.tmpDir, fileName);
+            File f = new File(conf.tmpDir(), fileName);
             return f;
         }
     }

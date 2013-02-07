@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.utils;
+package com.greenlaw110.rythm.internal;
 
 import java.util.regex.Pattern;
 

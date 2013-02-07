@@ -4,10 +4,10 @@ import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.ICaretParserFactory;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IParserFactory;
+import com.greenlaw110.rythm.internal.ICaretParserFactory;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.IParserFactory;
 import com.stevesoft.pat.Regex;
 
 public abstract class CaretParserFactoryBase implements ICaretParserFactory {

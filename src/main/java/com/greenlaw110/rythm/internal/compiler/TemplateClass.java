@@ -1,6 +1,8 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.ILang;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
@@ -10,8 +12,7 @@ import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.ITemplateClassEnhancer;
+import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
@@ -19,7 +20,6 @@ import com.greenlaw110.rythm.utils.S;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,7 +100,7 @@ public class TemplateClass {
             } else {
                 first = false;
             }
-            sb.append(engine().resourceManager.getFullTagName(tc));
+            sb.append(engine().resourceManager().getFullTagName(tc));
         }
         includeTemplateClassNames = sb.toString();
         return sb.toString();
@@ -264,7 +264,7 @@ public class TemplateClass {
      * @param file the template source file
      */
     public TemplateClass(File file, RythmEngine engine) {
-        this(engine.resourceManager.get(file), engine);
+        this(engine.resourceManager().get(file), engine);
     }
 
     /**
@@ -273,7 +273,7 @@ public class TemplateClass {
      * @param template
      */
     public TemplateClass(String template, RythmEngine engine) {
-        this(engine.resourceManager.get(template), engine);
+        this(engine.resourceManager().get(template), engine);
     }
 
     /**
@@ -282,7 +282,7 @@ public class TemplateClass {
      * @param template
      */
     public TemplateClass(String template, RythmEngine engine, IDialect dialect) {
-        this(engine.resourceManager.get(template), engine, dialect);
+        this(engine.resourceManager().get(template), engine, dialect);
     }
 
     public TemplateClass(ITemplateResource resource, RythmEngine engine) {
@@ -319,7 +319,7 @@ public class TemplateClass {
 
     @SuppressWarnings("unchecked")
     private Class<?> getJavaClass() throws Exception {
-        Class<?> c = engine().classLoader.loadClass(name(), true);
+        Class<?> c = engine().classLoader().loadClass(name(), true);
         if (null == javaClass) javaClass = (Class<ITemplate>) c;
         return c;
     }
@@ -352,7 +352,7 @@ public class TemplateClass {
             Class<?> c = templateInstance.getClass();
             Class<?> pc = c.getSuperclass();
             if (null != pc && !Modifier.isAbstract(pc.getModifiers())) {
-                engine().classes.getByClassName(pc.getName());
+                engine().classes().getByClassName(pc.getName());
             }
         }
         return templateInstance;
@@ -360,7 +360,7 @@ public class TemplateClass {
     
     public ITemplate asTemplate(ILang lang) {
         RythmEngine e = engine();
-        if (null == name || e.mode.isDev()) refresh();
+        if (null == name || e.mode().isDev()) refresh();
         return templateInstance_(lang).cloneMe(engine(), null);
     }
 
@@ -442,7 +442,7 @@ public class TemplateClass {
             if (!templateResource.isValid()) {
                 // it is removed?
                 isValid = false;
-                engine().classes.remove(this);
+                engine().classes().remove(this);
                 return false;
             }
             if (null == name) {
@@ -450,18 +450,18 @@ public class TemplateClass {
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
                 //name = templateResource.getSuggestedClassName();
-                engine().classes.add(this);
+                engine().classes().add(this);
             }
 
             if (null == javaSource) {
-                engine().classCache.loadTemplateClass(this);
+                engine().classCache().loadTemplateClass(this);
                 if (null != javaSource) {
                     // try refresh extended template class if there is
                     Pattern p = Pattern.compile(".*extends\\s+([a-zA-Z0-9_]+)\\s*\\{\\s*\\/\\/<extended_resource_key\\>(.*)\\<\\/extended_resource_key\\>.*", Pattern.DOTALL);
                     Matcher m = p.matcher(javaSource);
                     if (m.matches()) {
                         String extended = m.group(1);
-                        TemplateClassManager tcm = engine().classes;
+                        TemplateClassManager tcm = engine().classes();
                         extendedTemplateClass = tcm.getByClassName(extended);
                         if (null == extendedTemplateClass) {
                             String extendedResourceKey = m.group(2);
@@ -521,10 +521,10 @@ public class TemplateClass {
             // now start generate source and compile source to byte code
             reset();
             buildSourceCode();
-            engine().classCache.cacheTemplateClassSource(this); // cache source code for debugging purpose
+            engine().classCache().cacheTemplateClassSource(this); // cache source code for debugging purpose
             if (!codeBuilder.isRythmTemplate()) {
                 isValid = false;
-                engine().classes.remove(this);
+                engine().classes().remove(this);
                 return false;
             }
             isValid = true;
@@ -557,10 +557,10 @@ public class TemplateClass {
         templateInstance = null;
         for (TemplateClass tc : embeddedClasses) {
             tc.reset();
-            engine().classes.remove(tc);
+            engine().classes().remove(tc);
         }
         embeddedClasses.clear();
-        engine().classCache.deleteCache(this);
+        engine().classCache().deleteCache(this);
         engine().invalidate(this);
         javaClass = null;
     }
@@ -576,20 +576,20 @@ public class TemplateClass {
         compiling = true;
         long start = System.currentTimeMillis();
         try {
-            engine().classes.compiler.compile(new String[]{name()});
+            engine().classes().compiler.compile(new String[]{name()});
             if (logger.isTraceEnabled()) {
                 logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey());
             }
         } catch (CompileException.CompilerException e) {
             String cn = e.className;
-            TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes.getByClassName(cn);
+            TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes().getByClassName(cn);
             if (null == tc) tc = this;
             CompileException ce = new CompileException(engine(), tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
             javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
             throw ce;
         } catch (NullPointerException e) {
             String clazzName = name();
-            TemplateClass tc = engine().classes.getByClassName(clazzName);
+            TemplateClass tc = engine().classes().getByClassName(clazzName);
             if (this != tc) {
                 logger.error("tc is not this");
             }
@@ -630,18 +630,17 @@ public class TemplateClass {
                 bytes = javaByteCode;
                 if (null == bytes) bytes = compile();
                 long start = System.currentTimeMillis();
-                for (ITemplateClassEnhancer en : engine().templateClassEnhancers) {
-                    try {
-                        bytes = en.enhance(name(), bytes);
-                    } catch (Exception e) {
-                        logger.warn(e, "Error enhancing template class: %s", getKey());
-                    }
+                IByteCodeEnhancer en = engine().conf().get(RythmConfigurationKey.CODEGEN_BYTE_CODE_ENHANCER);
+                try {
+                    bytes = en.enhance(name(), bytes);
+                } catch (Exception e) {
+                    logger.warn(e, "Error enhancing template class: %s", getKey());
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
                 }
                 enhancedByteCode = bytes;
-                engine().classCache.cacheTemplateClass(this);
+                engine().classCache().cacheTemplateClass(this);
             }
             for (TemplateClass embedded : embeddedClasses) {
                 embedded.enhancedByteCode = null;
@@ -678,7 +677,7 @@ public class TemplateClass {
 //        //enhancedByteCode = code;
 //        compiled = true;
 //        enhance();
-//        if (!noCache) engine().classCache.cacheTemplateClass(this);
+//        if (!noCache) engine().classCache().cacheTemplateClass(this);
 //    }
 
     /**

@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.extension;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

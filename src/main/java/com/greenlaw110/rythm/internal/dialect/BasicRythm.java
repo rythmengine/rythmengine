@@ -1,10 +1,7 @@
 package com.greenlaw110.rythm.internal.dialect;
 
-import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.template.ToStringTemplateBase;
+import com.greenlaw110.rythm.internal.IDialect;
 
 /**
  * Basic Rythm is a very limited subset of Rythm which has only basic Rythm features:

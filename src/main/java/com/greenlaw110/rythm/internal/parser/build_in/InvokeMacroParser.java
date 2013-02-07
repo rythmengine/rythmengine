@@ -1,24 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
-import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.Patterns;
-import com.greenlaw110.rythm.spi.IBlockHandler;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.template.ITemplate;
-import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parse invocation:

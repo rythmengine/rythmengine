@@ -1,8 +1,9 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.IHotswapAgent;
+import com.greenlaw110.rythm.extension.IHotswapAgent;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.sandbox.RythmSecurityManager;
@@ -167,6 +168,8 @@ public class TemplateClassLoader extends ClassLoader {
     public ProtectionDomain protectionDomain;
 
     public RythmEngine engine;
+    
+    private RythmConfiguration conf;
 
     private static ClassLoader getDefParent() {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -180,7 +183,8 @@ public class TemplateClassLoader extends ClassLoader {
     public TemplateClassLoader(ClassLoader parent, RythmEngine engine) {
         super(parent);
         this.engine = engine;
-        for (TemplateClass tc : engine.classes.all()) {
+        this.conf = engine.conf();
+        for (TemplateClass tc : engine.classes().all()) {
             tc.uncompile();
         }
         pathHash = computePathHash();
@@ -216,12 +220,12 @@ public class TemplateClassLoader extends ClassLoader {
 
         // check if the class is restricted when run in sandbox mode
         if (Rythm.insideSandbox()) {
-            if (engine.restrictedClasses.contains(name)) {
+            if (conf.restrictedClasses().contains(name)) {
                 throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
             }
         }
 
-        TemplateClass tc = engine.classes.clsNameIdx.get(name);
+        TemplateClass tc = engine.classes().clsNameIdx.get(name);
         if (null == tc) {
             // it's not a template class, let's try to find already loaded one
             Class<?> c = findLoadedClass(name);
@@ -262,7 +266,7 @@ public class TemplateClassLoader extends ClassLoader {
             return maybeAlreadyLoaded;
         }
         long start = System.currentTimeMillis();
-        TemplateClass templateClass = engine.classes.getByClassName(name);
+        TemplateClass templateClass = engine.classes().getByClassName(name);
         if (templateClass != null) {
             if (templateClass.isDefinable()) {
                 return templateClass.javaClass;
@@ -298,7 +302,7 @@ public class TemplateClassLoader extends ClassLoader {
                 }
                 return templateClass.javaClass;
             }
-            engine.classes.remove(name);
+            engine.classes().remove(name);
         } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
             return null;
         } else {
@@ -307,12 +311,12 @@ public class TemplateClassLoader extends ClassLoader {
                 // should be an inner class, let's try to create it load it from cache
                 // 1. find the root class
                 String parentCN = name.substring(0, pos);
-                TemplateClass parent = engine.classes.getByClassName(parentCN);
+                TemplateClass parent = engine.classes().getByClassName(parentCN);
                 if (null == parent) {
                     throw new RuntimeException("Cannot find inner class def: " + name);
                 }
                 TemplateClass tc = TemplateClass.createInnerClass(name, null, parent);
-                engine.classCache.loadTemplateClass(tc);
+                engine.classCache().loadTemplateClass(tc);
                 byte[] bc = tc.enhancedByteCode;
                 if (null == bc) {
                     // inner class byte code cache missed some how, let's try to recover it
@@ -326,7 +330,7 @@ public class TemplateClassLoader extends ClassLoader {
                     parent.refresh(true);
                     parent.compile();
                     // now try again and see if we can find the class definition
-                    tc = engine.classes.getByClassName(name);
+                    tc = engine.classes().getByClassName(name);
                     Class<?> c = tc.javaClass;
                     if (null != c) return c;
                     bc = tc.enhancedByteCode;
@@ -392,10 +396,10 @@ public class TemplateClassLoader extends ClassLoader {
     }
 
     public void detectChange(TemplateClass tc) {
-        if (!engine.refreshOnRender() && null != tc.name()) return;
+        if (engine.isProdMode() && null != tc.name()) return;
         if (!tc.refresh()) return;
         if (tc.compile() == null) {
-            engine.classes.remove(tc);
+            engine.classes().remove(tc);
             currentState = new TemplateClassloaderState();
         } else {
             throw new ClassReloadException("Need reload");
@@ -406,10 +410,10 @@ public class TemplateClassLoader extends ClassLoader {
      * Detect Template changes
      */
     public void detectChanges() {
-        if (engine.refreshOnRender()) return;
+        if (engine.isProdMode()) return;
         // Now check for file modification
         List<TemplateClass> modifieds = new ArrayList<TemplateClass>();
-        for (TemplateClass tc : engine.classes.all()) {
+        for (TemplateClass tc : engine.classes().all()) {
             if (tc.refresh()) modifieds.add(tc);
         }
         Set<TemplateClass> modifiedWithDependencies = new HashSet<TemplateClass>();
@@ -418,7 +422,7 @@ public class TemplateClassLoader extends ClassLoader {
         boolean dirtySig = false;
         for (TemplateClass tc : modifiedWithDependencies) {
             if (tc.compile() == null) {
-                engine.classes.remove(tc);
+                engine.classes().remove(tc);
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             } else {
                 int sigChecksum = tc.sigChecksum;
@@ -431,16 +435,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
         if (newDefinitions.size() > 0) {
-            IHotswapAgent agent = engine.conf.hotswapAgent();
-            if (null != agent) {
-                try {
-                    agent.reload(newDefinitions.toArray(new ClassDefinition[newDefinitions.size()]));
-                } catch (Throwable e) {
-                    throw new ClassReloadException("Need Reload");
-                }
-            } else {
-                throw new ClassReloadException("Need Reload");
-            }
+            throw new ClassReloadException("Need Reload");
         }
         // Check signature (variable name & annotations aware !)
         if (dirtySig) {
@@ -451,9 +446,9 @@ public class TemplateClassLoader extends ClassLoader {
         int hash = computePathHash();
         if (hash != this.pathHash) {
             // Remove class for deleted files !!
-            for (TemplateClass tc : engine.classes.all()) {
+            for (TemplateClass tc : engine.classes().all()) {
                 if (!tc.templateResource.isValid()) {
-                    engine.classes.remove(tc);
+                    engine.classes().remove(tc);
                     currentState = new TemplateClassloaderState();//show others that we have changed..
                 }
             }
@@ -467,7 +462,7 @@ public class TemplateClassLoader extends ClassLoader {
     int pathHash = 0;
 
     int computePathHash() {
-        return engine.mode.isProd() ? 0 : classStateHashCreator.computePathHash(engine.tmpDir);
+        return engine.isProdMode() ? 0 : classStateHashCreator.computePathHash(engine.conf().tmpDir());
     }
 
 }

@@ -3,9 +3,9 @@ package com.greenlaw110.rythm.internal.dialect;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IParserFactory;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.IParserFactory;
 import com.greenlaw110.rythm.utils.S;
 
 import java.util.*;

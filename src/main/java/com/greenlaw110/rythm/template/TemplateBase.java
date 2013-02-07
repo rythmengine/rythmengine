@@ -1,7 +1,6 @@
 package com.greenlaw110.rythm.template;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
@@ -12,7 +11,7 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.runtime.ITag;
-import com.greenlaw110.rythm.ILang;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 import com.greenlaw110.rythm.utils.S;
@@ -451,6 +450,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             if (_logTime()) {
                 l = System.currentTimeMillis();
             }
+            
             engine.preprocess(this);
             setup();
             if (_logTime()) {

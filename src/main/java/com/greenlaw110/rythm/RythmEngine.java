@@ -1,12 +1,11 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.cache.ICacheService;
-import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.compiler.*;
 import com.greenlaw110.rythm.internal.dialect.AutoToString;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
@@ -19,7 +18,7 @@ import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.*;
 import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
-import com.greenlaw110.rythm.spi.*;
+import com.greenlaw110.rythm.extension.*;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
@@ -46,7 +45,8 @@ import java.util.concurrent.TimeUnit;
  * <p>The {@link Rythm} facade contains a default <code>RythmEngine</code> instance to make it
  * easy to use for most cases</p>
  */
-public class RythmEngine {
+public class RythmEngine implements IEventDispatcher {
+    private static final ILogger logger = Logger.get(RythmEngine.class);
 
     /**
      * Rythm Engine Version. Used along with 
@@ -55,7 +55,7 @@ public class RythmEngine {
      * 
      * TODO: use version marker and be substitute when build 
      */
-    public static final String version = "1.0-b2";
+    private static final String version = "1.0-b2";
     
     private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
 
@@ -96,237 +96,180 @@ public class RythmEngine {
         return Sandbox.sandboxMode();
     }
 
+    private RythmConfiguration _conf = null;
+
     /**
-     * Create a {@link Sandbox} instance to render the template
+     * Return {@link RythmConfiguration configuration} of the engine
+     * 
+     * <p>Usually user application should not call this method</p>
      * 
      * @return
      */
-    public Sandbox sandbox() {
-        return new Sandbox(this, secureExecutor);
-    }
-    
-    private boolean precompiling = false;
-
-    /**
-     * Notify the engine that external precompile of the template is started
-     * 
-     * <p><b>Note</b>, this method is usually to be called by third party plugin based on 
-     * rythm engine, and should NOT be called by user application.</p>
-     */
-    public void startPrecompile() {
-        precompiling = true;
+    public RythmConfiguration conf() {
+        if (null == _conf) {
+            throw new IllegalStateException("Rythm engine not initialized");
+        }
+        return _conf;
     }
 
     /**
-     * Notify the engine that external precompile of the template is stopped
+     * Return Version string of the engine instance. The version string
+     * is composed by {@link #version Rythm version} and the 
+     * configured {@link RythmConfigurationKey#ENGINE_PLUGIN_VERSION plugin version}. The version
+     * string will be used by Rythm to see if compiled bytecodes cached on disk should
+     * be refreshed in an new version or not.
      * 
-     * <p><b>Note</b>, this method is usually to be called by third party plugin based on 
-     * rythm engine, and should NOT be called by user application.</p>
-     */
-    public void stopPrecompile() {
-        precompiling = false;
-    }
-
-    /**
-     * Return true if precompile is in progress.
-     * 
-     * <p><b>Note</b>, this method is not an API for user application</p>
+     * <p><code>Note</code>, this method is not generally used by user application</p>
      * 
      * @return
      */
-    public boolean isPrecompiling() {
-        return precompiling;
+    public String version() {
+        return version + "-" + conf().pluginVersion();
     }
 
-    public String versionSignature() {
-        return version + "-" + conf.pluginVersion();
-    }
-
-    private final ILogger logger = Logger.get(RythmEngine.class);
-    public Rythm.Mode mode = null;
-    public RythmConfiguration conf = null;
-    public final RythmProperties configuration = new RythmProperties();
-    public final TemplateResourceManager resourceManager = new TemplateResourceManager(this);
-    public final TemplateClassManager classes = new TemplateClassManager(this);
-    public TemplateClassLoader classLoader = null;
-    public TemplateClassCache classCache = new TemplateClassCache(this);
-    private SecurityManager sm = null;
-    SandboxExecutingService secureExecutor = null;
-    public Set<String> restrictedClasses = new HashSet<String>();
-    public boolean preCompiling = false;
-    public IImplicitRenderArgProvider implicitRenderArgProvider = null;
-    private boolean enableTypeInference = false;
-    public boolean enableTypeInference() {
-        return enableTypeInference;
-    }
-    private boolean enableSmartEscape = false;
-    public boolean enableSmartEscape() {
-        return enableSmartEscape;
-    }
-    
-    private boolean enableNaturalTemplate = true;
-    public boolean enableNaturalTemplate() {
-        return enableNaturalTemplate;
-    }
-    /**
-     * If this is set to true then @cacheFor() {} only effective on product mode
-     */
-    public boolean cacheOnProdOnly = true;
-    /**
-     * Default Time to live for cache items
-     */
-    public int defaultTTL = 60 * 60;
-    public ICacheService cacheService = null;
-    public IDurationParser durationParser = null;
+    private Rythm.Mode _mode = null;
 
     /**
-     * Enable refresh resource on render. This could be turned off
-     * if the resource reload service is managed by container, e.g. Play!framework
+     * Return the engine {@link Rythm.Mode mode}
+     * 
+     * @return
      */
-    private boolean refreshOnRender = true;
-
-    public boolean refreshOnRender() {
-        return refreshOnRender && !isProdMode();
+    public Rythm.Mode mode() {
+        if (null == _mode) {
+            _mode = conf().get(RythmConfigurationKey.ENGINE_MODE);
+        }
+        return _mode;
     }
 
     /**
-     * When compactMode is true, then by default redundant spaces/line breaks are removed
+     * Is this engine the default {@link Rythm#engine} instance?
+     * 
+     * <p><b>Note</b>, not to be used by user application</p>
+     * 
+     * @return
      */
-    private boolean compactMode = true;
-
-    public boolean compactMode() {
-        return compactMode;
-    }
-
-    /**
-     * enable java extensions to expressions, e.g. @myvar.escapeHtml() or @myvar.pad(5) etc.
-     * <p/>
-     * disable java extension can improve parse performance
-     */
-    private boolean enableJavaExtensions = true;
-
-    /**
-     * Some context doesn't allow file write, e.g. GAE
-     */
-    public boolean noFileWrite = false;
-
-    public boolean enableJavaExtensions() {
-        return enableJavaExtensions;
-    }
-
-    private ILang defaultLang = null;
-    
-    public ILang getDefaultLang() {
-        return defaultLang;
-    }
-    
-    public File tmpDir;
-    public File templateHome;
-    //public File tagHome;
-    private File preCompiledHome;
-    public File preCompiledHome() {
-        return preCompiledHome;
-    }
-    public FileFilter tagFileFilter;
-
-    public final List<IRythmListener> listeners = new ArrayList<IRythmListener>();
-
-    public void registerListener(IRythmListener listener) {
-        if (null == listener) throw new NullPointerException();
-        if (!listeners.contains(listener)) listeners.add(listener);
-    }
-
-    public void unregisterListener(IRythmListener listener) {
-        if (null == listener) throw new NullPointerException();
-        listeners.remove(listener);
-    }
-
-    public void clearListener() {
-        listeners.clear();
-    }
-    
-    public void registerPreprocessor(ITemplatePreProcessor p) {
-        getExtensionManager().registerPreprocessor(p);
-    }
-
-    public final List<ITemplateClassEnhancer> templateClassEnhancers = new ArrayList<ITemplateClassEnhancer>();
-
-    public void registerTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
-        if (null == enhancer) throw new NullPointerException();
-        if (!templateClassEnhancers.contains(enhancer)) templateClassEnhancers.add(enhancer);
-    }
-
-    public void unregisterTemplateClassEnhancer(ITemplateClassEnhancer enhancer) {
-        if (null == enhancer) throw new NullPointerException();
-        templateClassEnhancers.remove(enhancer);
-    }
-
-    public void clearTemplateClassEnhancer() {
-        templateClassEnhancers.clear();
-    }
-
-    public RythmEngine(File templateHome) {
-        //this(templateHome, null);
-        init();
-        this.templateHome = templateHome;
-    }
-
-//    public RythmEngine(File templateHome, File tagHome) {
-//        init();
-//        this.templateHome = templateHome;
-//        this.tagHome = tagHome;
-//    }
-
-    public RythmEngine(Map<String, ?> userConfiguration) {
-        init(userConfiguration);
-    }
-
-    public RythmEngine() {
-        init();
-    }
-
     public boolean isSingleton() {
         return Rythm.engine == this;
     }
 
+    /**
+     * Is the engine running in {@link Rythm.Mode#prod product} mode?
+     * 
+     * @return
+     */
     public boolean isProdMode() {
-        return mode == Rythm.Mode.prod;
+        return mode() == Rythm.Mode.prod;
     }
 
+    /**
+     * Is the engine running in {@link Rythm.Mode#dev development} mode?
+     * @return
+     */
     public boolean isDevMode() {
-        return mode != Rythm.Mode.prod;
+        return mode() != Rythm.Mode.prod;
     }
 
-    private void setConf(String key, Object val) {
-        configuration.put(key, val);
+    private final TemplateResourceManager _resourceManager = new TemplateResourceManager(this);
+
+    /**
+     * Get {@link TemplateResourceManager resource manager} of the engine
+     * 
+     * <p><b>Note</b>, this method should not be used by user application</p>
+     * 
+     * @return
+     */
+    public TemplateResourceManager resourceManager() {
+        return _resourceManager;
+    }
+    
+    private final TemplateClassManager _classes = new TemplateClassManager(this);
+
+    /**
+     * Get {@link TemplateClassManager template class manager} of the engine
+     * 
+     * <p><b>Note</b>, this method should not be used by user application</p>
+     * 
+     * @return
+     */
+    public TemplateClassManager classes() {
+        return _classes;
+    }
+    
+    private TemplateClassLoader _classLoader = null;
+
+    /**
+     * Get {@link TemplateClassLoader class loader} of the engine
+     * 
+     * <p><b>Note</b>, this method should not be used by user application</p>
+     * 
+     * @return
+     */
+    public TemplateClassLoader classLoader() {
+        return _classLoader;
+    }
+    
+    private TemplateClassCache _classCache = new TemplateClassCache(this);
+
+    /**
+     * Get {@link TemplateClassCache class cache} of the engine
+     * 
+     * <p><b>Note</b>, this method should not be used by user application</p>
+     * 
+     * @return
+     */
+    public TemplateClassCache classCache() {
+        return _classCache;
     }
 
-    private File defaultRoot() {
-        try {
-            return new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private void initConf() {
     }
 
+    /**
+     * Create a rythm engine instance with default configuration
+     * 
+     * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
+     */
+    public RythmEngine() {
+        init();
+    }
 
-    public void init() {
+    /**
+     * Create a rythm engine instance with template root specified
+
+     * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
+     * @param templateHome
+     */
+    public RythmEngine(File templateHome) {
+        initConf();
+        _conf.setTemplateHome(templateHome);
+        init();
+    }
+
+    /**
+     * Create a rythm engine instance with user supplied configuration data
+     * 
+     * @see com.greenlaw110.rythm.conf.RythmConfigurationKey 
+     * @param userConfiguration
+     */
+    public RythmEngine(Map<String, ?> userConfiguration) {
+        init(userConfiguration);
+    }
+
+    private void init() {
         init(null);
     }
     
     private Map loadConfFromDisk() {
-        return null; //TODO
-    }
-
-    public void init(Map<String, ?> conf) {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (null == cl) cl = Rythm.class.getClassLoader();
         URL url = cl.getResource("rythm.conf");
         if (null != url) {
+            Properties p = new Properties();
             InputStream is = null;
             try {
                 is = url.openStream();
-                configuration.load(is);
+                p.load(is);
+                return p;
             } catch (Exception e) {
                 logger.warn(e, "Error loading rythm.conf");
             } finally {
@@ -337,23 +280,24 @@ public class RythmEngine {
                 }
             }
         }
+        return new HashMap();
+    }
+
+    public void init(Map<String, ?> conf) {
+        // load conf from disk
+        Map<String, ?> rawConf = loadConfFromDisk();
         
+        // load conf from System.properties
         Properties sysProps = System.getProperties();
-        configuration.putAll(sysProps);
-        if (null != conf) configuration.putAll(conf);
-        this.conf = new RythmConfiguration(conf);
+        rawConf.putAll((Map)sysProps);
+        
+        // load conf from user supplied configuration
+        if (null != conf) rawConf.putAll((Map)conf);
+        
+        // initialize the configuration with all loaded data 
+        this._conf = new RythmConfiguration(conf);
 
-
-        boolean disableLogging = configuration.getAsBoolean("rythm.logger.disabled", false);
-        if (disableLogging) {
-            Logger.registerLoggerFactory(new NullLogger.Factory());
-        } else {
-            ILoggerFactory fact = configuration.getAs("rythm.logger.factory", null, ILoggerFactory.class);
-            if (null != fact) Logger.registerLoggerFactory(fact);
-        }
-
-        mode = configuration.getAsMode("rythm.mode", Rythm.Mode.prod);
-        refreshOnRender = configuration.getAsBoolean("rythm.resource.refreshOnRender", true);
+        _mode = _conf.get(RythmConfigurationKey.ENGINE_MODE);
         enableJavaExtensions = configuration.getAsBoolean("rythm.enableJavaExtensions", true);
         boolean disableBuiltInJavaExtensions = configuration.getAsBoolean("rythm.disableBuiltInJavaExtensions", false);
         if (!disableBuiltInJavaExtensions) {
@@ -385,8 +329,6 @@ public class RythmEngine {
         cacheService.setDefaultTTL(defaultTTL);
         durationParser = configuration.getAsDurationParser("rythm.cache.durationParser");
 
-        cacheOnProdOnly = configuration.getAsBoolean("rythm.cache.prodOnly", true);
-
         cl = configuration.getAs("rythm.classLoader.parent", cl, ClassLoader.class);
         classLoader = new TemplateClassLoader(cl, this);
         classes.clear();
@@ -398,7 +340,6 @@ public class RythmEngine {
             }
         });
         //defaultRenderArgs = configuration.getAs("rythm.defaultRenderArgs", null, Map.class);
-        implicitRenderArgProvider = configuration.getAs("rythm.implicitRenderArgProvider", null, IImplicitRenderArgProvider.class);
 
         Object o = configuration.get("rythm.resource.loader");
         if (o instanceof ITemplateResourceLoader) {
@@ -411,10 +352,6 @@ public class RythmEngine {
             }
         }
         
-        sm = configuration.getAs("rythm.securityManager", null, SecurityManager.class);
-        long timeout = configuration.getAsLong("rythm.timeout", 1000L);
-        int poolSize = configuration.getAsInt("rythm.pool.size", 10);
-        secureExecutor = new SandboxExecutingService(poolSize, sm, timeout);
         String s = configuration.getProperty("rythm.restrictedClasses", "");
         s += ";com.greenlaw110.rythm.Rythm;com.greenlaw110.rythm.RythmEngine;java.io;java.nio;java.security;java.rmi;java.net;java.awt;java.applet";
         String[] sa = s.split("[\\s;:,]+");
@@ -573,11 +510,8 @@ public class RythmEngine {
     }
 
     public void preprocess(ITemplate t) {
-        IImplicitRenderArgProvider p = implicitRenderArgProvider;
+        IImplicitRenderArgProvider p = conf().implicitRenderArgProvider();
         if (null != p) p.setRenderArgs(t);
-        for (IRythmListener l : listeners) {
-            l.onRender(t);
-        }
     }
 
     public String render(String template, Object... args) {
@@ -780,11 +714,8 @@ public class RythmEngine {
         }
     }
 
-    public static void registerGlobalImports(String imports) {
-        CodeBuilder.registerImports(imports);
-    }
 
-    public static void registerGlobalImportProvider(IImportProvider provider) {
+    public static void registerGlobalImportProvider(ISourceCodeEnhancer provider) {
         CodeBuilder.registerImportProvider(provider);
     }
 
@@ -937,7 +868,7 @@ public class RythmEngine {
                 if (-1 < pos) cn = cn.substring(0, pos);
             }
             */
-            TemplateClass tc0 = classes.getByClassName(cn);
+            TemplateClass tc0 = classes().getByClassName(cn);
             if (null == tc0) {
                 System.out.println(tag.getClass());
                 System.out.println(name);
@@ -961,34 +892,55 @@ public class RythmEngine {
             }
         }
         if (null != body) tag.setRenderArg("_body", body);
-        for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
-            l.onInvoke(tag);
-        }
+        RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase)caller, tag));
         try {
             if (null != context) {
                 ((TagBase)tag).setBodyContext(context);
             }
             tag.call(line);
         } finally {
-            for (ITagInvokeListener l: getExtensionManager().tagInvokeListeners()) {
-                try {
-                    l.tagInvoked(tag);
-                } catch (RuntimeException e) {
-                    logger.error("Error call tagInvoked hook of %s", l.getClass());
-                }
-            }
+            RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase)caller, tag));
         }
     }
 
 
     public void handleTemplateExecutionException(Exception e, TemplateBase template) throws Exception {
-        for (ITemplateExecutionExceptionHandler h : em_.exceptionHandlers()) {
+        RythmEvents.ON_RENDER_EXCEPTION.trigger(this, F.T2(template, e));
+        for (IRenderExceptionHandler h : em_.exceptionHandlers()) {
             if (h.handleTemplateExecutionException(e, template)) return;
         }
         throw e;
     }
 
     // -- cache api
+
+    private Boolean _cacheOnProdOnly = null;
+    private boolean cacheOnProdOnly() {
+        if (null == _cacheOnProdOnly) {
+            _cacheOnProdOnly = conf().get(RythmConfigurationKey.CACHE_PROD_ONLY_ENABLED);
+        }
+        return _cacheOnProdOnly;
+    }
+
+    /**
+     * Default Time to live for cache items
+     */
+    private ICacheService _cacheService = null;
+
+    /**
+     * Return {@link ICacheService cache service implementation}
+     * 
+     * <p><b>Note</b>, this is not an API for user application</p>
+     * 
+     * @return
+     */
+    public ICacheService cacheService() {
+        if (_cacheService == null) {
+            _cacheService = conf().get(RythmConfigurationKey.CACHE_SERVICE_IMPL);
+        }
+        return _cacheService;
+    }
+    public IDurationParser durationParser = null;
 
     /**
      * Cache object using key and args for ttl seconds
@@ -999,7 +951,8 @@ public class RythmEngine {
      * @param args
      */
     public void cache(String key, Object o, int ttl, Object... args) {
-        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return;
+        if (conf().cacheDisabled()) return;
+        ICacheService cacheService = cacheService();
         Serializable value = null == o ? "" : (o instanceof Serializable ? (Serializable)o : o.toString());
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
@@ -1024,8 +977,9 @@ public class RythmEngine {
      * @param args
      */
     public void cache(String key, Object o, String duration, Object... args) {
-        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return;
-        int ttl = null == duration ? defaultTTL : durationParser.parseDuration(duration);
+        if (conf().cacheDisabled()) return;
+        ICacheService cacheService = cacheService();
+        int ttl = null == duration ? 0 : durationParser.parseDuration(duration);
         cache(key, o, ttl, args);
     }
 
@@ -1037,7 +991,8 @@ public class RythmEngine {
      * @return
      */
     public Serializable cached(String key, Object... args) {
-        if (cacheService == NoCacheService.INSTANCE || (mode.isDev() && cacheOnProdOnly)) return null;
+        if (conf().cacheDisabled()) return null;
+        ICacheService cacheService = cacheService();
         if (args.length > 0) {
             StringBuilder sb = new StringBuilder(key);
             for (Object arg : args) {
@@ -1046,19 +1001,6 @@ public class RythmEngine {
             key = sb.toString();
         }
         return cacheService.get(key);
-    }
-
-    interface IShutdownListener {
-        void onShutdown();
-    }
-    private IShutdownListener shutdownListener = null;
-    void setShutdownListener(IShutdownListener listener) {
-        this.shutdownListener = listener; 
-    }
-    public void shutdown() {
-        if (null != cacheService) cacheService.shutdown();
-        if (null != secureExecutor) secureExecutor.shutdown();
-        if (null != shutdownListener) shutdownListener.onShutdown();
     }
 
     // -- SPI interface
@@ -1077,7 +1019,7 @@ public class RythmEngine {
     // -- issue #47
     private Map<TemplateClass, Set<TemplateClass>> extendMap = new HashMap<TemplateClass, Set<TemplateClass>>();
     public void addExtendRelationship(TemplateClass parent, TemplateClass child) {
-        if (mode.isProd()) return;
+        if (mode().isProd()) return;
         Set<TemplateClass> children = extendMap.get(parent);
         if (null == children) {
             children = new HashSet<TemplateClass>();
@@ -1087,13 +1029,64 @@ public class RythmEngine {
     }
     // called to invalidate all template class which extends the parent
     public void invalidate(TemplateClass parent) {
-        if (mode.isProd()) return;
+        if (mode().isProd()) return;
         Set<TemplateClass> children = extendMap.get(parent);
         if (null == children) return;
         for (TemplateClass child: children) {
             invalidate(child);
             child.reset();
         }
+    }
+
+    // -- Sandbox
+    
+    private SandboxExecutingService _secureExecutor = null;
+    private SandboxExecutingService secureExecutor() {
+        if (null == _secureExecutor) {
+            int poolSize = conf().get(RythmConfigurationKey.SANDBOX_POOL_SIZE);
+            SecurityManager sm = conf().get(RythmConfigurationKey.SANDBOX_SECURITY_MANAGER_IMPL); 
+            int timeout = conf().get(RythmConfigurationKey.SANDBOX_TIMEOUT);
+            _secureExecutor = new SandboxExecutingService(poolSize, sm, timeout);
+        }
+        return _secureExecutor;
+    }
+
+    /**
+     * Create a {@link Sandbox} instance to render the template
+     * 
+     * @return
+     */
+    public Sandbox sandbox() {
+        return new Sandbox(this, secureExecutor());
+    }
+    
+    // dispatch rythm events
+    private IEventDispatcher eventDispatcher = null;
+    private IEventDispatcher eventDispatcher() {
+        if (null == eventDispatcher) {
+            eventDispatcher = new EventBus(this);
+        }
+        return eventDispatcher;
+    }
+
+    @Override
+    public void accept(IEvent event, Object param) {
+        eventDispatcher().accept(event, param);
+    }
+    
+    // -- Shutdown
+    
+    interface IShutdownListener {
+        void onShutdown();
+    }
+    private IShutdownListener shutdownListener = null;
+    void setShutdownListener(IShutdownListener listener) {
+        this.shutdownListener = listener; 
+    }
+    public void shutdown() {
+        if (null != _cacheService) _cacheService.shutdown();
+        if (null != _secureExecutor) _secureExecutor.shutdown();
+        if (null != shutdownListener) shutdownListener.onShutdown();
     }
 
 }

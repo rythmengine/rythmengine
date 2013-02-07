@@ -1,12 +1,9 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.ILang;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-
-import java.util.Stack;
 
 public interface IContext {
 

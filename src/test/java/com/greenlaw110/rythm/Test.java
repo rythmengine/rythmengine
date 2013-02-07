@@ -1,6 +1,6 @@
 package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.spi.Transformer;
+import com.greenlaw110.rythm.extension.Transformer;
 
 @Transformer
 public class Test {

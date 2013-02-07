@@ -1,7 +1,6 @@
-package com.greenlaw110.rythm.spi;
+package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 public interface IDialect {

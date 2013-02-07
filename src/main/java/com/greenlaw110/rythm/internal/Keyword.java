@@ -1,7 +1,5 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.spi.IKeyword;
-
 public enum Keyword implements IKeyword {
     /**
      * Assign enclosed part into a String variable

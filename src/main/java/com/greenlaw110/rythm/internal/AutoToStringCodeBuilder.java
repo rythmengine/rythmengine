@@ -6,7 +6,6 @@ import com.greenlaw110.rythm.internal.dialect.AutoToString;
 import com.greenlaw110.rythm.internal.parser.toString.AppendEndToken;
 import com.greenlaw110.rythm.internal.parser.toString.AppendFieldToken;
 import com.greenlaw110.rythm.internal.parser.toString.AppendStartToken;
-import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.template.ToStringTemplateBase;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.utils.S;
@@ -31,7 +30,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
         // skip annotations
         skipAnnotations.addAll(Arrays.asList("org.codehaus.jackson.annotate.JsonIgnore com.greenlaw110.rythm.toString.NoExpose ".split(" +")));
         transientAnnotations.addAll(Arrays.asList("javax.persistence.Transient com.google.code.morphia.annotations.Transient".split(" +")));
-        meta = ((AutoToString)dialect).meta;
+        meta = ((AutoToString) dialect).meta;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             p2tn("_logTime = true;");
         }
         p2t("__style = ").p(meta.style.toCode()).p(";").pn();
-        for (String argName: renderArgs.keySet()) {
+        for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (").p(argName).p(" == null) {");
             //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
@@ -78,7 +77,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     private Set<String> transientAnnotations = new HashSet<String>();
 
     private boolean shouldSkip(Annotation[] aa) {
-        for (Annotation a: aa) {
+        for (Annotation a : aa) {
             String an = a.annotationType().getName();
             if (skipAnnotations.contains(an)) return true;
             if (transientAnnotations.contains(an) && !meta.option.appendTransient) return true;
@@ -144,7 +143,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     private void appendMethodsIn(Class<?> c) {
         ToStringOption o = meta.option;
         Method[] ma = c.getDeclaredMethods();
-        for (Method m: ma) {
+        for (Method m : ma) {
             String mn = m.getName();
             if ("getClass".equals(mn)) continue;
             String fn = null;
@@ -167,7 +166,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     }
 
     private void appendIn(Class<?> c) {
-        if (engine.conf.playFramework()) {
+        if (engine().conf().playFramework()) {
             appendMethodsIn(c);
             appendFieldsIn(c);
         } else {
@@ -185,7 +184,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             c = c.getSuperclass();
             this.appendIn(c);
         }
-        for (String fn: skips) expressions.remove(fn);
+        for (String fn : skips) expressions.remove(fn);
         for (String fn : tokenList) {
             if (!expressions.containsKey(fn)) continue;
             String exp = expressions.get(fn);

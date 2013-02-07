@@ -1,7 +1,7 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.spi.Transformer;
+import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -11,13 +11,20 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
- * A utility class to manipulate String instance. Commonly used in template engine process.
+ * A utility class providing String manipulation methods. Commonly used in template engine process.
  * 
  * <p>Note all methods defined in this class is null safe. 
  * if any input is <code>null</code> the return value is <code>""</code></p>
  * 
- * <p>An instance of this utility is exposed in any Rythm template 
- * via {@link com.greenlaw110.rythm.template.TemplateBase#s()} method.</p>
+ * <p>An instance of this utility is exposed to any Rythm template 
+ * via {@link com.greenlaw110.rythm.template.TemplateBase#s()} method and can be used
+ * in template source code freely. E.g.</p>
+ * 
+ * <pre><code>
+ * @if(s().empty(name)) {
+ *    <div class="alert alert-error">user name is empty!</div>
+ * }
+ * </code></pre>
  */
 public class S {
     public static S INSTANCE = new S();

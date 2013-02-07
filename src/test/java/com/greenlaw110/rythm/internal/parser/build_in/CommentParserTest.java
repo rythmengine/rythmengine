@@ -2,7 +2,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import org.junit.Test;
 
-import com.greenlaw110.rythm.spi.IParser;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.ut.UnitTest;
 import com.greenlaw110.rythm.utils.TextBuilder;
 

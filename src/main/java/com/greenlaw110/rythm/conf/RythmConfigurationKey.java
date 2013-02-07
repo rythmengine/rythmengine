@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.conf;
 
-import com.greenlaw110.rythm.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
+import com.greenlaw110.rythm.extension.IDurationParser;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
-import com.greenlaw110.rythm.utils.IDurationParser;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
@@ -17,7 +17,7 @@ import java.util.Map;
 
 /**
  * {@link com.greenlaw110.rythm.RythmEngine} configuration keys. General rules:
- * 
+ * <p/>
  * <ul>
  * <li>When a key is ended with <code>.enabled</code>, then you should be able to set
  * the setting without <code>.enabled</code> or replace it with <code>.disabled</code>
@@ -31,23 +31,23 @@ import java.util.Map;
 public enum RythmConfigurationKey {
 
     /**
-     * Enable built-in {@link com.greenlaw110.rythm.ILang template language} implementations
+     * "built_in.template_lang.enabled": Enable built-in {@link com.greenlaw110.rythm.extension.ILang template language} implementations
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     BUILT_IN_TEMPLATE_LANG_ENABLED("built_in.template_lang.enabled", true),
 
     /**
-    * Enable built-in {@link com.greenlaw110.rythm.spi.Transformer transformer} implementations
-    * <p/>
-    * <p>Default value: <code>true</code></p>
-    *
-    * @see #FEATURE_TRANSFORMER_ENABLED
-    */
+     * "built_in.transformer.enabled": Enable built-in {@link com.greenlaw110.rythm.extension.Transformer transformer} implementations
+     * <p/>
+     * <p>Default value: <code>true</code></p>
+     *
+     * @see #FEATURE_TRANSFORM_ENABLED
+     */
     BUILT_IN_TRANSFORMER_ENABLED("built_in.transformer.enabled", true),
 
     /**
-     * Enable disable {@link com.greenlaw110.rythm.cache.ICacheService cache service}. When this
+     * "cache.enabled": Enable disable {@link com.greenlaw110.rythm.cache.ICacheService cache service}. When this
      * setting is turned off, the {@link #CACHE_SERVICE_IMPL} will be set to
      * {@link com.greenlaw110.rythm.cache.NoCacheService} without regarding to it's configuration
      * <p/>
@@ -58,7 +58,7 @@ public enum RythmConfigurationKey {
     CACHE_ENABLED("cache.enabled", false),
 
     /**
-     * Set {@link com.greenlaw110.rythm.cache.ICacheService cache service} implementation
+     * "cache.service.impl": Set {@link com.greenlaw110.rythm.cache.ICacheService cache service} implementation
      * <p/>
      * <p>Default value: {@link com.greenlaw110.rythm.cache.SimpleCacheService}</p>
      * <p/>
@@ -77,14 +77,15 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set {@link com.greenlaw110.rythm.utils.IDurationParser duration parser} implementation.
+     * "cache.duration_parser.impl": set {@link com.greenlaw110.rythm.extension.IDurationParser duration parser} implementation.
      * <p/>
-     * <p>Default value: {@link com.greenlaw110.rythm.utils.IDurationParser#DEFAULT_PARSER}</p>
+     * <p>Default value: {@link com.greenlaw110.rythm.extension.IDurationParser#DEFAULT_PARSER}</p>
      */
     CACHE_DURATION_PARSER_IMPL("cache.duration_parser.impl", IDurationParser.DEFAULT_PARSER),
 
     /**
-     * Turn on/off cache at {@link com.greenlaw110.rythm.Rythm.Mode#dev dev} mode. When
+     * "cache.prod_only.enabled": Turn on/off cache at
+     * {@link com.greenlaw110.rythm.Rythm.Mode#dev dev} mode. When
      * this setting is turned on, then cache will not effect at dev mode
      * <p/>
      * <p>Default value: <code>true</code></p>
@@ -92,31 +93,38 @@ public enum RythmConfigurationKey {
     CACHE_PROD_ONLY_ENABLED("cache.prod_only.enabled", true),
 
     /**
-     * Enable/disable compact redundant space and lines
+     * "codegen.compact.enabled": Enable/disable compact redundant space and lines
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     CODEGEN_COMPACT_ENABLED("codegen.compact.enabled", true),
 
     /**
-     * Set {@link com.greenlaw110.rythm.utils.IImplicitRenderArgProvider implicit template argument provider}
+     * "codegen.source_code_enhancer.impl": Set template
+     * {@link com.greenlaw110.rythm.extension.ISourceCodeEnhancer source code enhancer}
      * implementation.
-     * <p/>
      * <p>Default value: <code>null</code></p>
      */
-    CODEGEN_IMPLICIT_ARG_PROVIDER("codegen.implict_arg_provider.impl"),
+    CODEGEN_SOURCE_CODE_ENHANCER("codegen.source_code_enhancer.impl"),
 
     /**
-     * Set default {@link com.greenlaw110.rythm.ILang template lang}
+     * "codegen.byte_code_enhancer.impl": Set template
+     * {@link com.greenlaw110.rythm.extension.IByteCodeEnhancer byte code enhancer} implementation.
+     * <p>Default value: <code>null</code></p>
+     */
+    CODEGEN_BYTE_CODE_ENHANCER("codegen.byte_code_enhancer.impl"),
+
+    /**
+     * "default.template_lang.impl": Set default {@link com.greenlaw110.rythm.extension.ILang template lang}
      * <p/>
-     * <p>Default value: {@link com.greenlaw110.rythm.ILang.DefImpl#HTML}</p>
+     * <p>Default value: {@link com.greenlaw110.rythm.extension.ILang.DefImpl#HTML}</p>
      * <p/>
      * TODO: what if {@link #BUILT_IN_TEMPLATE_LANG_ENABLED} is false
      */
     DEFAULT_TEMPLATE_LANG_IMPL("default.template_lang.impl", ILang.DefImpl.HTML),
 
     /**
-     * Set default {@link com.greenlaw110.rythm.cache.ICacheService cache} ttl
+     * "default.cache_ttl": Set default {@link com.greenlaw110.rythm.cache.ICacheService cache} ttl
      * in second
      * <p/>
      * <p>Default value: 60 * 60(1hr</p>
@@ -137,8 +145,7 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the {@link com.greenlaw110.rythm.Rythm.Mode mode} of rythm engine
-     * <p/>
+     * "engine.mode": Set the {@link com.greenlaw110.rythm.Rythm.Mode mode} of rythm engine
      * <p>Default value: {@link com.greenlaw110.rythm.Rythm.Mode#prod}</p>
      */
     ENGINE_MODE("engine.mode") {
@@ -159,8 +166,8 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the {@link ClassLoader#getParent() parent} class loader of the rythm template class loader
-     * <p/>
+     * "engine.class_loader.parent.impl": Set the {@link ClassLoader#getParent() parent} class loader of the rythm
+     * template class loader
      * <p>Default value: first try to use {@link Thread#getContextClassLoader() current thread's context class loader}
      * if the context classloader is <code>null</code>, then use the class loader which loads the <code>Rythm.class</code></p>
      */
@@ -176,40 +183,56 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the {@link com.greenlaw110.rythm.IByteCodeHelper bytecode helper} implementation
-     * <p/>
+     * "engine.class_loader.bytecode_helper.impl": Set the {@link com.greenlaw110.rythm.extension.IByteCodeHelper bytecode helper}
+     * implementation
      * <p>Default value: <code>null</code></p>
      */
     ENGINE_CLASS_LOADER_BYTECODE_HELPER_IMPL("engine.class_loader.bytecode_helper.impl"),
 
     /**
-     * Set the {@link com.greenlaw110.rythm.IHotswapAgent hotswap agent} implementation
-     * <p/>
-     * <p>Default value: <code>null</code></p>
-     */
-    ENGINE_CLASS_LOADER_HOTSWAP_AGENT_IMPL("engine.class_loader.hotswap_agent.impl"),
-
-    /**
-     * Set the flag so that Rythm will load precompiled template class directly from
+     * "engine.load_precompiled.enabled": Set the flag so that Rythm will load precompiled template class directly from
      * bytecode cached in the {@link #HOME_PRECOMPILED precompiled root} when running
      * in {@link com.greenlaw110.rythm.Rythm.Mode#prod prod} mode.
-     * <p/>
      * <p>Default value: <code>false</code></p>
      */
     ENGINE_LOAD_PRECOMPILED_ENABLED("engine.load_precompiled.enabled", false),
 
     /**
-     * Enable/disable write to file system. This option is used by rythm to check if
-     * it should write template class bytecode cache to disk or not. In some cases 
+     * "engine.file_write.enabled": Enable/disable write to file system. This option is used by rythm to check if
+     * it should write template class bytecode cache to disk or not. In some cases
      * you want to disable file write due the limit of the runtime environment, e.g.
      * on GAE platform
-     * 
+     * <p/>
      * <p>Default value: <code>true</code></p>
      */
     ENGINE_FILE_WRITE_ENABLED("engine.file_write.enabled", true),
 
     /**
-     * A special flag used when Rythm is working with rythm-plugin for Play!Framework. Usually
+     * "engine.precompile.mode": Set/unset precompile mode. This option is used by play-rythm plugin (could also
+     * be other plugin) to notify rythm that is is doing a precompile. User application
+     * should not use this option
+     * <p/>
+     * <p>Default value: <code>false</code></p>
+     */
+    ENGINE_PRECOMPILE_MODE("engine.precompile.mode") {
+        @Override
+        public <T> T getConfiguration(Map<String, ?> configuration) {
+            String k = getKey();
+            Object v = configuration.get(k);
+            if (null == v) {
+                return (T) Boolean.FALSE;
+            } else {
+                if (v instanceof Boolean) {
+                    return (T) v;
+                } else {
+                    return (T) Boolean.valueOf(v.toString());
+                }
+            }
+        }
+    },
+
+    /**
+     * "engine.playframework.enabled": A special flag used when Rythm is working with rythm-plugin for Play!Framework. Usually
      * you should not touch this setting.
      * <p/>
      * <p>Default value: <code>false</code></p>
@@ -217,41 +240,41 @@ public enum RythmConfigurationKey {
     ENGINE_PLAYFRAMEWORK("engine.playframework.enabled", false),
 
     /**
-     * Set by plugin of certain framework, e.g. play!framework. Used to determine whether it needs
-     * to refresh the cached template class bytecode. Default value: <code>""</code> (empty string)
+     * "engine.plugin.version": Set by plugin of certain framework, e.g. play!framework. Used to determine
+     * whether it needs to refresh the cached template class bytecode. Default value: <code>""</code> (empty string)
      */
     ENGINE_PLUGIN_VERSION("engine.plugin.version", ""),
 
     /**
-     * Enable disable {@link com.greenlaw110.rythm.spi.Transformer transformer}
+     * "feature.transform.enabled": Enable disable {@link com.greenlaw110.rythm.extension.Transformer transformer}
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
-    FEATURE_TRANSFORMER_ENABLED("feature.transformer.enabled", true),
+    FEATURE_TRANSFORM_ENABLED("feature.transform.enabled", true),
 
     /**
-     * Enable disable type inference. TODO add link to type inference reference page
+     * "feature.type_inference.enabled": Enable disable type inference. TODO add link to type inference reference page
      * <p/>
      * <p>Default value: <code>false</code></p>
      */
     FEATURE_TYPE_INFERENCE_ENABLED("feature.type_inference.enabled", false),
 
     /**
-     * Enable disable smart escape. TODO: add link to smart escape reference page
+     * "feature.smart_escape.enabled": Enable disable smart escape. TODO: add link to smart escape reference page
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     FEATURE_SMART_ESCAPE_ENABLED("feature.smart_escape.enabled", true),
 
     /**
-     * Enable disable natural template. TODO: add reference link to natural template
+     * "feature.natural_template.enabled": Enable disable natural template. TODO: add reference link to natural template
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", true),
 
     /**
-     * Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
+     * "home.template": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
      * is not configured, therefore the {@link com.greenlaw110.rythm.resource.TemplateResourceManager} will
      * try to load {@link com.greenlaw110.rythm.resource.FileTemplateResource} from this template home dir
      * configured.
@@ -289,8 +312,8 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the rythm tmp dir. The tmp dir is to where Rythm write compiled template class bytecode when running in the
-     * {@link com.greenlaw110.rythm.Rythm.Mode#dev dev} mode.
+     * "home.tmp": Set the rythm tmp dir. The tmp dir is to where Rythm write compiled template class bytecode
+     * when running in the {@link com.greenlaw110.rythm.Rythm.Mode#dev dev} mode.
      * <p/>
      * <p>Default value: a file created with the following logic</p>
      * <p/>
@@ -326,7 +349,7 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the dir root of the precompiled template bytecodes. Default value: <code>null</code>
+     * "home.precompiled": Set the dir root of the precompiled template bytecodes. Default value: <code>null</code>
      *
      * @see #ENGINE_LOAD_PRECOMPILED_ENABLED
      */
@@ -353,12 +376,18 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Enable disable log in Rythm. Default value: true
+     * "i18n.lang": Set the language. Used to provide localized format to date or currency.
+     * <p>Default value: <code>en</code></p>
+     */
+    I18N_LANG("i18n.lang", "en"),
+
+    /**
+     * "log.enabled": Enable disable log in Rythm. Default value: true
      */
     LOG_ENABLED("log.enabled", true),
 
     /**
-     * Configure the {@link com.greenlaw110.rythm.logger.ILoggerFactory logger factory} implementation.
+     * "log.factory.impl": Configure the {@link com.greenlaw110.rythm.logger.ILoggerFactory logger factory} implementation.
      * When this configuration is not set, then a {@link com.greenlaw110.rythm.logger.JDKLogger.Factory} instance
      * is used to create the logger
      * <p/>
@@ -367,21 +396,21 @@ public enum RythmConfigurationKey {
     LOG_FACTORY_IMPL("log.factory.impl"),
 
     /**
-     * Print out relevant java source lines when exception encountered
+     * "log.source.java.enabled": Print out relevant java source lines when exception encountered
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     LOG_SOURCE_JAVA_ENABLED("log.source.java.enabled", true),
 
     /**
-     * Print out relevant template source lines when exception encountered
+     * "log.source.template.enabled": Print out relevant template source lines when exception encountered
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
     LOG_SOURCE_TEMPLATE_ENABLED("log.source.template.enabled", true),
 
     /**
-     * Log time spent executing a template. The level used to log the time logRenderTime
+     * "log.time.render.enabled": Log time spent executing a template. The level used to log the time logRenderTime
      * is {@link com.greenlaw110.rythm.logger.ILogger#debug(String, Object...)}
      * <p/>
      * <p>Default value: <code>false</code></p>
@@ -389,8 +418,22 @@ public enum RythmConfigurationKey {
     LOG_TIME_RENDER_ENABLED("log.time.render.enabled", false),
 
     /**
-     * The {@link com.greenlaw110.rythm.resource.ITemplateResourceLoader resource loader} implementation
-     * <p/>
+     * "render.tag_invocation_listener.impl": Set {@link com.greenlaw110.rythm.extension.ITagInvokeListener tag
+     * invocation listener} implementation.
+     * <p>Default value: <code>null</code></p>
+     */
+    RENDER_TAG_INVOCATION_LISTENER("render.tag_invocation_listener.impl"),
+
+    /**
+     * "render.exception_handler.impl": Set {@link com.greenlaw110.rythm.extension.IRenderExceptionHandler
+     * render exception handler} implementation.
+     * <p>Default value: <code>null</code></p>
+     */
+    RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
+
+    /**
+     * "resource.loader.impl": The {@link com.greenlaw110.rythm.resource.ITemplateResourceLoader resource loader}
+     * implementation
      * <p>Default value: <code>null</code>. But if this is not configured, try templates will be loaded as
      * {@link com.greenlaw110.rythm.resource.FileTemplateResource file template resource} first and if
      * still not found then try to load as
@@ -401,9 +444,8 @@ public enum RythmConfigurationKey {
     RESOURCE_LOADER_IMPL("resource.loader.impl"),
 
     /**
-     * Set the security manager to be used when running a template in {@link com.greenlaw110.rythm.Sandbox sandbox}
-     * mode.
-     * <p/>
+     * "sandbox.security_manager.impl": Set the security manager to be used when running a template in
+     * {@link com.greenlaw110.rythm.Sandbox sandbox} mode.
      * <p>Default value: <code>null</code>. When no security manager is configured, when the sandbox mode is running, an
      * instance of {@link com.greenlaw110.rythm.sandbox.RythmSecurityManager} will be initiated to supervise the
      * execution. Usually you should NOT set this configuration and allow Rythm to run it's <code>SecurityManager</code>
@@ -412,10 +454,9 @@ public enum RythmConfigurationKey {
     SANDBOX_SECURITY_MANAGER_IMPL("sandbox.security_manager.impl"),
 
     /**
-     * Set the timeout of a {@link com.greenlaw110.rythm.Sandbox sandbox} execution in milliseconds. If the execution
-     * failed to return after timeout, then Rythm will interrupt the execution thread and force it to return. This
-     * setting prevent infinite loop in untrusted template.
-     * <p/>
+     * "sandbox.timeout": Set the timeout of a {@link com.greenlaw110.rythm.Sandbox sandbox} execution in milliseconds.
+     * If the execution failed to return after timeout, then Rythm will interrupt the execution thread and force it
+     * to return. This setting prevent infinite loop in untrusted template.
      * <p>Default value: 1000</p>
      */
     SANDBOX_TIMEOUT("sandbox.timeout") {
@@ -434,8 +475,7 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set the thread pool size of {@link com.greenlaw110.rythm.Sandbox sandbox} executors.
-     * <p/>
+     * "sandbox.pool.size": Set the thread pool size of {@link com.greenlaw110.rythm.Sandbox sandbox} executors.
      * <p>Default value: 10</p>
      */
     SANDBOX_POOL_SIZE("sandbox.pool.size") {
@@ -454,12 +494,14 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * Set restricted classes for {@link com.greenlaw110.rythm.Sandbox sandbox} execution. The value should be
-     * full name of the classes or packages separated by <code>;</code>. For example, "foo.bar.Employee;foo.secure;...".
+     * "sandbox.restricted_class": Set restricted classes for {@link com.greenlaw110.rythm.Sandbox sandbox} execution.
+     * The value should be full name of the classes or packages separated by <code>;</code>. For example,
+     * "foo.bar.Employee;foo.secure;...".
+     * <p>
      * If a class or package name is presented in this setting, then the sandbox executor will raise a
      * {@link SecurityException} when the template trying to access the class. Note whatever this setting is
      * configured, Rythm will prevent the access to the following classes/packages:
-     * <p/>
+     * </p>
      * <ul>
      * <li><code>com.greenlaw110.rythm.Rythm;</code></li>
      * <li><code>com.greenlaw110.rythm.RythmEngine;</code></li>
@@ -471,11 +513,9 @@ public enum RythmConfigurationKey {
      * <li><code>java.awt;</code></li>
      * <li><code>java.applet</code></li>
      * </ul>
-     * <p/>
-     * <p/>
-     * <code>Default value: <code>null</code></code>
+     * <code>Default value: <code>""</code></code>
      */
-    SANDBOX_RESTRICTED_CLASS("sandbox.restricted_class");
+    SANDBOX_RESTRICTED_CLASS("sandbox.restricted_class", "");
 
     private String key;
     private Object defVal;
@@ -490,8 +530,8 @@ public enum RythmConfigurationKey {
     }
 
     /**
-     * Return the key string 
-     * 
+     * Return the key string
+     *
      * @return
      */
     public String getKey() {
@@ -503,7 +543,7 @@ public enum RythmConfigurationKey {
      * is passed in in case the default value be variable depending on
      * another setting. For example, the default value of {@link #HOME_TMP tmp dir}
      * setting depend on the value of {@link #ENGINE_MODE mode} setting
-     * 
+     *
      * @param configuration
      * @return
      */
@@ -513,7 +553,7 @@ public enum RythmConfigurationKey {
 
     /**
      * Calling to this method is equals to calling {@link #getKey()}
-     * 
+     *
      * @return
      */
     @Override
@@ -545,6 +585,21 @@ public enum RythmConfigurationKey {
         if (configuration.containsKey(k0)) {
             return getAsBoolean(k0, configuration);
         }
+        // try key with "rythm." prefix
+        key = "rythm." + key;
+        k0 = key.replace(".enabled", "");
+        k1 = k0 + ".disabled";
+        if (configuration.containsKey(k1)) {
+            return (!getAsBoolean(k1, configuration));
+        }
+        if (configuration.containsKey(key)) {
+            return getAsBoolean(key, configuration);
+        }
+        if (configuration.containsKey(k0)) {
+            return getAsBoolean(k0, configuration);
+        }
+
+        // still not found, use default value
         Object defVal = getDefVal(configuration);
         return (null == defVal) ? false : (Boolean) defVal;
     }
@@ -553,13 +608,24 @@ public enum RythmConfigurationKey {
         Object v = configuration.get(key);
         if (null == v) {
             String k0 = key.replace(".impl", "");
-            v = configuration.get(key);
+            v = configuration.get(k0);
             if (null == v) {
-                v = getDefVal(configuration);
+                // try key with "rythm." prefix
+                key = "rythm." + key;
+                v = configuration.get(key);
+                if (null == v) {
+                    k0 = key.replace(".impl", "");
+                    v = configuration.get(k0);
+                    if (null == v) {
+                        // still not found, load default value
+                        v = getDefVal(configuration);
+                        if (null == v) {
+                            // really don't have it, return null
+                            return null;
+                        }
+                    }
+                }
             }
-        }
-        if (null == v) {
-            return null;
         }
         if (v instanceof String) {
             String clsName = (String) v;
@@ -602,24 +668,35 @@ public enum RythmConfigurationKey {
         }
         Object o = configuration.get(key);
         if (null == o) {
+            // try key with "rythm." prefix
+            o = configuration.get("rythm." + key);
+        }
+        if (null == o) {
             return (T) getDefVal(configuration);
         } else {
             return (T) o;
         }
     }
-    
+
     private static Map<String, RythmConfigurationKey> lookup = new HashMap<String, RythmConfigurationKey>(50); static {
-        for (RythmConfigurationKey k: values()) {
+        for (RythmConfigurationKey k : values()) {
             lookup.put(k.getKey().toLowerCase(), k);
         }
     }
 
+    /**
+     * Return key enum instance from the string in case insensitive mode
+     *
+     * @param s
+     * @return
+     */
     public static RythmConfigurationKey valueOfIgnoreCase(String s) {
         if (S.empty(s)) throw new IllegalArgumentException();
-        return lookup.get(s.trim());
+        return lookup.get(s.trim().toLowerCase());
     }
 
     public static void main(String[] args) {
         System.out.println(values().length);
     }
+
 }

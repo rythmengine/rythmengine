@@ -1,10 +1,9 @@
 package com.greenlaw110.rythm.internal.parser;
 
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
-import com.greenlaw110.rythm.spi.IParser;
-import com.greenlaw110.rythm.spi.IParserFactory;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.IParserFactory;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;

@@ -1,16 +1,15 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.ILang;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.spi.IBlockHandler;
-import com.greenlaw110.rythm.spi.IContext;
-import com.greenlaw110.rythm.spi.IDialect;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,6 +18,9 @@ import java.util.Stack;
 public class TemplateParser implements IContext {
     private final ILogger logger = Logger.get(TemplateParser.class);
     private final CodeBuilder cb;
+    private final RythmEngine engine;
+    private final RythmConfiguration conf;
+    private final boolean compactMode;
     private String template;
     private int totalLines;
     int cursor = 0;
@@ -27,6 +29,9 @@ public class TemplateParser implements IContext {
         this.template = cb.template();
         totalLines = StringUtils.countMatches(template, "\n") + 1;
         this.cb = cb;
+        this.engine = cb.engine();
+        this.conf = this.engine.conf();
+        this.compactMode = this.conf.get(RythmConfigurationKey.CODEGEN_COMPACT_ENABLED);
         pushLang(cb.templateDefLang);
     }
 
@@ -58,7 +63,7 @@ public class TemplateParser implements IContext {
     }
 
     void parse() {
-        DialectManager dm = cb.engine.getDialectManager();
+        DialectManager dm = engine.getDialectManager();
         while (true) {
             this.breakStack.clear();
             this.langStack.clear();
@@ -185,13 +190,13 @@ public class TemplateParser implements IContext {
 
     @Override
     public RythmEngine getEngine() {
-        return cb.engine;
+        return engine;
     }
 
     @Override
     public boolean compactMode() {
         if (!compactStack.empty()) return compactStack.peek();
-        return getEngine().compactMode();
+        return compactMode;
     }
 
     private Stack<Boolean> compactStack = new Stack<Boolean>();
@@ -254,7 +259,7 @@ public class TemplateParser implements IContext {
     @Override
     public boolean insideBody() {
         if (!inBodyStack.empty()) return inBodyStack.peek();
-        return getEngine().compactMode();
+        return false;
     }
 
     private Stack<Boolean> inBodyStack = new Stack<Boolean>();
@@ -279,7 +284,7 @@ public class TemplateParser implements IContext {
     @Override
     public boolean insideBody2() {
         if (!inBodyStack2.empty()) return inBodyStack2.peek();
-        return getEngine().compactMode();
+        return false;
     }
 
     private Stack<Boolean> inBodyStack2 = new Stack<Boolean>();
@@ -355,6 +360,9 @@ public class TemplateParser implements IContext {
         template = s;
         totalLines = template.split("(\\r\\n|\\n|\\r)").length + 1;
         cb = null;
+        engine = null;
+        conf = null;
+        compactMode = true;
     }
 
     public static void main(String[] args) {
