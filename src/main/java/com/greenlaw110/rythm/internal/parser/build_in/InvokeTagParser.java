@@ -1,15 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.TemplateParser;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
-import com.greenlaw110.rythm.internal.IBlockHandler;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -246,7 +241,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                     pline();
                 }
                 ptline("if (null == _r_s) {");
-                p2tline("StringBuilder sbOld = getOut();");
+                p2tline("StringBuilder sbOld = getBuffer();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
                 if (ctx.peekInsideBody()) {
@@ -356,7 +351,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                     pline();
                 }
                 ptline("if (null == _r_s) {");
-                p2tline("StringBuilder sbOld = getOut();");
+                p2tline("StringBuilder sbOld = getBuffer();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
             }
@@ -416,7 +411,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         @Override
         public String closeBlock() {
             ctx.popInsideBody2();
-            ctx.getCodeBuilder().addBuilder(new Token("", ctx){
+            ctx.getCodeBuilder().addBuilder(new Token("", ctx) {
                 @Override
                 protected void output() {
                     ctx.popInsideBody();
@@ -435,9 +430,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 String body = ctx.getTemplateSource(startIndex, endIndex);
                 key = UUID.nameUUIDFromBytes(body.getBytes()).toString();
             }
-            StringBuilder sbOld = getOut();
+            StringBuilder sbOld = getBuffer();
             StringBuilder sbNew = new StringBuilder();
-            setOut(sbNew);
+            setBuffer(sbNew);
             p3tline("}");
             if (ctx.peekInsideBody2()) {
                 p2t("}, self, ").p(ignoreNonExistsTag).p(");");
@@ -463,7 +458,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             }
             p2tline("}");
             String s = sbNew.toString();
-            setOut(sbOld);
+            setBuffer(sbOld);
 
             return s;
         }
@@ -477,7 +472,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
 
             String testTag(String name) {
-                return ctx().getCodeBuilder().engine.testTag(name, ctx().getTemplateClass());
+                return engine_.testTag(name, ctx().getTemplateClass());
             }
 
             @Override

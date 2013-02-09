@@ -17,22 +17,27 @@ public enum Patterns {
 
     private String s_;
     private Pattern p_;
+
     private Patterns(String pattern) {
         s_ = pattern;
     }
+
     @Override
     public String toString() {
         return s_;
     }
+
     public Pattern pattern() {
         if (null == p_) {
             p_ = Pattern.compile(s_);
         }
         return p_;
     }
+
     public Matcher matcher(String s) {
         return pattern().matcher(s);
     }
+
     public boolean matches(String s) {
         return matcher(s).matches();
     }

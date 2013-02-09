@@ -13,18 +13,18 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 public class StringTemplateResource extends TemplateResourceBase implements ITemplateResource {
-    
+
     private String content;
-    
+
     public StringTemplateResource(String templateContent) {
         content = templateContent;
     }
-    
+
     public StringTemplateResource(String templateContent, RythmEngine engine) {
         super(engine);
         content = templateContent;
     }
-    
+
     @Override
     public String getKey() {
         return content;
@@ -73,7 +73,7 @@ public class StringTemplateResource extends TemplateResourceBase implements ITem
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof StringTemplateResource) {
-            StringTemplateResource that = (StringTemplateResource)obj;
+            StringTemplateResource that = (StringTemplateResource) obj;
             return that.getKey().equals(getKey());
         }
         return false;

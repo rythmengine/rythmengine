@@ -10,25 +10,32 @@ import java.util.Map;
  */
 public class NamedParams {
 
-    private NamedParams() {}
+    private NamedParams() {
+    }
 
-    public static final NamedParams instance = new NamedParams(); 
+    public static final NamedParams instance = new NamedParams();
 
     public static class Pair {
         public String k;
         public Object v;
+
         public Pair(String key, Object val) {
             k = key;
             v = val;
         }
     }
 
-    public static Pair pair(String k, Object v) {return new Pair(k, v);}
-    public static Pair p(String k, Object v) {return new Pair(k, v);}
-    
+    public static Pair pair(String k, Object v) {
+        return new Pair(k, v);
+    }
+
+    public static Pair p(String k, Object v) {
+        return new Pair(k, v);
+    }
+
     public static Map<String, Object> from(Pair... pairs) {
         Map<String, Object> map = new HashMap<String, Object>(pairs.length);
-        for (Pair p: pairs) {
+        for (Pair p : pairs) {
             map.put(p.k, p.v);
         }
         return map;

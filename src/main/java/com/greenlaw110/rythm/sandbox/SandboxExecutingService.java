@@ -38,9 +38,9 @@ public class SandboxExecutingService {
         try {
             f = exec(t);
             Object o = f.get(timeout, TimeUnit.MILLISECONDS);
-            if (o instanceof RuntimeException) throw (RuntimeException)o;
-            if (o instanceof Exchanger) throw new RuntimeException((Exception)o);
-            return (null == o) ? "" : o.toString(); 
+            if (o instanceof RuntimeException) throw (RuntimeException) o;
+            if (o instanceof Exchanger) throw new RuntimeException((Exception) o);
+            return (null == o) ? "" : o.toString();
         } catch (RuntimeException e) {
             f.cancel(true);
             throw e;

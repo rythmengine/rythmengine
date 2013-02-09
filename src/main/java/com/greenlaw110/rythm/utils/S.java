@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -12,17 +13,18 @@ import java.util.TimeZone;
 
 /**
  * A utility class providing String manipulation methods. Commonly used in template engine process.
- * 
- * <p>Note all methods defined in this class is null safe. 
+ * <p/>
+ * <p>Note all methods defined in this class is null safe.
  * if any input is <code>null</code> the return value is <code>""</code></p>
- * 
- * <p>An instance of this utility is exposed to any Rythm template 
+ * <p/>
+ * <p>An instance of this utility is exposed to any Rythm template
  * via {@link com.greenlaw110.rythm.template.TemplateBase#s()} method and can be used
  * in template source code freely. E.g.</p>
- * 
+ * <p/>
  * <pre><code>
+ *
  * @if(s().empty(name)) {
- *    <div class="alert alert-error">user name is empty!</div>
+ * <div class="alert alert-error">user name is empty!</div>
  * }
  * </code></pre>
  */
@@ -31,9 +33,9 @@ public class S {
 
     /**
      * Determine if a given String is null or empty. By empty it
-     * means equals to <code>""</code> after do a {@link String#trim()} 
-     * operation on it 
-     * 
+     * means equals to <code>""</code> after do a {@link String#trim()}
+     * operation on it
+     *
      * @param s
      * @return true if the String specified is empty or null
      */
@@ -42,8 +44,8 @@ public class S {
     }
 
     /**
-     * Alias of {@link #isEmpty(String)} 
-     * 
+     * Alias of {@link #isEmpty(String)}
+     *
      * @param s
      * @return
      */
@@ -52,19 +54,19 @@ public class S {
     }
 
     /**
-     * Determine if a given String is NOT null or empty. 
-     * 
-     * @see #isEmpty(String) 
+     * Determine if a given String is NOT null or empty.
+     *
      * @param s
      * @return false if the String specified is empty or null
+     * @see #isEmpty(String)
      */
     public static boolean isNotEmpty(String s) {
         return !isEmpty(s);
     }
-    
+
     /**
-     * Alias of {@link #isNotEmpty(String)} 
-     * 
+     * Alias of {@link #isNotEmpty(String)}
+     *
      * @param s
      * @return
      */
@@ -73,41 +75,41 @@ public class S {
     }
 
     /**
-     * Determine if a given Object instance is null or empty after it 
-     * converted to a String. 
-     * 
-     * @see #isEmpty(String) 
+     * Determine if a given Object instance is null or empty after it
+     * converted to a String.
+     *
      * @param o
      * @return
+     * @see #isEmpty(String)
      */
     public static boolean isEmpty(Object o) {
         return null == o || "".equals(o.toString().trim());
     }
 
     /**
-     * Alias of {@link #isEmpty(Object)} 
-     * 
+     * Alias of {@link #isEmpty(Object)}
+     *
      * @param o
      * @return
      */
     public static boolean empty(Object o) {
         return null == o || "".equals(str(o).trim());
     }
-    
+
     /**
-     * Determine if a given Object instance is NOT null or empty. 
-     * 
-     * @see #isEmpty(Object) 
+     * Determine if a given Object instance is NOT null or empty.
+     *
      * @param o
      * @return false if the String specified is empty or null
+     * @see #isEmpty(Object)
      */
     public static boolean isNotEmpty(Object o) {
         return !isEmpty(o);
     }
-    
+
     /**
-     * Alias of {@link #isNotEmpty(Object)} 
-     * 
+     * Alias of {@link #isNotEmpty(Object)}
+     *
      * @param o
      * @return
      */
@@ -118,23 +120,23 @@ public class S {
     /**
      * The modifier used to indicate the comparison should
      * ignore case
-     * 
-     * @see #isEqual(String, String, int) 
+     *
+     * @see #isEqual(String, String, int)
      */
     public static final int IGNORECASE = 0x00001000;
 
     /**
      * The modifier used to indicate the comparison should
      * ignore space
-     * 
-     * @see #isEqual(String, String, int) 
+     *
+     * @see #isEqual(String, String, int)
      */
     public static final int IGNORESPACE = 0x00002000;
 
     /**
      * Check if two String is equal. This comparison is {@link #IGNORECASE case sensitive}
      * and {@link #IGNORESPACE space sensitive}
-     * 
+     *
      * @param s1
      * @param s2
      * @return true if the two specified Strings are equal to each other
@@ -145,7 +147,7 @@ public class S {
 
     /**
      * Alias of {@link #isEqual(String, String)}
-     * 
+     *
      * @param s1
      * @param s2
      * @return
@@ -156,7 +158,7 @@ public class S {
 
     /**
      * Check if two Object is equal after converted into String
-     * 
+     *
      * @param o1
      * @param o2
      * @return true if the specified two object instance are equal after converting to String
@@ -167,7 +169,7 @@ public class S {
 
     /**
      * Alias of {@link #isEqual(Object, Object)}
-     * 
+     *
      * @param o1
      * @param o2
      * @return
@@ -178,7 +180,7 @@ public class S {
 
     /**
      * Alias of {@link #isEqual(String, String, int)}
-     * 
+     *
      * @param s1
      * @param s2
      * @param modifier
@@ -189,19 +191,19 @@ public class S {
     }
 
     /**
-     * Determine whether two string instance is equal based on 
+     * Determine whether two string instance is equal based on
      * the modifier passed in.
-     * 
+     * <p/>
      * <p>
-     *  is 2 strings equal case insensitive?
-     *  <code>S.isEqual(s1, s2, S.IGNORECASE)</code>
+     * is 2 strings equal case insensitive?
+     * <code>S.isEqual(s1, s2, S.IGNORECASE)</code>
      * </p>
-     * 
+     * <p/>
      * <p>
-     *  is 2 strings equals case and space insensitive?
-     *  <code>S.isEqual(s1, s2, S.IGNORECASE & S.IGNORESPACE)</code>
+     * is 2 strings equals case and space insensitive?
+     * <code>S.isEqual(s1, s2, S.IGNORECASE & S.IGNORESPACE)</code>
      * </p>
-     * 
+     *
      * @param s1
      * @param s2
      * @param modifier
@@ -226,6 +228,7 @@ public class S {
 
     /**
      * Alias of {@link #toString(Object)}
+     *
      * @param o
      * @return
      */
@@ -235,9 +238,9 @@ public class S {
 
     /**
      * Safe convert an Object to String. if the Object
-     * is <code>null</code> than <code>""</code> is 
+     * is <code>null</code> than <code>""</code> is
      * returned
-     * 
+     *
      * @param o
      * @return
      */
@@ -246,8 +249,8 @@ public class S {
     }
 
     /**
-     * Remove all line breaks from string representation of specified object O 
-     * 
+     * Remove all line breaks from string representation of specified object O
+     *
      * @param o
      * @return
      */
@@ -257,9 +260,9 @@ public class S {
     }
 
     /**
-     * Return a {@link ITemplate.RawData} type wrapper of 
+     * Return a {@link ITemplate.RawData} type wrapper of
      * an object without any escaping.
-     * 
+     *
      * @param o
      * @return
      */
@@ -271,9 +274,9 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with {@link #escapeXml(Object)} escaping.
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     *
      * @param s
      * @return
      */
@@ -285,12 +288,12 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with specified escaping scheme.
-     * 
+     * <p/>
      * <p>
      * You can pass any type of object to specify the escaping scheme. However
-     * they will in the end converted to {@link #toString(Object) converted to String} 
+     * they will in the end converted to {@link #toString(Object) converted to String}
      * and then determine which escaping to use:
-     * 
+     * <p/>
      * <ul>
      * <li>json: {@link #escapeJSON(Object)} </li>
      * <li>xml: {@link #escapeXML(Object)} </li>
@@ -299,9 +302,9 @@ public class S {
      * <li>html: {@link #escapeCSV(Object)} </li>
      * </ul>
      * </p>
-     * 
+     * <p/>
      * <p>Note Object instance is converted to String before escaping</p>
-     * 
+     *
      * @param o
      * @param escape
      * @return
@@ -309,8 +312,8 @@ public class S {
     @Transformer
     public static ITemplate.RawData escape(Object o, Object escape) {
         if (isEmpty(o)) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
-        if (escape instanceof ITemplate.Escape) return ((ITemplate.Escape)escape).apply(o);
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
+        if (escape instanceof ITemplate.Escape) return ((ITemplate.Escape) escape).apply(o);
         if (isEmpty(escape)) return escape(o);
         String se = escape.toString();
         if ("json".equalsIgnoreCase(se)) return escapeJson(o);
@@ -325,22 +328,22 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with HTML escaping
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     *
      * @param o
      * @return
      */
     @Transformer
     public static ITemplate.RawData escapeHTML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         return new ITemplate.RawData(StringEscapeUtils.escapeHtml4(o.toString()));
     }
 
     /**
      * Alias of {@link #escapeHTML(Object)}
-     * 
+     *
      * @param o
      * @return
      */
@@ -351,45 +354,45 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with CSV escaping
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     *
      * @param o
      * @return
      */
     @Transformer
     public static ITemplate.RawData escapeCSV(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         return new ITemplate.RawData(StringEscapeUtils.escapeCsv(o.toString()));
     }
 
     /**
      * Alias of {@link #escapeCSV(Object)}
-     * 
+     *
      * @param o
      * @return
      */
     public static ITemplate.RawData escapeCsv(Object o) {
         return escapeCSV(o);
     }
-        
+
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with JSON escaping
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     * <p/>
      * <p>After the object get escaped, the output string is safe to put into a
      * JSON block</p>
-     * 
+     *
      * @param o
      * @return
      */
     @Transformer
     public static ITemplate.RawData escapeJSON(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         String s0 = o.toString();
         s0 = s0.replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
         return new ITemplate.RawData(s0);
@@ -397,7 +400,7 @@ public class S {
 
     /**
      * Alias of {@link #escapeCSV(Object)}
-     * 
+     *
      * @param o
      * @return
      */
@@ -408,25 +411,25 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with JavaScript escaping
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     * <p/>
      * <p>After the object get escaped, the output string is safe to put inside a pair of
      * JavaScript quotation marks</p>
-     * 
+     *
      * @param o
      * @return
      */
     @Transformer
     public static ITemplate.RawData escapeJavaScript(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         return new ITemplate.RawData(StringEscapeUtils.escapeEcmaScript(o.toString()));
     }
 
     /**
      * Alias of {@link #escapeJavaScript(Object)}
-     * 
+     *
      * @param o
      * @return
      */
@@ -436,7 +439,7 @@ public class S {
 
     /**
      * Alias of {@link #escapeJavaScript(Object)}
-     * 
+     *
      * @param o
      * @return
      */
@@ -448,58 +451,58 @@ public class S {
     /**
      * Return a {@link ITemplate.RawData} type wrapper of
      * an object with XML escaping
-     * 
+     * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
-     * 
+     * <p/>
      * <p>After the object get escaped, the output string is safe to put inside a XML
      * attribute
-     * 
+     *
      * @param o
      * @return
      */
     @Transformer
     public static ITemplate.RawData escapeXML(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
 
     /**
      * Alias of {@link #escapeXML(Object)}
-     * 
+     *
      * @param o
      * @return
      */
     public static ITemplate.RawData escapeXml(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         return new ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
 
     /**
-     * Escape for regular expression 
-     * 
+     * Escape for regular expression
+     *
      * @param o
      * @return
      */
     public static ITemplate.RawData escapeRegex(Object o) {
         if (null == o) return ITemplate.RawData.NULL;
-        if (o instanceof ITemplate.RawData) return (ITemplate.RawData)o;
+        if (o instanceof ITemplate.RawData) return (ITemplate.RawData) o;
         String s = o.toString();
         return new ITemplate.RawData(s.replaceAll("([\\/\\*\\{\\}\\<\\>\\-\\\\\\!])", "\\\\$1"));
     }
 
     /**
-     * Strip the prefix and suffix from an object's String representation and 
+     * Strip the prefix and suffix from an object's String representation and
      * return the result
-     * 
+     * <p/>
      * <p>For example: </p>
-     * 
+     * <p/>
      * <pre><code>Object o = "xxBByy";
      * String s = S.strip(o, "xx", "yy")</code></pre>
-     * 
+     * <p/>
      * <p>At the end above code, <code>s</code> should be "BB"</p>
-     * 
+     *
      * @param o
      * @param prefix
      * @param suffix
@@ -515,8 +518,8 @@ public class S {
     }
 
     /**
-     * Strip the brace from an object's string representation and return the result 
-     * 
+     * Strip the brace from an object's string representation and return the result
+     *
      * @param o
      * @return
      */
@@ -525,8 +528,8 @@ public class S {
     }
 
     /**
-     * Strip the quotation mark from an object's string representation and return the result 
-     * 
+     * Strip the quotation mark from an object's string representation and return the result
+     *
      * @param o
      * @return
      */
@@ -536,7 +539,7 @@ public class S {
 
     /**
      * Strip off both brace and quotation
-     * 
+     *
      * @param o
      * @return
      */
@@ -550,12 +553,12 @@ public class S {
     /**
      * Shrink spaces in an object's string representation by merge multiple
      * spaces, tabs into one space, and multiple line breaks into one line break
-     * 
+     *
      * @param o
      * @return
      */
     public static String shrinkSpace(Object o) {
-        if (null == o) return  "";
+        if (null == o) return "";
         return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("[ \\t\\x0B\\f]+", " ");
     }
 
@@ -563,7 +566,7 @@ public class S {
     /**
      * Capitalize the first character of every word of the specified object's
      * string representation. Words are separated by space
-     * 
+     *
      * @param o
      * @return
      */
@@ -586,9 +589,9 @@ public class S {
     }
 
     /**
-     * Replace accent character (usually found in European languages) of the String representation of a 
-     * give object to non-accent char. 
-     * 
+     * Replace accent character (usually found in European languages) of the String representation of a
+     * give object to non-accent char.
+     *
      * @param o
      * @return
      */
@@ -601,7 +604,7 @@ public class S {
 
     /**
      * Make the first character be lowercase of the given object's string representation
-     * 
+     *
      * @param o
      * @return
      */
@@ -617,7 +620,7 @@ public class S {
 
     /**
      * Make the first character be uppercase of the given object's string representation
-     * 
+     *
      * @param o
      * @return
      */
@@ -632,8 +635,8 @@ public class S {
     }
 
     /**
-     * Turn an object's String representation into Camel Case 
-     * 
+     * Turn an object's String representation into Camel Case
+     *
      * @param obj
      * @return
      */
@@ -649,19 +652,23 @@ public class S {
         }
         return result.toString();
     }
-    
+
     @Transformer
-    public static String format(Number number, String pattern, String lang) {
+    public static String format(Number number, String pattern, String lang, String locale) {
+        RythmConfiguration conf = RythmEngine.get().conf();
         if (null == lang) {
-            lang = RythmEngine.get().configuration.getProperty("lang", "en");
-        } 
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale(lang));
+            lang = conf.lang();
+        }
+        if (null == locale) {
+            locale = conf.locale();
+        }
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale(lang, locale));
         return new DecimalFormat(pattern, symbols).format(number);
     }
 
     @Transformer
     public static String format(Number number, String pattern) {
-        return format(number, pattern, null);
+        return format(number, pattern, null, null);
     }
 
     @Transformer
@@ -671,20 +678,31 @@ public class S {
 
     @Transformer
     public static String format(Date date, String pattern) {
-        return format(date, pattern, null);
+        return format(date, pattern, null, null);
     }
 
     @Transformer
-    public static String format(Date date, String pattern, String lang) {
+    public static String format(Date date, String pattern, String lang, String locale) {
+        RythmConfiguration conf = RythmEngine.get().conf();
         if (null == lang) {
-            lang = RythmEngine.get().configuration.getProperty("lang", "en");
+            lang = conf.lang();
         }
-        return new SimpleDateFormat(pattern, new Locale(lang)).format(date);
+        if (null == locale) {
+            locale = conf.locale();
+        }
+        return new SimpleDateFormat(pattern, new Locale(lang, locale)).format(date);
     }
 
     @Transformer
-    public static String format(Date date, String pattern, String lang, String timezone) {
-        DateFormat df = new SimpleDateFormat(pattern, new Locale(lang));
+    public static String format(Date date, String pattern, String lang, String locale, String timezone) {
+        RythmConfiguration conf = RythmEngine.get().conf();
+        if (null == lang) {
+            lang = conf.lang();
+        }
+        if (null == locale) {
+            locale = conf.locale();
+        }
+        DateFormat df = new SimpleDateFormat(pattern, new Locale(lang, locale));
         df.setTimeZone(TimeZone.getTimeZone(timezone));
         return df.format(date);
     }

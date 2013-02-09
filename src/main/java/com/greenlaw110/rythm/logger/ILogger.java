@@ -8,7 +8,7 @@ package com.greenlaw110.rythm.logger;
  * To change this template use File | Settings | File Templates.
  */
 public interface ILogger {
-    
+
     public boolean isTraceEnabled();
 
     public void trace(String format, Object... args);

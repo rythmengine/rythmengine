@@ -18,6 +18,7 @@ public class Token extends TextBuilder {
 
     public static class StringToken extends Token {
         public String constId = null;
+
         public StringToken(String s, IContext ctx) {
             super(s, ctx);
         }
@@ -46,11 +47,11 @@ public class Token extends TextBuilder {
         public boolean compactMode() {
             return super.compactMode();
         }
-        
+
         public int getLineNo() {
             return line;
         }
-        
+
         public String s() {
             return s;
         }
@@ -76,7 +77,7 @@ public class Token extends TextBuilder {
         public boolean equals(Object obj) {
             if (obj == this) return true;
             if (obj instanceof StringToken) {
-                StringToken st = (StringToken)obj;
+                StringToken st = (StringToken) obj;
                 return st.compactMode() == compactMode() && st.s.equals(s);
             }
             return false;
@@ -88,11 +89,14 @@ public class Token extends TextBuilder {
     protected IContext ctx;
     protected int line;
     protected boolean disableCompactMode = false;
+
     protected boolean compactMode() {
         if (disableCompactMode) return false;
         return (null == ctx ? true : ctx.compactMode());
     }
+
     private RythmEngine engine = null;
+    private Iterable<IJavaExtension> javaExtensions = null;
     private boolean transformEnabled = true;
     /*
      * Indicate whether token parse is good
@@ -112,7 +116,9 @@ public class Token extends TextBuilder {
         this.s = s;
         line = -1;
         this.disableCompactMode = disableCompactMode;
+        //TODO: dangerous engine assignment here. only called by AppendXXToken in AutoToStringCodeBuilder
         this.engine = Rythm.engine();
+        this.javaExtensions = engine.extensionManager().javaExtensions();
         this.transformEnabled = engine.conf().transformEnabled();
     }
 
@@ -126,6 +132,7 @@ public class Token extends TextBuilder {
         ctx = context;
         line = (null == context) ? -1 : context.currentLine();
         this.engine = ctx.getEngine();
+        this.javaExtensions = engine.extensionManager().javaExtensions();
         this.disableCompactMode = disableCompactMode;
         this.transformEnabled = engine.conf().transformEnabled();
     }
@@ -152,6 +159,7 @@ public class Token extends TextBuilder {
     }
 
     private static final Regex R_ = new Regex("^\\s*(?@())\\s*$");
+
     private static String stripOuterBrackets(String s) {
         if (S.isEmpty(s)) return s;
         if (R_.search(s)) {
@@ -164,6 +172,7 @@ public class Token extends TextBuilder {
     }
 
     private static final Pattern P_ELVIS = Pattern.compile("(.*)(\\s*\\?\\s*:\\s*.*)");
+
     private static String[] stripElvis(String s) {
         if (S.isEmpty(s)) return new String[]{"", ""};
         s = stripOuterBrackets(s);
@@ -171,11 +180,12 @@ public class Token extends TextBuilder {
         if (m.matches()) {
             String s0 = m.group(1);
             String s1 = m.group(2);
-            return new String[] {s0, s1};
+            return new String[]{s0, s1};
         } else {
-            return new String[] {s, ""};
+            return new String[]{s, ""};
         }
     }
+
     private static String processElvis(String s) {
         if (S.isEmpty(s)) return s;
         String[] sa = stripElvis(s);
@@ -185,9 +195,10 @@ public class Token extends TextBuilder {
         elvis = elvis.replaceFirst("^\\s*\\?\\s*:\\s*", "");
         return String.format("((null == %1$s) ? %2$s : %1$s)", s, elvis);
     }
+
     protected final void outputExpression(List<String> nullValueTester) {
         int size = nullValueTester.size();
-        for (String s: nullValueTester) {
+        for (String s : nullValueTester) {
             p("if (null != ").p(s).p(") {\n\t");
         }
         outputExpression();
@@ -196,9 +207,11 @@ public class Token extends TextBuilder {
             pn("}");
         }
     }
+
     protected final void outputExpression() {
         outputExpression(true);
     }
+
     protected final void outputExpression(boolean needsPrint) {
         if (S.isEmpty(s)) return;
         String s = processExtensions(engine);
@@ -206,6 +219,7 @@ public class Token extends TextBuilder {
         else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
         pline();
     }
+
     private String processExtensions(RythmEngine engine) {
         if (!transformEnabled) return s;
         String s0 = s;
@@ -215,6 +229,7 @@ public class Token extends TextBuilder {
         class Pair {
             IJavaExtension extension;
             String signature;
+
             Pair(IJavaExtension e, String s) {
                 extension = e;
                 signature = s;
@@ -222,9 +237,9 @@ public class Token extends TextBuilder {
         }
         Stack<Pair> allMatched = new Stack<Pair>();
         // try parse java extension first
-        while(true) {
+        while (true) {
             boolean matched = false;
-            for(IJavaExtension e: engine.javaExtensions()) {
+            for (IJavaExtension e : javaExtensions) {
                 Pattern p = e.pattern1();
                 Matcher m = p.matcher(s);
                 if (m.matches()) {
@@ -241,7 +256,7 @@ public class Token extends TextBuilder {
         if (hasJavaExtension) {
             // process inner elvis expression
             s = processElvis(s);
-            while (!allMatched.empty()){
+            while (!allMatched.empty()) {
                 Pair p = allMatched.pop();
                 s = p.extension.extend(s, p.signature);
             }
@@ -250,9 +265,9 @@ public class Token extends TextBuilder {
             String[] sa = stripElvis(s);
             s = sa[0];
             String elvis = sa[1];
-            while(true) {
+            while (true) {
                 boolean matched = false;
-                for(IJavaExtension e: engine.javaExtensions()) {
+                for (IJavaExtension e : javaExtensions) {
                     Pattern p = e.pattern1();
                     Matcher m = p.matcher(s);
                     if (m.matches()) {
@@ -265,7 +280,7 @@ public class Token extends TextBuilder {
                 }
                 if (!matched) break;
             }
-            while (!allMatched.empty()){
+            while (!allMatched.empty()) {
                 // process inner elvis expression
                 s = processElvis(s);
                 Pair p = allMatched.pop();
@@ -281,7 +296,7 @@ public class Token extends TextBuilder {
             s = String.format("(%s)", s);
         }
         s = compact(s);
-        for (IExpressionProcessor p: engine.getExtensionManager().expressionProcessors()) {
+        for (IExpressionProcessor p : engine.extensionManager().expressionProcessors()) {
             String result = p.process(s, this);
             if (null != result) {
                 // remove line breaks so that we can easily handle line numbers
@@ -291,42 +306,42 @@ public class Token extends TextBuilder {
         return s;
     }
 
-    public Token ptline(String msg, Object ... args) {
+    public Token ptline(String msg, Object... args) {
         String s = String.format(msg, args);
         p("\t").p(s);
         pline();
         return this;
     }
 
-    public Token p2tline(String msg, Object ... args) {
+    public Token p2tline(String msg, Object... args) {
         String s = String.format(msg, args);
         p("\t\t").p(s);
         pline();
         return this;
     }
 
-    public Token p3tline(String msg, Object ... args) {
+    public Token p3tline(String msg, Object... args) {
         String s = String.format(msg, args);
         p("\t\t\t").p(s);
         pline();
         return this;
     }
 
-    public Token p4tline(String msg, Object ... args) {
+    public Token p4tline(String msg, Object... args) {
         String s = String.format(msg, args);
         p("\t\t\t\t").p(s);
         pline();
         return this;
     }
 
-    public Token p5tline(String msg, Object ... args) {
+    public Token p5tline(String msg, Object... args) {
         String s = String.format(msg, args);
         p("\t\t\t\t\t").p(s);
         pline();
         return this;
     }
 
-    public Token pline(String msg, Object ... args) {
+    public Token pline(String msg, Object... args) {
         String s = String.format(msg, args);
         p(s);
         pline();
@@ -356,7 +371,7 @@ public class Token extends TextBuilder {
         boolean startsWithSpace = s.startsWith(" ") || s.startsWith("\t");
         boolean endsWithSpace = s.endsWith(" ") || s.endsWith("\t");
         if (startsWithSpace) tb.p(" ");
-        for (String line: lines) {
+        for (String line : lines) {
             if (i++ > 0) tb.p("\n");
             line = line.replaceAll("[ \t]+", " ").trim();
             tb.p(line);
@@ -368,9 +383,9 @@ public class Token extends TextBuilder {
     protected String compact(String s) {
         return compactMode() ? compact_(s) : s;
     }
-    
+
     public static String processRythmExpression(String s, RythmEngine eninge) {
-        Token token = new Token(s, (IContext)null);
+        Token token = new Token(s, (IContext) null);
         return token.processExtensions(eninge);
     }
 

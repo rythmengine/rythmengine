@@ -10,6 +10,7 @@ package com.greenlaw110.rythm.internal;
 public interface IExpressionProcessor {
     /**
      * Process the expression. Return processed result if processed null otherwise
+     *
      * @param exp
      * @param token
      * @return
@@ -18,5 +19,5 @@ public interface IExpressionProcessor {
 
     public interface IResult {
         String get();
-    }    
+    }
 }

@@ -4,7 +4,6 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
-import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -29,9 +28,9 @@ public class TemplateClassCache {
         this.conf = engine.conf();
         this.mode = engine.mode();
     }
-    
+
     /**
-     * is class cache enabled on the {@link #engine} instance 
+     * is class cache enabled on the {@link #engine} instance
      */
     private boolean enabled() {
         if (mode.isDev() || conf.loadPrecompiled() || conf.precompileMode()) {
@@ -83,16 +82,16 @@ public class TemplateClassCache {
                 hash.append((char) read);
                 offset++;
             }
-            
+
             //check hash only in non precompiled mode
-            if(!conf.loadPrecompiled()){
-	            String curHash = hash(tc);
-	            if (!curHash.equals(hash.toString())) {
-	                if (logger.isTraceEnabled()) {
-	                    logger.trace("Bytecode too old (%s != %s)", hash, curHash);
-	                }
-	                return;
-	            }
+            if (!conf.loadPrecompiled()) {
+                String curHash = hash(tc);
+                if (!curHash.equals(hash.toString())) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Bytecode too old (%s != %s)", hash, curHash);
+                    }
+                    return;
+                }
             }
 
             // --- load java source
@@ -115,7 +114,7 @@ public class TemplateClassCache {
                 s = sa[1];
                 sa = s.split(";");
                 tc.importPaths = new HashSet<String>();
-                for (String path: sa) {
+                for (String path : sa) {
                     if ("java.lang".equals(path)) continue;
                     tc.importPaths.add(path);
                 }
@@ -199,14 +198,14 @@ public class TemplateClassCache {
                 tb.p(tc.javaSource);
                 tb.p("__INCLUDED_TAG_TYPES__").p(tc.serializeIncludeTagTypes());
                 tb.p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
-                    .p("__IMPORT_PATH_LIST__");
+                        .p("__IMPORT_PATH_LIST__");
                 if (tc.importPaths == null) {
                     tc.importPaths = new HashSet<String>(0);
                 }
                 if (tc.importPaths.isEmpty()) {
                     tc.importPaths.add("java.lang");
                 }
-                boolean  first = true;
+                boolean first = true;
                 for (String s : tc.importPaths) {
                     if (!first) {
                         tb.p(";");
@@ -272,13 +271,10 @@ public class TemplateClassCache {
      */
     String hash(TemplateClass tc) {
         try {
-            StringBuffer enhancers = new StringBuffer();
-            for (IByteCodeEnhancer plugin : engine.templateClassEnhancers) {
-                enhancers.append(plugin.getClass().getName());
-            }
+            Object enhancer = engine.conf().byteCodeEnhancer();
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((engine.version() + enhancers.toString() + tc.getTemplateSource(true)).getBytes("utf-8"));
+            messageDigest.update((engine.version() + String.valueOf(enhancer) + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {

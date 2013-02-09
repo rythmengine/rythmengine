@@ -4,8 +4,6 @@ import com.greenlaw110.rythm.internal.RythmThreadFactory;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
 
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Create secure template executing thread
@@ -13,7 +11,7 @@ import java.util.concurrent.ConcurrentMap;
 class SandboxThreadFactory extends RythmThreadFactory {
     private SecurityManager sm;
     private String password = null;
-    
+
     public SandboxThreadFactory(SecurityManager sm) {
         super("rythm-executor");
         if (null == sm) {
@@ -25,16 +23,18 @@ class SandboxThreadFactory extends RythmThreadFactory {
     }
 
     //static ConcurrentMap<String, SandboxThread> runners = new ConcurrentHashMap<String, SandboxThread>();
-    
+
     static class SandboxThread extends Thread {
         private SecurityManager sm;
         private SandboxThreadFactory fact;
+
         public SandboxThread(SandboxThreadFactory fact, SecurityManager sm, ThreadGroup group, Runnable target, String name, long stackSize) {
             super(group, target, name, stackSize);
             this.sm = sm;
             this.fact = fact;
             //runners.put(name, this);
         }
+
         @Override
         public void run() {
             SecurityManager osm = System.getSecurityManager();
@@ -46,7 +46,7 @@ class SandboxThreadFactory extends RythmThreadFactory {
             } finally {
                 if (osm != nsm) {
                     if (nsm instanceof RythmSecurityManager) {
-                        RythmSecurityManager rsm = (RythmSecurityManager)nsm;
+                        RythmSecurityManager rsm = (RythmSecurityManager) nsm;
                         rsm.unlock(fact.password);
                         System.setSecurityManager(osm);
                         rsm.lock(fact.password);
@@ -62,7 +62,7 @@ class SandboxThreadFactory extends RythmThreadFactory {
     protected Thread newThread0(ThreadGroup g, Runnable r, String name, long stackSize) {
         return new SandboxThread(this, sm, g, r, name, stackSize);
     }
-    
+
     static void shutdown() {
 //        for (Thread t: runners.values()) {
 //            t.stop();

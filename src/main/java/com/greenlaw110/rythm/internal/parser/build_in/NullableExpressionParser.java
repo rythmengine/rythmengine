@@ -1,10 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.parser.CodeToken;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.ExtensionManager;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  * Parse groovy nullable expression, e.g. @foo?.bar()?.zee
- *
+ * <p/>
  * Must be invoked behind invoking of the normal ExpressionParser
  *
  * @author luog
@@ -28,7 +29,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
         //if (!(dialect instanceof Rythm)) throw new DialectNotSupportException(dialect.id());
         final String caret_ = dialect.a();
 
-        return new ParserBase(ctx){
+        return new ParserBase(ctx) {
 
             @Override
             public TextBuilder go() {
@@ -39,7 +40,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                 final Regex r4 = new Regex(patternStr4());
 
                 String s = remain();
-                String exp = null;
+                String exp;
                 int step = 0;
                 if (r1.search(s)) {
                     exp = r1.stringMatched(2);
@@ -60,9 +61,10 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                 step(step);
                 StringBuilder curExp = new StringBuilder();
                 final List<String> statements = new ArrayList<String>();
+                ExtensionManager jem = ctx().getEngine().extensionManager();
                 while (r3.search(exp)) {
                     String s0 = r3.stringMatched().trim();
-                    if (ctx().getEngine().isJavaExtension(s0)) break;
+                    if (jem.isJavaExtension(s0)) break;
                     if (s0.endsWith("?.")) {
                         s0 = s0.replace("?.", "");
                         curExp.append(s0);

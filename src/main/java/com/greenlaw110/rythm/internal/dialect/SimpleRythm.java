@@ -1,8 +1,8 @@
 package com.greenlaw110.rythm.internal.dialect;
 
-import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.parser.build_in.*;
 
 /**
  * Simple Rythm mode is a subset of Rythm mode which has most Rythm feature except the template layout/extend features:
@@ -21,10 +21,11 @@ public class SimpleRythm extends DialectBase {
     public String id() {
         return ID;
     }
-    
+
     public static final IDialect INSTANCE = new SimpleRythm();
-    
-    protected SimpleRythm() {}
+
+    protected SimpleRythm() {
+    }
 
     public String a() {
         return "@";
@@ -39,18 +40,18 @@ public class SimpleRythm extends DialectBase {
     @Override
     public boolean isMyTemplate(String template) {
         String[] forbidden = {
-            "@extends",
-            "@section",
-            "@render",
-            "@doLayout",
-            "@doBody",
-            "@include",
-            "@set",
-            "@get",
-            "@init",
-            "@nosim"
+                "@extends",
+                "@section",
+                "@render",
+                "@doLayout",
+                "@doBody",
+                "@include",
+                "@set",
+                "@get",
+                "@init",
+                "@nosim"
         };
-        for (String s: forbidden) {
+        for (String s : forbidden) {
             if (template.contains(s)) return false;
         }
 

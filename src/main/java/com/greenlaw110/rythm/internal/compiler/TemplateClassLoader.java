@@ -1,9 +1,9 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.extension.IHotswapAgent;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.sandbox.RythmSecurityManager;
@@ -168,16 +168,15 @@ public class TemplateClassLoader extends ClassLoader {
     public ProtectionDomain protectionDomain;
 
     public RythmEngine engine;
-    
+
     private RythmConfiguration conf;
 
-    private static ClassLoader getDefParent() {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return null == cl ? RythmEngine.class.getClassLoader() : cl;
+    private static ClassLoader getDefParent(RythmEngine engine) {
+        return engine.conf().get(RythmConfigurationKey.ENGINE_CLASS_LOADER_PARENT_IMPL);
     }
 
     public TemplateClassLoader(RythmEngine engine) {
-        this(getDefParent(), engine);
+        this(getDefParent(engine), engine);
     }
 
     public TemplateClassLoader(ClassLoader parent, RythmEngine engine) {

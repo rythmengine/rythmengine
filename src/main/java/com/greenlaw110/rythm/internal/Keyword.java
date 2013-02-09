@@ -19,7 +19,7 @@ public enum Keyword implements IKeyword {
     CACHE,
     CASE,
     /**
-     * Force compact mode in regard of engine.compactMode()
+     * Force compact mode in regard of engine.conf().compactEnabled()
      */
     COMPACT,
     /**
@@ -89,14 +89,14 @@ public enum Keyword implements IKeyword {
     LOG_TIME("__logTime__"),
     /**
      * Define an macro.
-     *
+     * <p/>
      * A macro is different from an assignment or an inline tag in that
      * it is purely happen at parsing time, while the assign and inline tag
      * is evaluated at runtime
      */
     MACRO,
     /**
-     * For no compact in regard to engine.compactMode
+     * For no compact in regard to engine.conf().compactEnabled()
      */
     NOCOMPACT,
     /**
@@ -151,9 +151,11 @@ public enum Keyword implements IKeyword {
     VERBATIM;
 
     private final String s;
+
     private Keyword() {
         this.s = name().toLowerCase();
     }
+
     private Keyword(String s) {
         this.s = (null == s) ? name().toLowerCase() : s;
     }

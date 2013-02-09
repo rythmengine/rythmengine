@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.internal.IBlockHandler;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -14,7 +14,6 @@ import com.stevesoft.pat.Regex;
  * else branch for @for loop, executed in case the loop variable is empty
  *
  * @author luog
- *
  */
 public class ElseForParser extends CaretParserFactoryBase {
 
@@ -25,7 +24,7 @@ public class ElseForParser extends CaretParserFactoryBase {
             @Override
             public TextBuilder go() {
                 IBlockHandler bh = ctx().currentBlock();
-                if (null == bh || ! (bh instanceof ForEachCodeToken)) return null;
+                if (null == bh || !(bh instanceof ForEachCodeToken)) return null;
 
                 String a = dialect().a();
                 Regex r = new Regex(String.format("^((%s\\}?|%s?\\})\\s*(else([\\s\\r\\n\\t]*(\\{|[\\s\\r\\n\\t]+)))).*", a, a));

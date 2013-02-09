@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -19,12 +19,13 @@ import java.util.regex.Pattern;
 public class CacheParser extends KeywordParserFactory {
 
     private static final Pattern P_INT = Pattern.compile("\\-?[0-9\\*\\/\\+\\-]+");
+
     public static void validateDurationStr(String d, IContext ctx) {
         if ("null".equals(d)) return;
         if ((d.startsWith("\"") && d.endsWith("\""))) {
             String s = S.stripQuotation(d);
             try {
-                ctx.getEngine().durationParser.parseDuration(s);
+                ctx.getEngine().conf().durationParser().parseDuration(s);
             } catch (Exception e) {
                 raiseParseException(ctx, "Invalid time duration: %s", d);
             }
@@ -41,12 +42,12 @@ public class CacheParser extends KeywordParserFactory {
       if (null != s) {
         p(s);
       } else {
-        StringBuilder sbOld = getOut();
+        StringBuilder sbOld = getBuffer();
         StringBuilder sbNew = new StringBuilder()
-        setOut(sbNew);
+        setBuffer(sbNew);
         ...
         s = sbNew.toString();
-        setOut(sbOld);
+        setBuffer(sbOld);
         _engine().cache("key", s, duration, 1, foo.bar());
         p(s)
       }
@@ -58,7 +59,8 @@ public class CacheParser extends KeywordParserFactory {
         private int startIndex;
         private int endIndex;
         private String key;
-        CacheToken( String duration, String args, IContext ctx) {
+
+        CacheToken(String duration, String args, IContext ctx) {
             super("", ctx);
             this.duration = S.isEmpty(duration) ? "null" : duration;
             // check if duration is valid
@@ -79,11 +81,11 @@ public class CacheParser extends KeywordParserFactory {
             pline();
             pt("} else {");
             pline();
-            p2t("StringBuilder sbOld = getOut();");
+            p2t("StringBuilder sbOld = getBuffer();");
             pline();
             p2t("StringBuilder sbNew = new StringBuilder();");
             pline();
-            p2t("setOut(sbNew);");
+            p2t("setBuffer(sbNew);");
             pline();
         }
 
@@ -94,12 +96,12 @@ public class CacheParser extends KeywordParserFactory {
             String tmplName = ctx.getTemplateClass().name();
             String keySeed = body + tmplName;
             key = UUID.nameUUIDFromBytes(keySeed.getBytes()).toString();
-            StringBuilder sbOld = getOut();
+            StringBuilder sbOld = getBuffer();
             StringBuilder sbNew = new StringBuilder();
-            setOut(sbNew);
+            setBuffer(sbNew);
             p2t("s = sbNew.toString();");
             pline();
-            p2t("setOut(sbOld);");
+            p2t("setBuffer(sbOld);");
             pline();
             p2t("_engine().cache(\"").p(key).p("\",s,").p(duration).p(args).p(");");
             pline();
@@ -110,7 +112,7 @@ public class CacheParser extends KeywordParserFactory {
             p("}");
             pline();
             String s = sbNew.toString();
-            setOut(sbOld);
+            setBuffer(sbOld);
             return s;
         }
     }

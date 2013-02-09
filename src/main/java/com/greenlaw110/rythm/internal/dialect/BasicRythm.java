@@ -1,7 +1,7 @@
 package com.greenlaw110.rythm.internal.dialect;
 
-import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.parser.build_in.*;
 
 /**
  * Basic Rythm is a very limited subset of Rythm which has only basic Rythm features:
@@ -9,7 +9,7 @@ import com.greenlaw110.rythm.internal.IDialect;
  * <li>Expression evaluation (nullable express also supported) and escaping</li>
  * <li>if-elseif-else, and for(T e: Iterable<T>)</></li>
  * </ul>
- * 
+ * <p/>
  * Specifically, argument declaration and scripting is disabled in ToString mode; @for(; ;) is not allowed in Basic
  * mode to prevent infinite loop
  */
@@ -23,7 +23,7 @@ public class BasicRythm extends SimpleRythm {
     }
 
     public static final IDialect INSTANCE = new BasicRythm();
-    
+
     protected BasicRythm() {
     }
 
@@ -36,32 +36,32 @@ public class BasicRythm extends SimpleRythm {
     @Override
     public boolean isMyTemplate(String template) {
         String[] forbidden = {
-            "@args",
-            "@assign",
-            "@debug",
-            "@doLayout",
-            "@doBody",
-            "@extends",
-            "@section",
-            "@render",
-            "@import",
-            "@include",
-            "@invoke",
-            "@set",
-            "@get",
-            "@init",
-            "@expand",
-            "@exec",
-            "@macro",
-            "@compact",
-            "@nocompact",
-            "@def ",
-            "@tag ",
-            "@return",
-            "@nosim",
-            "@verbatim"
+                "@args",
+                "@assign",
+                "@debug",
+                "@doLayout",
+                "@doBody",
+                "@extends",
+                "@section",
+                "@render",
+                "@import",
+                "@include",
+                "@invoke",
+                "@set",
+                "@get",
+                "@init",
+                "@expand",
+                "@exec",
+                "@macro",
+                "@compact",
+                "@nocompact",
+                "@def ",
+                "@tag ",
+                "@return",
+                "@nosim",
+                "@verbatim"
         };
-        for (String s: forbidden) {
+        for (String s : forbidden) {
             if (template.contains(s)) return false;
         }
 

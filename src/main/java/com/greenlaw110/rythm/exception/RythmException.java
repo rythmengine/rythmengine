@@ -3,7 +3,6 @@ package com.greenlaw110.rythm.exception;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -35,8 +34,8 @@ public class RythmException extends FastRuntimeException {
     public RythmException(RythmEngine engine, Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
         boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
-        boolean logJava = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
-        boolean logTmpl = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
+        boolean logJava = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
+        boolean logTmpl = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
         this.engine = engine;
         this.templateName = templateName;
@@ -60,9 +59,8 @@ public class RythmException extends FastRuntimeException {
 
     public RythmException(RythmEngine engine, Throwable t, TemplateClass tc, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
-        boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
-        boolean logJava = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
-        boolean logTmpl = engine.conf.get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
+        boolean logJava = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
+        boolean logTmpl = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
         this.engine = engine;
         this.javaLineNumber = javaLineNumber;
@@ -105,15 +103,15 @@ public class RythmException extends FastRuntimeException {
         TextBuilder tb = new TextBuilder();
         tb.p("Relevant template source lines:\n-------------------------------------------------\n");
         String[] lines = tmplSource.split("(\\n\\r|\\r\\n|\\r|\\n)");
-        int start = 0, end = lines.length ;
+        int start = 0, end = lines.length;
         if (templateLineNumber > -1 && templateLineNumber < lines.length) {
             start = Math.max(0, templateLineNumber - 6);
             end = Math.min(end, templateLineNumber + 6);
         }
-        for (int line = start;line < end; ++line) {
+        for (int line = start; line < end; ++line) {
             if ((line + 1) == templateLineNumber) tb.p(">> ");
             else tb.p("   ");
-            tb.p(line+1).p(": ").p(lines[line]).p("\n");
+            tb.p(line + 1).p(": ").p(lines[line]).p("\n");
         }
         templateSourceInfo = tb.toString();
         return templateSourceInfo;
@@ -128,6 +126,7 @@ public class RythmException extends FastRuntimeException {
     }
 
     private static final Pattern P = Pattern.compile(".*\\/\\/line:\\s*([0-9]+).*");
+
     private static int resolveTemplateLineNumber(int javaLineNumber, int templateLineNumber, String javaSource, TemplateClass templateClass) {
         if (javaLineNumber != -1 && templateLineNumber == -1) {
             String[] lines = getJavaSource(javaSource, templateClass).split("(\\r\\n|\\n\\r|\\n|\\r)");
@@ -135,7 +134,7 @@ public class RythmException extends FastRuntimeException {
                 String errorLine = lines[javaLineNumber - 1];
                 Matcher m = P.matcher(errorLine);
                 if (m.matches()) {
-                    return  Integer.parseInt(m.group(1));
+                    return Integer.parseInt(m.group(1));
                 }
             }
         }

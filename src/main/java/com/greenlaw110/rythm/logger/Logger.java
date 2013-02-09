@@ -16,9 +16,11 @@ public class Logger {
 
     private static class Proxy implements ILogger {
         private Class<?> c_;
+
         Proxy(Class<?> clazz) {
             c_ = clazz;
         }
+
         ILogger impl() {
             return getLogger_(c_);
         }
@@ -100,6 +102,7 @@ public class Logger {
     }
 
     private static Map<Class<?>, ILogger> loggers = new HashMap<Class<?>, ILogger>();
+
     private static ILogger getLogger_(Class<?> clazz) {
         ILogger logger = loggers.get(clazz);
         if (null == logger) {
@@ -108,50 +111,96 @@ public class Logger {
         }
         return logger;
     }
-    
+
     private static ILoggerFactory userFact = null;
     private static final ILoggerFactory fact = new ILoggerFactory() {
         private ILoggerFactory defFact = new JDKLogger.Factory();
+
         @Override
         public ILogger getLogger(Class<?> clazz) {
             return null == userFact ? defFact.getLogger(clazz) : userFact.getLogger(clazz);
         }
     };
-    
+
     public static ILogger get(Class<?> clazz) {
         return new Proxy(clazz);
     }
-    
+
     private static ILogger def = null;
+
     private static ILogger def() {
         if (null == def) def = get(Rythm.class);
         return def;
     }
-    
+
     public static void registerLoggerFactory(ILoggerFactory fact) {
         reset();
         userFact = fact;
     }
-    
+
     public static void reset() {
         userFact = null;
         def = null;
         loggers.clear();
     }
 
-    public static boolean isTraceEnabled() {return def().isTraceEnabled();}
-    public static void trace(String format, Object... args) {def().trace(format, args);}
-    public static void trace(Throwable t, String format, Object... args) {def().trace(t, format, args);}
-    public static boolean isDebugEnabled() {return def().isDebugEnabled();}
-    public static void debug(String format, Object... args) {def().debug(format, args);}
-    public static void debug(Throwable t, String format, Object... args) {def().debug(t, format, args);}
-    public static boolean isInfoEnabled() {return def().isInfoEnabled();}
-    public static void info(String format, Object... arg) {def().info(format, arg);}
-    public static void info(Throwable t, String format, Object... args) {def().info(t, format, args);}
-    public static boolean isWarnEnabled() {return def().isWarnEnabled();}
-    public static void warn(String format, Object... arg) {def().warn(format, arg);}
-    public static void warn(Throwable t, String format, Object... args) {def().warn(t, format, args);}
-    public static boolean isErrorEnabled() {return def().isErrorEnabled();}
-    public static void error(String format, Object... arg) {def().error(format, arg);}
-    public static void error(Throwable t, String format, Object... args) {def().error(t, format, args);}
+    public static boolean isTraceEnabled() {
+        return def().isTraceEnabled();
+    }
+
+    public static void trace(String format, Object... args) {
+        def().trace(format, args);
+    }
+
+    public static void trace(Throwable t, String format, Object... args) {
+        def().trace(t, format, args);
+    }
+
+    public static boolean isDebugEnabled() {
+        return def().isDebugEnabled();
+    }
+
+    public static void debug(String format, Object... args) {
+        def().debug(format, args);
+    }
+
+    public static void debug(Throwable t, String format, Object... args) {
+        def().debug(t, format, args);
+    }
+
+    public static boolean isInfoEnabled() {
+        return def().isInfoEnabled();
+    }
+
+    public static void info(String format, Object... arg) {
+        def().info(format, arg);
+    }
+
+    public static void info(Throwable t, String format, Object... args) {
+        def().info(t, format, args);
+    }
+
+    public static boolean isWarnEnabled() {
+        return def().isWarnEnabled();
+    }
+
+    public static void warn(String format, Object... arg) {
+        def().warn(format, arg);
+    }
+
+    public static void warn(Throwable t, String format, Object... args) {
+        def().warn(t, format, args);
+    }
+
+    public static boolean isErrorEnabled() {
+        return def().isErrorEnabled();
+    }
+
+    public static void error(String format, Object... arg) {
+        def().error(format, arg);
+    }
+
+    public static void error(Throwable t, String format, Object... args) {
+        def().error(t, format, args);
+    }
 }

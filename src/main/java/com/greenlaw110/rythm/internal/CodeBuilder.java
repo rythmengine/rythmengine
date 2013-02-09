@@ -203,7 +203,7 @@ public class CodeBuilder extends TextBuilder {
      * Reset to the state before construction
      */
     public void clear() {
-        out().ensureCapacity(0);
+        buffer().ensureCapacity(0);
         this.engine = null;
         this.tmpl = null;
         this.cName = null;
@@ -269,12 +269,6 @@ public class CodeBuilder extends TextBuilder {
 
     public String includingClassName() {
         return null == includingCName ? cName : includingCName;
-    }
-
-    private static ISourceCodeEnhancer importProvider = null;
-
-    public static void registerImportProvider(ISourceCodeEnhancer provider) {
-        importProvider = provider;
     }
 
     private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
@@ -379,7 +373,7 @@ public class CodeBuilder extends TextBuilder {
         if (null == tagName) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
-        TemplateBase includeTag = (TemplateBase) engine.tags.get(tagName);
+        TemplateBase includeTag = (TemplateBase) engine.getTag(tagName);
         if (includeTag instanceof JavaTagBase) {
             throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
         }
@@ -407,7 +401,7 @@ public class CodeBuilder extends TextBuilder {
             setExtended_deprecated(extended, args, lineNo);
             logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager().getFullTagName(extendedTemplateClass));
         } else {
-            TemplateBase tb = (TemplateBase) engine.tags.get(fullName);
+            TemplateBase tb = (TemplateBase) engine.getTag(fullName);
             TemplateClass tc = tb.getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;
@@ -793,7 +787,7 @@ public class CodeBuilder extends TextBuilder {
         pn();
         ptn("@Override protected void setup() {");
         if (logTime) {
-            p2tn("_logTime = true;");
+            p2tn("__logTime = true;");
         }
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -870,7 +864,7 @@ public class CodeBuilder extends TextBuilder {
             p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature);
             p("{\ncom.greenlaw110.rythm.template.TemplateBase oldParent = this.__parent;\ntry{\nthis.__parent = this;\n");
             boolean isVoid = tag.autoRet;
-            StringBuilder sb = out();
+            StringBuilder sb = buffer();
             if (!isVoid) {
                 p(tag.body);
             } else {
@@ -887,17 +881,17 @@ public class CodeBuilder extends TextBuilder {
         pn();
         pn();
         ptn("@Override public com.greenlaw110.rythm.utils.TextBuilder build(){");
-        p2t("out().ensureCapacity(").p(tmpl.length()).p(");").pn();
+        p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
-        StringBuilder old = out();
-        setOut(sb);
+        StringBuilder old = buffer();
+        setBuffer(sb);
         // try merge strings
         List<TextBuilder> merged = mergeStringTokens(this.builders);
         for (TextBuilder b : merged) {
             b.build();
         }
         buildBody = sb.toString();
-        setOut(old);
+        setBuffer(old);
         p(buildBody);
         p("\n\t\treturn this;\n\t}\n");
 

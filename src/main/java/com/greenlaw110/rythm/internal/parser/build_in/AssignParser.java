@@ -1,18 +1,19 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 /**
  * assign enclosed part into a variable
+ *
  * @assign("xx") {...} create a variable
  * @assign("xxx", true) {...} // create a final variable
  */
@@ -21,6 +22,7 @@ public class AssignParser extends KeywordParserFactory {
     public class AssignToken extends BlockCodeToken {
         private String assignTo;
         private boolean isFinal;
+
         public AssignToken(String assignTo, IContext context) {
             super(null, context);
             String[] sa = assignTo.split(",");
@@ -49,8 +51,8 @@ public class AssignParser extends KeywordParserFactory {
             String assignTo = this.assignTo;
             if (isFinal) assignTo = this.assignTo + "___";
             StringBuilder sbNew = new StringBuilder();
-            StringBuilder sbOld = getOut();
-            setOut(sbNew);
+            StringBuilder sbOld = getBuffer();
+            setBuffer(sbNew);
             p3tline("String s = sbNew.toString();");
             p3tline("setSelfOut(sbOld);");
             p3t(assignTo).p(" = s;");
@@ -61,7 +63,7 @@ public class AssignParser extends KeywordParserFactory {
                 pline();
             }
             String s = sbNew.toString();
-            setOut(sbOld);
+            setBuffer(sbOld);
             return s;
         }
     }
@@ -88,7 +90,8 @@ public class AssignParser extends KeywordParserFactory {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain())) raiseParseException("bad @assign statement. Correct usage: @assign(\"myVariable\"){...}");
+                if (!r.search(remain()))
+                    raiseParseException("bad @assign statement. Correct usage: @assign(\"myVariable\"){...}");
                 int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);

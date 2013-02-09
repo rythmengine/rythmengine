@@ -9,7 +9,7 @@ import java.io.File;
  * A wrapper of Rythm engine and make sure the rendering is happen in Sandbox mode
  */
 public class Sandbox {
-    
+
     private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
@@ -24,22 +24,25 @@ public class Sandbox {
 
     RythmEngine engine;
     SandboxExecutingService secureExecutor = null;
+
     public Sandbox(RythmEngine engine, SandboxExecutingService executor) {
         this.engine = engine;
         this.secureExecutor = executor;
     }
+
     private RythmEngine engine() {
         if (null != engine) return engine;
         return Rythm.engine();
     }
+
     public String render(String template, Object... args) {
         RythmEngine eng = engine();
-        eng.enterSandbox();
+        sandboxMode.set(true);
         try {
             ITemplate t = engine().getTemplate(template, args);
             return secureExecutor.execute(t);
         } finally {
-            eng.leaveSandbox();
+            sandboxMode.set(false);
         }
     }
 
@@ -52,12 +55,12 @@ public class Sandbox {
             sandboxMode.set(false);
         }
     }
-    
+
     public static String hasAccessToRestrictedClasses(RythmEngine engine, String code) {
-        for (String s: engine.restrictedClasses) {
+        for (String s : engine.conf().restrictedClasses()) {
             if (code.contains(s)) return s;
         }
         return null;
     }
-    
+
 }

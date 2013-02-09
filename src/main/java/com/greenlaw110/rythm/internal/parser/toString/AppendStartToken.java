@@ -13,7 +13,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 public class AppendStartToken extends CodeToken {
 
     private static String getCode() {
-        return "__style.appendStart(out(), _);";
+        return "__style.appendStart(buffer(), _);";
     }
 
     public AppendStartToken(TextBuilder caller) {

@@ -1,18 +1,17 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.conf.RythmConfigurationKey;
-import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
-import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
@@ -357,7 +356,7 @@ public class TemplateClass {
         }
         return templateInstance;
     }
-    
+
     public ITemplate asTemplate(ILang lang) {
         RythmEngine e = engine();
         if (null == name || e.mode().isDev()) refresh();
@@ -365,13 +364,12 @@ public class TemplateClass {
     }
 
     public ITemplate asTemplate() {
-        return asTemplate((ILang)null);
+        return asTemplate((ILang) null);
     }
-    
+
     public ITemplate asTemplate(ITemplate caller) {
-        TemplateBase tb = (TemplateBase)caller;
-        ITemplate.Context ctx = tb.__ctx;
-        return templateInstance_(ctx.langStack.peek()).cloneMe(engine(), caller);
+        TemplateBase tb = (TemplateBase) caller;
+        return templateInstance_(tb.__curLang()).cloneMe(engine(), caller);
     }
 
     private boolean refreshing = false;
@@ -630,14 +628,16 @@ public class TemplateClass {
                 bytes = javaByteCode;
                 if (null == bytes) bytes = compile();
                 long start = System.currentTimeMillis();
-                IByteCodeEnhancer en = engine().conf().get(RythmConfigurationKey.CODEGEN_BYTE_CODE_ENHANCER);
-                try {
-                    bytes = en.enhance(name(), bytes);
-                } catch (Exception e) {
-                    logger.warn(e, "Error enhancing template class: %s", getKey());
-                }
-                if (logger.isTraceEnabled()) {
-                    logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+                IByteCodeEnhancer en = engine().conf().byteCodeEnhancer();
+                if (null != en) {
+                    try {
+                        bytes = en.enhance(name(), bytes);
+                    } catch (Exception e) {
+                        logger.warn(e, "Error enhancing template class: %s", getKey());
+                    }
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+                    }
                 }
                 enhancedByteCode = bytes;
                 engine().classCache().cacheTemplateClass(this);

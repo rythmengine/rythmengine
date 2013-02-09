@@ -1,12 +1,11 @@
 package com.greenlaw110.rythm.logger;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A NULL logger implementation which log nothing
  */
-public class NullLogger implements ILogger{
+public class NullLogger implements ILogger {
     private static final long serialVersionUID = 1L;
 
     public NullLogger(Class c) {
@@ -22,7 +21,7 @@ public class NullLogger implements ILogger{
     }
 
     @Override
-    public void trace(Throwable t, String msg, Object ... arg) {
+    public void trace(Throwable t, String msg, Object... arg) {
     }
 
     @Override
@@ -35,7 +34,7 @@ public class NullLogger implements ILogger{
     }
 
     @Override
-    public void debug(Throwable t, String msg, Object ... arg) {
+    public void debug(Throwable t, String msg, Object... arg) {
     }
 
     @Override
@@ -48,7 +47,7 @@ public class NullLogger implements ILogger{
     }
 
     @Override
-    public void info(Throwable t, String msg, Object ... arg) {
+    public void info(Throwable t, String msg, Object... arg) {
     }
 
     @Override

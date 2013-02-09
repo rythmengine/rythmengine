@@ -7,6 +7,7 @@ public interface IDialect {
 
     /**
      * Return the ID of the dialect, might be something like "rythm" or "play-groovy" etc.
+     *
      * @return
      */
     String id();
@@ -21,7 +22,7 @@ public interface IDialect {
 
     /**
      * Register a special case parser which will be processed before all other parsers
-     *
+     * <p/>
      * <p>for example, the rythm extension for play!framework might want to register a special case parser to
      * process something like @{Controller.actionMethod()} or &{'MSG_ID'} etc.
      *
@@ -34,9 +35,9 @@ public interface IDialect {
     void begin(IContext ctx);
 
     void end(IContext ctx);
-    
+
     boolean enableScripting();
-    
+
     boolean enableFreeForLoop();
 
     CodeBuilder createCodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine);

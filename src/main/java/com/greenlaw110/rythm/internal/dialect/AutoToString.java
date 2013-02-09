@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.internal.dialect;
 
-import com.greenlaw110.rythm.*;
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.AutoToStringCodeBuilder;
 import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 
@@ -25,7 +25,9 @@ public class AutoToString extends ToString {
     }
 
     public static final IDialect INSTANCE = new AutoToString();
-    protected AutoToString() {}
+
+    protected AutoToString() {
+    }
 
     public AutoToStringData meta = null;
 
@@ -52,7 +54,7 @@ public class AutoToString extends ToString {
         }
 
         public Class<?> clazz;
-        public ToStringOption option = ToStringOption.defaultOption;
+        public ToStringOption option = ToStringOption.DEFAULT_OPTION;
         public ToStringStyle style = ToStringStyle.DEFAULT_STYLE;
 
         private int hash = 0;
@@ -72,7 +74,7 @@ public class AutoToString extends ToString {
         public boolean equals(Object obj) {
             if (obj == this) return true;
             if (obj instanceof AutoToStringData) {
-                AutoToStringData that = (AutoToStringData)obj;
+                AutoToStringData that = (AutoToStringData) obj;
                 return that.clazz.equals(this.clazz) && that.option.equals(this.option) && that.style.equals(this.style);
             }
             return false;
@@ -84,15 +86,20 @@ public class AutoToString extends ToString {
     }
 
     private static final Pattern P = Pattern.compile("\\{class *: *([a-zA-Z_0-9\\.\\$]+) *; *toStringOption *: *(\\{.*?\\}) *; *toStringStyle *: *([a-zA-Z_0-9\\.\\$]+) *\\}");
+
     public static AutoToStringData parseStr(String s) {
         Matcher m = P.matcher(s);
         if (!m.matches()) throw new IllegalArgumentException("Unrecognized AutoToString template: " + s);
         String cs = m.group(1);
         String os = m.group(2);
         String ss = m.group(3);
-        Class<?> c = null;
+        Class<?> c;
+        RythmEngine engine = RythmEngine.get();
+        if (null == engine) {
+            engine = com.greenlaw110.rythm.Rythm.engine();
+        }
         try {
-            c = com.greenlaw110.rythm.Rythm.engine().classLoader.loadClass(cs);
+            c = engine.classLoader().loadClass(cs);
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Class not found: " + cs);
         }
@@ -103,7 +110,7 @@ public class AutoToString extends ToString {
     }
 
     public static void main(String[] args) {
-        String s = templateStr(String.class, ToStringOption.defaultOption.setAppendTransient(true), ToStringStyle.DEFAULT_STYLE);
+        String s = templateStr(String.class, ToStringOption.DEFAULT_OPTION.setAppendTransient(true), ToStringStyle.DEFAULT_STYLE);
         System.out.println(s);
         AutoToStringData d = parseStr(s);
         System.out.println(d);

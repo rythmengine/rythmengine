@@ -16,12 +16,13 @@ public abstract class TemplateResourceBase implements ITemplateResource {
 
     /**
      * When this field is set to null, it assumes using Rythm's singleton mode
-     *
+     * <p/>
      * This field should be set to null if needs to serialize the template resource to some where, e.g. Cache
      */
     private RythmEngine engine;
 
-    public TemplateResourceBase() {}
+    public TemplateResourceBase() {
+    }
 
     public TemplateResourceBase(RythmEngine engine) {
         if (null == engine) return;
@@ -47,7 +48,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         if (obj == this) return true;
         if (null == obj) return false;
         if (getClass().equals(obj.getClass())) {
-            return ((TemplateResourceBase)obj).getKey().equals(getKey());
+            return ((TemplateResourceBase) obj).getKey().equals(getKey());
         }
         return false;
     }
@@ -61,7 +62,8 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     protected abstract long defCheckInterval();
 
     protected Long userCheckInterval() {
-        return engine().configuration.getAsLong(String.format("rythm.%s.interval", getClass().getSimpleName()), null);
+        //return engine().configuration.getAsLong(String.format("rythm.%s.interval", getClass().getSimpleName()), null);
+        return null;
     }
 
     protected abstract long lastModified();

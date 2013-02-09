@@ -1,12 +1,11 @@
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.IRenderExceptionHandler;
 import com.greenlaw110.rythm.extension.ITagInvokeListener;
-import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.extension.ITemplatePreProcessor;
 import com.greenlaw110.rythm.extension.Transformer;
+import com.greenlaw110.rythm.utils.S;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +13,40 @@ import java.util.List;
 
 public class ExtensionManager {
 
-    private RythmEngine engine;
+    private final List<IJavaExtension> _extensions = new ArrayList<IJavaExtension>();
+    private final RythmEngine engine;
 
     public ExtensionManager(RythmEngine engine) {
+        if (null == engine) throw new NullPointerException();
         this.engine = engine;
     }
 
-    RythmEngine engine() {
-        return null == engine ? Rythm.engine() : engine;
+    /**
+     * Add a Java extension
+     *
+     * @param javaExtension
+     */
+    public void registerJavaExtension(IJavaExtension javaExtension) {
+        _extensions.add(javaExtension);
+    }
+
+    Iterable<IJavaExtension> javaExtensions() {
+        return _extensions;
+    }
+
+    /**
+     * Is a specified method name a java extension?
+     *
+     * @param s
+     * @return
+     */
+    public boolean isJavaExtension(String s) {
+        for (IJavaExtension ext : _extensions) {
+            if (S.isEqual(s, ext.methodName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ExtensionManager registerUserDefinedParsers(IParserFactory... parsers) {
@@ -30,7 +55,7 @@ public class ExtensionManager {
 
     /**
      * Register a special case parser to a dialect
-     *
+     * <p/>
      * <p>for example, the play-rythm plugin might want to register a special case parser to
      * process something like @{Controller.actionMethod()} or &{'MSG_ID'} etc to "japid"
      * and "play-groovy" dialects
@@ -39,11 +64,12 @@ public class ExtensionManager {
      * @param parsers
      */
     public ExtensionManager registerUserDefinedParsers(String dialect, IParserFactory... parsers) {
-        engine().getDialectManager().registerExternalParsers(dialect, parsers);
+        engine.dialectManager().registerExternalParsers(dialect, parsers);
         return this;
     }
 
     private List<IRenderExceptionHandler> exceptionHandlers = new ArrayList<IRenderExceptionHandler>();
+
     public ExtensionManager registerTemplateExecutionExceptionHandler(IRenderExceptionHandler h) {
         if (!exceptionHandlers.contains(h)) exceptionHandlers.add(h);
         return this;
@@ -54,6 +80,7 @@ public class ExtensionManager {
     }
 
     private List<IExpressionProcessor> expressionProcessors = new ArrayList<IExpressionProcessor>();
+
     public ExtensionManager registerExpressionProcessor(IExpressionProcessor p) {
         if (!expressionProcessors.contains(p)) expressionProcessors.add(p);
         return this;
@@ -64,6 +91,7 @@ public class ExtensionManager {
     }
 
     private List<ITagInvokeListener> tagInvokeListeners = new ArrayList<ITagInvokeListener>();
+
     public ExtensionManager registerTagInvoeListener(ITagInvokeListener l) {
         if (!tagInvokeListeners.contains(l)) tagInvokeListeners.add(l);
         return this;
@@ -73,31 +101,22 @@ public class ExtensionManager {
         return tagInvokeListeners;
     }
 
-    private List<ITemplatePreProcessor> preprocessors = new ArrayList<ITemplatePreProcessor>();
-    public ExtensionManager registerPreprocessor(ITemplatePreProcessor p) {
-        preprocessors.add(p);
-        return this;
-    }
-    
-    public Iterable<ITemplatePreProcessor> preProcessors() {
-        return preprocessors;
-    }
-
     private List<ILang> templateLangList = new ArrayList<ILang>();
+
     public ExtensionManager registerTemplateLang(ILang lang) {
         templateLangList.add(lang);
         return this;
     }
-    
+
     public Iterable<ILang> templateLangs() {
         return templateLangList;
     }
-    
+
     public boolean hasTemplateLangs() {
         return !templateLangList.isEmpty();
     }
-    
-    public ExtensionManager registerJavaExtensions(Class<? extends Transformer> c){
+
+    public ExtensionManager registerJavaExtensions(Class<? extends Transformer> c) {
         //TODO
         return this;
     }

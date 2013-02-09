@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -36,7 +36,7 @@ public class EscapeParser extends KeywordParserFactory {
                 else if ("JavaScript".equalsIgnoreCase(s)) s = "JS";
                 else s = s.toUpperCase();
                 if (Arrays.binarySearch(ITemplate.Escape.stringValues(), s) < 0) {
-                     raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(ITemplate.Escape.stringValues()), s);
+                    raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(ITemplate.Escape.stringValues()), s);
                 }
                 s = String.format("__ctx.pushEscape(com.greenlaw110.rythm.template.ITemplate.Escape.%s);", s);
                 return new BlockCodeToken(s, ctx()) {

@@ -2,8 +2,8 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class ExecMacroToken extends CodeToken {
             throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Cannot find macro definition for \"%s\"", s);
         }
         List<TextBuilder> list = cb.getMacro(s);
-        for (TextBuilder tb: list) {
+        for (TextBuilder tb : list) {
             tb.build();
         }
     }

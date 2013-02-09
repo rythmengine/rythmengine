@@ -17,7 +17,9 @@ public class CompileException extends RythmException {
         public String className;
         public int javaLineNumber;
         public String message;
-        private CompilerException(){}
+
+        private CompilerException() {
+        }
     }
 
     public static CompilerException compilerException(String className, int line, String message) {

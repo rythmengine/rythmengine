@@ -20,14 +20,14 @@ public class ParamTypeInferencer {
         else if (type.contains("byte")) return type.replace("byte", "Byte");
         else return type;
     }
-    
+
     private static final ThreadLocal<Map<String, String>> typeMap = new ThreadLocal<Map<String, String>>() {
         @Override
         protected Map<String, String> initialValue() {
             return new HashMap<String, String>();
         }
     };
-    
+
     private static String getTypeName(Object val) {
         String clsName;
         if (null == val) {
@@ -37,13 +37,13 @@ public class ParamTypeInferencer {
             clsName = c.getName();
             if (c.isArray()) {
                 Class cc = c.getComponentType();
-                while(cc.isArray()) cc = cc.getComponentType();
+                while (cc.isArray()) cc = cc.getComponentType();
                 String cName = cc.getName();
                 String s = clsName;
                 // now count the number of '[' to see how many dimension this array has
                 int d = 0;
                 for (int i = 0; i < s.length(); i++) {
-                    if (s.charAt(i) == '['){
+                    if (s.charAt(i) == '[') {
                         d++;
                     } else {
                         break;
@@ -58,17 +58,17 @@ public class ParamTypeInferencer {
         }
         return clsName;
     }
-    
+
     public static void registerParams(RythmEngine engine, Object... args) {
         if (!engine.conf().enableTypeInference()) return;
-        
+
         if (args.length == 0) return;
-        
+
         Map<String, String> tMap = typeMap.get();
         tMap.clear();
         if (args.length == 1 && args[0] instanceof Map) {
-            Map<String, Object> params = (Map)args[0];
-            for (String name: params.keySet()) {
+            Map<String, Object> params = (Map) args[0];
+            for (String name : params.keySet()) {
                 Object val = params.get(name);
                 tMap.put(name, getTypeName(val));
             }
@@ -80,7 +80,7 @@ public class ParamTypeInferencer {
             }
         }
     }
-    
+
     public static Map<String, String> getTypeMap() {
         return typeMap.get();
     }

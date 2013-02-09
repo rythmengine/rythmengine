@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.internal.parser.Directive;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.parser.Directive;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -43,7 +43,7 @@ public class CommentParser extends CaretParserFactoryBase {
                     return Pattern.compile(String.format("^(%s//.*?)\n.*", a()), Pattern.DOTALL);
                 }
             }
-            
+
             private Pattern blockComment() {
                 return Pattern.compile(String.format("^(%s\\*.*?\\*%s).*", a(), a()), Pattern.DOTALL);
             }

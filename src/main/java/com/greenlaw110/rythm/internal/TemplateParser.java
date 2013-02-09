@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -31,7 +31,7 @@ public class TemplateParser implements IContext {
         this.cb = cb;
         this.engine = cb.engine();
         this.conf = this.engine.conf();
-        this.compactMode = this.conf.get(RythmConfigurationKey.CODEGEN_COMPACT_ENABLED);
+        this.compactMode = (Boolean) this.conf.get(RythmConfigurationKey.CODEGEN_COMPACT_ENABLED);
         pushLang(cb.templateDefLang);
     }
 
@@ -49,13 +49,13 @@ public class TemplateParser implements IContext {
             super(ctx, "Free loop style (@for(;;)) not allowed in current dialect[%s]", ctx.getDialect());
         }
     }
-    
+
     public static class ScriptingDisabledException extends RewindableException {
         public ScriptingDisabledException(IContext ctx) {
             super(ctx, "Scripting not allowed in current dialect[%s]", ctx.getDialect());
         }
     }
-    
+
     public static class ComplexExpressionException extends RewindableException {
         public ComplexExpressionException(IContext ctx) {
             super(ctx, "Complex expression not allowed in current dialect[%s]", ctx.getDialect());
@@ -63,7 +63,7 @@ public class TemplateParser implements IContext {
     }
 
     void parse() {
-        DialectManager dm = engine.getDialectManager();
+        DialectManager dm = engine.dialectManager();
         while (true) {
             this.breakStack.clear();
             this.langStack.clear();
@@ -305,7 +305,7 @@ public class TemplateParser implements IContext {
         if (inBodyStack2.empty()) return null;
         return inBodyStack2.pop();
     }
-    
+
     private boolean insideDirectiveComment = false;
 
     @Override
@@ -315,7 +315,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public void enterDirectiveComment() {
-        insideDirectiveComment = true; 
+        insideDirectiveComment = true;
     }
 
     @Override

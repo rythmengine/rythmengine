@@ -1,13 +1,15 @@
 package com.greenlaw110.rythm.cache;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +21,7 @@ import java.util.concurrent.*;
 public class SimpleCacheService implements ICacheService {
 
     public static final SimpleCacheService INSTANCE = new SimpleCacheService();
-    
+
     private static class TimerThreadFactory extends RythmThreadFactory {
         private TimerThreadFactory() {
             super("rythm-timer");
@@ -29,7 +31,7 @@ public class SimpleCacheService implements ICacheService {
     private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1, new TimerThreadFactory());
 
     private SimpleCacheService() {
-        scheduler.scheduleAtFixedRate(new Runnable(){
+        scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 List<String> toBeRemoved = new ArrayList<String>();
@@ -55,6 +57,7 @@ public class SimpleCacheService implements ICacheService {
         String key;
         Serializable value;
         int ttl;
+
         Item(String key, Serializable value, int ttl) {
             this.key = key;
             this.value = value;

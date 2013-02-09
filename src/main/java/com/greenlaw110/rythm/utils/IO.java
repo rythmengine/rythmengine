@@ -7,6 +7,7 @@ public class IO {
 
     /**
      * Read file content to a String (always use utf-8)
+     *
      * @param file The file to read
      * @return The String content
      */
@@ -16,6 +17,7 @@ public class IO {
 
     /**
      * Read file content to a String
+     *
      * @param url The url resource to read
      * @return The String content
      */
@@ -29,6 +31,7 @@ public class IO {
 
     /**
      * Read file content to a String (always use utf-8)
+     *
      * @param url the url resource to read
      * @return The String content
      */
@@ -38,6 +41,7 @@ public class IO {
 
     /**
      * Read file content to a String
+     *
      * @param file The file to read
      * @return The String content
      */
@@ -63,13 +67,13 @@ public class IO {
                 out.println(line);
             }
             return result.toString();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            if(is != null) {
+            if (is != null) {
                 try {
                     is.close();
-                } catch(Exception e) {
+                } catch (Exception e) {
                     //
                 }
             }
@@ -78,8 +82,9 @@ public class IO {
 
     /**
      * Write String content to a file (always use utf-8)
+     *
      * @param content The content to write
-     * @param file The file to write
+     * @param file    The file to write
      */
     public static void writeContent(CharSequence content, File file) {
         writeContent(content, file, "utf-8");
@@ -87,8 +92,9 @@ public class IO {
 
     /**
      * Write String content to a file (always use utf-8)
+     *
      * @param content The content to write
-     * @param file The file to write
+     * @param file    The file to write
      */
     public static void writeContent(CharSequence content, File file, String encoding) {
         OutputStream os = null;
@@ -98,12 +104,12 @@ public class IO {
             printWriter.println(content);
             printWriter.flush();
             os.flush();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                if(os != null) os.close();
-            } catch(Exception e) {
+                if (os != null) os.close();
+            } catch (Exception e) {
                 //
             }
         }
@@ -115,21 +121,15 @@ public class IO {
             printWriter.println(content);
             printWriter.flush();
             writer.flush();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                if(writer != null) writer.close();
-            } catch(Exception e) {
+                if (writer != null) writer.close();
+            } catch (Exception e) {
                 //
             }
         }
-    }
-
-    public static File tmpDir() {
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
-        if (!tmpDir.isDirectory() && !tmpDir.mkdir()) throw new RuntimeException("couldn't create temp dir " + tmpDir.getName());
-        return tmpDir;
     }
 
 

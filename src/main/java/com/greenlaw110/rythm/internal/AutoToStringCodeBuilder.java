@@ -6,7 +6,6 @@ import com.greenlaw110.rythm.internal.dialect.AutoToString;
 import com.greenlaw110.rythm.internal.parser.toString.AppendEndToken;
 import com.greenlaw110.rythm.internal.parser.toString.AppendFieldToken;
 import com.greenlaw110.rythm.internal.parser.toString.AppendStartToken;
-import com.greenlaw110.rythm.template.ToStringTemplateBase;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -42,7 +41,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     protected void pSetup() {
         ptn("@Override protected void setup() {");
         if (logTime) {
-            p2tn("_logTime = true;");
+            p2tn("__logTime = true;");
         }
         p2t("__style = ").p(meta.style.toCode()).p(";").pn();
         for (String argName : renderArgs.keySet()) {

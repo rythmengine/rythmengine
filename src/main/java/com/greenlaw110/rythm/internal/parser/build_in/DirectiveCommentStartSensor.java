@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Detect if a directive comment is reached and strip
  * it out from the parsing process
- * 
+ * <p/>
  * <p>For example when &lt;!-- @&gt; is found the
  * &lt;!-- should be stripped out</p>
  */
@@ -70,7 +70,7 @@ public class DirectiveCommentStartSensor extends ParserBase {
             }
             lang = lang.getParent();
         }
-        
+
         return null;
     }
 

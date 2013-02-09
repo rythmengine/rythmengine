@@ -23,11 +23,11 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         ctx = context;
         RythmEngine engine = ctx.getEngine();
         RythmConfiguration conf = engine.conf();
-        if (conf.enableSmartEscape() && engine.getExtensionManager().hasTemplateLangs()) {
+        if (conf.enableSmartEscape() && engine.extensionManager().hasTemplateLangs()) {
             parsers.add(new LangBlockStartSensor(ctx));
             parsers.add(new LangBlockEndSensor(ctx));
         }
-        if (conf.enableNaturalTemplate() && engine.getExtensionManager().hasTemplateLangs()) {
+        if (conf.enableNaturalTemplate() && engine.extensionManager().hasTemplateLangs()) {
             parsers.add(new DirectiveCommentStartSensor(ctx));
             parsers.add(new DirectiveCommentEndSensor(ctx));
         }

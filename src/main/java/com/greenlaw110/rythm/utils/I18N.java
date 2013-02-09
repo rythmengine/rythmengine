@@ -147,6 +147,13 @@ public class I18N {
         symbols.put("ZWD", "Z$");
     }
 
+    static final Map<String, String> dateFormats = new HashMap<String, String>();
+
+    static {
+        dateFormats.put("us", "MM/dd/yyyy");
+        dateFormats.put("au", "dd/MM/yyyy");
+    }
+
     /**
      * Retrieve currency symbol for a currency
      *
@@ -162,12 +169,13 @@ public class I18N {
 
     public static String getDateFormat() {
         RythmEngine engine = RythmEngine.get();
-        final String dateFormat = engine.configuration.getProperty("date.format");
-        if (S.isNotEmpty(dateFormat)) {
+        String locale = engine.conf().locale();
+        final String dateFormat = dateFormats.get(locale);
+        if (null != dateFormat) {
             return dateFormat;
+        } else {
+            return "yyyy-MM-dd";
         }
-        // Default value. It's completely arbitrary.
-        return "yyyy-MM-dd";
     }
 
 }

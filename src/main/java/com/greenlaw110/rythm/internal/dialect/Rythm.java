@@ -1,18 +1,20 @@
 package com.greenlaw110.rythm.internal.dialect;
 
-import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.internal.IDialect;
+import com.greenlaw110.rythm.internal.parser.build_in.*;
 
 public class Rythm extends DialectBase {
 
     public static final String ID = "rythm-full";
-    
+
     public String id() {
         return ID;
     }
-    
+
     public static final IDialect INSTANCE = new Rythm();
-    protected Rythm() {}
+
+    protected Rythm() {
+    }
 
     public String a() {
         return "@";

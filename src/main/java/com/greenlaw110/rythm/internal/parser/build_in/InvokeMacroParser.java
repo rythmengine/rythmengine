@@ -1,18 +1,16 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.dialect.Rythm;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.dialect.Rythm;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 /**
  * Parse invocation:
  *
- * @myMacro()
- *
- * Note since this is also a pattern for expression parser, InvokeMacroParser must
+ * @myMacro() Note since this is also a pattern for expression parser, InvokeMacroParser must
  * be put in front of InvokeTagParser and expression parser
  */
 public class InvokeMacroParser extends CaretParserFactoryBase {

@@ -11,7 +11,6 @@ import java.util.Map;
  * Define a type to wrap a JSON string
  */
 public class JSONWrapper {
-    private String s_;
     private JSON j_;
 
     /**
@@ -67,7 +66,7 @@ public class JSONWrapper {
     public Map<String, Object> getObject() {
         return (JSONObject) j_;
     }
-    
+
     public static JSONWrapper wrap(String s) {
         return new JSONWrapper(s);
     }

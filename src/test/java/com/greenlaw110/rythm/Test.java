@@ -20,7 +20,7 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        Rythm.engine().registerJavaExtension(Test.class);
+        Rythm.engine().registerTransformer(Test.class);
         String t = "@args String s, int i\n" +
                 "double of \"@s\" is \"@s.dbl()\",\n " +
                 "double of [@i] is [@i.dbl().format(\"0000.00\")]";

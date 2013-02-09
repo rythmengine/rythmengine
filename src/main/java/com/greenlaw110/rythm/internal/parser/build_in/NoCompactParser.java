@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
@@ -31,7 +31,7 @@ public class NoCompactParser extends KeywordParserFactory {
                 return new BlockCodeToken("", ctx()) {
                     @Override
                     public void openBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()){
+                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
                             @Override
                             protected void output() {
                                 ctx().pushCompact(false);
@@ -42,7 +42,7 @@ public class NoCompactParser extends KeywordParserFactory {
 
                     @Override
                     public String closeBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()){
+                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
                             @Override
                             protected void output() {
                                 ctx().popCompact();

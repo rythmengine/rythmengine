@@ -2,9 +2,9 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
 
@@ -17,16 +17,14 @@ public class ForEachCodeToken extends BlockCodeToken {
     private int closePos;
 
     /**
-     *
-     * @each String [str]: myStrList @
-     *         ^     ^       ^        ^
-     *         |     |       |        |
-     *        type varname  iterable endloop
-     *
      * @param type
      * @param varname
      * @param iterable
      * @param context
+     * @each String [str]: myStrList @
+     * ^     ^       ^        ^
+     * |     |       |        |
+     * type varname  iterable endloop
      */
     public ForEachCodeToken(String type, String varname, String iterable, IContext context) {
         super(null, context);
@@ -43,7 +41,9 @@ public class ForEachCodeToken extends BlockCodeToken {
             String itrType = cb.getRenderArgType(iterable);
             if (null != itrType) {
                 Regex r = new Regex(".*((?@<>))");
-                if (r.search(itrType)) {type = r.stringMatched(1);}
+                if (r.search(itrType)) {
+                    type = r.stringMatched(1);
+                }
                 this.type = S.strip(type, "<", ">");
                 boolean key = iterable.endsWith("keySet()");
                 boolean val = iterable.endsWith("values()");
@@ -92,21 +92,34 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varIsLast = prefix + "_isLast";
         String varSep = prefix + "_sep";
         String varUtils = prefix + "_utils";
-        
+
         String varItr = cb.newVarName();
-        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).p(");");pline();
-        p("int ").p(varSize).p(" = ").p(varItr).p(".size();");pline();
-        p("if (").p(varSize).p(" > 0) {");pline();
-        p("int ").p(varId).p(" = 0;");pline();
-        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).p(") {");pline();
-        p(varId).p("++;");pline();
-        p("boolean ").p(varIsOdd).p(" = ").p(varId).p(" % 2 == 1;");pline();
-        p("String ").p(varParity).p(" = ").p(varIsOdd).p(" ? \"odd\" : \"even\";");pline();
-        p("boolean ").p(varIsFirst).p(" = ").p(varId).p(" == 1;");pline();
-        p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");pline();
-        p("String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");pline();
-        p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).p(");");pline();
+        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).p(");");
+        pline();
+        p("int ").p(varSize).p(" = ").p(varItr).p(".size();");
+        pline();
+        p("if (").p(varSize).p(" > 0) {");
+        pline();
+        p("int ").p(varId).p(" = 0;");
+        pline();
+        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).p(") {");
+        pline();
+        p(varId).p("++;");
+        pline();
+        p("boolean ").p(varIsOdd).p(" = ").p(varId).p(" % 2 == 1;");
+        pline();
+        p("String ").p(varParity).p(" = ").p(varIsOdd).p(" ? \"odd\" : \"even\";");
+        pline();
+        p("boolean ").p(varIsFirst).p(" = ").p(varId).p(" == 1;");
+        pline();
+        p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");
+        pline();
+        p("String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");
+        pline();
+        p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).p(");");
+        pline();
     }
+
     public void output1() {
         String prefix = "_".equals(varname) ? "" : varname;
         String curClassName = ctx.getCodeBuilder().includingClassName();
@@ -131,6 +144,7 @@ public class ForEachCodeToken extends BlockCodeToken {
     public String closeBlock() {
         return "\n\t}\n}\n}\n";
     }
+
     public String closeBlock1() {
         ctx.popBreak();
         closePos = ctx.cursor();

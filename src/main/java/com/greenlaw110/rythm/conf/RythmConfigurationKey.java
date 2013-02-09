@@ -376,10 +376,16 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * "i18n.lang": Set the language. Used to provide localized format to date or currency.
+     * "i18n.lang": Set the language. Used to get i18n message
      * <p>Default value: <code>en</code></p>
      */
     I18N_LANG("i18n.lang", "en"),
+
+    /**
+     * "i18n.locale": Set the locale. Used to provide localized format to date or currency.
+     * <p>Default value: <code>us</code></p>
+     */
+    I18N_LOCALE("i18n.locale", "us"),
 
     /**
      * "log.enabled": Enable disable log in Rythm. Default value: true

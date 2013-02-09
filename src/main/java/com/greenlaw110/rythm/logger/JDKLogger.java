@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 /**
  * A JDK logger implementation
  */
-public class JDKLogger implements ILogger{
+public class JDKLogger implements ILogger {
     private static final long serialVersionUID = 1L;
     protected final Logger logger;
     protected final String className;
@@ -27,7 +27,7 @@ public class JDKLogger implements ILogger{
     }
 
     @Override
-    public void trace(Throwable t, String msg, Object ... arg) {
+    public void trace(Throwable t, String msg, Object... arg) {
         log(Level.FINEST, t, msg, arg);
     }
 
@@ -42,7 +42,7 @@ public class JDKLogger implements ILogger{
     }
 
     @Override
-    public void debug(Throwable t, String msg, Object ... arg) {
+    public void debug(Throwable t, String msg, Object... arg) {
         log(Level.FINE, t, msg, arg);
     }
 
@@ -57,7 +57,7 @@ public class JDKLogger implements ILogger{
     }
 
     @Override
-    public void info(Throwable t, String msg, Object ... arg) {
+    public void info(Throwable t, String msg, Object... arg) {
         log(Level.INFO, t, msg, arg);
     }
 

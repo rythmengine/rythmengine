@@ -2,12 +2,12 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -43,12 +43,13 @@ public class ArgsParser extends KeywordParserFactory {
                 return new Directive("", ctx()) {
                     @Override
                     public void call() {
-                        for (F.T4<Integer, String, String, String> rd: ral) {
+                        for (F.T4<Integer, String, String, String> rd : ral) {
                             builder().addRenderArgs(rd._1, rd._2, rd._3, rd._4);
                         }
                     }
                 };
             }
+
             /*
              * parse @args String s...
              */
@@ -56,7 +57,7 @@ public class ArgsParser extends KeywordParserFactory {
                 String remain = remain();
                 Regex r = new Regex(String.format("%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))", a(), keyword()));
                 if (r.search(remain)) {
-                    String  s = r.stringMatched(2);
+                    String s = r.stringMatched(2);
                     s = S.strip(s, "{", "}");
                     step(r.stringMatched().length());
                     return go2(s);

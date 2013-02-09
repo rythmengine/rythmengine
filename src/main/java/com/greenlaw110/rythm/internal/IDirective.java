@@ -1,7 +1,7 @@
 package com.greenlaw110.rythm.internal;
 
 /**
- * Mark a token 
+ * Mark a token
  */
 public interface IDirective {
     void call();

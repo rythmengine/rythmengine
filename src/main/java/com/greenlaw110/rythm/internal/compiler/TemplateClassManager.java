@@ -52,6 +52,7 @@ public class TemplateClassManager {
 
     /**
      * All loaded classes.
+     *
      * @return All loaded classes
      */
     public List<TemplateClass> all() {
@@ -60,6 +61,7 @@ public class TemplateClassManager {
 
     /**
      * Get a class by name
+     *
      * @param name The fully qualified class name
      * @return The TemplateClass or null
      */
@@ -73,7 +75,7 @@ public class TemplateClassManager {
         TemplateClass tc = tmplIdx.get(name);
         if (null == tc) {
             // try to see if resourceLoader has some kind of name transform
-            ITemplateResource r = engine.resourceManager.getFileResource(name.toString());
+            ITemplateResource r = engine.resourceManager().getFileResource(name.toString());
             if (null == r) return null;
             tc = tmplIdx.get(r.getKey());
         }
@@ -97,7 +99,7 @@ public class TemplateClassManager {
 
     List<TemplateClass> getEmbeddedClasses(String name) {
         List<TemplateClass> l = new ArrayList<TemplateClass>();
-        for (String cn: clsNameIdx.keySet()) {
+        for (String cn : clsNameIdx.keySet()) {
             if (cn.startsWith(name + "$")) {
                 l.add(clsNameIdx.get(cn));
             }
@@ -125,10 +127,10 @@ public class TemplateClassManager {
         String name0 = templateClass.name0();
         clsNameIdx.remove(name0);
         List<String> embedded = new ArrayList<String>();
-        for (String cn: clsNameIdx.keySet()) {
+        for (String cn : clsNameIdx.keySet()) {
             if (cn.matches(name0 + "v[0-9]+\\$.*")) embedded.add(cn);
         }
-        for (String cn: embedded) clsNameIdx.remove(cn);
+        for (String cn : embedded) clsNameIdx.remove(cn);
         if (null != templateClass && null != templateClass.templateResource) tmplIdx.remove(templateClass.getKey());
     }
 

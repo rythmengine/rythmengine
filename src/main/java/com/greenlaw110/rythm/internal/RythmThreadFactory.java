@@ -14,7 +14,7 @@ public class RythmThreadFactory implements ThreadFactory {
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
         namePrefix = poolName + "-thread-";
     }
-    
+
     protected Thread newThread0(ThreadGroup g, Runnable r, String name, long stackSize) {
         return new Thread(g, r, name, stackSize);
     }

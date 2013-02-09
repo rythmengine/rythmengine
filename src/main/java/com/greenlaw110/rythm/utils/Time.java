@@ -3,19 +3,9 @@
  */
 package com.greenlaw110.rythm.utils;
 
-import javax.naming.OperationNotSupportedException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +21,7 @@ public class Time {
 
     /**
      * Parse a duration
+     *
      * @param duration 3h, 2mn, 7s
      * @return The number of seconds
      */
@@ -66,6 +57,7 @@ public class Time {
 
     /**
      * Parse a CRON expression
+     *
      * @param cron The CRON String
      * @return The next Date that satisfy the expression
      */
@@ -79,9 +71,10 @@ public class Time {
 
     /**
      * Compute the number of milliseconds between the next valid date and the one after
+     *
      * @param cron The CRON String
      * @return the number of milliseconds between the next valid date and the one after,
-     * with an invalid interval between
+     *         with an invalid interval between
      */
     public static long cronInterval(String cron) {
         return cronInterval(cron, new Date());
@@ -89,10 +82,11 @@ public class Time {
 
     /**
      * Compute the number of milliseconds between the next valid date and the one after
+     *
      * @param cron The CRON String
      * @param date The date to start search
      * @return the number of milliseconds between the next valid date and the one after,
-     * with an invalid interval between
+     *         with an invalid interval between
      */
     public static long cronInterval(String cron, Date date) {
         try {
@@ -104,7 +98,7 @@ public class Time {
 
     /**
      * Thanks to Quartz project, https://quartz.dev.java.net
-     *
+     * <p/>
      * Provides a parser and evaluator for unix-like cron expressions. Cron
      * expressions provide the ability to specify complex time combinations such as
      * &quot;At 8:00am every Monday through Friday&quot; or &quot;At 1:30am every
@@ -112,7 +106,7 @@ public class Time {
      * <P>
      * Cron expressions are comprised of 6 required fields and one optional field
      * separated by white space. The fields respectively are described as follows:
-     *
+     * <p/>
      * <table cellspacing="8">
      * <tr>
      * <th align="left">Field Name</th>
@@ -245,7 +239,7 @@ public class Time {
      * <P>
      * The legal characters and the names of months and days of the week are not
      * case sensitive.
-     *
+     * <p/>
      * <p>
      * <b>NOTES:</b>
      * <ul>
@@ -254,7 +248,6 @@ public class Time {
      * </li>
      * </ul>
      * </p>
-     *
      *
      * @author Sharada Jambula, James House
      * @author Contributions from Mads Henderson
@@ -299,6 +292,7 @@ public class Time {
             dayMap.put("FRI", new Integer(6));
             dayMap.put("SAT", new Integer(7));
         }
+
         private String cronExpression = null;
         private TimeZone timeZone = null;
         protected transient TreeSet<Integer> seconds;
@@ -320,9 +314,8 @@ public class Time {
          *
          * @param cronExpression String representation of the cron expression the
          *                       new object should represent
-         * @throws java.text.ParseException
-         *         if the string expression cannot be parsed into a valid
-         *         <CODE>CronExpression</CODE>
+         * @throws java.text.ParseException if the string expression cannot be parsed into a valid
+         *                                  <CODE>CronExpression</CODE>
          */
         public CronExpression(String cronExpression) throws ParseException {
             if (cronExpression == null) {
@@ -405,6 +398,7 @@ public class Time {
 
         /**
          * Return the interval between the next valid date and the one after
+         *
          * @param date the date/time at which to begin the search
          * @return the number of milliseconds between the next valid and the one after
          */
@@ -463,6 +457,7 @@ public class Time {
 
             return true;
         }
+
         ////////////////////////////////////////////////////////////////////////////
         //
         // Expression Parsing Functions

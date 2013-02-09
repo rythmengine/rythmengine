@@ -1,8 +1,8 @@
 package com.greenlaw110.rythm.internal.compiler;
 
-import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
+import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import org.eclipse.jdt.core.compiler.IProblem;

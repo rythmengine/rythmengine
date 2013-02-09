@@ -32,7 +32,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -45,7 +46,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -58,7 +60,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -71,7 +74,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -84,7 +88,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -97,7 +102,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -110,7 +116,8 @@ public class Each {
             boolean isFirst = (i == 1);
             boolean isLast = (i == items.length);
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(items[i], size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
     }
 
@@ -127,16 +134,18 @@ public class Each {
             boolean isFirst = (i == (start + 1));
             boolean isLast = !it.hasNext();
             String sep = isLast ? "" : ","; // default loop item separator
-            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast))) break;
+            if (!body.render(o, size, i, isOdd, isOdd ? "odd" : "even", isFirst, isLast, sep, new IBody.LoopUtils(/*i, size, */isFirst, isLast)))
+                break;
         }
         //p(body.toString());
     }
 
-    public static interface IBody<E>  {
+    public static interface IBody<E> {
         public static class LoopUtils {
             //private final int id;
             private final boolean isFirst;
             private final boolean isLast;
+
             //private final int size;
             public LoopUtils(/*int id, int size,*/ boolean isFirst, boolean isLast) {
                 //this.id = id;
@@ -144,36 +153,42 @@ public class Each {
                 this.isLast = isLast;
                 //this.size = size;
             }
+
             public String sep(String sep) {
                 return postSep(sep);
             }
+
             public String preSep(String sep) {
                 return isFirst ? "" : sep;
             }
+
             public String postSep(String sep) {
                 return isLast ? "" : sep;
             }
         }
+
         boolean render(final E e, final int size, final int index, final boolean isOdd, final String parity, final boolean isFirst, final boolean isLast, final String sep, final LoopUtils utils);
+
         void ensureCapacity(int loopCnt);
     }
 
     public static abstract class Looper<E> implements IBody<E> {
-//        private StringBuilder out = null;
+        //        private StringBuilder buffer = null;
 //        private int bodySize = 16;
-        public Looper (TextBuilder tb) {
-            //out = tb.out();
+        public Looper(TextBuilder tb) {
+            //buffer = tb.buffer();
         }
+
         public Looper(TextBuilder tb, int bodySize) {
-            //out = tb.out();
+            //buffer = tb.buffer();
             //this.bodySize = bodySize;
         }
 
         public void ensureCapacity(int loopCnt) {
-//            int len = out.length();
+//            int len = buffer.length();
 //            int delta = loopCnt * bodySize;
-//            out.ensureCapacity(len + delta);
-            //System.out.println(String.format("capacity: %s + %s * %s", len, bodySize, loopCnt ));
+//            buffer.ensureCapacity(len + delta);
+            //System.buffer.println(String.format("capacity: %s + %s * %s", len, bodySize, loopCnt ));
         }
 
 //        protected String toString(Object o) {
@@ -182,8 +197,8 @@ public class Each {
 //
 //        private void p_(Object o) {
 //            String s = toString(o);
-//            if (!s.isEmpty()) out.append(s);
-//            //out.append(o);
+//            if (!s.isEmpty()) buffer.append(s);
+//            //buffer.append(o);
 //        }
 //
 //        /**
@@ -193,12 +208,12 @@ public class Each {
 //         * @return
 //         */
 //        public final Looper p(Object o) {
-//            if (null != o) out.append(o);
+//            if (null != o) buffer.append(o);
 //            return this;
 //        }
 //
 //        public final Looper p(String s) {
-//            if (null != s && !s.isEmpty()) out.append(s);
+//            if (null != s && !s.isEmpty()) buffer.append(s);
 //            return this;
 //        }
 //
@@ -211,13 +226,13 @@ public class Each {
 //         */
 //        protected final Looper pn(Object o) {
 //            if (null != o) p_(o);
-//            out.append('\n');
+//            buffer.append('\n');
 //            return this;
 //        }
 //
 //        protected final Looper pn(String s) {
-//            if (null != s && !s.isEmpty()) out.append(s);
-//            out.append("\n");
+//            if (null != s && !s.isEmpty()) buffer.append(s);
+//            buffer.append("\n");
 //            return this;
 //        }
 //
@@ -229,14 +244,14 @@ public class Each {
 //         * @return
 //         */
 //        protected final Looper np(Object o) {
-//            out.append('\n');
+//            buffer.append('\n');
 //            if (null != o) p_(o);
 //            return this;
 //        }
 //
 //        protected final Looper np(String s) {
-//            out.append("\n");
-//            if (null != s && !s.isEmpty()) out.append(s);
+//            buffer.append("\n");
+//            if (null != s && !s.isEmpty()) buffer.append(s);
 //            return this;
 //        }
 //

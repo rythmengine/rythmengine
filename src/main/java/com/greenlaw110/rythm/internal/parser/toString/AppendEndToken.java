@@ -1,6 +1,5 @@
 package com.greenlaw110.rythm.internal.parser.toString;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -14,7 +13,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 public class AppendEndToken extends CodeToken {
 
     private static String getCode() {
-        return "__style.appendEnd(out(), _);";
+        return "__style.appendEnd(buffer(), _);";
     }
 
     public AppendEndToken(TextBuilder caller) {

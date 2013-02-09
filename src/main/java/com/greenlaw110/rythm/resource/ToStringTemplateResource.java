@@ -21,7 +21,7 @@ public class ToStringTemplateResource extends TemplateResourceBase implements IT
         meta = data;
     }
 
-    public ToStringTemplateResource(AutoToString.AutoToStringData data  , RythmEngine engine) {
+    public ToStringTemplateResource(AutoToString.AutoToStringData data, RythmEngine engine) {
         super(engine);
         meta = data;
     }
@@ -74,7 +74,7 @@ public class ToStringTemplateResource extends TemplateResourceBase implements IT
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof ToStringTemplateResource) {
-            ToStringTemplateResource that = (ToStringTemplateResource)obj;
+            ToStringTemplateResource that = (ToStringTemplateResource) obj;
             return that.getKey().equals(getKey());
         }
         return false;

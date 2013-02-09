@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.internal.IBlockHandler;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -15,7 +15,6 @@ import com.stevesoft.pat.Regex;
  * <li><code>@ else ...@</code><li>
  *
  * @author luog
- *
  */
 public class ElseIfParser extends CaretParserFactoryBase {
 
@@ -26,7 +25,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
             @Override
             public TextBuilder go() {
                 IBlockHandler bh = ctx().currentBlock();
-                if (null == bh || ! (bh instanceof IfParser.IfBlockCodeToken)) return null;
+                if (null == bh || !(bh instanceof IfParser.IfBlockCodeToken)) return null;
 
                 String a = dialect().a();
                 Regex r1 = new Regex(String.format("^((%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "\\s*\\{?)).*", a, a));

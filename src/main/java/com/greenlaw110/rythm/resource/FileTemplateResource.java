@@ -2,11 +2,10 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.utils.IO;
 
 import java.io.File;
@@ -56,19 +55,8 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     public FileTemplateResource(File templateFile, RythmEngine engine) {
         super(engine);
-        //File home = engine().templateHome;
-        //File tagHome = engine().tagHome;
         file = templateFile;
         key = file.getPath();
-
-//        if (null != tagHome && isValid()) {
-//            // set tag name if this file is found under tag home
-//            String tagPath = tagHome.getAbsolutePath();
-//            String filePath = file.getAbsolutePath();
-//            if (filePath.startsWith(tagPath)) {
-//                this.tagName = retrieveTagName(tagHome, file);
-//            }
-//        }
     }
 
     private static String retrieveTagName(File tagHome, File tagFile) {
@@ -106,7 +94,8 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     @Override
     protected Long userCheckInterval() {
-        return engine().configuration.getAsLong("rythm.resource.file.interval", null);
+        //return engine().configuration.getAsLong("rythm.resource.file.interval", null);
+        return null;
     }
 
     @Override
@@ -145,7 +134,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     public static TemplateClass tryLoadTag(String tagName, RythmEngine engine) {
         if (null == engine) engine = Rythm.engine();
-        if (engine.tags.containsKey(tagName)) return null;
+        if (engine.hasTag(tagName)) return null;
         tagName = tagName.replace('.', '/');
         final String[] suffixes = {
                 ".rythm",

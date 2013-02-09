@@ -6,7 +6,7 @@ import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.extension.IRenderExceptionHandler;
 import com.greenlaw110.rythm.extension.ISourceCodeEnhancer;
 import com.greenlaw110.rythm.extension.ITagInvokeListener;
-import com.greenlaw110.rythm.runtime.ITag;
+import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.F;
@@ -34,30 +34,31 @@ public class EventBus implements IEventDispatcher {
         registerHandlers();
     }
 
-    private static interface IEventHandler<PARAM> {
-        void handleEvent(RythmEngine engine, PARAM param);
+    private static interface IEventHandler<RETURN, PARAM> {
+        RETURN handleEvent(RythmEngine engine, PARAM param);
     }
 
-    private Map<IEvent<?>, IEventHandler<?>> dispatcher = new HashMap<IEvent<?>, IEventHandler<?>>();
+    private Map<IEvent<?, ?>, IEventHandler<?, ?>> dispatcher = new HashMap<IEvent<?, ?>, IEventHandler<?, ?>>();
 
     @Override
-    public void accept(IEvent event, Object param) {
+    public Object accept(IEvent event, Object param) {
         IEventHandler handler = dispatcher.get(event);
         if (null != handler) {
-            handler.handleEvent(engine, param);
+            return handler.handleEvent(engine, param);
         }
+        return null;
     }
 
     private void registerHandlers() {
-        Map<IEvent<?>, IEventHandler<?>> m = dispatcher;
-        m.put(RythmEvents.ON_BUILD_JAVA_SOURCE, new IEventHandler<CodeBuilder>() {
+        Map<IEvent<?, ?>, IEventHandler<?, ?>> m = dispatcher;
+        m.put(RythmEvents.ON_BUILD_JAVA_SOURCE, new IEventHandler<Void, CodeBuilder>() {
             @Override
-            public void handleEvent(RythmEngine engine, CodeBuilder cb) {
+            public Void handleEvent(RythmEngine engine, CodeBuilder cb) {
                 ISourceCodeEnhancer ce = sourceCodeEnhancer;
-                if (null == ce) return;
+                if (null == ce) return null;
                 if (cb.basicTemplate()) {
                     // basic template do not have common codes
-                    return;
+                    return null;
                 }
                 // add common render args
                 Map<String, ?> defArgs = ce.getRenderArgDescriptions();
@@ -70,48 +71,54 @@ public class EventBus implements IEventDispatcher {
                 for (String s : ce.imports()) {
                     cb.addImport(s, -1);
                 }
+                return null;
             }
         });
-        m.put(RythmEvents.ON_CLOSING_JAVA_CLASS, new IEventHandler<CodeBuilder>() {
+        m.put(RythmEvents.ON_CLOSING_JAVA_CLASS, new IEventHandler<Void, CodeBuilder>() {
             @Override
-            public void handleEvent(RythmEngine engine, CodeBuilder cb) {
+            public Void handleEvent(RythmEngine engine, CodeBuilder cb) {
                 // add common source code
                 ISourceCodeEnhancer ce = sourceCodeEnhancer;
-                if (null == ce) return;
+                if (null == ce) {
+                    return null;
+                }
                 if (cb.basicTemplate()) {
                     // basic template do not have common codes
-                    return;
+                    return null;
                 }
                 cb.np(ce.sourceCode());
                 cb.pn();
+                return null;
             }
         });
-        m.put(RythmEvents.ON_TAG_INVOCATION, new IEventHandler<F.T2<ITemplate, ITag>>() {
+        m.put(RythmEvents.ON_TAG_INVOCATION, new IEventHandler<Void, F.T2<ITemplate, ITag>>() {
             @Override
-            public void handleEvent(RythmEngine engine, F.T2<ITemplate, ITag> param) {
+            public Void handleEvent(RythmEngine engine, F.T2<ITemplate, ITag> param) {
                 ITagInvokeListener l = tagInvokeListener;
                 if (null == l) {
-                    return;
+                    return null;
                 }
                 ITag tag = param._2;
                 l.onInvoke(tag);
+                return null;
             }
         });
-        m.put(RythmEvents.TAG_INVOKED, new IEventHandler<F.T2<TemplateBase, ITag>>() {
+        m.put(RythmEvents.TAG_INVOKED, new IEventHandler<Void, F.T2<TemplateBase, ITag>>() {
             @Override
-            public void handleEvent(RythmEngine engine, F.T2<TemplateBase, ITag> param) {
+            public Void handleEvent(RythmEngine engine, F.T2<TemplateBase, ITag> param) {
                 ITagInvokeListener l = tagInvokeListener;
                 if (null == l) {
-                    return;
+                    return null;
                 }
                 ITag tag = param._2;
                 l.invoked(tag);
+                return null;
             }
         });
-        m.put(RythmEvents.ON_RENDER_EXCEPTION, new IEventHandler<F.T2<TemplateBase, Exception>>() {
+        m.put(RythmEvents.ON_RENDER_EXCEPTION, new IEventHandler<Boolean, F.T2<TemplateBase, Exception>>() {
             @Override
-            public void handleEvent(RythmEngine engine, F.T2<TemplateBase, Exception> param) {
-                exceptionHandler.handleTemplateExecutionException(param._2, param._1);
+            public Boolean handleEvent(RythmEngine engine, F.T2<TemplateBase, Exception> param) {
+                return exceptionHandler.handleTemplateExecutionException(param._2, param._1);
             }
         });
     }

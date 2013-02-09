@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * Detect if a lang block is reached and put
  * instruction in template java source to switch
  * lang context
- * 
+ * <p/>
  * <p>For example when &lt;script &gt; is reached
  * a instruction <code>pushLang(ILang lang)</code>
  * should be put in place</p>
@@ -37,18 +37,18 @@ public class LangBlockStartSensor extends ParserBase {
         IContext ctx = ctx();
         ILang curLang = ctx.peekLang();
         if (!curLang.allowInternalLang()) return null;
-        
+
         String remain = ctx.getRemain();
-        Iterable<ILang> langs = ctx.getEngine().getExtensionManager().templateLangs();
-        
-        for (ILang lang: langs) {
+        Iterable<ILang> langs = ctx.getEngine().extensionManager().templateLangs();
+
+        for (ILang lang : langs) {
             if (lang.allowedExternalLangs().contains(curLang)) {
                 String blockStart = lang.blockStart();
                 if (null == blockStart) {
                     logger.warn("null block start found for lang[%s] inside lang[%s]", lang, curLang);
                     continue;
                 }
-                
+
                 Pattern pStart = patterns.get(blockStart);
                 if (null == pStart) {
                     pStart = Pattern.compile(blockStart, Pattern.DOTALL);
@@ -72,13 +72,13 @@ public class LangBlockStartSensor extends ParserBase {
         String p1 = "'<h2>abc<h2>'";
         String p2 = "'<h1>xyz<h1>'";
         String p3 = "'<h3>123<h3>'";
-    
+
         System.out.println("--- smart escape enabled ---");
         System.setProperty("rythm.enableSmartEscape", "true");
         RythmEngine engine1 = new RythmEngine();
         String s1 = engine1.render(template, p1, p2, p3);
         System.out.println(s1);
-        
+
         System.out.println("\n\n--- smart escape disabled ---");
         System.setProperty("rythm.enableSmartEscape", "false");
         RythmEngine engine2 = new RythmEngine();

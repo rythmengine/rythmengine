@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -17,6 +17,7 @@ public class SectionParser extends KeywordParserFactory {
 
     public class SectionToken extends BlockCodeToken {
         private String section;
+
         public SectionToken(String section, IContext context) {
             super(null, context);
             this.section = section;
@@ -55,7 +56,8 @@ public class SectionParser extends KeywordParserFactory {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain())) raiseParseException("bad @section statement. Correct usage: @section(\"mySection\"){...}");
+                if (!r.search(remain()))
+                    raiseParseException("bad @section statement. Correct usage: @section(\"mySection\"){...}");
                 int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);

@@ -13,6 +13,7 @@ public class ClassReloadException extends FastRuntimeException {
     public ClassReloadException(String msg) {
         super(msg);
     }
+
     public ClassReloadException(String msg, Throwable t) {
         super(msg, t);
     }

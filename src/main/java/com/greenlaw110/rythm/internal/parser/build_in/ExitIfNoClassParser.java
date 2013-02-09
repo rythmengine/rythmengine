@@ -1,12 +1,8 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.TemplateParser;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -29,7 +25,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
                 String s = r.stringMatched(1);
                 s = S.stripBraceAndQuotation(s);
                 try {
-                    ctx().getEngine().classLoader.loadClass(s);
+                    ctx().getEngine().classLoader().loadClass(s);
                     return new Token("", ctx());
                 } catch (Exception e) {
                     throw new TemplateParser.ExitInstruction();
@@ -64,7 +60,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
                 s = s.substring(1);
             }
             if (s.endsWith("\"") || s.endsWith("'")) {
-                s = s.substring(0, s.length() -1);
+                s = s.substring(0, s.length() - 1);
             }
             System.out.println(s);
         }

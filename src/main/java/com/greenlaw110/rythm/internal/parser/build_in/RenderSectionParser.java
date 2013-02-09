@@ -1,12 +1,12 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -20,6 +20,7 @@ public class RenderSectionParser extends KeywordParserFactory {
 
     public class DefaultSectionToken extends BlockCodeToken {
         private String section;
+
         public DefaultSectionToken(String section, IContext context) {
             super(null, context);
             if (S.isEmpty(section)) {
@@ -37,8 +38,8 @@ public class RenderSectionParser extends KeywordParserFactory {
         @Override
         public String closeBlock() {
             StringBuilder sbNew = new StringBuilder();
-            StringBuilder sbOld = getOut();
-            setOut(sbNew);
+            StringBuilder sbOld = getBuffer();
+            setBuffer(sbNew);
             p2tline("_endSection(true);");
             if ("__CONTENT__".equals(section)) {
                 p2tline("_pLayoutContent();");
@@ -46,7 +47,7 @@ public class RenderSectionParser extends KeywordParserFactory {
                 p2t("_pLayoutSection(\"").p(section).p("\");");
                 pline();
             }
-            setOut(sbOld);
+            setBuffer(sbOld);
             return sbNew.toString();
         }
     }
@@ -59,7 +60,8 @@ public class RenderSectionParser extends KeywordParserFactory {
     public IParser create(IContext ctx) {
         return new ParserBase(ctx) {
             public TextBuilder go() {
-                Matcher m = ptn(dialect()).matcher(remain());;
+                Matcher m = ptn(dialect()).matcher(remain());
+                ;
                 if (!m.matches()) return null;
                 String s = m.group(1);
                 step(s.length());

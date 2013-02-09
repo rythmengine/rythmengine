@@ -1,7 +1,9 @@
 package com.greenlaw110.rythm.conf;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.extension.IByteCodeHelper;
+import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.template.ITemplate;
 
@@ -172,7 +174,7 @@ public class RythmConfiguration {
      */
     public boolean disableFileWrite() {
         if (null == _disableFileWrite) {
-            boolean b = get(ENGINE_FILE_WRITE_ENABLED);
+            boolean b = (Boolean) get(ENGINE_FILE_WRITE_ENABLED);
             _disableFileWrite = !b;
         }
         return _disableFileWrite;
@@ -248,9 +250,9 @@ public class RythmConfiguration {
      */
     public boolean cacheEnabled() {
         if (null == _cacheEnabled) {
-            boolean ce = get(CACHE_ENABLED);
+            boolean ce = (Boolean) get(CACHE_ENABLED);
             Rythm.Mode mode = get(ENGINE_MODE);
-            boolean po = get(CACHE_PROD_ONLY_ENABLED);
+            boolean po = (Boolean) get(CACHE_PROD_ONLY_ENABLED);
             if (!ce) {
                 _cacheEnabled = false;
             } else {
@@ -288,6 +290,29 @@ public class RythmConfiguration {
         return _transformEnabled;
     }
 
+    private Boolean _compactEnabled = null;
+
+
+    public boolean compactModeEnabled() {
+        if (null == _compactEnabled) {
+            _compactEnabled = get(CODEGEN_COMPACT_ENABLED);
+        }
+        return _compactEnabled;
+    }
+
+    private IDurationParser _durationParser = null;
+
+    /**
+     * Return {@link RythmConfigurationKey#CACHE_DURATION_PARSER_IMPL} without lookup
+     *
+     * @return
+     */
+    public IDurationParser durationParser() {
+        if (null == _durationParser) {
+            _durationParser = get(CACHE_DURATION_PARSER_IMPL);
+        }
+        return _durationParser;
+    }
 
     private ILang _defaultLang = null;
 
@@ -333,11 +358,48 @@ public class RythmConfiguration {
 
     /**
      * Set template source home path
-     * 
+     * <p/>
      * <p><b>Note</b>, this is not supposed to be used by user application or third party plugin</p>
      */
     public void setTemplateHome(File home) {
         raw.put(HOME_TEMPLATE.getKey(), home);
         data.put(HOME_TEMPLATE, home);
+    }
+
+    private IByteCodeEnhancer _byteCodeEnhancer = IByteCodeEnhancer.INSTS.NULL;
+
+    public IByteCodeEnhancer byteCodeEnhancer() {
+        if (IByteCodeEnhancer.INSTS.NULL == _byteCodeEnhancer) {
+            _byteCodeEnhancer = get(CODEGEN_BYTE_CODE_ENHANCER);
+        }
+        return _byteCodeEnhancer;
+    }
+
+    private String _lang = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#I18N_LANG} without lookup
+     *
+     * @return
+     */
+    public String lang() {
+        if (null == _lang) {
+            _lang = get(I18N_LANG);
+        }
+        return _lang;
+    }
+
+    private String _locale = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#I18N_LOCALE} without lookup
+     *
+     * @return
+     */
+    public String locale() {
+        if (null == _locale) {
+            _locale = get(I18N_LOCALE);
+        }
+        return _locale;
     }
 }

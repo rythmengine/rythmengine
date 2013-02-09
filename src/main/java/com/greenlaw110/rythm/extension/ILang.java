@@ -9,27 +9,28 @@ import static com.greenlaw110.rythm.internal.compiler.TemplateClass.CN_SUFFIX;
 /**
  * Specify a language (e.g. JavaScript) or a format (e.g. csv). The information could be used by
  * Rythm to support {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_NATURAL_TEMPLATE_ENABLED
- * natural template feature} and 
+ * natural template feature} and
  * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED smart escape feature}
  */
 public interface ILang {
 
     /**
      * Return comment start. E.g. for HTML, it should be <code>&lt!--</code>
-     * 
+     *
      * @return
      */
     String commentStart();
 
     /**
      * Return comment end. For HTML it should be <code>--&gt;</code>
+     *
      * @return
      */
     String commentEnd();
 
     /**
-     * Return escape scheme 
-     * 
+     * Return escape scheme
+     *
      * @return
      */
     ITemplate.Escape escape();
@@ -37,32 +38,31 @@ public interface ILang {
     /**
      * Some lang could be embedded into another. E.g. JS and CSS could be
      * embedded into HTML. This method returns a regex string the direct the start
-     * of the embedded lang. 
-     * 
+     * of the embedded lang.
+     * <p/>
      * <p>Note the regex string must support group and the {@link java.util.regex.Matcher#group(int) group 1}
-     * must be the captured block start. For example, JS block start is &lt;script&gt; or 
+     * must be the captured block start. For example, JS block start is &lt;script&gt; or
      * &lt;script type="..."...&gt;, then the <code>blockStart</code> method of JS lang should be
      * <code>(\&lt;\s*script\s*.*?\&lt;).*</code></p>
-     * 
+     *
      * @return
      */
     String blockStart();
 
     /**
      * Return a regex string indicate an end of a lang block
-     * 
-     * @see #blockStart() for regex requirement
-     * 
+     *
      * @return
+     * @see #blockStart() for regex requirement
      */
     String blockEnd();
 
     /**
      * Return true if this lang impl allow another lang be
      * embedded inside. e.g. HTML should return true
-     * for this method because it allows JS and CSS 
+     * for this method because it allows JS and CSS
      * be embedded inside
-     * 
+     *
      * @return
      */
     boolean allowInternalLang();
@@ -73,14 +73,14 @@ public interface ILang {
      * contains an HTML impl. If no other lang is allowed
      * to embed this lang, then an empty set shall
      * be returned
-     * 
+     *
      * @return
      */
     Set<ILang> allowedExternalLangs();
 
     /**
      * Set the parent lang to the embedded lang
-     * 
+     *
      * @param parent
      */
     void setParent(ILang parent);
@@ -88,7 +88,7 @@ public interface ILang {
     /**
      * Return parent lang or null if there is no parent
      * set on it
-     * 
+     *
      * @return
      */
     ILang getParent();
@@ -97,12 +97,12 @@ public interface ILang {
      * Return a string that could be write into
      * the target java source code to create an instance
      * of this Lang
-     * 
+     *
      * @return
      */
     String newInstanceStr();
-    
-    
+
+
     public static class DefImpl implements ILang, Cloneable {
 
         public static final DefImpl HTML = new DefImpl("HTML", "<!--", "-->", ITemplate.Escape.XML) {
@@ -130,24 +130,24 @@ public interface ILang {
                 return set;
             }
         };
-                        
+
         public static final DefImpl JSON = new DefImpl("JSON", null, null, ITemplate.Escape.JSON);
         public static final DefImpl CSV = new DefImpl("CSV", null, null, ITemplate.Escape.CSV);
-    
+
         private final String id;
         private final String commentStart;
         private final String commentEnd;
         private final ITemplate.Escape escape;
-        
+
         private final String blockStart;
         private final String blockEnd;
-        
+
         private ILang parent;
-        
+
         protected DefImpl(String id, String commentStart, String commentEnd, ITemplate.Escape escape) {
             this(id, commentStart, commentEnd, escape, null, null);
         }
-        
+
         protected DefImpl(String id, String commentStart, String commentEnd, ITemplate.Escape escape, String blockStart, String blockEnd) {
             this.id = id;
             this.commentEnd = commentEnd;
@@ -237,14 +237,14 @@ public interface ILang {
             for (String s : sa) m.put(s, DefImpl.JSON);
 
             sa = new String[]{"csv" + CN_SUFFIX, "csv_rythm" + CN_SUFFIX};
-            for (String s : sa) m.put(s, DefImpl.CSV);            
-            
+            for (String s : sa) m.put(s, DefImpl.CSV);
+
             for (String k : m.keySet()) {
                 if (fileName.endsWith(k)) {
                     return m.get(k);
                 }
             }
-            
+
             return def;
         }
     }

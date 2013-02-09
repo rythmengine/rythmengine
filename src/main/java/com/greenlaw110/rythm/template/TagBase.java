@@ -4,18 +4,13 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.runtime.ITag;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 25/01/12
- * Time: 12:16 AM
- * To change this template use File | Settings | File Templates.
+ * Define a tag
  */
 public abstract class TagBase extends TemplateBase implements ITag {
     protected ILogger logger = Logger.get(TagBase.class);
@@ -24,7 +19,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     protected Body _context;
 
-    private int _line;    
+    private int _line;
 
     protected int _line() {
         return _line;
@@ -33,21 +28,21 @@ public abstract class TagBase extends TemplateBase implements ITag {
     @Override
     public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
-        TagBase newTag = (TagBase)super.cloneMe(engine, caller);
+        TagBase newTag = (TagBase) super.cloneMe(engine, caller);
         newTag._body = null;
-        //newTag._out = new StringBuilder();
+        //newTag.__buffer = new StringBuilder();
         return newTag;
     }
 
     @Override
     public void setRenderArgs(Map<String, Object> args) {
         super.setRenderArgs(args);
-        if (args.containsKey("_body")) _body = (Body)args.get("_body");
+        if (args.containsKey("_body")) _body = (Body) args.get("_body");
     }
 
     @Override
     public void setRenderArg(String name, Object arg) {
-        if ("_body".equals(name)) _body = (Body)arg;
+        if ("_body".equals(name)) _body = (Body) arg;
         super.setRenderArg(name, arg);
     }
 
@@ -60,15 +55,15 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public void call(int line) {
         _line = line;
         if (null != _context) {
-            _out = new StringBuilder();
+            __buffer = new StringBuilder();
             _context.p(S.raw(renderWithParent()));
-        } else if (null != _caller && null != _out) {
-            _caller.p(S.raw(renderWithParent())); // a real tag
+        } else if (null != __caller && null != __buffer) {
+            __caller.p(S.raw(renderWithParent())); // a real tag
         } else {
             render(); // an normal template
         }
     }
-    
+
     // make sure it does not write to OutputStream or Writer
     private String renderWithParent() {
         if (null != __parent) return render();
@@ -87,7 +82,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     @Override
     protected void _pLayoutContent() {
-        if (null != _body) _body.render(null, out());
+        if (null != _body) _body.render(null, buffer());
         else super._pLayoutContent();
     }
 

@@ -2,7 +2,6 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.IO;
 
 import java.net.URL;
@@ -106,7 +105,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
     @Override
     protected Long userCheckInterval() {
-        return engine().configuration.getAsLong("rythm.resource.classpath.interval", Long.valueOf(1000 * 5));
+        return Long.valueOf(1000 * 5);
     }
 
     @Override

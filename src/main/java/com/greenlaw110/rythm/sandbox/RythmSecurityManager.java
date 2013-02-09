@@ -14,11 +14,11 @@ public class RythmSecurityManager extends SecurityManager {
     public static boolean isRythmThread() {
         return (Thread.currentThread() instanceof SandboxThreadFactory.SandboxThread);
     }
-    
+
     private SecurityManager osm;
     private String code = null;
     private boolean released = false;
-    
+
     private String hash(String input) {
         try {
             MessageDigest m = MessageDigest.getInstance("MD5");
@@ -28,13 +28,13 @@ public class RythmSecurityManager extends SecurityManager {
             throw new RuntimeException(e);
         }
     }
-    
+
     public RythmSecurityManager(SecurityManager sm, String password) {
         osm = sm;
         if (null == password) throw new NullPointerException();
         code = hash(password);
     }
-    
+
     public void unlock(String password) {
         if (code.equals(hash(password))) {
             released = true;
@@ -42,7 +42,7 @@ public class RythmSecurityManager extends SecurityManager {
             throw new SecurityException("password not match");
         }
     }
-    
+
     public void lock(String password) {
         if (code.equals(hash(password))) {
             released = false;
@@ -50,12 +50,13 @@ public class RythmSecurityManager extends SecurityManager {
             throw new SecurityException("password not match");
         }
     }
-    
+
     private void checkRythm() {
         if (!released && isRythmThread()) {
             throw new SecurityException("Access to protected resource is restricted in Sandbox mode");
         }
     }
+
     @Override
     public void checkCreateClassLoader() {
         checkRythm();
@@ -64,7 +65,7 @@ public class RythmSecurityManager extends SecurityManager {
 
     @Override
     public void checkAccess(Thread t) {
-        if (! (t instanceof SandboxThreadFactory.SandboxThread)) checkRythm();
+        if (!(t instanceof SandboxThreadFactory.SandboxThread)) checkRythm();
         if (null != osm) osm.checkAccess(t);
     }
 

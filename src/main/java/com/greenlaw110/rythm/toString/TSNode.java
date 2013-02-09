@@ -2,9 +2,7 @@ package com.greenlaw110.rythm.toString;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +16,7 @@ public class TSNode {
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj instanceof TSNode) {
-            return ((TSNode)obj).type.equals(type);
+            return ((TSNode) obj).type.equals(type);
         }
         return false;
     }

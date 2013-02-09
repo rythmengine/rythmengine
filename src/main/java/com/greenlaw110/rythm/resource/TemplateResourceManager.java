@@ -1,11 +1,12 @@
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,10 +21,11 @@ public class TemplateResourceManager {
 
     private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
 
-    public ITemplateResourceLoader resourceLoader = null;
+    private ITemplateResourceLoader _resourceLoader = null;
 
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
+        _resourceLoader = engine.conf().get(RythmConfigurationKey.RESOURCE_LOADER_IMPL);
     }
 
     private ITemplateResource cache(ITemplateResource resource) {
@@ -32,12 +34,12 @@ public class TemplateResourceManager {
     }
 
     public TemplateClass tryLoadTag(String tagName, TemplateClass tc) {
-        if (null != resourceLoader) return resourceLoader.tryLoadTag(tagName, tc);
+        if (null != _resourceLoader) return _resourceLoader.tryLoadTag(tagName, tc);
         else return FileTemplateResource.tryLoadTag(tagName, engine);
     }
 
     public String getFullTagName(TemplateClass tc) {
-        if (null != resourceLoader) return resourceLoader.getFullTagName(tc);
+        if (null != _resourceLoader) return _resourceLoader.getFullTagName(tc);
         else return FileTemplateResource.getFullTagName(tc, engine);
     }
 
@@ -55,7 +57,7 @@ public class TemplateResourceManager {
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
 
-        if (null != resourceLoader) resource = resourceLoader.load(str);
+        if (null != _resourceLoader) resource = _resourceLoader.load(str);
         if (null != resource) return resource;
 
         // try build-in loader

@@ -1,11 +1,11 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.CodeBuilder;
+import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -20,6 +20,7 @@ public class DefTagParser extends KeywordParserFactory {
         String signature;
         String retType;
         CodeBuilder.InlineTag tag;
+
         public DefTagToken(String tagName, String retType, String signature, String body, IContext context) {
             super("", context);
             this.retType = retType;
@@ -63,7 +64,7 @@ public class DefTagParser extends KeywordParserFactory {
                     String s = r.stringMatched(1);
                     int curLine = ctx().currentLine();
                     ctx().step(s.length() - 1);
-                    while(ctx().peek() != '}') ctx().step(-1);
+                    while (ctx().peek() != '}') ctx().step(-1);
                     s = r.stringMatched(2);
                     s = s.substring(1); // strip left "{"
                     s = s.substring(0, s.length() - 1); // strip right "}"
