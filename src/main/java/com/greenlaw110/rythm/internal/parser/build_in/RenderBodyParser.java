@@ -54,7 +54,7 @@ public class RenderBodyParser extends KeywordParserFactory {
                 step(r.stringMatched().length());
                 String paramS = r.stringMatched(3);
                 InvokeTagParser.ParameterDeclarationList params = new InvokeTagParser.ParameterDeclarationList();
-                InvokeTagParser.InvokeTagToken.parseParams(paramS, params, ctx().getEngine());
+                InvokeTagParser.InvokeTagToken.parseParams(paramS, params, ctx());
                 return new RenderBodyToken(params, ctx());
             }
         };

@@ -28,13 +28,13 @@ public class InvokeTagParser extends CaretParserFactoryBase {
         public String nameDef;
         public String valDef;
 
-        ParameterDeclaration(String name, String val, RythmEngine engine) {
+        ParameterDeclaration(String name, String val, IContext ctx) {
             if (null != name) {
                 if (name.startsWith("\"") || name.startsWith("'")) name = name.substring(1);
                 if (name.endsWith("\"") || name.endsWith("'")) name = name.substring(0, name.length() - 1);
             }
             nameDef = name;
-            valDef = Token.processRythmExpression(val, engine);
+            valDef = Token.processRythmExpression(val, ctx);
             //System.out.println(String.format("%s : %s", name, val));
         }
 
@@ -47,8 +47,8 @@ public class InvokeTagParser extends CaretParserFactoryBase {
     public static class ParameterDeclarationList {
         public List<ParameterDeclaration> pl = new ArrayList<ParameterDeclaration>();
 
-        void addParameterDeclaration(String nameDef, String valDef, RythmEngine engine) {
-            pl.add(new ParameterDeclaration(nameDef, valDef, engine));
+        void addParameterDeclaration(String nameDef, String valDef, IContext ctx) {
+            pl.add(new ParameterDeclaration(nameDef, valDef, ctx));
         }
 
         @Override
@@ -99,10 +99,10 @@ public class InvokeTagParser extends CaretParserFactoryBase {
          * Parse line like (bar='c', foo=bar.length(), zee=component[foo], "hello")
          */
         private void parseParams(String line) {
-            parseParams(line, params, ctx.getEngine());
+            parseParams(line, params, ctx);
         }
 
-        static void parseParams(String line, ParameterDeclarationList params, RythmEngine engine) {
+        static void parseParams(String line, ParameterDeclarationList params, IContext ctx) {
             if (S.isEmpty(line)) return;
             // strip '(' and ')'
             line = line.trim();
@@ -112,7 +112,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
             line = S.strip(line, "{", "}");
             line = line.replaceAll("^\\s+", ""); // allow line breaks in params
             while (r.search(line)) {
-                params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), engine);
+                params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), ctx);
             }
         }
 
@@ -508,13 +508,6 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
     private static String patternStr() {
         return "^(%s([_a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@()))((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
-    }
-
-    private static void testParseParams() {
-        String line = "value: (me()._getProperty(\"fn\"))";
-        ParameterDeclarationList params = new ParameterDeclarationList();
-        InvokeTagToken.parseParams(line, params, new RythmEngine());
-        System.out.println(params);
     }
 
     private static void testParseExtension() {

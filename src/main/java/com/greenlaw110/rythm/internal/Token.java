@@ -214,14 +214,15 @@ public class Token extends TextBuilder {
 
     protected final void outputExpression(boolean needsPrint) {
         if (S.isEmpty(s)) return;
-        String s = processExtensions(engine);
+        String s = processExtensions(false);
         if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
         else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
         pline();
     }
 
-    private String processExtensions(RythmEngine engine) {
+    private String processExtensions(boolean stripExtensions) {
         if (!transformEnabled) return s;
+        RythmEngine engine = this.engine;
         String s0 = s;
         boolean outerBracketsStripped;
         s = stripOuterBrackets(s);
@@ -258,7 +259,9 @@ public class Token extends TextBuilder {
             s = processElvis(s);
             while (!allMatched.empty()) {
                 Pair p = allMatched.pop();
-                s = p.extension.extend(s, p.signature);
+                if (!stripExtensions) {
+                    s = p.extension.extend(s, p.signature);
+                }
             }
         } else {
             // then check elvsi and then java extensions again
@@ -280,7 +283,7 @@ public class Token extends TextBuilder {
                 }
                 if (!matched) break;
             }
-            while (!allMatched.empty()) {
+            while (!stripExtensions && !allMatched.empty()) {
                 // process inner elvis expression
                 s = processElvis(s);
                 Pair p = allMatched.pop();
@@ -384,8 +387,13 @@ public class Token extends TextBuilder {
         return compactMode() ? compact_(s) : s;
     }
 
-    public static String processRythmExpression(String s, RythmEngine eninge) {
-        Token token = new Token(s, (IContext) null);
-        return token.processExtensions(eninge);
+    public static String processRythmExpression(String s, IContext ctx) {
+        Token token = new Token(s, ctx);
+        return token.processExtensions(false);
+    }
+    
+    public static String stripJavaExtension(String s, IContext ctx) {
+        Token token = new Token(s, ctx);
+        return token.processExtensions(true);
     }
 }

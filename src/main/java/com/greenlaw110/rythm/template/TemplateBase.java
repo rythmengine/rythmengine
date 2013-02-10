@@ -606,7 +606,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     }
                 } catch (RythmException e) {
                     throw e;
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     StackTraceElement[] stackTrace = e.getStackTrace();
                     String msg = null;
                     for (StackTraceElement se : stackTrace) {

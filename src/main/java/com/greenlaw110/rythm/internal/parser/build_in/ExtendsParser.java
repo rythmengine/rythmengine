@@ -53,7 +53,7 @@ public class ExtendsParser extends KeywordParserFactory {
                     //r = argsPattern;
                     r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
                     while (r.search(s)) {
-                        params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), ctx().getEngine());
+                        params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), ctx());
                     }
                 }
 
@@ -82,48 +82,6 @@ public class ExtendsParser extends KeywordParserFactory {
 
     protected String patternStr0() {
         return "(%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
-    }
-
-    private static void test1() {
-        Regex r = new ExtendsParser().reg(Rythm.INSTANCE);
-        String line = "@extends(\"_panel.html\", a:5, b=foo.bar(4)[1]);";
-        if (!r.search(line)) {
-            throw new RuntimeException("1");
-        }
-        System.out.println(r.stringMatched());
-        String s = r.stringMatched(2);
-        if (null == s) {
-            throw new RuntimeException("2");
-        }
-        r = innerPattern;
-        System.out.println(s);
-        if (!r.search(s)) {
-            throw new RuntimeException("3");
-        }
-
-        // process extend target
-        s = r.stringMatched(1);
-        if (s.startsWith("\"") || s.startsWith("'")) {
-            s = s.substring(1);
-        }
-        if (s.endsWith("\"") || s.endsWith("'")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        final String sExtend = s;
-        System.out.println(sExtend);
-
-        // process extend params
-        final InvokeTagParser.ParameterDeclarationList params = new InvokeTagParser.ParameterDeclarationList();
-        s = r.stringMatched(2);
-        if (!S.isEmpty(s)) {
-            s = s.replaceFirst(",\\s*", "");
-            r = argsPattern;
-            while (r.search(s)) {
-                params.addParameterDeclaration(r.stringMatched(4), r.stringMatched(5), new RythmEngine());
-            }
-        }
-        System.out.println(s);
-        System.out.println(params);
     }
 
     public static void main(String[] args) {

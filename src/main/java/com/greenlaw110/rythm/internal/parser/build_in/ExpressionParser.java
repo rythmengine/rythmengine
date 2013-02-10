@@ -2,10 +2,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IDialect;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.TemplateParser;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
@@ -23,13 +20,24 @@ import com.stevesoft.pat.Regex;
  */
 public class ExpressionParser extends CaretParserFactoryBase {
 
-    public static void assertBasic(String symbol, IContext context) {
-        if (symbol.contains("_utils.sep(\"")) return;// Rythm builtin expression TODO: generalize
-        boolean isSimple = Patterns.VarName.matches(symbol);
+    /**
+     * Return symbol with transformer extension stripped off 
+     * 
+     * @param symbol
+     * @param context
+     * @return
+     */
+    public static String assertBasic(String symbol, IContext context) {
+        if (symbol.contains("_utils.sep(\"")) return symbol;// Rythm builtin expression TODO: generalize
+        //String s = Token.stripJavaExtension(symbol, context);
+        //s = S.stripBrace(s);
+        String s = symbol;
+        boolean isSimple = Patterns.VarName.matches(s);
         IContext ctx = context;
         if (!isSimple) {
             throw new TemplateParser.ComplexExpressionException(ctx);
         }
+        return s;
     }
 
     static class ExpressionToken extends CodeToken {
@@ -38,28 +46,25 @@ public class ExpressionParser extends CaretParserFactoryBase {
             super(s, context);
             checkRestrictedClass(ctx, s);
             if (context.getDialect() instanceof BasicRythm) {
-                s = S.stripBrace(s);
-                // basic rythm dialect support only simple expression
-                assertBasic(s, context);
-                int pos = s.indexOf("("); // find out the method name
-                if (pos != -1) {
-                    String methodName = s.substring(0, pos);
-                } else {
-                    // find out array and it's dimension
-                    int d = 0;
-                    for (int i = 0; i < s.length(); ++i) {
-                        if (s.charAt(i) == '[') d++;
-                    }
-                    pos = s.indexOf("[");
-                    if (pos != -1) {
-                        s = s.substring(0, pos);
-                    }
-                    String type = "Object";
-                    for (int i = 0; i < d; ++i) {
-                        type = type + "[]";
-                    }
-                    context.getCodeBuilder().addRenderArgsIfNotDeclared(context.currentLine(), type, s);
+                if (s.startsWith("(")) {
+                    s = S.stripBrace(s);
                 }
+                // basic rythm dialect support only simple expression
+                s = assertBasic(s, context);
+                // find out array and it's dimension
+                int d = 0;
+                for (int i = 0; i < s.length(); ++i) {
+                    if (s.charAt(i) == '[') d++;
+                }
+                int pos = s.indexOf("[");
+                if (pos != -1) {
+                    s = s.substring(0, pos);
+                }
+                String type = "Object";
+                for (int i = 0; i < d; ++i) {
+                    type = type + "[]";
+                }
+                context.getCodeBuilder().addRenderArgsIfNotDeclared(context.currentLine(), type, s);
             }
         }
 

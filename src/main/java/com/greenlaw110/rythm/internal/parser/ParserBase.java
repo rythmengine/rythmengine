@@ -10,6 +10,7 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -91,7 +92,7 @@ public abstract class ParserBase implements IParser {
     protected final void checkRestrictedClass(String code) {
         if (Rythm.insideSandbox()) {
             String s = Sandbox.hasAccessToRestrictedClasses(ctx().getEngine(), code);
-            if (null != s) {
+            if (S.notEmpty(s)) {
                 raiseParseException("Access to restricted class [%s] is blocked in sandbox mode", s);
             }
         }
