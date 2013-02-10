@@ -37,7 +37,7 @@ public class DirectiveCommentEndSensor extends ParserBase {
         while (null != lang) {
             String s = lang.commentEnd();
             s = S.escapeRegex(s).toString();
-            s = "(" + s + ")" + ".*";
+            s = "(\\s*" + s + ")" + ".*";
             Pattern p = patterns.get(s);
             if (null == p) {
                 p = Pattern.compile(s, Pattern.DOTALL);

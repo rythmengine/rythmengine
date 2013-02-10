@@ -61,28 +61,10 @@ public class LangBlockStartSensor extends ParserBase {
                     ctx.pushLang(lang);
                     String s = String.format("p(\"%s\");__ctx.pushLang(%s);", matched, lang.newInstanceStr());
                     return new CodeToken(s, ctx);
+                } else {
                 }
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        String template = "<p>@1</p>\n\t<script>\n\t\talert('@2');\n\t</script>\n<p>@3</p>";
-        String p1 = "'<h2>abc<h2>'";
-        String p2 = "'<h1>xyz<h1>'";
-        String p3 = "'<h3>123<h3>'";
-
-        System.out.println("--- smart escape enabled ---");
-        System.setProperty("rythm.enableSmartEscape", "true");
-        RythmEngine engine1 = new RythmEngine();
-        String s1 = engine1.render(template, p1, p2, p3);
-        System.out.println(s1);
-
-        System.out.println("\n\n--- smart escape disabled ---");
-        System.setProperty("rythm.enableSmartEscape", "false");
-        RythmEngine engine2 = new RythmEngine();
-        String s2 = engine2.render(template, p1, p2, p3);
-        System.out.println(s2);
     }
 }

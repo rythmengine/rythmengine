@@ -15,7 +15,9 @@ import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.resource.TemplateResourceManager;
@@ -249,6 +251,16 @@ public class RythmEngine implements IEventDispatcher {
       Constructors, Configuration and Initializing
     -------------------------------------------------------------------------------*/
 
+    private void _initLogger(Map<String, ?> conf) {
+        boolean logEnabled = (Boolean)RythmConfigurationKey.LOG_ENABLED.getConfiguration(conf);
+        if (logEnabled) {
+            ILoggerFactory factory = RythmConfigurationKey.LOG_FACTORY_IMPL.getConfiguration(conf);
+            Logger.registerLoggerFactory(factory);
+        } else {
+            Logger.registerLoggerFactory(new NullLogger.Factory());
+        }
+    }
+
     private void _initConf(Map<String, ?> conf) {
         // load conf from disk
         Map<String, ?> rawConf = _loadConfFromDisk();
@@ -259,6 +271,8 @@ public class RythmEngine implements IEventDispatcher {
 
         // load conf from user supplied configuration
         if (null != conf) rawConf.putAll((Map) conf);
+        
+        _initLogger(rawConf);
 
         // initialize the configuration with all loaded data 
         this._conf = new RythmConfiguration(rawConf);
@@ -345,7 +359,7 @@ public class RythmEngine implements IEventDispatcher {
         // register built-in transformers if enabled
         boolean enableBuiltInJavaExtensions = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED);
         if (enableBuiltInJavaExtensions) {
-            registerTransformer(S.class);
+            registerTransformer("rythm", S.class);
         }
 
         boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TEMPLATE_LANG_ENABLED);
@@ -374,33 +388,59 @@ public class RythmEngine implements IEventDispatcher {
     -------------------------------------------------------------------------------*/
 
     /**
-     * User application could call this method to register {@link Transformer transformers}.
-     * This method could be called multiple times
+     * Register {@link Transformer transformers} using namespace specified in
+     * the namespace {@link com.greenlaw110.rythm.extension.Transformer#value() value} defined in
+     * the annotation.
      *
-     * @param extensionClasses
+     * @param transformerClasses
      */
-    public void registerTransformer(Class<?>... extensionClasses) {
+    public void registerTransformer(Class<?>... transformerClasses) {
+        registerTransformer(null, transformerClasses);
+    }
+
+    /**
+     * Register {@link Transformer transformers} using namespace specified to
+     * replace the namespace {@link com.greenlaw110.rythm.extension.Transformer#value() value} defined in
+     * the annotation.
+     *
+     * @param transformerClasses
+     */
+    public void registerTransformer(String namespace, Class<?>... transformerClasses) {
         ExtensionManager jem = extensionManager();
-        for (Class<?> extensionClass : extensionClasses) {
-            boolean classAnnotated = extensionClass.getAnnotation(Transformer.class) != null;
+        for (Class<?> extensionClass : transformerClasses) {
+            Transformer t = extensionClass.getAnnotation(Transformer.class);
+            boolean classAnnotated = null != t;
+            String nmsp = namespace;
+            boolean namespaceIsEmpty = S.empty(namespace);
+            if (classAnnotated && namespaceIsEmpty) {
+                nmsp = t.value();
+            }
             for (Method m : extensionClass.getDeclaredMethods()) {
                 int flag = m.getModifiers();
                 if (!Modifier.isPublic(flag) || !Modifier.isStatic(flag)) continue;
                 int len = m.getParameterTypes().length;
                 if (len <= 0) continue;
 
-                if (!classAnnotated) {
-                    boolean methodAnnotated = m.getAnnotation(Transformer.class) != null;
-                    if (!methodAnnotated) continue;
+                Transformer tm = m.getAnnotation(Transformer.class);
+                boolean methodAnnotated = null != tm;
+                if (!methodAnnotated && !classAnnotated) continue;
+                
+                String mnmsp = nmsp;
+                if (methodAnnotated && namespaceIsEmpty) {
+                    mnmsp = tm.value();
                 }
 
                 String cn = extensionClass.getSimpleName();
                 String cn0 = extensionClass.getName();
                 String mn = m.getName();
+                String fullName = String.format("%s.%s", cn0, mn);
+                if (S.notEmpty(mnmsp) && !"rythm".equals(mnmsp)) {
+                    mn = mnmsp + "_" + mn;
+                }
                 if (len == 1) {
-                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, String.format("%s.%s", cn0, mn)));
+                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, fullName));
                 } else {
-                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", String.format("%s.%s", cn0, mn)));
+                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", fullName));
                 }
             }
         }
@@ -714,6 +754,10 @@ public class RythmEngine implements IEventDispatcher {
      */
     public String toString(String template, Object obj) {
         Class argClass = obj.getClass();
+        String clsName = argClass.getName();
+        if (clsName.matches(".*\\$[0-9].*")) {
+            argClass = obj.getClass().getSuperclass();
+        }
         String key = template + argClass;
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {

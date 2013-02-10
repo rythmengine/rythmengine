@@ -31,6 +31,9 @@ public class ForEachCodeToken extends BlockCodeToken {
         if (null == iterable) throw new NullPointerException();
         this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname;
+        if (iterable.contains("..") || iterable.contains(" to ") || iterable.contains(" till ")) {
+            iterable = "com.greenlaw110.rythm.utils.Range.valueOf(\"" + iterable + "\")";
+        }
         this.iterable = iterable;
         openPos = context.cursor();
         IContext ctx = context;

@@ -388,9 +388,4 @@ public class Token extends TextBuilder {
         Token token = new Token(s, (IContext) null);
         return token.processExtensions(eninge);
     }
-
-    public static void main(String[] args) {
-        System.setProperty("rythm.enableTypeInference", "true");
-        System.out.println(Rythm.render("@args String attributes\n@attributes.escapeJson()", "abc"));
-    }
 }

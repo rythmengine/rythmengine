@@ -136,12 +136,4 @@ public class ExpressionParser extends CaretParserFactoryBase {
         return "^(%s[0-9a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
 
-    public static void main(String[] args) {
-        System.setProperty("rythm.enableTypeInference", "true");
-        RythmEngine re = new RythmEngine();
-        String s = "@1.length() @(@1.length() + @5) b";
-        s = re.render(s, "foo", 4);
-        System.out.println(s);
-    }
-
 }

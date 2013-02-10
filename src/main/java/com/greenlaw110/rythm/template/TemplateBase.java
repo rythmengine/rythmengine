@@ -1359,6 +1359,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 }
             };
         }
+        
+        public _Itr(Range range) {
+            _o = range;
+            _size = range.size();
+            iterator = range.iterator();
+        }
 
         public _Itr(Iterable<T> tc) {
             _o = tc;

@@ -206,34 +206,43 @@ public class RythmConfiguration {
      *
      * @return
      */
-    public boolean enableTypeInference() {
+    public boolean typeInferenceEnabled() {
         if (null == _enableTypeInference) {
             _enableTypeInference = get(FEATURE_TYPE_INFERENCE_ENABLED);
         }
         return _enableTypeInference;
     }
 
-    private Boolean _enableSmartEscape = null;
+    private Boolean _smartEscapeEnabled = null;
 
     /**
      * Get {@link RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED} without lookup
      *
      * @return
      */
-    public boolean enableSmartEscape() {
-        if (null == _enableSmartEscape) {
-            _enableSmartEscape = get(FEATURE_SMART_ESCAPE_ENABLED);
+    public boolean smartEscapeEnabled() {
+        if (null == _smartEscapeEnabled) {
+            _smartEscapeEnabled = (Boolean)get(FEATURE_SMART_ESCAPE_ENABLED);
         }
-        return _enableSmartEscape;
+        return _smartEscapeEnabled;
     }
 
-    private Boolean _enableNaturalTemplate = null;
+    private Boolean _naturalTemplateEnabled = null;
 
-    public boolean enableNaturalTemplate() {
-        if (null == _enableNaturalTemplate) {
-            _enableNaturalTemplate = get(FEATURE_NATURAL_TEMPLATE_ENABLED);
+    public boolean naturalTemplateEnabled() {
+        if (null == _naturalTemplateEnabled) {
+            _naturalTemplateEnabled = (Boolean)get(FEATURE_NATURAL_TEMPLATE_ENABLED);
         }
-        return _enableNaturalTemplate;
+        return _naturalTemplateEnabled;
+    }
+    
+    private Boolean _debugJavaSourceEnabled = null;
+    
+    public boolean debugJavaSourceEnabled() {
+        if (null == _debugJavaSourceEnabled) {
+            _debugJavaSourceEnabled = (Boolean)get(ENGINE_DEBUG_JAVA_SOURCE_ENABLED);
+        }
+        return _debugJavaSourceEnabled;
     }
 
     private Boolean _cacheEnabled = null;

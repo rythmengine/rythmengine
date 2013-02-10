@@ -1,11 +1,9 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.TemplateParser;
-import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
@@ -14,10 +12,6 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ForEachParser extends KeywordParserFactory {
     private static final ILogger logger = Logger.get(ForEachParser.class);
@@ -55,13 +49,30 @@ public class ForEachParser extends KeywordParserFactory {
                         }
                     };
                 } else {
-                    r = reg(dialect());
-                    if (!r.search(S.stripBrace(s))) {
-                        raiseParseException("Error parsing @for statement, correct usage: @for(Type var: iterable){...}");
+                    s = S.stripBrace(s);
+                    int pos0 = -1, pos1 = -1;
+                    String iterable = null, varname = null, type = null;
+                    if (s.contains(":")) {
+                        pos0 = s.indexOf(":");
+                        pos1 = pos0 + 1;
+                    } else if (s.contains(" in ")) {
+                        pos0 = s.indexOf(" in ");
+                        pos1 = pos0 + 4;
+                    } else {
+                        // the for(Iterable) style
+                        iterable = s;
                     }
-                    String iterable = r.stringMatched(6);
-                    String varname = r.stringMatched(5);
-                    String type = r.stringMatched(2);
+                    if (-1 != pos0) {
+                        String s1 = s.substring(0, pos0).trim();
+                        iterable = s.substring(pos1, s.length());
+                        if (s1.contains(" ")) {
+                            pos0 = s1.indexOf(" ");
+                            type = s1.substring(0, pos0);
+                            varname = s1.substring(pos0, s1.length());
+                        } else {
+                            varname = s1;
+                        }
+                    }
                     if (null != type) type = type.trim();
                     return new ForEachCodeToken(type, varname, iterable, ctx());
                 }
@@ -76,7 +87,7 @@ public class ForEachParser extends KeywordParserFactory {
 
     // match for(int i=0; i<100;++i) {
     protected String patternStr2() {
-        return "^%s%s\\s*((?@()))\\s*\\{";
+        return "^%s%s\\s*((?@()))\\s*\\{?";
     }
 
     @Override
@@ -85,37 +96,4 @@ public class ForEachParser extends KeywordParserFactory {
         //return "^(((" + Patterns.Type + ")\\s+)?(" + Patterns.VarName + ")\\s*\\:\\s*)?(" + Patterns.Expression2 + ")$";
         return "^((([a-zA-Z0-9_\\.]+)(\\s*\\[\\s*\\]|\\s*(?@<>))?\\s+)?(" + Patterns.VarName + ")\\s*\\:\\s*)?(" + Patterns.Expression2 + ")$";
     }
-
-    public static void main(String[] args) {
-        Rythm.render("abc\ndds\n@for(dd, dd{}\nadfs");
-    }
-
-    private static void test5() {
-        List<String> sl = Arrays.asList("a,b,c".split(","));
-        String s;
-        s = Rythm.render("@for(s:sl){|\n\n|@s, [@s_index], [@s_isOdd], [@s_parity], \n[@s_isFirst], [@s_isLast], [@s_sep], \n[@s_utils.sep(\" and \")]}", sl);
-        System.out.println(s);
-    }
-
-    private static void test4() {
-        String campaign = "abc";
-        List<String> targets = new ArrayList<String>(Arrays.asList("FACEBOOK,MOBILE".split(",")));
-        String s = Rythm.substitute("Campaign launch fee - @campaign on (@for(channels){@(_)@_utils.sep(\" and \")}) channels", campaign, targets);
-        System.out.println(s);
-    }
-
-    private static void test3() {
-        Regex r0 = new Regex("");
-        ForEachParser p = new ForEachParser();
-        Regex r = p.reg(BasicRythm.INSTANCE);
-        String s = "@for(play.libs.F.T2<String, String> tab: tabs) {}";
-        s = "play.libs.F.T2 [] tab: tabs";
-        //s = "String s: sa";
-        //s = "sa";
-        //s = "@for(int i = 0; i < 5; ++i){:@(i+1) }";
-        //s = "x : component.get(\"options\").split(\"-\\\\*\\\\!\\\\*-\")";
-        if (r.search(s)) p(r, 8);
-        //System.out.println(Rythm.render(s));
-    }
-
 }

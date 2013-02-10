@@ -1,5 +1,6 @@
 package com.greenlaw110.rythm.cache;
 
+import com.greenlaw110.rythm.TestBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,7 +8,7 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class SimpleCacheServiceTest extends Assert {
+public class SimpleCacheServiceTest extends TestBase {
     private ICacheService cache = SimpleCacheService.INSTANCE;
     @Before
     public void setup() {
@@ -60,4 +61,7 @@ public class SimpleCacheServiceTest extends Assert {
         assertTrue("timeout cached items should be removed", null == cache.get("key1"));
     }
 
+    public static void main(String[] args) {
+        run(SimpleCacheServiceTest.class);
+    }
 }

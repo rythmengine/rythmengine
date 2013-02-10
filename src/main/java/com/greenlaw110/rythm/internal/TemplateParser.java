@@ -74,9 +74,9 @@ public class TemplateParser implements IContext {
             this.continueStack.clear();
             this.insideDirectiveComment = false;
             this.blocks.clear();
-            dm.beginParse(this);
             cursor = 0;
             cb.rewind();
+            dm.beginParse(this);
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(this);
                 for (TextBuilder builder : tt) {

@@ -188,7 +188,7 @@ public class CodeBuilder extends TextBuilder {
             pName = className.substring(0, i);
         }
         this.engine = null == engine ? Rythm.engine() : engine;
-        this.conf = engine.conf();
+        this.conf = this.engine.conf();
         this.requiredDialect = requiredDialect;
         this.templateClass = templateClass;
         ILang lang = templateClass.templateLang;
@@ -261,6 +261,10 @@ public class CodeBuilder extends TextBuilder {
         this.renderArgs.putAll(codeBuilder.renderArgs);
         this.importLineMap.putAll(codeBuilder.importLineMap);
         renderArgCounter += codeBuilder.renderArgCounter;
+    }
+
+    public CodeBuilder() {
+        super();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     public String className() {
@@ -556,6 +560,9 @@ public class CodeBuilder extends TextBuilder {
             pBuild();
             RythmEvents.ON_CLOSING_JAVA_CLASS.trigger(engine, this);
             pClassClose();
+            if (conf.debugJavaSourceEnabled()) {
+                logger.info("java source code for %s: \n%s", templateClass, this);
+            }
             return this;
         } catch (NotRythmTemplateException e) {
             isNotRythmTemplate = true;
@@ -638,7 +645,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pRenderArgs() {
         pn();
         // -- output private members
-        if (renderArgs.isEmpty() && conf.enableTypeInference()) {
+        if (renderArgs.isEmpty() && conf.typeInferenceEnabled()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
             List<String> ls = new ArrayList<String>(tMap.keySet());
             Collections.sort(ls);

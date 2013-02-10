@@ -1,7 +1,11 @@
 package com.greenlaw110.rythm.utils;
 
+import com.greenlaw110.rythm.internal.parser.Patterns;
+import com.stevesoft.pat.Regex;
+
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 public class F {
 
@@ -510,6 +514,11 @@ public class F {
             protected Integer next(Integer element) {
                 return ++element;
             }
+
+            @Override
+            public int size() {
+                return max() - min();
+            }
         };
     }
 
@@ -519,6 +528,14 @@ public class F {
             protected Character next(Character element) {
                 return (char) (element + 1);
             }
+
+            @Override
+            public int size() {
+                char min = min();
+                char max = max();
+                return (int)max - (int)min;
+            }
         };
     }
+    
 }

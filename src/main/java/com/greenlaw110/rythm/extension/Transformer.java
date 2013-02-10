@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * When the annotation is marked on a class, then all public static methods with return
  * value and at least one parameter will be treated as transformer</p>
  * <p/>
- * <p>You can register them to RythmEngine by {@link com.greenlaw110.rythm.RythmEngine#registerTransformer(Class)}
+ * <p>You can register them to RythmEngine by {@link com.greenlaw110.rythm.RythmEngine#registerTransformer(Class[])}
  * method</p>, once you have registered your Java extension methods, the template author can use them
  * in template. Be careful of the name conflict of your Java extension and Rythm's built-in
  * Java extension. You can turn off rythm's built java extension by set "rythm.disableBuiltInTransformer"
@@ -42,4 +42,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Transformer {
+    /**
+     * The namespace of the transformer. When namespace is presented, the 
+     * template author needs to use the namespace to qualify the transformer
+     * in the template source. For example, <code>@x.app_myTransformer()</code> 
+     * 
+     * <p>Default value: "app"</p>
+     * 
+     * @return
+     */
+    String value() default "app";
 }

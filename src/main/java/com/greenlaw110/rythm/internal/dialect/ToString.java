@@ -14,7 +14,7 @@ import com.greenlaw110.rythm.internal.ToStringTemplateBase;
  * <p/>
  * Specifically, argument declaration and scripting is disabled in ToString mode; @for loop is not allowed in ToString mode also
  */
-public class ToString extends BasicRythm {
+public class ToString extends SimpleRythm {
 
     public static final String ID = "rythm-toString";
 
@@ -82,7 +82,7 @@ public class ToString extends BasicRythm {
     @Override
     public void begin(IContext ctx) {
         CodeBuilder cb = ctx.getCodeBuilder();
-        cb.addRenderArgs(ctx.currentLine(), type.getName(), "_");
+        cb.addRenderArgs(ctx.currentLine(), type.getName().replace('$', '.'), "_");
         //cb.setSimpleTemplate(0);
         cb.setExtended(ToStringTemplateBase.class);
     }

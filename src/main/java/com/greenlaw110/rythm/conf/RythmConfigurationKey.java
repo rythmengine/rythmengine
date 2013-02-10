@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
 import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.logger.JDKLogger;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.S;
 
@@ -230,6 +231,8 @@ public enum RythmConfigurationKey {
             }
         }
     },
+    
+    ENGINE_DEBUG_JAVA_SOURCE_ENABLED("engine.debug_java_source.enabled", false),
 
     /**
      * "engine.playframework.enabled": A special flag used when Rythm is working with rythm-plugin for Play!Framework. Usually
@@ -271,7 +274,7 @@ public enum RythmConfigurationKey {
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
-    FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", true),
+    FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", false),
 
     /**
      * "home.template": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
@@ -397,9 +400,9 @@ public enum RythmConfigurationKey {
      * When this configuration is not set, then a {@link com.greenlaw110.rythm.logger.JDKLogger.Factory} instance
      * is used to create the logger
      * <p/>
-     * <p>Default value: <code>null</code></p>
+     * <p>Default value: <code>com.greenlaw110.rythm.logger.JDKLogger.Factory</code></p>
      */
-    LOG_FACTORY_IMPL("log.factory.impl"),
+    LOG_FACTORY_IMPL("log.factory.impl", JDKLogger.Factory.class),
 
     /**
      * "log.source.java.enabled": Print out relevant java source lines when exception encountered
@@ -637,6 +640,12 @@ public enum RythmConfigurationKey {
             String clsName = (String) v;
             try {
                 return (T) Class.forName(clsName).newInstance();
+            } catch (Exception e) {
+                throw new ConfigurationException(e, "Error getting implementation configuration: %s", key);
+            }
+        } else if (v instanceof Class) {
+            try {
+                return (T) ((Class)v).newInstance();
             } catch (Exception e) {
                 throw new ConfigurationException(e, "Error getting implementation configuration: %s", key);
             }

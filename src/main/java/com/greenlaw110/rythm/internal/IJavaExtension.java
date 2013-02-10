@@ -28,10 +28,6 @@ public interface IJavaExtension {
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
 
-        public VoidParameterExtension(String waiveName, String name) {
-            this(waiveName, name, String.format("com.greenlaw110.rythm.utils.S.%s", name));
-        }
-
         public VoidParameterExtension(String waiveName, String name, String fullName) {
             methodName = name;
             fullMethodName = fullName;
@@ -57,6 +53,7 @@ public interface IJavaExtension {
         public String methodName() {
             return methodName;
         }
+
     }
 
     static class ParameterExtension implements IJavaExtension {
@@ -64,10 +61,6 @@ public interface IJavaExtension {
         private String fullMethodName = null;
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
-
-        public ParameterExtension(String waiveName, String name, String signature) {
-            this(waiveName, name, signature, String.format("com.greenlaw110.rythm.utils.S.%s", name));
-        }
 
         public ParameterExtension(String waiveName, String name, String signature, String fullName) {
             methodName = name;
@@ -95,6 +88,7 @@ public interface IJavaExtension {
         public String methodName() {
             return methodName;
         }
+
     }
 
 }

@@ -234,7 +234,7 @@ public class Rythm {
     public static String toString(String template, Object obj) {
         return engine().toString(template, obj);
     }
-
+    
     /**
      * @param obj
      * @return
@@ -302,7 +302,9 @@ public class Rythm {
      * @see com.greenlaw110.rythm.RythmEngine#shutdown()
      */
     public static void shutdown() {
-        engine().shutdown();
+        if (null == engine) return;
+        engine.shutdown();
+        engine = null;
     }
 
 }

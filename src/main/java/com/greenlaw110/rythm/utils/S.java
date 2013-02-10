@@ -644,11 +644,16 @@ public class S {
     public static String camelCase(Object obj) {
         if (null == obj) return "";
         String string = obj.toString();
-        string = noAccents(string);
-        string = string.replaceAll("[^\\w ]", "");
+        //string = noAccents(string);
+        //string = string.replaceAll("[^\\w ]", "");
         StringBuilder result = new StringBuilder(string.length());
-        for (String part : string.split(" ")) {
-            result.append(capFirst(part));
+        String[] sa = string.split(" ");
+        int l = sa.length;
+        for (int i = 0; i < l; ++i) {
+            if (i > 0) result.append(" ");
+            for (String s : sa[i].split("_")) {
+                result.append(capFirst(s));
+            }
         }
         return result.toString();
     }
