@@ -1,10 +1,9 @@
-package com.greenlaw110.rythm.feature.transformer;
+package com.greenlaw110.rythm.advanced.transformer;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.utils.S;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;

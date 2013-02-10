@@ -12,6 +12,13 @@ import java.util.regex.Pattern;
  */
 public abstract class TestBase extends Assert {
 
+    protected String t;
+    protected String s;
+    
+    protected String r(String template, Object... args) {
+        return Rythm.render(template, args);
+    }
+
     @Before
     public void initRythm() {
         Rythm.shutdown();

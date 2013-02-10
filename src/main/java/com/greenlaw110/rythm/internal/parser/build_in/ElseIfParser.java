@@ -6,8 +6,11 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
+
+import java.util.regex.Pattern;
 
 /**
  * <ul>Recognised the following patterns:
@@ -28,26 +31,36 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 if (null == bh || !(bh instanceof IfParser.IfBlockCodeToken)) return null;
 
                 String a = dialect().a();
-                Regex r1 = new Regex(String.format("^((%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "\\s*\\{?)).*", a, a));
-                Regex r2 = new Regex(String.format("^((%s\\}?|%s?\\})\\s*(else([\\s\\r\\n\\t]*(\\{|[\\s\\r\\n\\t]+)))).*", a, a));
+                Regex r1 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*", a, a));
+                Regex r2 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*", a, a));
 
                 String s = ctx.getRemain();
-                String s1 = null;
+                String s1;
+                boolean expression = false;
                 if (r1.search(s)) {
                     s1 = r1.stringMatched(1);
                     if (null == s1) return null;
                     step(s1.length());
-                    s1 = r1.stringMatched(3);
+                    s1 = r1.stringMatched(4);
+                    expression = true;
                 } else if (r2.search(s)) {
                     s1 = r2.stringMatched(1);
                     if (null == s1) return null;
                     step(s1.length());
-                    s1 = r2.stringMatched(3);
+                    s1 = r2.stringMatched(4);
                 } else {
                     return null;
                 }
-                if (!s1.endsWith("{")) s1 = s1 + "{";
-                if (!s1.startsWith("}")) s1 = "}" + s1;
+                Regex r = new Regex("}?\\s*else\\s+if\\s*((?@()))(\\s*\\{)?");
+                if (expression && r.search(s1)) {
+                    s1 = r.stringMatched(1);
+                    s1 = ExpressionParser.processPositionPlaceHolder(s1);
+                    s1 = "\n} else if (com.greenlaw110.rythm.utils.Eval.eval(" + s1 + ")) {";
+                } else {
+                    Pattern p = Pattern.compile(".*\\{(\\n\\r|\\r\\n|[\\n\\r])?", Pattern.DOTALL);
+                    if (!p.matcher(s1).matches()) s1 = s1 + "{";
+                    if (!s1.startsWith("}")) s1 = "}" + s1;
+                }
                 try {
                     ctx.closeBlock();
                 } catch (ParseException e) {

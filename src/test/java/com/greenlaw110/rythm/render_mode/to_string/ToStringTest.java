@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.feature.to_string;
+package com.greenlaw110.rythm.advanced.to_string;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;

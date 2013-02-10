@@ -44,7 +44,7 @@ public class IfParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
-        return "(^%s(%s\\s*((?@()))(\\s*\\{)?)).*";
+        return "(^%s(%s\\s*((?@()))([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*";
     }
 
     public static void main(String[] args) {

@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 
 public class BlockCloseParser extends ParserBase {
 
-    private static final String PTN = "([\\}]?%s[\\}\\s\\n\\>\\]]).*";
+    private static final String PTN = "((\\n\\r|\\r\\n|[\\n\\r])?[\\}]?%s[\\}\\s\\n\\>\\]]).*";
+    private static final String PTN2 = "((\\n\\r|\\r\\n|[\\n\\r])?(\\}%s|%s\\}|%s|\\})([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*";
 
     public BlockCloseParser(IContext context) {
         super(context);
@@ -27,9 +28,15 @@ public class BlockCloseParser extends ParserBase {
         if ("@".equals(remain)) {
             s = remain;
         } else {
-            Pattern p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);
-            Matcher m = p.matcher(ctx.getRemain());
-            if (!m.matches()) return null;
+            Pattern p = Pattern.compile(String.format(PTN2, a(), a(), a()), Pattern.DOTALL);
+            Matcher m = p.matcher(remain);
+            if (!m.matches()) {
+                p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);
+                m = p.matcher(remain);
+                if (!m.matches()) {
+                    return null;
+                }
+            };
             s = m.group(1);
         }
         // keep ">" or "]" for case like <a id=".." @if (...) class="error" @>
