@@ -3,6 +3,7 @@ package com.greenlaw110.rythm;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.JUnitCore;
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,11 @@ public abstract class TestBase extends Assert {
     @Before
     public void initRythm() {
         Rythm.shutdown();
+        System.setProperty(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
+        System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
+        System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
+        System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
+        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "true");
     }
 
     protected void assertNotContains(String found, String notExpected) {

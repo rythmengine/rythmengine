@@ -14,6 +14,7 @@ public class SmartEscapeTest extends TestBase {
     @Before
     public void setup() {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
+        System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
     }
     
     @Test

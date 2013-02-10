@@ -355,6 +355,11 @@ public class TemplateParser implements IContext {
         dialect = null;
     }
 
+    @Override
+    public void removeImmediateLastLineBreak() {
+        cb.removeImmediateLastLineBreak();
+    }
+
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;
@@ -365,17 +370,4 @@ public class TemplateParser implements IContext {
         compactMode = true;
     }
 
-    public static void main(String[] args) {
-        TemplateParser tp = new TemplateParser("\nHello \n\r\nworld!");
-        System.out.println(tp.totalLines);
-        System.out.println(tp.currentLine());
-        tp.step(5);
-        System.out.println("5 steps ahead");
-        System.out.println(tp.currentLine());
-        System.out.println(tp.getRemain());
-        tp.step(4);
-        System.out.println("4 steps ahead");
-        System.out.println(tp.currentLine());
-        System.out.println(tp.getRemain());
-    }
 }

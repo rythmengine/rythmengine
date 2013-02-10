@@ -167,4 +167,6 @@ public interface IContext {
     void pushLang(ILang lang);
 
     ILang popLang();
+    
+    void removeImmediateLastLineBreak();
 }

@@ -13,7 +13,7 @@ public class RythmEvents<RETURN, PARAM> implements IEvent<RETURN, PARAM> {
      * Right before template parsing started
      */
     public static final
-    IEvent<Void, CodeBuilder> ON_PARSE = new RythmEvents<Void, CodeBuilder>();
+    IEvent<String, CodeBuilder> ON_PARSE = new RythmEvents<String, CodeBuilder>();
 
     /**
      * Before start building java source code. A good place to inject implicit

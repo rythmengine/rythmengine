@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 
 public class Token extends TextBuilder {
 
+    private Token() {}
+    public static Token EMPTY_TOKEN = new Token();
+
     public static class StringToken extends Token {
         public String constId = null;
 
@@ -53,6 +56,11 @@ public class Token extends TextBuilder {
         }
 
         public String s() {
+            return s;
+        }
+
+        @Override
+        public String toString() {
             return s;
         }
 
@@ -368,7 +376,11 @@ public class Token extends TextBuilder {
     }
 
     private static String compact_(String s) {
+        if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])+")) {
+            return "\\n";
+        }
         String[] lines = s.split("[\\r\\n]+");
+        if (0 == lines.length) return "";
         TextBuilder tb = new TextBuilder();
         int i = 0;
         boolean startsWithSpace = s.startsWith(" ") || s.startsWith("\t");
@@ -382,9 +394,13 @@ public class Token extends TextBuilder {
         if (endsWithSpace) tb.p(" ");
         return tb.toString();
     }
+    
+    private static String processLineBreaks_(String s) {
+        return s;
+    }
 
     protected String compact(String s) {
-        return compactMode() ? compact_(s) : s;
+        return compactMode() ? compact_(s) : processLineBreaks_(s);
     }
 
     public static String processRythmExpression(String s, IContext ctx) {

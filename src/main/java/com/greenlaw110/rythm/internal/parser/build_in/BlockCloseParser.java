@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 
 public class BlockCloseParser extends ParserBase {
 
-    private static final String PTN = "((\\n\\r|\\r\\n|[\\n\\r])?[\\}]?%s[\\}\\s\\n\\>\\]]).*";
-    private static final String PTN2 = "((\\n\\r|\\r\\n|[\\n\\r])?(\\}%s|%s\\}|%s|\\})([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*";
+    private static final String PTN = "([\\}]?%s[\\}\\s\\n\\>\\]]).*";
+    private static final String PTN2 = "((\\}%s|%s\\}|\\})([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*";
 
     public BlockCloseParser(IContext context) {
         super(context);
@@ -49,16 +49,7 @@ public class BlockCloseParser extends ParserBase {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        ctx.removeImmediateLastLineBreak();
         return new CodeToken(s, ctx);
     }
-
-    public static void main(String[] args) {
-        String s = "@";
-        Pattern p = Pattern.compile(String.format(PTN, "@"), Pattern.DOTALL);
-        Matcher m = p.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group(1));
-        }
-    }
-
 }

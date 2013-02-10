@@ -196,6 +196,8 @@ public class CodeBuilder extends TextBuilder {
             lang = ILang.DefImpl.probeFileName(templateClass.name(), this.engine.conf().defaultLang());
         }
         this.templateDefLang = lang;
+        String tmpl = RythmEvents.ON_PARSE.trigger(this.engine, this);
+        this.tmpl = tmpl;
         this.parser = new TemplateParser(this);
     }
 
@@ -526,6 +528,21 @@ public class CodeBuilder extends TextBuilder {
             list.add(builder);
         }
     }
+    
+    public void removeImmediateLastLineBreak() {
+        for (int i = builders.size() - 1; i >= 0; --i) {
+            TextBuilder tb = builders.get(i);
+            if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
+                continue;
+            }
+            if (tb.getClass().equals(Token.StringToken.class)) {
+                if (tb.toString().matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
+                    builders.remove(i);
+                }
+            }
+            break;
+        }
+    }
 
     String template() {
         return tmpl;
@@ -540,7 +557,6 @@ public class CodeBuilder extends TextBuilder {
         }
         try {
             RythmEngine engine = engine();
-            RythmEvents.ON_PARSE.trigger(engine, this);
             parser.parse();
             invokeDirectives();
             //if (!basicTemplate()) addDefaultRenderArgs();
@@ -841,10 +857,15 @@ public class CodeBuilder extends TextBuilder {
         Token.StringToken curTk = new Token.StringToken("", parser);
         for (int i = 0; i < builders.size(); ++i) {
             TextBuilder tb = builders.get(i);
-            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock) {
+            if (tb == Token.EMPTY_TOKEN) {
+                continue;
+            }
+            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock || tb instanceof IDirective) {
                 if (tb instanceof Token.StringToken) {
                     Token.StringToken tk = (Token.StringToken) tb;
                     curTk = curTk.mergeWith(tk);
+                } else if (tb instanceof IDirective) {
+                    // do nothing
                 } else {
                     BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock) tb;
                     curTk = curTk.mergeWith(bk);

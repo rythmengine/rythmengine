@@ -51,6 +51,16 @@ public class EventBus implements IEventDispatcher {
 
     private void registerHandlers() {
         Map<IEvent<?, ?>, IEventHandler<?, ?>> m = dispatcher;
+        m.put(RythmEvents.ON_PARSE, new IEventHandler<String, CodeBuilder>() {
+            @Override
+            public String handleEvent(RythmEngine engine, CodeBuilder c) {
+                // pre process template source
+                String tmpl = c.template();
+                tmpl = tmpl.replaceAll("(\\r\\n)", "\n");
+                tmpl = tmpl.replaceAll("\\r", "\n");
+                return tmpl;
+            }
+        });
         m.put(RythmEvents.ON_BUILD_JAVA_SOURCE, new IEventHandler<Void, CodeBuilder>() {
             @Override
             public Void handleEvent(RythmEngine engine, CodeBuilder cb) {

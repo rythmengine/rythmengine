@@ -45,7 +45,7 @@ public class ToStringTest extends TestBase {
         Data data = new Data("bar", 5);
         String s = data.toString();
         assertContains(s, "[foo=bar,bar=5]");
-        assertContains(s, "com.greenlaw110.rythm.feature.to_string.ToStringTest$Data");
+        assertContains(s, "com.greenlaw110.rythm.advanced.to_string.ToStringTest$Data");
         
         // test with output transient and static fields
         s = Rythm.toString(data, new ToStringOption(true, true), null);
@@ -63,13 +63,14 @@ public class ToStringTest extends TestBase {
         s = data.toString(ToStringStyle.SHORT_PREFIX_STYLE);
         assertContains(s, "[foo=bar,bar=5]");
         assertContains(s, "ToStringTest.Data");
-        assertNotContains(s, "com.greenlaw110.rythm.feature.to_string.ToStringTest$Data");
+        assertNotContains(s, "com.greenlaw110.rythm.advanced.to_string.ToStringTest$Data");
         
         // test with SIMPLE_STYLE
         s = data.toString(ToStringStyle.SIMPLE_STYLE);
         assertEquals(s, "bar,5");
     }
     
+    @Test
     public void testToString() {
         Data data = new Data("bar", 5);
         String s = Rythm.toString("@_.getFoo() = @_.bar", data);

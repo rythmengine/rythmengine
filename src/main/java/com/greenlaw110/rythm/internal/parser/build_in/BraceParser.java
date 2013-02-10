@@ -15,7 +15,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 public class BraceParser implements IParserFactory {
 
     @Override
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
@@ -30,6 +30,9 @@ public class BraceParser implements IParserFactory {
                     if (null == bh) raiseParseException("no open block found");
                     boolean isLiteral = bh instanceof BlockToken.LiteralBlock;
                     String s = ctx().closeBlock();
+                    if (!isLiteral) {
+                        ctx.removeImmediateLastLineBreak();
+                    }
                     return isLiteral ? new Token.StringToken(s, ctx()) : new CodeToken(s, ctx());
                 }
                 return null;
