@@ -2,6 +2,8 @@ package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.RythmEngine;
 
+import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,10 @@ public class ParamTypeInferencer {
         } else {
             Class c = val.getClass();
             clsName = c.getName();
+            if (clsName.contains("$")) {
+                //anonymous or embedded class, let's try parent type
+                clsName = c.getSuperclass().getName();
+            }
             if (c.isArray()) {
                 Class cc = c.getComponentType();
                 while (cc.isArray()) cc = cc.getComponentType();
@@ -54,6 +60,24 @@ public class ParamTypeInferencer {
                     sb.append("[]");
                 }
                 clsName = sb.toString();
+            } else {
+                // try to see if this is a generic type
+                if (val instanceof Collection) {
+                    Collection col = (Collection)val;
+                    if (col.size() > 0) {
+                        if (val instanceof Map) {
+                            Object k = ((Map) val).keySet().iterator().next();
+                            Object v = ((Map) val).get(k);
+                            String kType = getTypeName(k);
+                            String vType = null == v ? "Object" : getTypeName(v);
+                            clsName = clsName + "<" + kType + "," + vType + ">";
+                        } else {
+                            Object e = col.iterator().next();
+                            String eType = null == val ? "Object" : getTypeName(e);
+                            clsName = clsName + "<" + eType + ">";
+                        }
+                    }
+                }
             }
         }
         return clsName;

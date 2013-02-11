@@ -48,11 +48,8 @@ public class IfParser extends KeywordParserFactory {
     }
 
     public static void main(String[] args) {
-        String p = String.format(new IfParser().patternStr(), "@", "if");
-        System.out.println(p);
-
-        Regex r = new Regex(p);
-        String s = "@if (\"TAB\".equalsTo(fbAuthMethod.toString())) {\n";
+        String s = "/js/%{out.write(play.getVirtualFile(\".version\").contentAsString())}%/";
+        Regex r = new Regex(".*(%(?@{})%).*");
         p(s, r);
     }
 

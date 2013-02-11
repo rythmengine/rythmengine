@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.utils.S;
@@ -29,6 +30,9 @@ public class ForEachCodeToken extends BlockCodeToken {
     public ForEachCodeToken(String type, String varname, String iterable, IContext context) {
         super(null, context);
         if (null == iterable) throw new NullPointerException();
+        iterable = iterable.trim();
+        iterable = ExpressionParser.processPositionPlaceHolder(iterable);
+        if (null != type) type = type.trim();
         this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname;
         if (iterable.contains("..") || iterable.contains(" to ") || iterable.contains(" till ")) {
@@ -40,38 +44,48 @@ public class ForEachCodeToken extends BlockCodeToken {
         ctx.pushBreak(IContext.Break.BREAK);
         ctx.pushContinue(IContext.Continue.CONTINUE);
         CodeBuilder cb = context.getCodeBuilder();
-        if (S.isEmpty(type)) {
+        boolean isBasic = ctx.getDialect() instanceof BasicRythm;
+        if (S.isEmpty(type) || "Object".equals(type)) {
             String itrType = cb.getRenderArgType(iterable);
             if (null != itrType) {
                 Regex r = new Regex(".*((?@<>))");
                 if (r.search(itrType)) {
                     type = r.stringMatched(1);
-                }
-                this.type = S.strip(type, "<", ">");
-                boolean key = iterable.endsWith("keySet()");
-                boolean val = iterable.endsWith("values()");
-                if (key || val) {
-                    r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
-                    if (r.search(this.type)) {
-                        if (key) this.type = r.stringMatched(1);
-                        else this.type = r.stringMatched(2);
+                    this.type = S.strip(type, "<", ">");
+                    boolean key = iterable.endsWith("keySet()");
+                    boolean val = iterable.endsWith("values()");
+                    if (key || val) {
+                        r = new Regex("([a-zA-Z0-9\\[\\]_]+(?@<>)?)\\s*\\,\\s*([a-zA-Z0-9\\[\\]_]+(?@<>)?)");
+                        if (r.search(this.type)) {
+                            if (key) this.type = r.stringMatched(1);
+                            else this.type = r.stringMatched(2);
+                        } else {
+                            throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Invalid for loop iterator type declaration: %s", itrType);
+                        }
+                    }
+                } else {
+                    if (itrType.endsWith("]")) {
+                        int pos = itrType.lastIndexOf("[");
+                        this.type = itrType.substring(0, pos);
                     } else {
-                        throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Invalid for loop iterator type declaration: %s", itrType);
+                        this.type = "Object";
                     }
                 }
                 if (S.isEqual(this.type, this.varname)) this.varname = "_";
             } else {
                 this.type = "Object";
             }
+        } else if (isBasic) {
+            throw new TemplateParser.TypeDeclarationException(ctx);
         }
-        if (ctx.getDialect() instanceof BasicRythm) {
+        if (isBasic) {
             ExpressionParser.assertBasic(iterable, context);
             context.getCodeBuilder().addRenderArgsIfNotDeclared(line, "Iterable<?>", iterable);
         }
     }
 
     private String ObjectType(String type) {
-        if (null == type) return "Object";
+        if (null == type) return "";
         if ("int".equals(type)) return "Integer";
         if ("float".equals(type)) return "Float";
         if ("double".equals(type)) return "Double";
@@ -123,34 +137,34 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
     }
 
-    public void output1() {
-        String prefix = "_".equals(varname) ? "" : varname;
-        String curClassName = ctx.getCodeBuilder().includingClassName();
-        int bodySize = closePos - openPos;
-        String varName = ctx.getCodeBuilder().newVarName();
-        p("_Itr<").p(type).p("> ").p(varName).p(" = new _Itr(").p(iterable).p(");");
-        pline();
-        p("if (").p(varName).p(".size() > 0) {");
-        pline();
-        p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(varName);
-        p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(");
-        p(curClassName).p(".this,").p(bodySize).p("){");
-        pline();
-        pt("public boolean render(final ");
-        p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ");
-        p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ");
-        p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast, final String ").p(prefix).p("_sep, final com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(prefix).p("_utils) { ");
-        pline();
-    }
-
+//    public void output1() {
+//        String prefix = "_".equals(varname) ? "" : varname;
+//        String curClassName = ctx.getCodeBuilder().includingClassName();
+//        int bodySize = closePos - openPos;
+//        String varName = ctx.getCodeBuilder().newVarName();
+//        p("_Itr<").p(type).p("> ").p(varName).p(" = new _Itr(").p(iterable).p(");");
+//        pline();
+//        p("if (").p(varName).p(".size() > 0) {");
+//        pline();
+//        p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(varName);
+//        p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(");
+//        p(curClassName).p(".this,").p(bodySize).p("){");
+//        pline();
+//        pt("public boolean render(final ");
+//        p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ");
+//        p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ");
+//        p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast, final String ").p(prefix).p("_sep, final com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(prefix).p("_utils) { ");
+//        pline();
+//    }
+//
     @Override
     public String closeBlock() {
         return "\n\t}\n}\n}\n";
     }
 
-    public String closeBlock1() {
-        ctx.popBreak();
-        closePos = ctx.cursor();
-        return "\n\t return true;\n\t}});\n}\n";
-    }
+//    public String closeBlock1() {
+//        ctx.popBreak();
+//        closePos = ctx.cursor();
+//        return "\n\t return true;\n\t}});\n}\n";
+//    }
 }

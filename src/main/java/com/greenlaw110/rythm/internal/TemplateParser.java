@@ -61,6 +61,12 @@ public class TemplateParser implements IContext {
             super(ctx, "Complex expression not allowed in current dialect[%s]", ctx.getDialect());
         }
     }
+    
+    public static class TypeDeclarationException extends RewindableException {
+        public TypeDeclarationException(IContext ctx) {
+            super(ctx, "Type declaration not allowed in current dialect[%s]", ctx.getDialect());
+        }
+    }
 
     void parse() {
         DialectManager dm = engine.dialectManager();

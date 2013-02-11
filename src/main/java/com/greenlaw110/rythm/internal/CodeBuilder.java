@@ -465,6 +465,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public String getRenderArgType(String name) {
+        addInferencedRenderArgs();
         RenderArgDeclaration rad = renderArgs.get(name);
         if (null != rad) return rad.type;
         else return null;
@@ -657,10 +658,8 @@ public class CodeBuilder extends TextBuilder {
         Regex regex = new Regex("(?@<>)", "");
         return regex.replaceAll(type);
     }
-
-    protected void pRenderArgs() {
-        pn();
-        // -- output private members
+    
+    private void addInferencedRenderArgs() {
         if (renderArgs.isEmpty() && conf.typeInferenceEnabled()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
             List<String> ls = new ArrayList<String>(tMap.keySet());
@@ -670,6 +669,12 @@ public class CodeBuilder extends TextBuilder {
                 addRenderArgs(-1, type, name);
             }
         }
+    }
+
+    protected void pRenderArgs() {
+        pn();
+        addInferencedRenderArgs();
+        // -- output private members
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             pt("protected ").p(arg.type).p(" ").p(argName);

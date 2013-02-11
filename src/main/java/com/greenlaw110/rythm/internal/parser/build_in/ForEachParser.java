@@ -58,6 +58,9 @@ public class ForEachParser extends KeywordParserFactory {
                     } else if (s.contains(" in ")) {
                         pos0 = s.indexOf(" in ");
                         pos1 = pos0 + 4;
+                    } else if (s.contains(" <- ")) {
+                        pos0 = s.indexOf(" <- ");
+                        pos1 = pos0 + 4;
                     } else {
                         // the for(Iterable) style
                         iterable = s;
@@ -73,7 +76,6 @@ public class ForEachParser extends KeywordParserFactory {
                             varname = s1;
                         }
                     }
-                    if (null != type) type = type.trim();
                     return new ForEachCodeToken(type, varname, iterable, ctx());
                 }
             }
