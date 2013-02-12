@@ -6,6 +6,7 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -24,7 +25,7 @@ public class ImportParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext c) {
-        return new ParserBase(c) {
+        return new RemoveLeadingLineBreakAndSpacesParser(c) {
             public TextBuilder go() {
                 String remain = remain();
                 String line = null;

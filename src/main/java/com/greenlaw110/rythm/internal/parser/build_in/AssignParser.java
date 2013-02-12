@@ -4,9 +4,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.Patterns;
+import com.greenlaw110.rythm.internal.parser.*;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -87,7 +85,7 @@ public class AssignParser extends KeywordParserFactory {
 //    }
 
     public IParser create(IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain()))

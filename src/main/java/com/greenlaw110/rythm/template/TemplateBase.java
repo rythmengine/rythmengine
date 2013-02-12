@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.template;
 import com.alibaba.fastjson.JSON;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.extension.ILang;
@@ -1166,7 +1167,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param <T>
      */
     protected static class _Itr<T> implements Iterable<T> {
-        private Object _o;
+        private Object _o = null;
         private int _size = -1;
         private Iterator<T> iterator = null;
         private int cursor = 0;
@@ -1364,6 +1365,47 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             _o = range;
             _size = range.size();
             iterator = range.iterator();
+        }
+        
+        public _Itr(Object obj) {
+            if (null == obj) {
+                throw new NullPointerException();
+            }
+            String s = obj.toString();
+            if (S.isEmpty(s)) {
+                _o = "";
+                _size = 0;
+                iterator = Collections.EMPTY_LIST.iterator();
+                return;
+            }
+            List<String> seps = new ArrayList<String>();
+            RythmEngine engine = RythmEngine.get();
+            RythmConfiguration conf = engine.conf();
+            if ("zh".equals(conf.lang())) {
+                seps.addAll(Arrays.asList("\n,、,，,；,。,：".split(",")));
+            } else {
+                seps.add("\n");
+            }
+            seps.addAll(Arrays.asList(";^,^:^_^-".split("\\^")));
+            for(String sep: seps) {
+                if (s.contains(sep)) {
+                    List<String> ls = Arrays.asList(s.split(sep));
+                    List<String> ls0 = new ArrayList<String>();
+                    for(String s0: ls) {
+                        ls0.add(s0.trim());
+                    }
+                    _o = ls0;
+                    _size = ls.size();
+                    iterator = (Iterator<T>)ls0.iterator();
+                    break;
+                }
+            }
+            if (null == _o) {
+                List<String> ls = new ArrayList<String>();
+                ls.add(s);
+                _size = 1;
+                iterator = (Iterator<T>)ls.iterator();
+            }
         }
 
         public _Itr(Iterable<T> tc) {

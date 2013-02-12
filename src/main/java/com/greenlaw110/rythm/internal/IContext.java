@@ -168,5 +168,4 @@ public interface IContext {
 
     ILang popLang();
     
-    void removeImmediateLastLineBreak();
 }

@@ -516,10 +516,24 @@ public class CodeBuilder extends TextBuilder {
         if (null == list) throw new NullPointerException();
         return list;
     }
-
+    
+    public boolean removeNextLF = false;
     public void addBuilder(TextBuilder builder) {
-        if (macroStack.empty()) builders.add(builder);
-        else {
+        if (builder == Token.EMPTY_TOKEN) {
+            return;
+        }
+        Token token = (Token)builder;
+        if (removeNextLF) {
+            if (token.removeLeadingLineBreak()) {
+                removeNextLF = false;
+            }
+        }
+        if (token.removeNextLineBreak) {
+            removeNextLF = true;
+        }
+        if (macroStack.empty()) {
+            builders.add(builder);
+        } else {
             String macro = macroStack.peek();
             List<TextBuilder> list = macros.get(macro);
             if (null == list) {
@@ -530,18 +544,85 @@ public class CodeBuilder extends TextBuilder {
         }
     }
     
-    public void removeImmediateLastLineBreak() {
+    /**
+     * If from the current cursor to last linebreak are all space, then
+     * remove all those spaces and the last line break
+     */
+    public void removeSpaceToLastLineBreak(IContext ctx) {
+        boolean shouldRemoveSpace = true;
         for (int i = builders.size() - 1; i >= 0; --i) {
             TextBuilder tb = builders.get(i);
             if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                 continue;
             }
             if (tb.getClass().equals(Token.StringToken.class)) {
-                if (tb.toString().matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
-                    builders.remove(i);
+                String s = tb.toString();
+                if (s.matches("[ \\t\\x0B\\f]+")) {
+                    continue;
+                } else if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
+                } else {
+                    shouldRemoveSpace = false;
                 }
             }
             break;
+        }
+        if (shouldRemoveSpace) {
+            for (int i = builders.size() - 1; i >= 0; --i) {
+                TextBuilder tb = builders.get(i);
+                if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
+                    continue;
+                }
+                if (tb.getClass().equals(Token.StringToken.class)) {
+                    String s = tb.toString();
+                    if (s.matches("[ \\t\\x0B\\f]+")) {
+                        builders.remove(i);
+                        continue;
+                    } else if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
+                        builders.remove(i);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * If from the current cursor till last linebreak are all space, then
+     * remove all those spaces and the last line break
+     */
+    public void removeSpaceTillLastLineBreak(IContext ctx) {
+        boolean shouldRemoveSpace = true;
+        for (int i = builders.size() - 1; i >= 0; --i) {
+            TextBuilder tb = builders.get(i);
+            if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
+                continue;
+            }
+            if (tb.getClass().equals(Token.StringToken.class)) {
+                String s = tb.toString();
+                if (s.matches("[ \\t\\x0B\\f]+")) {
+                    continue;
+                } else if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
+                } else {
+                    shouldRemoveSpace = false;
+                }
+            }
+            break;
+        }
+        if (shouldRemoveSpace) {
+            for (int i = builders.size() - 1; i >= 0; --i) {
+                TextBuilder tb = builders.get(i);
+                if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
+                    continue;
+                }
+                if (tb.getClass().equals(Token.StringToken.class)) {
+                    String s = tb.toString();
+                    if (s.matches("[ \\t\\x0B\\f]+")) {
+                        builders.remove(i);
+                        continue;
+                    }
+                }
+                break;
+            }
         }
     }
 

@@ -41,6 +41,8 @@ public abstract class ParserBase implements IParser {
         c_ = null;
         engine_ = null;
     }
+    
+    
 
     protected ParserBase(IContext context) {
         if (null == context) throw new NullPointerException();
@@ -73,7 +75,7 @@ public abstract class ParserBase implements IParser {
         return c_.pop();
     }
 
-    protected final IContext ctx() {
+    public final IContext ctx() {
         return c_;
     }
 

@@ -2,11 +2,14 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingSpacesIfLineBreak;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.ParserDispatcher;
 import com.greenlaw110.rythm.internal.parser.build_in.*;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.ArrayList;
@@ -61,8 +64,26 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             @Override
             public TextBuilder next() {
                 for (IParser p : parsers) {
-                    TextBuilder t = p.go();
+                    TextBuilder t;
+                    F.T2<IParser, TextBuilder> t2 = null;
+                    if (p instanceof ParserDispatcher) {
+                        t2 = ((ParserDispatcher) p).go2();
+                        t = null == t2 ? null : t2._2;
+                    } else {
+                        t = p.go();
+                    }
+                    
                     if (null != t) {
+                        if (null != t2) {
+                            p = t2._1;
+                        }
+                        IContext ctx = p.ctx();
+                        CodeBuilder cb = ctx.getCodeBuilder();
+                        if (p instanceof IRemoveLeadingLineBreakAndSpaces) {
+                            cb.removeSpaceToLastLineBreak(ctx);
+                        } else if (p instanceof IRemoveLeadingSpacesIfLineBreak) {
+                            cb.removeSpaceTillLastLineBreak(ctx);
+                        }
                         lastCursor = ((TemplateParser) ctx).cursor;
                         return t;
                     }

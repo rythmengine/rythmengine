@@ -3,7 +3,9 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IContext;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
@@ -18,7 +20,7 @@ import java.util.regex.Pattern;
  * Detect if a directive comment is closed and strip
  * it out from the parsing process
  */
-public class DirectiveCommentEndSensor extends ParserBase {
+public class DirectiveCommentEndSensor extends RemoveLeadingLineBreakAndSpacesParser {
     ILogger logger = Logger.get(DirectiveCommentEndSensor.class);
 
     public DirectiveCommentEndSensor(IContext context) {
@@ -48,7 +50,7 @@ public class DirectiveCommentEndSensor extends ParserBase {
                 s = m.group(1);
                 ctx.step(s.length());
                 ctx.leaveDirectiveComment();
-                return new TextBuilder();
+                return Token.EMPTY_TOKEN;
             }
             lang = lang.getParent();
         }

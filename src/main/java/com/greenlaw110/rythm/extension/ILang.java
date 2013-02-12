@@ -114,7 +114,7 @@ public interface ILang {
         };
         public static final DefImpl XML = new DefImpl("XML", "<!--", "-->", ITemplate.Escape.XML);
 
-        public static final DefImpl JS = new DefImpl("JS", "/*", "*/", ITemplate.Escape.JS, "(\\<\\s*script(\\s*|\\s+.*)?\\>).*", "(\\<\\/\\s*script\\s*\\>).*") {
+        public static final DefImpl JS = new DefImpl("JS", "/*", "*/", ITemplate.Escape.JS, "(<\\s*script[^<>]*?>).*", "(\\<\\/\\s*script\\s*\\>).*") {
             @Override
             public Set<ILang> allowedExternalLangs() {
                 Set<ILang> set = new HashSet<ILang>();
@@ -122,7 +122,7 @@ public interface ILang {
                 return set;
             }
         };
-        public static final DefImpl CSS = new DefImpl("CSS", "/*", "*/", ITemplate.Escape.JS, "(\\<\\s*style(\\s*|\\s+.*)?\\>).*", "(\\<\\/\\s*style\\s*\\>).*") {
+        public static final DefImpl CSS = new DefImpl("CSS", "/*", "*/", ITemplate.Escape.JS, "(<\\s*style[^<>]*?>).*", "(\\<\\/\\s*style\\s*\\>).*") {
             @Override
             public Set<ILang> allowedExternalLangs() {
                 Set<ILang> set = new HashSet<ILang>();

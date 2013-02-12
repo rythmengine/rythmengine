@@ -5,7 +5,9 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.Directive;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -22,7 +24,7 @@ import java.util.regex.Pattern;
  */
 public class CommentParser extends CaretParserFactoryBase {
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Pattern p = inlineComment();
                 Matcher m = p.matcher(remain());
@@ -30,7 +32,6 @@ public class CommentParser extends CaretParserFactoryBase {
                     p = blockComment();
                     m = p.matcher(remain());
                     if (!m.matches()) return null;
-                    ctx.removeImmediateLastLineBreak();
                 } else {
                     // special process to directive comments
                     if (ctx.insideDirectiveComment()) {

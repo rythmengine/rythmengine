@@ -1,87 +1,24 @@
 package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
-import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
-import static com.greenlaw110.rythm.utils.NamedParams.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-/**
- * Test @if and @for
- */
-public class FlowControlTest extends TestBase {
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
+import static com.greenlaw110.rythm.utils.NamedParams.from;
+import static com.greenlaw110.rythm.utils.NamedParams.p;
 
+/**
+ * Test @for parser
+ */
+public class ForParserTest extends TestBase {
     @Before
     public void configure() {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
     }
 
-    @Test
-    public void testIf() {
-        t = "@if(true) {true}";
-        s = r(t);
-        assertEquals("true", s);
-        
-        t = "@if(true) true@";
-        assertEquals("true", s);
-    }
-    
-    @Test
-    public void testIfElse() {
-        t = "@if(@1) {true} else {false}";
-        s = r(t, true);
-        assertEquals("true", s);
-        s = r(t, false);
-        assertEquals("false", s);
-        
-        t = "@if(@1) true@ else false@";
-        s = r(t, true);
-        assertEquals("true", s);
-        s = r(t, false);
-        assertEquals("false", s);
-    }
-    
-    @Test
-    public void testIfElseIf() {
-        t = "@if(@1 < 14) {kid} else if (@1 < 30) {yong man} else {aged}";
-        s = r(t, 10);
-        assertEquals("kid", s);
-        s = r(t, 28);
-        assertEquals("yong man", s);
-        s = r(t, 200);
-        assertEquals("aged", s);
-
-        t = "@if(@1 < 14) kid@ else if (@1 < 30) yong man@ else aged@";
-        s = r(t, 10);
-        assertEquals("kid", s);
-        s = r(t, 28);
-        assertEquals("yong man", s);
-        s = r(t, 200);
-        assertEquals("aged", s);
-    }
-    
-    @Test
-    public void testIfWithLineBreak() {
-        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
-        t = "@if(@1 < 14) {\n\tkid\n} else if (@1 < 30) {\n\tyong man\n} else {\n\taged\n}";
-        s = r(t, 10);
-        assertEquals("\tkid", s);
-        s = r(t, 28);
-        assertEquals("\tyong man", s);
-        s = r(t, 200);
-        assertEquals("\taged", s);
-
-        t = "@if(@1 < 14) \n\tkid\n@ else if (@1 < 30) \n\tyong man\n@ else \n\taged\n@";
-        s = r(t, 10);
-        assertEquals("\tkid", s);
-        s = r(t, 28);
-        assertEquals("\tyong man", s);
-        s = r(t, 200);
-        assertEquals("\taged", s);
-    }
 
     /**
      * Test @for(int i = 0; i < 100; ++i) style
@@ -91,6 +28,13 @@ public class FlowControlTest extends TestBase {
         t = "@for (int i = 0; i < 5; ++i) {@i}";
         s = r(t);
         assertEquals("01234", s);
+    }
+    
+    @Test
+    public void testForLoop1WithLineBreak() {
+        t = "abc\n@for (int i = 0; i < 5; ++i) {\n\t@i\n}\n123";
+        s = r(t);
+        assertEquals("abc\n\t0\n\t1\n\t2\n\t3\n\t4\n123", s);
     }
 
     /**
@@ -205,13 +149,109 @@ public class FlowControlTest extends TestBase {
     }
     
     @Test
-    public void testLineBreaks() {
+    public void testForWithLineBreaks() {
         t = "abc\n@for (String item: items) { \n\t@(item)@item_sep\n}xyz";
         s = r(t, from(p("items", "a,b,c".split(","))));
-        assertEquals("a,b,c", s);
+        assertEquals("abc\n\ta,\n\tb,\n\tc\nxyz", s);
+
+        t = "abc\n@for (String item: items) { \n\t@(item)@item_sep\n}  \nxyz";
+        s = r(t, from(p("items", "a,b,c".split(","))));
+        assertEquals("abc\n\ta,\n\tb,\n\tc\nxyz", s);
+    }
+        
+    @Test
+    public void testForWithLineBreaks2() {
+        t = "abc@for (String item: items) {@(item)@item_sep}xyz";
+        s = r(t, from(p("items", "a,b,c".split(","))));
+        assertEquals("abca,b,cxyz", s);
+
+        t = "abc@for (String item: items) {@(item)@item_sep\n}  \nxyz";
+        s = r(t, from(p("items", "a,b,c".split(","))));
+        assertEquals("abca,\nb,\nc\nxyz", s);
+    }
+    
+    @Test
+    public void testSmartIterator() {
+        t = "@for(@1){@__sep}";
+        s = r(t, "a, b, c");
+        assertEquals("a,b,c",s);
+
+        s = r(t, "a : b:c");
+        assertEquals("a,b,c",s);
+
+        s = r(t, "a; b; c");
+        assertEquals("a,b,c",s);
+        
+        s = r(t, "a - b - c");
+        assertEquals("a,b,c",s);
+        
+        s = r(t, "a_b_c");
+        assertEquals("a,b,c",s);
+        
+        s = r(t, "a:1,b:2;x:10,y:12");
+        assertEquals("a:1,b:2,x:10,y:12", s);
+    }
+    
+    @Test
+    public void testLoopVarSeparator() {
+        t = "@for(\"a:b:c\"){@__sep}";
+        assertEquals("a,b,c", r(t));
+        
+        t = "@for(\"a:b:c\"){@_ @_sep}";
+        assertEquals("a ,b ,c ", r(t));
+
+        t = "@for(s in \"a:b:c\"){@s__sep}";
+        assertEquals("a,b,c", r(t)); 
+
+        t = "@for(s in \"a:b:c\"){@s @s_sep}";
+        assertEquals("a ,b ,c ", r(t));
+        
+        t = "@for(\"a:b:c\"){@(_)@_utils.sep(\"|\")}";
+        assertEquals("a|b|c", r(t));
+    }
+    
+    @Test
+    public void testLoopVarSize() {
+        t = "@for(1..5){@(_)/@(_size)@_sep}";
+        assertEquals("1/4,2/4,3/4,4/4", r(t));
+    }
+    
+    @Test
+    public void testLoopVarParity() {
+        t = "@for(1..5){@(_):@(_parity)@_sep}";
+        assertEquals("1:odd,2:even,3:odd,4:even", r(t));
+        
+        t = "@for(1..5){@(_):@(_isOdd ? 1 : 0)@_sep}";
+        assertEquals("1:1,2:0,3:1,4:0", r(t));
+    }
+    
+    @Test
+    public void testLoopVarFirstLast() {
+        t = "@for(1..5){@(_):@if(_isFirst){[f]}else if(_isLast){[l]}else{[]}@_sep}";
+        assertEquals("1:[f],2:[],3:[],4:[l]", r(t));
+    }
+    
+    @Test
+    public void testLoopVarIndex() {
+        t = "@for(\"a,b,c\")@_|@(_index)@_sep@";
+        assertEquals("a|1,b|2,c|3", r(t));
+    }
+    
+    @Test
+    public void testElse() {
+        t = "@for(@1){@__sep}else{empty list}";
+        assertEquals("empty list", r(t, Arrays.asList(new String[]{})));
+        assertEquals("a,b,c", r(t, Arrays.asList("a,b,c".split(","))));
+    }
+    
+    @Test
+    public void testElseWithLineBreaks() {
+        t = "abc\n\t@for(@1){\n\t\t@__sep\n\t} else {\n\t\tempty list\n\t}\n123";
+        assertEquals("abc\n\t\tempty list\n123", r(t, ""));
+        assertEquals("abc\n\t\ta,\n\t\tb,\n\t\tc\n123", r(t, "a,b,c"));
     }
 
     public static void main(String[] args) {
-        run(FlowControlTest.class);
+        run(ForParserTest.class);
     }
 }

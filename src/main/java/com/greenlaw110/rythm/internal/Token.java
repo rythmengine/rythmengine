@@ -47,6 +47,13 @@ public class Token extends TextBuilder {
         }
 
         @Override
+        public boolean removeLeadingLineBreak() {
+            //String s0 = s;
+            s = s.replaceFirst("^[ \\t\\x0B\\f]*\\n", "");
+            return true;
+        }
+
+        @Override
         public boolean compactMode() {
             return super.compactMode();
         }
@@ -97,6 +104,11 @@ public class Token extends TextBuilder {
     protected IContext ctx;
     protected int line;
     protected boolean disableCompactMode = false;
+    public boolean removeNextLineBreak = false;
+    
+    public boolean removeLeadingLineBreak() {
+        return false;
+    }
 
     protected boolean compactMode() {
         if (disableCompactMode) return false;

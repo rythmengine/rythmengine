@@ -4,8 +4,11 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.internal.IBlockHandler;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -23,7 +26,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
 
     @Override
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
 
             @Override
             public TextBuilder go() {
@@ -31,10 +34,11 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 if (null == bh || !(bh instanceof IfParser.IfBlockCodeToken)) return null;
 
                 String a = dialect().a();
+                //Regex rLF = new Regex("^(\\n\\r|\\r\\n|[\\n\\r]).*");
                 Regex r1 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*", a, a));
                 Regex r2 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*", a, a));
 
-                String s = ctx.getRemain();
+                final String s = ctx.getRemain();
                 String s1;
                 boolean expression = false;
                 if (r1.search(s)) {
@@ -51,6 +55,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 } else {
                     return null;
                 }
+                //boolean needsToAddLF = rLF.search(s);
                 Regex r = new Regex("}?\\s*else\\s+if\\s*((?@()))(\\s*\\{)?");
                 if (expression && r.search(s1)) {
                     s1 = r.stringMatched(1);
@@ -66,6 +71,9 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
+//                if (needsToAddLF) {
+//                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+//                }
                 return new IfParser.IfBlockCodeToken(s1, ctx);
             }
 

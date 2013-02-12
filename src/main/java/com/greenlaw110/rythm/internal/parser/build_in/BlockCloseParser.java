@@ -1,10 +1,10 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.exception.ParseException;
+import com.greenlaw110.rythm.internal.IBlockHandler;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.parser.CodeToken;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,7 +22,8 @@ public class BlockCloseParser extends ParserBase {
     @Override
     public Token go() {
         IContext ctx = ctx();
-        if (ctx.currentBlock() == null) return null;
+        IBlockHandler bh = ctx.currentBlock();
+        if (null == bh) return null;
         String remain = remain();
         String s;
         if ("@".equals(remain)) {
@@ -40,7 +41,7 @@ public class BlockCloseParser extends ParserBase {
             s = m.group(1);
         }
         // keep ">" or "]" for case like <a id=".." @if (...) class="error" @>
-        if (s.endsWith(">") || s.endsWith("]")) s = s.substring(0, s.length() - 1);
+        if (s.endsWith(">") || s.endsWith("]") || s.endsWith("\n")) s = s.substring(0, s.length() - 1);
         ctx.step(s.length());
         boolean hasLineBreak = s.contains("\\n") || s.contains("\\r");
         try {
@@ -49,7 +50,16 @@ public class BlockCloseParser extends ParserBase {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        ctx.removeImmediateLastLineBreak();
-        return new CodeToken(s, ctx);
+        CodeToken ct = new CodeToken(s, ctx);
+        if (!(bh instanceof BlockToken.LiteralBlock)) {
+            String bhCls = bh.getClass().getName();
+            if (bhCls.contains("ForEach") || bhCls.contains("ElseFor")) {
+                ctx.getCodeBuilder().removeSpaceTillLastLineBreak(ctx);
+                ct.removeNextLineBreak = true;
+            } else {
+                ctx.getCodeBuilder().removeSpaceToLastLineBreak(ctx);
+            }
+        }
+        return ct;
     }
 }

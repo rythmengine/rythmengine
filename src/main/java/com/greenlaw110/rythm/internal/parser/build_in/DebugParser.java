@@ -5,7 +5,9 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -16,7 +18,7 @@ import com.stevesoft.pat.Regex;
  * Time: 5:28 PM
  * To change this template use File | Settings | File Templates.
  */
-public class DebugParser extends KeywordParserFactory {
+public class DebugParser extends KeywordParserFactory implements IRemoveLeadingLineBreakAndSpaces {
 
     @Override
     public Keyword keyword() {
@@ -24,7 +26,7 @@ public class DebugParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {

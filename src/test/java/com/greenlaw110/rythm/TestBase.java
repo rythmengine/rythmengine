@@ -27,7 +27,7 @@ public abstract class TestBase extends Assert {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
         System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
-        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "true");
+        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
     }
 
     protected void assertNotContains(String found, String notExpected) {

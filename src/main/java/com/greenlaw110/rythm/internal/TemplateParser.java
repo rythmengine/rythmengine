@@ -361,11 +361,6 @@ public class TemplateParser implements IContext {
         dialect = null;
     }
 
-    @Override
-    public void removeImmediateLastLineBreak() {
-        cb.removeImmediateLastLineBreak();
-    }
-
     /* this constructor is just for testing purpose */
     private TemplateParser(String s) {
         template = s;

@@ -14,8 +14,8 @@ public class ForEachCodeToken extends BlockCodeToken {
     private String type;
     private String varname;
     private String iterable;
-    private int openPos;
-    private int closePos;
+//    private int openPos;
+//    private int closePos;
 
     /**
      * @param type
@@ -39,7 +39,7 @@ public class ForEachCodeToken extends BlockCodeToken {
             iterable = "com.greenlaw110.rythm.utils.Range.valueOf(\"" + iterable + "\")";
         }
         this.iterable = iterable;
-        openPos = context.cursor();
+        //openPos = context.cursor();
         IContext ctx = context;
         ctx.pushBreak(IContext.Break.BREAK);
         ctx.pushContinue(IContext.Continue.CONTINUE);
@@ -108,6 +108,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varIsFirst = prefix + "_isFirst";
         String varIsLast = prefix + "_isLast";
         String varSep = prefix + "_sep";
+        String varWithSep = prefix + "__sep";
         String varUtils = prefix + "_utils";
 
         String varItr = cb.newVarName();
@@ -132,6 +133,8 @@ public class ForEachCodeToken extends BlockCodeToken {
         p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");
         pline();
         p("String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");
+        pline();
+        p("String ").p(varWithSep).p(" = com.greenlaw110.rythm.utils.S.str(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\");");
         pline();
         p("com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(varUtils).p(" = new com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils(").p(varIsFirst).p(", ").p(varIsLast).p(");");
         pline();

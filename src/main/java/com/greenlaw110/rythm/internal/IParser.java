@@ -10,4 +10,6 @@ public interface IParser {
      * @return
      */
     TextBuilder go();
+    
+    IContext ctx();
 }

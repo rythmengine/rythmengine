@@ -51,6 +51,25 @@ public class CommentTest extends TestBase {
         s = r(t);
         assertEquals("abc\nxyz", s);
     }
+    
+    @Test
+    public void testRemoveSpaceTillLastLineBreak() {
+        t = "abc\n\t   @//xyzd daf\n\t123";
+        s = r(t);
+        assertEquals("abc\n\t123",s);
+        
+        t = "abc\t @//xyzd daf\n\t123";
+        s = r(t);
+        assertEquals("abc\t \n\t123",s );
+        
+        t = "abc\n\t   @**\n *\n * abc\n *@\n123";
+        s = r(t);
+        assertEquals("abc\n123", s);
+        
+        t = "abc\t   @**\n *\n * abc\n *@\n123";
+        s = r(t);
+        assertEquals("abc\t   \n123", s);
+    }
 
     public static void main(String[] args) {
         run(CommentTest.class);

@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
@@ -21,7 +22,7 @@ import java.util.regex.Pattern;
  * <p>For example when &lt;!-- @&gt; is found the
  * &lt;!-- should be stripped out</p>
  */
-public class DirectiveCommentStartSensor extends ParserBase {
+public class DirectiveCommentStartSensor extends RemoveLeadingLineBreakAndSpacesParser {
     ILogger logger = Logger.get(DirectiveCommentStartSensor.class);
 
     public DirectiveCommentStartSensor(IContext context) {
@@ -67,7 +68,7 @@ public class DirectiveCommentStartSensor extends ParserBase {
                 s = m.group(1);
                 ctx.step(s.length());
                 ctx.enterDirectiveComment();
-                return new TextBuilder();
+                return Token.EMPTY_TOKEN;
             }
             lang = lang.getParent();
         }

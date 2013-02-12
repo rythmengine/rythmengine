@@ -4,6 +4,7 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.IParserFactory;
 import com.greenlaw110.rythm.internal.dialect.DialectBase;
+import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
@@ -25,8 +26,8 @@ public class ParserDispatcher extends ParserBase {
         super(context);
         P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), Patterns.VarName);
     }
-
-    public TextBuilder go() {
+    
+    public F.T2<IParser, TextBuilder> go2() {
         DialectBase d = (DialectBase) dialect();
         IContext c = ctx();
         Matcher m = P.matcher(remain());
@@ -35,15 +36,19 @@ public class ParserDispatcher extends ParserBase {
             IParser p = d.createBuildInParser(s, c);
             if (null != p) {
                 TextBuilder tb = p.go();
-                if (null != tb) return tb;
+                if (null != tb) return F.T2(p, tb);
             }
         }
         for (IParserFactory f : d.freeParsers()) {
             IParser p = f.create(c);
-            TextBuilder t = p.go();
-            if (null != t) return t;
+            TextBuilder tb = p.go();
+            if (null != tb) return F.T2(p, tb);
         }
         return null;
+    }
+
+    public TextBuilder go() {
+        throw new UnsupportedOperationException();
     }
 
     public static void main(String[] args) {

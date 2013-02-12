@@ -5,6 +5,7 @@ import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
 
@@ -15,10 +16,10 @@ import com.stevesoft.pat.Regex;
  *
  * @author luog
  */
-public class ScriptParser extends ParserBase {
+public class ScriptParser extends RemoveLeadingLineBreakAndSpacesParser {
 
 
-    private static final String PTN = "^(%s((?@{}))%s?[\\r\\n]*)";
+    private static final String PTN = "^(%s((?@{}))%s?)";
 
     public ScriptParser(IContext context) {
         super(context);

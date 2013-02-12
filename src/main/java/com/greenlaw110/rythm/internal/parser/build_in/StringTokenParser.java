@@ -26,17 +26,27 @@ public class StringTokenParser extends ParserBase {
     public TextBuilder go() {
         IContext ctx = ctx();
         String s = ctx.getRemain();
+        if (s.length() == 0) {
+            return Token.EMPTY_TOKEN;
+        }
         String a = a();
         Pattern p = Pattern.compile(String.format(PTN, a, a, a),
                 Pattern.DOTALL);
         Matcher m = p.matcher(s);
-        if (!m.matches())
+        if (!m.matches()) {
             return null;
+        }
         s = m.group(1);
-        if (s.length() == 0) return null;
+        if (s.length() == 0) {
+            return null;
+        }
         ctx.step(s.length());
         s = s.replace(String.format("%s%s", a, a), a).replace("\\", "\\\\");
-        return new Token.StringToken(s, ctx);
+        if ("".equals(s)) {
+            return Token.EMPTY_TOKEN;
+        } else {
+            return new Token.StringToken(s, ctx);
+        }
     }
 
     public static void main(String[] args) {

@@ -33,7 +33,7 @@ public enum Keyword implements IKeyword {
     /**
      * Foreach loop
      */
-    EACH("(for|forEach|each)"),
+    EACH("(?i)(for|forEach|each)"),
     /**
      * Mark a section that expression should be output after escaped
      */
@@ -61,11 +61,7 @@ public enum Keyword implements IKeyword {
     /**
      * plain java if else block
      */
-    IF,
-    /**
-     * the negative IF
-     */
-    IFNOT,
+    IF("(?i)(if|ifNot)"),
     /**
      * import java packages/classes
      */

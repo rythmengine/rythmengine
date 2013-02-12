@@ -7,7 +7,9 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.parser.Directive;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.F;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -24,7 +26,7 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             /*
              * parse @args {...}
              */

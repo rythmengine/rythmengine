@@ -59,7 +59,10 @@ public class LangBlockStartSensor extends ParserBase {
                     String matched = m.group(1);
                     ctx.step(matched.length());
                     ctx.pushLang(lang);
-                    String s = String.format("p(\"%s\");__ctx.pushLang(%s);", matched, lang.newInstanceStr());
+                    String s = matched;
+                    s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+                    
+                    s = String.format("p(\"%s\");__ctx.pushLang(%s);", s, lang.newInstanceStr());
                     return new CodeToken(s, ctx);
                 } else {
                 }

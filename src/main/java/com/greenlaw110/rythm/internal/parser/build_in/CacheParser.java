@@ -5,7 +5,9 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
+import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -119,7 +121,7 @@ public class CacheParser extends KeywordParserFactory {
 
     @Override
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             @Override
             public TextBuilder go() {
                 Regex r = reg(dialect());

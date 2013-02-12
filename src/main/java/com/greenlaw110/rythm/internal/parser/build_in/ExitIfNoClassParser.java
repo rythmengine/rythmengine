@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -15,7 +16,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext ctx) {
-        return new ParserBase(ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
