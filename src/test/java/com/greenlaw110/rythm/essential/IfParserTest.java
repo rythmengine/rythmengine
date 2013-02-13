@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Test @if parser
@@ -106,6 +107,37 @@ public class IfParserTest extends TestBase {
         assertEquals("\tyong man\n 123", s);
         s = r(t, 200);
         assertEquals("\taged\n 123", s);
+    }
+    
+    private void yes(Object p) {
+        assertEquals("yes", r(t, p, null));
+    }
+    
+    private void no(Object p) {
+        assertEquals("no", r(t, p, null));
+    }
+    
+    @Test
+    public void testSmartIfEval() {
+        t = "@if(@1){yes}else{no}";
+        yes("whatever string");
+        no(null);
+        no("FALSE");
+        no("NO");
+        yes("yes");
+        no("  ");
+        no(Collections.EMPTY_LIST);
+        no(Collections.EMPTY_MAP);
+        no(Collections.EMPTY_SET);
+        yes(Arrays.asList("1,2".split(",")));
+        yes(1);
+        no(0L);
+        yes(1.1);
+        no((char)0);
+        String[] sa = new String[0];
+        no(sa);
+        Integer[] ia = {1}; //note cannot use int[] here, it will cause type cast exception
+        yes(ia);
     }
     
     public static void main(String[] args) {

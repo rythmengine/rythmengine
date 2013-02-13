@@ -111,10 +111,6 @@ public class TemplateClass {
         includeTagTypes.put(tagName, type);
     }
 
-    public String getTagType(String tagName) {
-        return includeTagTypes.get(tagName);
-    }
-
     public boolean returnObject(String tagName) {
         String retType = includeTagTypes.get(tagName);
         if (null != retType) {
@@ -447,6 +443,9 @@ public class TemplateClass {
                 // this is the root level template class
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
+                if (engine().conf().typeInferenceEnabled()) {
+                    name += ParamTypeInferencer.uuid();
+                }
                 //name = templateResource.getSuggestedClassName();
                 engine().classes().add(this);
             }

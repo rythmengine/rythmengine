@@ -486,11 +486,20 @@ public class RythmEngine implements IEventDispatcher {
     //static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
 
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
-        ParamTypeInferencer.registerParams(this, args);
+        boolean typeInferenceEnabled = conf().typeInferenceEnabled();
+        if (typeInferenceEnabled) {
+            ParamTypeInferencer.registerParams(this, args);
+        }
+        
+        String key = template;
+        if (typeInferenceEnabled) {
+            key += ParamTypeInferencer.uuid();
+        }
 
-        TemplateClass tc = classes().getByTemplate(template);
+        TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(template, this, dialect);
+            classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         setRenderArgs(t, args);
@@ -535,11 +544,19 @@ public class RythmEngine implements IEventDispatcher {
      */
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File file, Object... args) {
-        ParamTypeInferencer.registerParams(this, args);
+        boolean typeInferenceEnabled = conf().typeInferenceEnabled();
+        if (typeInferenceEnabled) {
+            ParamTypeInferencer.registerParams(this, args);
+        }
 
-        TemplateClass tc = classes().getByTemplate(resourceManager().get(file).getKey());
+        String key = S.str(resourceManager().get(file).getKey());
+        if (typeInferenceEnabled) {
+            key += ParamTypeInferencer.uuid();
+        }
+        TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(file, this);
+            classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
@@ -696,11 +713,19 @@ public class RythmEngine implements IEventDispatcher {
      */
     @SuppressWarnings("unchecked")
     public String renderString(String template, Object... args) {
-        ParamTypeInferencer.registerParams(this, args);
-
-        TemplateClass tc = classes().getByTemplate(template);
+        boolean typeInferenceEnabled = conf().typeInferenceEnabled();
+        if (typeInferenceEnabled) {
+            ParamTypeInferencer.registerParams(this, args);
+        }
+        
+        String key = template;
+        if (typeInferenceEnabled) {
+            key += ParamTypeInferencer.uuid();
+        }
+        TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(new StringTemplateResource(template), this);
+            classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         setRenderArgs(t, args);
@@ -762,7 +787,7 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(template, this, new ToString(argClass));
-            classes().tmplIdx.put(key, tc);
+            classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         t.setRenderArg(0, obj);
@@ -797,7 +822,7 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(new ToStringTemplateResource(key), this, new AutoToString(c, key));
-            classes().tmplIdx.put(key, tc);
+            classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         t.setRenderArg(0, obj);
@@ -861,14 +886,24 @@ public class RythmEngine implements IEventDispatcher {
      * @return
      */
     public String renderIfTemplateExists(String template, Object... args) {
-        ParamTypeInferencer.registerParams(this, args);
+        boolean typeInferenceEnabled = conf().typeInferenceEnabled();
+        if (typeInferenceEnabled) {
+            ParamTypeInferencer.registerParams(this, args);
+        }
 
         if (nonExistsTemplates.contains(template)) return "";
+
+        String key = template;
+        if (typeInferenceEnabled) {
+            key += ParamTypeInferencer.uuid();
+        }
+
         TemplateClass tc = classes().getByTemplate(template);
         if (null == tc) {
             ITemplateResource rsrc = resourceManager().getFileResource(template);
             if (rsrc.isValid()) {
                 tc = new TemplateClass(rsrc, this);
+                classes().add(key, tc);
             } else {
                 nonExistsTemplates.add(template);
                 if (mode().isDev() && nonExistsTemplatesChecker == null) {

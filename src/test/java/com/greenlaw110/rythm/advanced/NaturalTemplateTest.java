@@ -1,4 +1,4 @@
-package com.greenlaw110.rythm.advanced.natural_template;
+package com.greenlaw110.rythm.advanced;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;

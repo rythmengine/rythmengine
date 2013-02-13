@@ -1,6 +1,7 @@
 package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.utils.S;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -27,6 +28,13 @@ public class ParamTypeInferencer {
         @Override
         protected Map<String, String> initialValue() {
             return new HashMap<String, String>();
+        }
+    };
+
+    private static final ThreadLocal<String> uuid = new ThreadLocal<String>() {
+        @Override
+        protected String initialValue() {
+            return "";
         }
     };
 
@@ -90,19 +98,30 @@ public class ParamTypeInferencer {
 
         Map<String, String> tMap = typeMap.get();
         tMap.clear();
+        long id = 0;
         if (args.length == 1 && args[0] instanceof Map) {
             Map<String, Object> params = (Map) args[0];
             for (String name : params.keySet()) {
                 Object val = params.get(name);
-                tMap.put(name, getTypeName(val));
+                String typeName = getTypeName(val);
+                tMap.put(name, typeName);
+                id += typeName.hashCode() * name.hashCode();
             }
         } else {
             // suppose template variable is denoted with @1, @2 ...
             for (int i = 0; i < args.length; ++i) {
                 String name = "__v_" + (i + 1); // start from 1 instead of 0
-                tMap.put(name, getTypeName(args[i]));
+                String typeName = getTypeName(args[i]);
+                tMap.put(name, typeName);
+                id += (i + 1) * typeName.hashCode();
             }
         }
+        if (id < 0) id = -1 * id;
+        uuid.set(String.valueOf(id));
+    }
+    
+    public static String uuid() {
+        return S.str(uuid.get());
     }
 
     public static Map<String, String> getTypeMap() {

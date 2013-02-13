@@ -106,6 +106,10 @@ public class TemplateClassManager {
         }
         return l;
     }
+    
+    public void add(Object key, TemplateClass templateClass) {
+        tmplIdx.put(key, templateClass);
+    }
 
     public void add(TemplateClass templateClass) {
         clsNameIdx.put(templateClass.name0(), templateClass);
