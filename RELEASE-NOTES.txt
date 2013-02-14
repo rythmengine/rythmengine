@@ -1,0 +1,17 @@
+
+                            Rythm Engine
+                            Version R1.0
+                           Release Notes
+
+
+INTRODUCTION:
+
+This document contains the release notes for the 1.0 version of Rythm Engine.
+Rythm Engine is a easy to use template engine that should be of use in any 
+Java environment.
+
+The project is hosted at https://github.com/greenlaw110/rythm/. For issues resolved
+in the first release, please check out 
+https://github.com/greenlaw110/rythm/issues?state=closed.
+
+The project web site is http://rythmengine.com

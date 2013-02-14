@@ -1,0 +1,11 @@
+Rythm Engine
+Copyright 2011-2021 Gelin Luo (greenlaw110(at)gmail.com)
+
+This product includes software developed by
+Gelin Luo (http://www.linkedin.com/in/greenlaw110)
+
+This product includes software from 
+- Play!Framework
+under the Apache License 2.0 (see: F.java, IO.java, Time.java)
+- http://www.source-code.biz/
+under the Apache License 2.0 (see: Base64.java)

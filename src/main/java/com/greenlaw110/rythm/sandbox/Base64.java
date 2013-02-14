@@ -1,46 +1,99 @@
+/* 
+ * Copyright (C) 2013 The Rythm Engine project
+ * Gelin Luo <greenlaw110(at)gmail.com>
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 package com.greenlaw110.rythm.sandbox;
 
 /**
- * Source code come from http://examples.oreilly.com/9781565924024/files/oreilly/jonathan/util/Base64.java
+ * Source code come from 
+ * http://www.source-code.biz/base64coder/java/Base64Coder.java.txt,
+ * 
+ * Under Apache License, V2.0
  */
 class Base64 {
 
-    public static String encode(byte[] raw) {
-        StringBuffer encoded = new StringBuffer();
-        for (int i = 0; i < raw.length; i += 3) {
-            encoded.append(encodeBlock(raw, i));
-        }
-        return encoded.toString();
+    // The line separator string of the operating system.
+    private static final String systemLineSeparator = System.getProperty("line.separator");
+
+    // Mapping table from 6-bit nibbles to Base64 characters.
+    private static final char[] map1 = new char[64];
+
+    static {
+        int i = 0;
+        for (char c = 'A'; c <= 'Z'; c++) map1[i++] = c;
+        for (char c = 'a'; c <= 'z'; c++) map1[i++] = c;
+        for (char c = '0'; c <= '9'; c++) map1[i++] = c;
+        map1[i++] = '+';
+        map1[i++] = '/';
     }
 
-    protected static char[] encodeBlock(byte[] raw, int offset) {
-        int block = 0;
-        int slack = raw.length - offset - 1;
-        int end = (slack >= 2) ? 2 : slack;
-        for (int i = 0; i <= end; i++) {
-            byte b = raw[offset + i];
-            int neuter = (b < 0) ? b + 256 : b;
-            block += neuter << (8 * (2 - i));
-        }
-        char[] base64 = new char[4];
-        for (int i = 0; i < 4; i++) {
-            int sixbit = (block >>> (6 * (3 - i))) & 0x3f;
-            base64[i] = getChar(sixbit);
-        }
-        if (slack < 1) base64[2] = '=';
-        if (slack < 2) base64[3] = '=';
-        return base64;
+    // Mapping table from Base64 characters to 6-bit nibbles.
+    private static final byte[] map2 = new byte[128];
+
+    static {
+        for (int i = 0; i < map2.length; i++) map2[i] = -1;
+        for (int i = 0; i < 64; i++) map2[map1[i]] = (byte) i;
     }
 
-    protected static char getChar(int sixBit) {
-        if (sixBit >= 0 && sixBit <= 25)
-            return (char) ('A' + sixBit);
-        if (sixBit >= 26 && sixBit <= 51)
-            return (char) ('a' + (sixBit - 26));
-        if (sixBit >= 52 && sixBit <= 61)
-            return (char) ('0' + (sixBit - 52));
-        if (sixBit == 62) return '+';
-        if (sixBit == 63) return '/';
-        return '?';
+    /**
+     * Encodes a byte array into Base64 format.
+     * No blanks or line breaks are inserted in the output.
+     *
+     * @param in An array containing the data bytes to be encoded.
+     * @return A character array containing the Base64 encoded data.
+     */
+    public static char[] encode(byte[] in) {
+        return encode(in, 0, in.length);
     }
+
+
+    /**
+     * Encodes a byte array into Base64 format.
+     * No blanks or line breaks are inserted in the output.
+     *
+     * @param in   An array containing the data bytes to be encoded.
+     * @param iOff Offset of the first byte in <code>in</code> to be processed.
+     * @param iLen Number of bytes to process in <code>in</code>, starting at <code>iOff</code>.
+     * @return A character array containing the Base64 encoded data.
+     */
+    public static char[] encode(byte[] in, int iOff, int iLen) {
+        int oDataLen = (iLen * 4 + 2) / 3;       // output length without padding
+        int oLen = ((iLen + 2) / 3) * 4;         // output length including padding
+        char[] out = new char[oLen];
+        int ip = iOff;
+        int iEnd = iOff + iLen;
+        int op = 0;
+        while (ip < iEnd) {
+            int i0 = in[ip++] & 0xff;
+            int i1 = ip < iEnd ? in[ip++] & 0xff : 0;
+            int i2 = ip < iEnd ? in[ip++] & 0xff : 0;
+            int o0 = i0 >>> 2;
+            int o1 = ((i0 & 3) << 4) | (i1 >>> 4);
+            int o2 = ((i1 & 0xf) << 2) | (i2 >>> 6);
+            int o3 = i2 & 0x3F;
+            out[op++] = map1[o0];
+            out[op++] = map1[o1];
+            out[op] = op < oDataLen ? map1[o2] : '=';
+            op++;
+            out[op] = op < oDataLen ? map1[o3] : '=';
+            op++;
+        }
+        return out;
+    }
+
 }

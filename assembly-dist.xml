@@ -40,6 +40,9 @@ under the License.
                 <include>assembly-dist.xml</include>
                 <include>pom.xml</include>
             </includes>
+            <excludes>
+                <exclude>samples/classes/**</exclude>
+            </excludes>
         </fileSet>
         <!-- do we want it? <fileSet>
             <directory>${project.build.directory}/apidocs</directory>
