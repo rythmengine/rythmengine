@@ -26,7 +26,7 @@ under the License.
         <format>zip</format>
     </formats>
 
-    <includeSiteDirectory>true</includeSiteDirectory>
+    <includeSiteDirectory>false</includeSiteDirectory>
     <includeBaseDirectory>true</includeBaseDirectory>
 
     <fileSets>
@@ -34,20 +34,20 @@ under the License.
             <directory>${basedir}</directory>
             <outputDirectory></outputDirectory>
             <includes>
-                <include>doc/**</include>
                 <include>samples/**</include>
                 <include>src/**</include>
                 <include>assembly-dist.xml</include>
                 <include>pom.xml</include>
             </includes>
             <excludes>
+                <exclude>doc/**</exclude>
                 <exclude>samples/classes/**</exclude>
             </excludes>
         </fileSet>
-        <!-- do we want it? <fileSet>
-            <directory>${project.build.directory}/apidocs</directory>
+        <fileSet>
+            <directory>${project.build.directory}/site/apidocs</directory>
             <outputDirectory>documentation/api</outputDirectory>
-        </fileSet>-->
+        </fileSet>
     </fileSets>
 
 
