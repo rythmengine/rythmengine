@@ -66,7 +66,11 @@ public class ParamTypeInferencer {
             clsName = c.getName();
             if (clsName.contains("$")) {
                 //anonymous or embedded class, let's try parent type
-                clsName = c.getSuperclass().getName();
+                if (clsName.startsWith("java.")) {
+                    clsName = c.getSuperclass().getName();  
+                } else {
+                    clsName = clsName.replace('$', '.');
+                }
             }
             if (c.isArray()) {
                 Class cc = c.getComponentType();

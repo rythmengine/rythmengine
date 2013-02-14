@@ -66,6 +66,10 @@ public abstract class TestBase extends Assert {
         assertTrue(msg, m.matches());
     }
     
+    protected void eq(String result) {
+        assertEquals(result, s);
+    }
+    
     protected static void run(Class<? extends TestBase> cls) {
         JUnitCore.main(cls.getName());
     }
