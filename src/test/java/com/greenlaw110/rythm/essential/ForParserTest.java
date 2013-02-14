@@ -269,6 +269,18 @@ public class ForParserTest extends TestBase {
         assertEquals("abc\n\t\tempty list\n123", r(t, ""));
         assertEquals("abc\n\t\ta,\n\t\tb,\n\t\tc\n123", r(t, "a,b,c"));
     }
+    
+    @Test
+    public void testBreak() {
+        t = "@for(int i in 1..10){@(i)@if(i > 3){@break}}";
+        eq("1234");
+    }
+    
+    @Test
+    public void testContinue() {
+        t = "@for(int i in 1..10){@if((i % 2) == 0){@continue}@i}";
+        eq("13579");
+    }
 
     public static void main(String[] args) {
         run(ForParserTest.class);

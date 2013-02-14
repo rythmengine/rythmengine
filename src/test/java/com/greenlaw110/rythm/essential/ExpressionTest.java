@@ -51,7 +51,7 @@ public class ExpressionTest extends TestBase {
 
         @Override
         public String toString() {
-            return Rythm.toString(this);
+            return bar();
         }
     }
 
@@ -127,10 +127,19 @@ public class ExpressionTest extends TestBase {
         s = r(t, from(p("d", d)));
         eq("boo");
 
+        t = "@args com.greenlaw110.rythm.essential.ExpressionTest.Data d\n@(d.nullMe()?:new com.greenlaw110.rythm.essential.ExpressionTest.Data())";
+        s = r(t, from(p("d", d)));
+        eq("nullbar");
+
         // this will fail, rythm cannot handle that complexity yet.
         // t = "@((d.nullMe() ?: new com.greenlaw110.rythm.essential.ExpressionTest.Data()).now())";
         // s = r(t, from(p("d", d)));
         // eq("foo");
+        
+        // this will also fail, rythm cannot handle mix null safe and elvs:
+//        t = "@args com.greenlaw110.rythm.essential.ExpressionTest.Data d\n@(d?.nullMe()?:new com.greenlaw110.rythm.essential.ExpressionTest.Data())";
+//        s = r(t, from(p("d", d)));
+//        eq("nullbar");
     }
 
     public static void main(String[] args) {

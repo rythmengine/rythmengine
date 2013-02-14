@@ -110,7 +110,6 @@ public class CodeBuilder extends TextBuilder {
                 return "0f";
             else if (type.equalsIgnoreCase("double"))
                 return "0d";
-
             return "null";
         }
 
@@ -823,10 +822,10 @@ public class CodeBuilder extends TextBuilder {
             pn();
             ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
             {
-                p2tn("int _p = 0, l = args.length;");
+                p2tn("int __p = 0, __l = args.length;");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
-                    p2t("if (_p < l) { Object v = args[_p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (__p < __l) { Object v = args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;

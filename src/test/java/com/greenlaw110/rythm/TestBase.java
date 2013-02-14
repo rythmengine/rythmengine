@@ -47,6 +47,8 @@ public abstract class TestBase extends Assert {
         System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
         System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        t = null;
+        s = null;
     }
 
     protected void assertNotContains(String found, String notExpected) {
@@ -67,6 +69,9 @@ public abstract class TestBase extends Assert {
     }
     
     protected void eq(String result) {
+        if (null == s) {
+            s = r(t);
+        }
         assertEquals(result, s);
     }
     

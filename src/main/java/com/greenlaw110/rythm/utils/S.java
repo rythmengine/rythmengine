@@ -48,7 +48,8 @@ import java.util.TimeZone;
  * </code></pre>
  */
 public class S {
-    public static S INSTANCE = new S();
+    public static final S INSTANCE = new S();
+    public static final String EMPTY_STR = "";
 
     /**
      * Determine if a given String is null or empty. By empty it
