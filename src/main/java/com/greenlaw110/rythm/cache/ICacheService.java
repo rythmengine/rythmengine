@@ -71,6 +71,11 @@ public interface ICacheService {
     /**
      * Remove all cached items
      */
+    void clear();
+
+    /**
+     * Alias of {@link #clear()}
+     */
     void clean();
 
     /**
@@ -84,4 +89,12 @@ public interface ICacheService {
      * Shutdown the cache service
      */
     void shutdown();
+
+    /**
+     * Restart the cache service after shutdown
+     * 
+     * <p>Note, by default the cache service
+     * should be started after initialized</p>
+     */
+    void startup();
 }

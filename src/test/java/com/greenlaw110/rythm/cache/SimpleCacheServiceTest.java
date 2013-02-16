@@ -28,10 +28,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class SimpleCacheServiceTest extends TestBase {
-    private ICacheService cache = SimpleCacheService.INSTANCE;
+    private SimpleCacheService cache = SimpleCacheService.INSTANCE;
     @Before
     public void setup() {
+        cache.shutdown();
         cache.setDefaultTTL(3);
+        cache.debug = false;
+        cache.startup();
     }
 
     private CountDownLatch lock = new CountDownLatch(1);
@@ -39,23 +42,17 @@ public class SimpleCacheServiceTest extends TestBase {
     @Test
     public void testPutGet() throws Exception {
         cache.put("key1", "val1", 2);
-        assertTrue("cached item does not match previous item", "val1".equals(cache.get("key1")));
-        synchronized (lock) {
-            lock.await(1900, TimeUnit.MILLISECONDS);
-        }
-        assertTrue("cached item does not match previous item", "val1".equals(cache.get("key1")));
-        synchronized (lock) {
-            lock.await(1101, TimeUnit.MILLISECONDS);
-        }
-        assertTrue("timeout cached items should be removed", null == cache.get("key1"));
+        assertEquals("val1", (cache.get("key1")));
+        Thread.sleep(1900);
+        assertEquals("val1", (cache.get("key1")));
+        Thread.sleep(1200);
+        assertEquals(null, cache.get("key1"));
+        cache.debug = false;
     }
 
     @Test
     public void testRemove() throws Exception {
         cache.put("key1", "val1", 10);
-        synchronized (lock) {
-            lock.await(1000, TimeUnit.MILLISECONDS);
-        }
         assertTrue("cached item does not match previous item", "val1".equals(cache.get("key1")));
         assertTrue("removed cached item does not match", "val1".equals(cache.remove("key1")));
         assertTrue("removed cached item should not exists", null == cache.get("key1"));
@@ -63,21 +60,39 @@ public class SimpleCacheServiceTest extends TestBase {
 
     @Test
     public void testRefreshTTL() throws Exception {
+        //System.err.println("============ testRefreshTTL ===========");
+        //cache.debug = true;
         cache.put("key1", "val1", 1);
-        assertTrue("cached item does not match previous item", "val1".equals(cache.get("key1")));
-        synchronized (lock) {
-            lock.await(900, TimeUnit.MILLISECONDS);
-        }
-        assertTrue("cached item does not match previous item", "val1".equals(cache.get("key1")));
+        assertEquals("val1", cache.get("key1"));
+        Thread.sleep(900);
+        assertEquals("val1", cache.get("key1"));
+        Thread.sleep(250);
+        assertEquals(null, cache.get("key1"));
+        //System.err.println("*****************************************");
         cache.put("key1", "val2", 2);
-        synchronized (lock) {
-            lock.await(1900, TimeUnit.MILLISECONDS);
-        }
-        assertTrue("cached items does not match", "val2".equals(cache.get("key1")));
-        synchronized (lock) {
-            lock.await(1101, TimeUnit.MILLISECONDS);
-        }
-        assertTrue("timeout cached items should be removed", null == cache.get("key1"));
+        assertEquals("val2", cache.get("key1"));
+        Thread.sleep(1900);
+        assertEquals("val2", cache.get("key1"));
+        Thread.sleep(150);
+        //System.err.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        assertEquals(null, cache.get("key1"));
+    }
+    
+    @Test
+    public void testExpireOrder() throws Exception {
+        //System.err.println("============ testExpireOrder ===========");
+        cache.put("k2", "v2", 2);
+        cache.put("k3", "v3", 3);
+        cache.put("k1", "v1", 1);
+        Thread.sleep(1050);
+        assertNull(cache.get("k1"));
+        assertEquals("v2", cache.get("k2"));
+        assertEquals("v3", cache.get("k3"));
+        Thread.sleep(1000);
+        assertNull(cache.get("k2"));
+        assertEquals("v3", cache.get("k3"));
+        Thread.sleep(1000);
+        assertNull(cache.get("k3"));
     }
 
     public static void main(String[] args) {

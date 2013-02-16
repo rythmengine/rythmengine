@@ -19,6 +19,8 @@
 */
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.template.TemplateBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.JUnitCore;
@@ -73,6 +75,12 @@ public abstract class TestBase extends Assert {
             s = r(t);
         }
         assertEquals(result, s);
+    }
+    
+    protected void getSource() {
+        TemplateBase tb = (TemplateBase) Rythm.engine().getTemplate(t);
+        TemplateClass tc = tb.getTemplateClass(false);
+        s = tc.javaSource;
     }
     
     protected static void run(Class<? extends TestBase> cls) {

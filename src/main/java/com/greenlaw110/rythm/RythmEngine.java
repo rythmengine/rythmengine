@@ -373,6 +373,7 @@ public class RythmEngine implements IEventDispatcher {
         int ttl = (Integer) _conf.get(RythmConfigurationKey.DEFAULT_CACHE_TTL);
         _cacheService = _conf.get(RythmConfigurationKey.CACHE_SERVICE_IMPL);
         _cacheService.setDefaultTTL(ttl);
+        _cacheService.startup();
 
 
         // register built-in transformers if enabled
