@@ -251,7 +251,7 @@ public enum RythmConfigurationKey {
         }
     },
     
-    ENGINE_DEBUG_JAVA_SOURCE_ENABLED("engine.debug_java_source.enabled", false),
+    ENGINE_OUTPUT_JAVA_SOURCE_ENABLED("engine.debug_java_source.enabled", false),
 
     /**
      * "engine.playframework.enabled": A special flag used when Rythm is working with rythm-plugin for Play!Framework. Usually

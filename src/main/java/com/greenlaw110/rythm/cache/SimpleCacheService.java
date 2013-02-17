@@ -20,6 +20,8 @@
 package com.greenlaw110.rythm.cache;
 
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 
 import java.io.Serializable;
 import java.util.*;
@@ -29,13 +31,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luog
- * Date: 13/04/12
- * Time: 10:05 PM
- * To change this template use File | Settings | File Templates.
+ * A simple cache service implementation
  */
 public class SimpleCacheService implements ICacheService {
+    private static final ILogger logger = Logger.get(SimpleCacheService.class);
 
     public static final SimpleCacheService INSTANCE = new SimpleCacheService();
 
@@ -72,7 +71,6 @@ public class SimpleCacheService implements ICacheService {
 
     private ConcurrentHashMap<String, Item> cache_ = new ConcurrentHashMap<String, Item>();
     private Queue<Item> items_ = new PriorityQueue<Item>();
-    public boolean debug = false;
 
     @Override
     public void put(String key, Serializable value, int ttl) {
@@ -89,9 +87,6 @@ public class SimpleCacheService implements ICacheService {
                 item.ttl = ttl;
             } else {
                 items_.offer(newItem);
-                if (debug) {
-                    System.err.println("+++" + newItem.value + "| " + System.currentTimeMillis());
-                }
             }
         } else {
             item.value = value;
@@ -112,11 +107,8 @@ public class SimpleCacheService implements ICacheService {
 
     @Override
     public void clear() {
-        if (debug) {
-            System.err.println("cccccccccccc: " + cache_.size());
-            System.err.println("iiiiiiiiiiii: " + items_.size());
-        }
         cache_.clear();
+        items_.clear();
     }
     
     @Override
@@ -159,15 +151,12 @@ public class SimpleCacheService implements ICacheService {
             scheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    if (debug) {
-                        System.err.println("------ simple cache service loop ----- ");
-                    }
                     if (items_.size() == 0) {
                         return;
                     }
                     long now = System.currentTimeMillis();
-                    if (debug) {
-                        System.err.println(">>>>now: " + now);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(">>>>now:%s", now);
                     }
                     while(true) {
                         Item item = items_.peek();
@@ -175,17 +164,16 @@ public class SimpleCacheService implements ICacheService {
                             break;
                         }
                         long ts = item.ts + item.ttl * 1000;
-                        //System.err.println("ts:  " + ts);
                         if ((ts) < now + 50) {
                             items_.poll();
                             cache_.remove(item.key);
-                            if (debug) {
-                                System.err.println("---" + item.value + "| " + System.currentTimeMillis());
+                            if (Logger.isTraceEnabled()) {
+                                logger.trace("- %s at %s", item.key, ts);
                             }
                             continue;
                         } else {
-                            if (debug) {
-                                System.err.println(">>>>ts:  " + ts);
+                            if (Logger.isTraceEnabled()) {
+                                logger.trace(">>>>ts:  %s", ts);
                             }
                         }
                         break;

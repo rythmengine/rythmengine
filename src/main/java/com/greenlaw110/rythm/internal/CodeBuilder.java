@@ -670,9 +670,6 @@ public class CodeBuilder extends TextBuilder {
             if (!simpleTemplate()) pExtendInitArgCode();
             pRenderArgs();
             pInlineTags();
-//            for (IByteCodeEnhancer enhancer : engine.templateClassEnhancers) {
-//                np(enhancer.sourceCode());
-//            }
             pBuild();
             RythmEvents.ON_CLOSING_JAVA_CLASS.trigger(engine, this);
             pClassClose();

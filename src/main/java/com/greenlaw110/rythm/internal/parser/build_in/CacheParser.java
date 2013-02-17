@@ -140,14 +140,13 @@ public class CacheParser extends KeywordParserFactory {
 
     @Override
     public IParser create(final IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+        return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("Error parsing @cacheFor statement. Correct usage: @cacheFor (\"duration_string\") {cache block}");
+                    raiseParseException("Error parsing @cache statement. Correct usage: @cache (\"duration_string\") {cache block}");
                 }
-                String key = UUID.nameUUIDFromBytes(remain().getBytes()).toString();
                 ctx.step(r.stringMatched().length());
                 String s = r.stringMatched(2); // ("1m", 1, bar.foo())
                 s = S.stripBrace(s); // "1m", 1, bar.foo()
@@ -176,17 +175,6 @@ public class CacheParser extends KeywordParserFactory {
     protected String patternStr() {
         //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
         return "^(^%s%s\\s*((?@()))(\\s*\\{)?)";
-    }
-
-    public static void main(String[] args) {
-        Regex r = new CacheParser().reg(Rythm.INSTANCE);
-        String s = "@cacheFor(\"1m\", 1, bar.foo())ab";
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-            System.out.println(r.stringMatched(2));
-            System.out.println(r.stringMatched(3));
-        }
     }
 
 }

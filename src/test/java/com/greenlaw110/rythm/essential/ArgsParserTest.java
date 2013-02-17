@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.ENGINE_OUTPUT_JAVA_SOURCE_ENABLED;
+
 /**
  * Test @args parser
  */
@@ -55,5 +57,23 @@ public class ArgsParserTest extends TestBase {
         t = "@args() {String s = \"foo\", int i = 3}@s @i";
         s = r(t);
         eq("foo 3");
+    }
+    
+    @Test
+    public void testPositionHolder() {
+        t = "@args String @1, int @2;@(1)_@2";
+        s = r(t, "s", 0);
+        eq("s_0");
+    }
+    
+    @Test
+    public void testLineBreaks() {
+        t = "abc@args(){String @1}xyz@1";
+        s = r(t, "s");
+        eq("abcxyzs");
+        
+        t = "abc\n@args String @1\nxyz@1";
+        s = r(t, "s");
+        eq("abc\nxyzs");
     }
 }

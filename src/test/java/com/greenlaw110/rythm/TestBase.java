@@ -20,6 +20,8 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.TemplateBase;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +35,8 @@ import java.util.regex.Pattern;
  * The Test base class
  */
 public abstract class TestBase extends Assert {
-
+    protected static ILogger logger = Logger.get(TestBase.class);
+    
     protected String t;
     protected String s;
     
@@ -49,6 +52,7 @@ public abstract class TestBase extends Assert {
         System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
         System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
         t = null;
         s = null;
     }

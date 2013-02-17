@@ -259,7 +259,7 @@ public class RythmConfiguration {
     
     public boolean debugJavaSourceEnabled() {
         if (null == _debugJavaSourceEnabled) {
-            _debugJavaSourceEnabled = (Boolean)get(ENGINE_DEBUG_JAVA_SOURCE_ENABLED);
+            _debugJavaSourceEnabled = (Boolean)get(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED);
         }
         return _debugJavaSourceEnabled;
     }

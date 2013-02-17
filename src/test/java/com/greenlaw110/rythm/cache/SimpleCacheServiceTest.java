@@ -33,7 +33,6 @@ public class SimpleCacheServiceTest extends TestBase {
     public void setup() {
         cache.shutdown();
         cache.setDefaultTTL(3);
-        cache.debug = false;
         cache.startup();
     }
 
@@ -47,7 +46,6 @@ public class SimpleCacheServiceTest extends TestBase {
         assertEquals("val1", (cache.get("key1")));
         Thread.sleep(1200);
         assertEquals(null, cache.get("key1"));
-        cache.debug = false;
     }
 
     @Test
@@ -60,27 +58,24 @@ public class SimpleCacheServiceTest extends TestBase {
 
     @Test
     public void testRefreshTTL() throws Exception {
-        //System.err.println("============ testRefreshTTL ===========");
-        //cache.debug = true;
         cache.put("key1", "val1", 1);
         assertEquals("val1", cache.get("key1"));
         Thread.sleep(900);
         assertEquals("val1", cache.get("key1"));
         Thread.sleep(250);
         assertEquals(null, cache.get("key1"));
-        //System.err.println("*****************************************");
+        logger.trace("*****************************************");
         cache.put("key1", "val2", 2);
         assertEquals("val2", cache.get("key1"));
         Thread.sleep(1900);
         assertEquals("val2", cache.get("key1"));
         Thread.sleep(150);
-        //System.err.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        logger.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         assertEquals(null, cache.get("key1"));
     }
     
     @Test
     public void testExpireOrder() throws Exception {
-        //System.err.println("============ testExpireOrder ===========");
         cache.put("k2", "v2", 2);
         cache.put("k3", "v3", 3);
         cache.put("k1", "v1", 1);

@@ -69,7 +69,7 @@ public class NaturalTemplateTest extends TestBase {
     public void testLangSwitch() {
         String t = "<!-- @if (true) { --><script>/* @if(true) {*/alert(1);<!-- } --></script><!-- } -->";
         String s = Rythm.render(t);
-        System.setProperty(ENGINE_DEBUG_JAVA_SOURCE_ENABLED.getKey(), "false");
+        System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
         assertEquals("<script>alert(1);</script>", s);
     }
     

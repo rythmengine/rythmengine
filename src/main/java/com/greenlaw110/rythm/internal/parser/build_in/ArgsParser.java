@@ -45,7 +45,7 @@ public class ArgsParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+        return new ParserBase(ctx) {
             /*
              * parse @args {...}
              */
@@ -59,6 +59,7 @@ public class ArgsParser extends KeywordParserFactory {
                     checkRestrictedClass(type);
                     String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
+                    name = ExpressionParser.processPositionPlaceHolder(name);
                     ral.add(new F.T4(line, type, name, defVal));
                 }
                 return new Directive("", ctx()) {
@@ -102,6 +103,7 @@ public class ArgsParser extends KeywordParserFactory {
                     checkRestrictedClass(type);
                     String name = r.stringMatched(4);
                     String defVal = r.stringMatched(6);
+                    name = ExpressionParser.processPositionPlaceHolder(name);
                     //ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                     ctx().getCodeBuilder().addRenderArgs(ctx().currentLine(), type, name, defVal);
                 }
@@ -139,12 +141,13 @@ public class ArgsParser extends KeywordParserFactory {
             String name = r.stringMatched(4);
             String type = r.stringMatched(2);
             String defVal = r.stringMatched(5);
+            name = ExpressionParser.processPositionPlaceHolder(name);
             ral.add(new CodeBuilder.RenderArgDeclaration(lineNo, type, name, defVal));
         }
         return ral;
     }
 
-    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]+[fLld]?|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([@a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]+[fLld]?|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
 
     public static final String PATTERN2 = "";
 
@@ -155,21 +158,6 @@ public class ArgsParser extends KeywordParserFactory {
 
     protected String patternStr0() {
         return "(%s%s([\\s,]+[a-zA-Z][a-zA-Z0-9_\\.]*(\\<[a-zA-Z][a-zA-Z0-9_\\.,]*\\>)?[\\s]+[a-zA-Z][a-zA-Z0-9_\\.]*)+(;|\\r?\\n)+).*";
-    }
-
-    public static void main(String[] args) {
-        test1();
-    }
-
-    public static void test2() {
-        Regex r = new Regex("@args(\\([ \t\f]*\\))?[ \t\f]*((?@{}))");
-        String s = "@args() {\nString s = 1}";
-        p(s, r);
-    }
-
-    public static void test1() {
-        String s = "@args int x = 99, long y = 100\n@x=@y;\n@{String s = null;\nif (s.length() > 0{\n}\n} \n@{_setOutput(\"c:/t/1.txt\")} \n";
-        System.out.println(Rythm.render(s));
     }
 
 }

@@ -53,6 +53,15 @@ public class CacheParserTest extends TestBase {
         s = r(t, n + 1);
         eq(String.valueOf(n + 1));
     }
+    
+    @Test
+    public void testLineBreaks() {
+        t = "abc\n@cache(){123}\nxyz";
+        eq("abc\n123\nxyz");
+        t = "xyz@cache(){abc}123";
+        s = r(t);
+        eq("xyzabc123");
+    }
 
     public static void main(String[] args) {
         run(CacheParserTest.class);

@@ -102,7 +102,8 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     public static String processPositionPlaceHolder(String s) {
-        Regex r = new Regex("@([0-9]+)", "__v_${1}");
+        String rs = s.startsWith("@(") ? "@\\(([0-9]+)\\)" : "@([0-9]+)";
+        Regex r = new Regex(rs, "__v_${1}");
         return r.replaceAll(s);
     }
 
@@ -134,12 +135,21 @@ public class ExpressionParser extends CaretParserFactoryBase {
             public TextBuilder go() {
                 String s = remain();
                 if (r1.search(s)) {
-                    s = r1.stringMatched(1);
-                    if (null != s && !caret.equals(s.trim())) {
-                        step(s.length());
-                        s = processPositionPlaceHolder(s);
-                        s = s.replaceFirst(caret, "");
-                        return new ExpressionToken(s, ctx());
+                    s = r1.stringMatched();
+                    if (s.length() > 0) {
+                        String s0 = s.substring(1);
+                        int pos = s0.indexOf("@");
+                        if (pos > -1) {
+                            s = s.substring(0, pos + 1);
+                            step(s.length());
+                        }
+                        //s = r1.stringMatched(1);
+                        if (!caret.equals(s.trim())) {
+                            step(s.length());
+                            s = processPositionPlaceHolder(s);
+                            s = s.replaceFirst(caret, "");
+                            return new ExpressionToken(s, ctx());
+                        }
                     }
                 }
                 s = remain();
