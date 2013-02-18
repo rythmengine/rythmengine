@@ -68,12 +68,24 @@ public class ArgsParserTest extends TestBase {
     
     @Test
     public void testLineBreaks() {
-        t = "abc@args(){String @1}xyz@1";
-        s = r(t, "s");
-        eq("abcxyzs");
-        
         t = "abc\n@args String @1\nxyz@1";
         s = r(t, "s");
         eq("abc\nxyzs");
+        t = "abc@args(){String @1}xyz@1";
+        s = r(t, "s");
+        eq("abcxyzs");
+        t = "abc\n@args(){String @1}\nxyz@1";
+        s = r(t, "s");
+        eq("abc\nxyzs");
+        t = "abc\n@args(){\nString @1\n}\nxyz@1";
+        s = r(t, "s");
+        eq("abc\nxyzs");
+        t = "abc\n\t@args(){\nString @1\n}\nxyz@1";
+        s = r(t, "s");
+        eq("abc\nxyzs");
+    }
+
+    public static void main(String[] args) {
+        run(ArgsParserTest.class);
     }
 }

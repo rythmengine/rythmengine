@@ -24,9 +24,9 @@ import com.greenlaw110.rythm.exception.CompileException;
 import org.junit.Test;
 
 /**
- * Test @args parser
+ * Test @import parser
  */
-public class IncludeParserTest extends TestBase {
+public class ImportParserTest extends TestBase {
     @Test
     public void testSimple() {
         t = "@import com.greenlaw110.rythm.*, com.greenlaw110.rythm.conf.RythmConfigurationKey";
@@ -75,9 +75,24 @@ public class IncludeParserTest extends TestBase {
         assertContains(s, "import static com.greenlaw110.rythm.Rythm.*;");
         assertContains(s, "import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;");
     }
+    
+    @Test
+    public void testLineBreak() {
+        t = "abc\n@import java.lang.*\nxyz";
+        s = r(t);
+        eq("abc\nxyz");
+        
+        t = "abc\n@import(){java.lang.*}\nxyz";
+        s = r(t);
+        eq("abc\nxyz");
+        
+        t = "abc\n\t@import(){java.lang.*}\nxyz";
+        s = r(t);
+        eq("abc\nxyz");
+    }
 
     public static void main(String[] args) {
-        run(IncludeParserTest.class);
+        run(ImportParserTest.class);
     }
 
 }

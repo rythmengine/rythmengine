@@ -170,7 +170,7 @@ public class Token extends TextBuilder {
         this.s = s;
         ctx = context;
         line = (null == context) ? -1 : context.currentLine();
-        this.engine = ctx.getEngine();
+        this.engine = null == ctx ? Rythm.engine() : ctx.getEngine();
         this.javaExtensions = engine.extensionManager().javaExtensions();
         this.disableCompactMode = disableCompactMode;
         this.transformEnabled = engine.conf().transformEnabled();
@@ -406,28 +406,45 @@ public class Token extends TextBuilder {
         pline();
     }
 
+    private static final Pattern P_C1 = Pattern.compile("\\n+", Pattern.DOTALL);
+    private static final Pattern P_C2 = Pattern.compile("[ \\t\\x0B\\f]+", Pattern.DOTALL);
+    private static final Pattern P_C3 = Pattern.compile("[ \\t\\x0B\\f]+\\n", Pattern.DOTALL);
+    private static final Pattern P_C4 = Pattern.compile("\\n[ \\t\\x0B\\f]+", Pattern.DOTALL);
     private static String compact_(String s) {
         if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])+")) {
-            return "\\n";
+            return "\n";
         }
-        String[] lines = s.split("[\\r\\n]+");
-        if (0 == lines.length) return "";
-        TextBuilder tb = new TextBuilder();
-        int i = 0;
-        boolean startsWithSpace = s.startsWith(" ") || s.startsWith("\t");
-        boolean endsWithSpace = s.endsWith(" ") || s.endsWith("\t");
-        if (startsWithSpace) tb.p(" ");
-        for (String line : lines) {
-            if (i++ > 0) tb.p("\n");
-            line = line.replaceAll("[ \t]+", " ").trim();
-            tb.p(line);
-        }
-        if (endsWithSpace) tb.p(" ");
-        return tb.toString();
+        Matcher m = P_C1.matcher(s);
+        s = m.replaceAll("\n");
+        m = P_C2.matcher(s);
+        s = m.replaceAll(" ");
+        m = P_C3.matcher(s);
+        s = m.replaceAll("\n");
+        m = P_C4.matcher(s);
+        s = m.replaceAll("\n");
+        return s;
+//        String[] lines = s.split("[\\r\\n]+");
+//        if (0 == lines.length) return "";
+//        TextBuilder tb = new TextBuilder();
+//        int i = 0;
+//        boolean startsWithSpace = s.startsWith(" ") || s.startsWith("\t");
+//        boolean endsWithSpace = s.endsWith(" ") || s.endsWith("\t");
+//        if (startsWithSpace) tb.p(" ");
+//        for (String line : lines) {
+//            if (i++ > 0) tb.p("\n");
+//            line = line.replaceAll("[ \t]+", " ").trim();
+//            tb.p(line);
+//        }
+//        if (endsWithSpace) tb.p(" ");
+//        return tb.toString();
     }
     
     private static String processLineBreaks_(String s) {
         return s;
+    }
+    
+    public void compact() {
+        s = compact(s);
     }
 
     protected String compact(String s) {

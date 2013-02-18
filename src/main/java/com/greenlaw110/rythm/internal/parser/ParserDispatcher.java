@@ -43,7 +43,7 @@ public class ParserDispatcher extends ParserBase {
 
     public ParserDispatcher(IContext context) {
         super(context);
-        P = pattern("%s(%s)(\\s*|\\(|\\{).*", a(), Patterns.VarName);
+        P = pattern("\\n?[ \\t\\x0B\\f]*%s(%s)(\\s*|\\(|\\{).*", a(), Patterns.VarName);
     }
     
     public F.T2<IParser, TextBuilder> go2() {
@@ -68,14 +68,6 @@ public class ParserDispatcher extends ParserBase {
 
     public TextBuilder go() {
         throw new UnsupportedOperationException();
-    }
-
-    public static void main(String[] args) {
-        Pattern p = Pattern.compile("@([a-zA-Z0-9_]+)(\\s*|\\(|\\{).*");
-        Matcher m = p.matcher("@var String name;Hello @name");
-        if (m.matches()) {
-            System.out.println(m.group(1));
-        }
     }
 
 }

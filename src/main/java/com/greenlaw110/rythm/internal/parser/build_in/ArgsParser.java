@@ -20,10 +20,7 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
@@ -77,18 +74,33 @@ public class ArgsParser extends KeywordParserFactory {
              */
             public TextBuilder go() {
                 String remain = remain();
-                Regex r = new Regex(String.format("%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))", a(), keyword()));
+                Regex r = new Regex(String.format("\\n?[ \\t\\x0B\\f]*%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))\\n?", a(), keyword()));
                 if (r.search(remain)) {
+                    String matched = r.stringMatched();
+                    if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                        ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    }
                     String s = r.stringMatched(2);
                     s = S.strip(s, "{", "}");
-                    step(r.stringMatched().length());
+                    step(matched.length());
                     return go2(s);
                 }
+                boolean startWithLineBreak = remain.startsWith("\n");
+                if (startWithLineBreak) {
+                    remain = remain.substring(1);
+                }
+                String space = "";
+                Regex r0 = new Regex("^(\\s+).*");
+                if (r0.search(remain)) {
+                    space = r0.stringMatched(1);
+                }
+                space = startWithLineBreak ? "\n" + space : space;
+                remain = remain.replaceFirst("^\\s+", "");
                 String key = String.format("%s%s ", a(), keyword());
                 if (!remain.startsWith(key)) {
                     raiseParseException("No argument declaration found");
                 }
-                step(key.length());
+                step(key.length() + (startWithLineBreak ? 1 : 0));
                 remain = remain();
                 r = reg(dialect());
                 int step = 0;
@@ -109,11 +121,14 @@ public class ArgsParser extends KeywordParserFactory {
                 }
                 step(step);
                 // strip off the following ";" symbol and line breaks
-                char c = peek();
+                char c;
                 while (true) {
                     c = peek();
                     if ((' ' == c || ';' == c || '\r' == c || '\n' == c) && ctx.hasRemain()) {
                         step(1);
+                        if (space.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(space, ctx));
+                        }
                     } else {
                         break;
                     }

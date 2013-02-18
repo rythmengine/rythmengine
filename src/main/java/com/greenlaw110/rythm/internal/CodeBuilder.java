@@ -974,6 +974,7 @@ public class CodeBuilder extends TextBuilder {
             } else {
                 if (null != curTk && curTk.s().length() > 0) {
                     curTk = addConst(curTk);
+                    curTk.compact();
                     merged.add(curTk);
                 }
                 curTk = new Token.StringToken("", parser);
@@ -982,6 +983,7 @@ public class CodeBuilder extends TextBuilder {
         }
         if (null != curTk && curTk.s().length() > 0) {
             curTk = addConst(curTk);
+            curTk.compact();
             merged.add(curTk);
         }
         return merged;

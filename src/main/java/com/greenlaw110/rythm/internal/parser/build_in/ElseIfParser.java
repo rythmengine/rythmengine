@@ -54,14 +54,16 @@ public class ElseIfParser extends CaretParserFactoryBase {
 
                 String a = dialect().a();
                 //Regex rLF = new Regex("^(\\n\\r|\\r\\n|[\\n\\r]).*");
-                Regex r1 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*", a, a));
-                Regex r2 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?(%s\\}?|%s?\\})\\s*(else([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*", a, a));
+                Regex r1 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?[ \\t\\x0B\\f]*(%s\\}?|%s?\\})\\s*(else\\s*if\\s*" + Patterns.Expression + "[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)).*", a, a));
+                Regex r2 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?[ \\t\\x0B\\f]*(%s\\}?|%s?\\})\\s*(else([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*", a, a));
 
                 final String s = ctx.getRemain();
                 String s1;
                 boolean expression = false;
+                String matched;
                 if (r1.search(s)) {
                     s1 = r1.stringMatched(1);
+                    matched = s1;
                     if (null == s1) return null;
                     step(s1.length());
                     s1 = r1.stringMatched(4);
@@ -69,6 +71,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 } else if (r2.search(s)) {
                     s1 = r2.stringMatched(1);
                     if (null == s1) return null;
+                    matched = s1;
                     step(s1.length());
                     s1 = r2.stringMatched(4);
                 } else {
@@ -86,6 +89,24 @@ public class ElseIfParser extends CaretParserFactoryBase {
                     if (!s1.startsWith("}")) s1 = "}" + s1;
                 }
                 try {
+                    if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                        ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                        Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
+                        }
+                    } else {
+                        Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
+                        }
+                    }
                     ctx.closeBlock();
                 } catch (ParseException e) {
                     throw new RuntimeException(e);

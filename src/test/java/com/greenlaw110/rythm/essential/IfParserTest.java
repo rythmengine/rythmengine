@@ -126,6 +126,24 @@ public class IfParserTest extends TestBase {
         assertEquals("\tyong man\n 123", s);
         s = r(t, 200);
         assertEquals("\taged\n 123", s);
+        
+        t = "abc\n@if(@1){true}else{false}\nxyz";
+        s = r(t, "true");
+        eq("abc\ntrue\nxyz");
+        s = r(t, false);
+        eq("abc\nfalse\nxyz");
+
+        t = "abc\n@if(@1){\ntrue\n}else{\nfalse\n}\nxyz";
+        s = r(t, "true");
+        eq("abc\ntrue\nxyz");
+        s = r(t, false);
+        eq("abc\nfalse\nxyz");
+        
+        t = "abc\n\t@if(@1){\n\t\ttrue\n\t} else {\n\t\tfalse\n\t}\nxyz";
+        s = r(t, "true");
+        eq("abc\n\t\ttrue\nxyz");
+        s = r(t, false);
+        eq("abc\n\t\tfalse\nxyz");
     }
     
     private void yes(Object p) {

@@ -20,10 +20,56 @@
 package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
+import com.greenlaw110.rythm.internal.Token;
+import com.stevesoft.pat.Regex;
+import org.junit.Before;
 import org.junit.Test;
 
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.CODEGEN_COMPACT_ENABLED;
+
 public class CompactModeTest extends TestBase {
+    
+    @Before
+    public void setup() {
+        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "true");
+    }
+    
+    @Test
+    public void testCompactSpace() {
+        t = "<h1>   abc</h1>  x";
+        eq("<h1> abc</h1> x");
+    }
+    
+    @Test
+    public void testCompactLineBreaks() {
+        t = "<h1>\n\nabc\n</h1>";
+        eq("<h1>\nabc\n</h1>");
+    }
+    
+    @Test
+    public void testBlankAfterLineBreak() {
+        t = "<h1> \n</h1>";
+        eq("<h1>\n</h1>");
+    }
+    
+    @Test
+    public void testLineBreakAfterBlank() {
+        t = "<h1>\n </h1>";
+        eq("<h1>\n</h1>");
+    }
+    
     @Test
     public void testCompactDisabled() {
+        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        t = "<h1>   abc</h1>  x";
+        eq("<h1>   abc</h1>  x");
+
+        t = "<h1>\n\nabc\n</h1>";
+        s = r(t);
+        eq("<h1>\n\nabc\n</h1>");
+    }
+
+    public static void main(String[] args) {
+        run(CompactModeTest.class);
     }
 }

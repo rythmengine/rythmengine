@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class BraceParser implements IParserFactory {
 
-    private final Pattern P = Pattern.compile("^((\\n\\s*}\\s*)\\n).*", Pattern.DOTALL);
+    private final Pattern P = Pattern.compile("^((\\n[ \\t\\x0B\\f]*}[ \\t\\x0B\\f]*)\\n).*", Pattern.DOTALL);
 
     @Override
     public IParser create(final IContext ctx) {

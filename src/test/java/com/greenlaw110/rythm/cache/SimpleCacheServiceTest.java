@@ -69,7 +69,7 @@ public class SimpleCacheServiceTest extends TestBase {
         assertEquals("val2", cache.get("key1"));
         Thread.sleep(1900);
         assertEquals("val2", cache.get("key1"));
-        Thread.sleep(150);
+        Thread.sleep(200);
         logger.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         assertEquals(null, cache.get("key1"));
     }

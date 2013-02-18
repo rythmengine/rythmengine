@@ -19,10 +19,7 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
@@ -34,7 +31,7 @@ import java.util.regex.Matcher;
 
 public class ImportParser extends KeywordParserFactory {
 
-    private static final String R = "(%s%s[\\s]+([a-zA-Z0-9_\\.*,\\s]+);?).*";
+    private static final String R = "(\\n?[ \\t\\x0B\\f]*%s%s[\\s]+([a-zA-Z0-9_\\.*,[ \\t\\x0B\\f]*)]+);?\\n?).*";
 
     public ImportParser() {
     }
@@ -43,22 +40,25 @@ public class ImportParser extends KeywordParserFactory {
         return R;
     }
 
-    public IParser create(final IContext c) {
-        return new RemoveLeadingLineBreakAndSpacesParser(c) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 String remain = remain();
-                String line = null;
-                Regex r = new Regex(String.format("%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))", a(), keyword()));
+                String line;
+                Regex r = new Regex(String.format("\\n?[ \\t\\x0B\\f]*%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))[ \\t\\x0B\\f]*\\n?", a(), keyword()));
+                String matched;
                 if (r.search(remain)) {
+                    matched = r.stringMatched();
                     String s = r.stringMatched(2);
                     s = S.strip(s, "{", "}");
-                    step(r.stringMatched().length());
+                    step(matched.length());
                     line = s.replaceAll("[\\n\\r]+", ",");
                 } else {
                     Matcher m = ptn(dialect()).matcher(remain);
                     if (!m.matches()) return null;
                     String s = m.group(1);
                     step(s.length());
+                    matched = s;
                     //String imports = s.replaceFirst(String.format("%s%s[\\s]+", a(), keyword()), "").replaceFirst("(;|\\r?\\n)+$", "");
                     line = m.group(2);
                 }
@@ -68,7 +68,7 @@ public class ImportParser extends KeywordParserFactory {
                  * to support call tag using import paths. That why we move
                  * the addImport statement here from Directive.call()
                  */
-                String[] sa = line.split("[;,\\s]+");
+                String[] sa = line.split("[;, \\t\\x0B\\f]+");
                 CodeBuilder cb = builder();
                 boolean statik = false;
                 for (String imp : sa) {
@@ -79,7 +79,29 @@ public class ImportParser extends KeywordParserFactory {
                         statik = false;
                     }
                 }
-                return new Directive("", ctx());
+                boolean leadingLB = matched.startsWith("\n");
+                boolean afterLB = matched.endsWith("\n"); 
+                if (leadingLB || afterLB) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    if (leadingLB ^ afterLB) {
+                        Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                return Token.EMPTY_TOKEN;
             }
         };
     }

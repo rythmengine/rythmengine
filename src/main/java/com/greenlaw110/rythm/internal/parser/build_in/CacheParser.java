@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
@@ -147,6 +148,25 @@ public class CacheParser extends KeywordParserFactory {
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @cache statement. Correct usage: @cache (\"duration_string\") {cache block}");
                 }
+                String matched = r.stringMatched();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 ctx.step(r.stringMatched().length());
                 String s = r.stringMatched(2); // ("1m", 1, bar.foo())
                 s = S.stripBrace(s); // "1m", 1, bar.foo()
@@ -174,7 +194,7 @@ public class CacheParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s(%s\\s+\\(.*\\)(\\s*\\{)?)).*";
-        return "^(^%s%s\\s*((?@()))(\\s*\\{)?)";
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))(\\s*\\{)?\\n?)";
     }
 
 }

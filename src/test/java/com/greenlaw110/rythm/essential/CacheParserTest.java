@@ -57,10 +57,33 @@ public class CacheParserTest extends TestBase {
     @Test
     public void testLineBreaks() {
         t = "abc\n@cache(){123}\nxyz";
+        //System.err.println(t);
+        s = r(t);
         eq("abc\n123\nxyz");
+
+        t = "abc\n@cache(){\n123\n}\nxyz";
+        //System.err.println(t);
+        s = r(t);
+        eq("abc\n123\nxyz");
+
         t = "xyz@cache(){abc}123";
         s = r(t);
         eq("xyzabc123");
+
+        t = "abc\n @cache(){123}\nxyz";
+        //System.err.println(t);
+        s = r(t);
+        eq("abc\n 123\nxyz");
+    }
+    
+    @Test
+    public void testCacheDisabled() {
+        System.setProperty(CACHE_ENABLED.getKey(), "false");
+        t = "@cache(\"1s\"){@1}";
+        int n = new Random().nextInt(1000);
+        s = r(t, n);
+        s = r(t, n + 1);
+        eq(String.valueOf(n + 1));
     }
 
     public static void main(String[] args) {

@@ -19,10 +19,7 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.TemplateParser;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -34,7 +31,7 @@ import com.stevesoft.pat.Regex;
 public class ForEachParser extends KeywordParserFactory {
     private static final ILogger logger = Logger.get(ForEachParser.class);
 
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
 
         return new RemoveLeadingSpacesIfLineBreakParser(ctx) {
             public TextBuilder go() {
@@ -43,7 +40,26 @@ public class ForEachParser extends KeywordParserFactory {
                 if (!r.search(remain)) {
                     raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");
                 }
-                step(r.stringMatched().length());
+                String matched = r.stringMatched();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                step(matched.length());
                 String s = r.stringMatched(2);
                 if (s.contains(";")) {
                     if (!ctx().getDialect().enableFreeForLoop()) {
@@ -110,7 +126,7 @@ public class ForEachParser extends KeywordParserFactory {
 
     // match for(int i=0; i<100;++i) {
     protected String patternStr2() {
-        return "^%s%s\\s*((?@()))([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)";
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)";
     }
 
     @Override
