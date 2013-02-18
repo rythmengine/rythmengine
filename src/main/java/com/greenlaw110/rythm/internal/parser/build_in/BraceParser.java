@@ -68,6 +68,13 @@ public class BraceParser implements IParserFactory {
                             if (bhCls.contains("For")) {
                                 ctx.getCodeBuilder().removeSpaceTillLastLineBreak(ctx);
                                 ct.removeNextLineBreak = true;
+                            } else if (bhCls.contains("Assign")) {
+                                remain = ctx.getRemain();
+                                Matcher m = Pattern.compile("(^[ \\t\\x0B\\f]*\\n).*", Pattern.DOTALL).matcher(remain);
+                                if (m.matches()) {
+                                    String space = m.group(1);
+                                    step(space.length());
+                                }
                             } else {
                                 ctx.getCodeBuilder().removeSpaceToLastLineBreak(ctx);
                             }
@@ -86,6 +93,10 @@ public class BraceParser implements IParserFactory {
                             if (bhCls.contains("For")) {
                                 cb.addBuilder(new Token.StringToken("\n", ctx));
                                 cb.removeNextLF = true;
+                            } else if (bhCls.contains("Assign")) {
+                                if (m.group(1).endsWith("\n")) {
+                                    cb.removeNextLF = true;
+                                }
                             }
                             ctx.step(s.length());
                             CodeToken ct = new CodeToken(ctx.closeBlock(), ctx);

@@ -32,7 +32,7 @@ import com.stevesoft.pat.Regex;
 
 public class BreakParser extends KeywordParserFactory {
 
-    private static final String R = "^(%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
+    private static final String R = "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
 
     public BreakParser() {
     }
@@ -45,14 +45,14 @@ public class BreakParser extends KeywordParserFactory {
         return new RemoveLeadingLineBreakAndSpacesParser(c) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (r.search(remain())) {
-                    step(r.stringMatched().length());
-                    IContext.Break b = ctx().peekBreak();
-                    if (null == b) raiseParseException("Bad @break statement: No loop context");
-                    return new CodeToken(b.getStatement(), ctx());
+                if (!r.search(remain())) {
+                    raiseParseException("Bad @break statement. Correct usage: @break()");
                 }
-                raiseParseException("Bad @break statement. Correct usage: @break()");
-                return null;
+                String matched = r.stringMatched();
+                step(matched.length());
+                IContext.Break b = ctx().peekBreak();
+                if (null == b) raiseParseException("Bad @break statement: No loop context");
+                return new CodeToken(b.getStatement(), ctx());
             }
         };
     }

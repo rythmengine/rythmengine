@@ -23,6 +23,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.*;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -103,16 +104,34 @@ public class AssignParser extends KeywordParserFactory {
 //        };
 //    }
 
-    public IParser create(IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain()))
-                    raiseParseException("bad @assign statement. Correct usage: @assign(\"myVariable\"){...}");
-                int curLine = ctx().currentLine();
-                step(r.stringMatched().length());
+                    raiseParseException("bad @assign statement. Correct usage: @assign(myVariable){...}");
+                String matched = r.stringMatched();
+                step(matched.length());
                 String s = r.stringMatched(1);
                 s = S.stripBrace(s);
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 return new AssignToken(s, ctx());
             }
         };
@@ -122,11 +141,11 @@ public class AssignParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
-        return "%s%s\\s*((?@()))[\\s]*\\{?\\s*";
+        return "\\n?[ \\t\\x0B\\f]*%s%s[ \\t\\x0B\\f]*((?@()))[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?";
     }
 
     public static void main(String[] args) {
-        String s = "@assign(\"x\") {abc} @x.getClass()";
+        String s = "@assign(x) {abc} @x.getClass()";
         System.out.println(new RythmEngine().render(s));
     }
 

@@ -32,7 +32,7 @@ import com.stevesoft.pat.Regex;
 
 public class ContinueParser extends KeywordParserFactory {
 
-    private static final String R = "^(%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
+    private static final String R = "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
 
     public ContinueParser() {
     }

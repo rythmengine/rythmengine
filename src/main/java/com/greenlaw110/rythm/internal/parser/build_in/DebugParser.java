@@ -60,7 +60,7 @@ public class DebugParser extends KeywordParserFactory implements IRemoveLeadingL
 
     @Override
     protected String patternStr() {
-        return "%s%s\\s*((?@()))[\\r\\n]*";
+        return "%s%s\\s*((?@()))[\\n]*";
     }
 
     public static void main(String[] args) {

@@ -274,12 +274,28 @@ public class ForParserTest extends TestBase {
     public void testBreak() {
         t = "@for(int i in 1..10){@(i)@if(i > 3){@break}}";
         eq("1234");
+
+        t = "@for(int i in 1..10){@(i)@if(i > 3){\n\t@break\n}}";
+        s = r(t);
+        eq("1234");
+
+        t = "@for(int i in 1..10){@(i)@if(i > 3){\n\toverflow...\n\t@break\n}}";
+        s = r(t);
+        eq("1234\toverflow...");
     }
     
     @Test
     public void testContinue() {
         t = "@for(int i in 1..10){@if((i % 2) == 0){@continue}@i}";
         eq("13579");
+
+        t = "@for(int i in 1..10){@if((i % 2) == 0){\n\t@continue\n}@i}";
+        s = r(t);
+        eq("13579");
+
+        t = "@for(int i in 1..10){@if((i % 2) == 0){\n\tE\n\t@continue\n}@i}";
+        s = r(t);
+        eq("1\tE3\tE5\tE7\tE9");
     }
 
     public static void main(String[] args) {
