@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
@@ -34,7 +35,7 @@ import com.stevesoft.pat.Regex;
  */
 public class ExecParser extends KeywordParserFactory {
 
-    private static final String R = "(^%s(%s\\s*((?@()))\\s*))";
+    private static final String R = "(^\\n?[ \\t\\x0B\\f]*%s(%s\\s*((?@()))\\s*))";
 
     public ExecParser() {
     }
@@ -43,15 +44,34 @@ public class ExecParser extends KeywordParserFactory {
         return R;
     }
 
-    public IParser create(IContext c) {
-        return new RemoveLeadingLineBreakAndSpacesParser(c) {
+    public IParser create(final IContext ctx) {
+        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("Error parsing @exec statement. Correct usage: @exec(\"my-macro\")");
+                    raiseParseException("Error parsing @exec statement. Correct usage: @exec(myMacro)");
                 }
                 final int curLine = ctx().currentLine();
-                step(r.stringMatched().length());
+                final String matched = r.stringMatched();
+                step(matched.length());
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 String s = r.stringMatched(3);
                 if (S.isEmpty(s)) {
                     raiseParseException("Error parsing @exec statement. Correct usage: @exec(\"my-macro\")");
@@ -65,14 +85,5 @@ public class ExecParser extends KeywordParserFactory {
     @Override
     public Keyword keyword() {
         return Keyword.EXEC;
-    }
-
-    public static void main(String[] args) {
-        ExecParser p = new ExecParser();
-        Regex r = p.reg(Rythm.INSTANCE);
-        String s = "@exec(\"x.y.z\") \n@sayHi(\"green\")";
-        if (r.search(s)) {
-            p(r);
-        }
     }
 }

@@ -41,7 +41,7 @@ public class CompactModeTest extends TestBase {
     }
     
     @Test
-    public void testCompactLineBreaks() {
+    public void testLineBreaks() {
         t = "<h1>\n\nabc\n</h1>";
         eq("<h1>\nabc\n</h1>");
     }

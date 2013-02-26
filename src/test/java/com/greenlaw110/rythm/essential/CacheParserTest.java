@@ -77,6 +77,16 @@ public class CacheParserTest extends TestBase {
     }
     
     @Test
+    public void testShortNotation() {
+        t = "@cache()@1@";
+        s = r(t, 5);
+        eq("5");
+        
+        s = r(t, 6);
+        eq("5");
+    }
+    
+    @Test
     public void testCacheDisabled() {
         System.setProperty(CACHE_ENABLED.getKey(), "false");
         t = "@cache(\"1s\"){@1}";

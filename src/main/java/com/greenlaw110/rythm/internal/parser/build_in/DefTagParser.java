@@ -19,10 +19,7 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
@@ -65,26 +62,54 @@ public class DefTagParser extends KeywordParserFactory {
         return Keyword.TAG;
     }
 
-    public IParser create(IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @def, correct usage: @def tagName([arguments...])");
                 }
-                step(r.stringMatched().length());
+                final String matched = r.stringMatched();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    //ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                step(matched.length());
                 String retType = r.stringMatched(3);
                 String tagName = r.stringMatched(6);
                 String signature = r.stringMatched(7);
                 if (null != retType && !"void".equals(retType)) {
                     r = new Regex("^(\\s*((?@{})))");
-                    if (!r.search("{" + ctx().getRemain())) {
-                        this.raiseParseException("code blocked expected after @def tag");
+                    String remain = ctx.getRemain();
+                    if (!r.search("{" + remain)) {
+                        // short notation?
+                        r = new Regex("^(\\s*((?@@@)))");
+                        if (!r.search("@" + remain)) {
+                            this.raiseParseException("code blocked expected after @def tag");
+                        }
                     }
                     String s = r.stringMatched(1);
                     int curLine = ctx().currentLine();
                     ctx().step(s.length() - 1);
-                    while (ctx().peek() != '}') ctx().step(-1);
+                    if (s.startsWith("{")) {
+                        while (ctx().peek() != '}') ctx().step(-1);
+                    } else {
+                        while (ctx().peek() != '@') ctx().step(-1);
+                    }
                     s = r.stringMatched(2);
                     s = s.substring(1); // strip left "{"
                     s = s.substring(0, s.length() - 1); // strip right "}"
@@ -107,14 +132,7 @@ public class DefTagParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^%s%s\\s+(([_a-zA-Z][\\w_$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{\\s*\\r*\\n*";
-    }
-
-    public static void main(String[] args) {
-        DefTagParser tp = new DefTagParser();
-        Regex r = tp.reg(Rythm.INSTANCE);
-        String s = "@tag Map<String, Map<String, Map<String, Long>>> myTag(String x, Map<String, Map<String, Map<String, Long>>> y) {\\n y.name: x\\n}";
-        p(s, r, 9);
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s+(([_a-zA-Z][\\w_$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{?[ \\t\\x0B\\f]*\\n?";
     }
 
 }

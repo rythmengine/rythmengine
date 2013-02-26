@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -40,14 +41,32 @@ public class MacroParser extends KeywordParserFactory {
         return Keyword.MACRO;
     }
 
-    public IParser create(IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain()))
-                    raiseParseException("bad @macro statement. Correct usage: @macro(\"macro-name\"){...}");
-                int curLine = ctx().currentLine();
-                step(r.stringMatched().length());
+                    raiseParseException("bad @macro statement. Correct usage: @macro(macro-name){...}");
+                final String matched = r.stringMatched();
+                step(matched.length());
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 String s = r.stringMatched(1);
                 final String macro = S.stripBraceAndQuotation(s);
                 return new BlockCodeToken("", ctx()) {
@@ -69,15 +88,7 @@ public class MacroParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
-        return "%s%s\\s*((?@()))[\\s]*\\{?\\s*";
-    }
-
-    public static void main(String[] args) {
-        Regex r = new MacroParser().reg(Rythm.INSTANCE);
-        if (r.search("@macro(\"JS\") abc")) {
-            p(r);
-        }
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))[\\s]*\\{?[ \\t\\x0B\\f]*\\n?";
     }
 
 }

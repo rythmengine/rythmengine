@@ -61,6 +61,13 @@ public class AssignParserTest extends TestBase {
         s = r(t);
         eq("abc\nabc\nxyz");
     }
+    
+    @Test
+    public void testShortNotation() {
+        t = "@assign(x)abc@\n@x";
+        s = r(t);
+        eq("abc");
+    }
 
     public static void main(String[] args) {
         run(AssignParserTest.class);

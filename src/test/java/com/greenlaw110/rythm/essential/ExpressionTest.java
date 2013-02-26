@@ -159,6 +159,13 @@ public class ExpressionTest extends TestBase {
 //        s = r(t, from(p("d", d)));
 //        eq("nullbar");
     }
+    
+    @Test
+    public void testEscape() {
+        t = "@1";
+        s = r(t, "<h1>x</h1>");
+        eq("&lt;h1&gt;x&lt;/h1&gt;");
+    }
 
     public static void main(String[] args) {
         run(ExpressionTest.class);

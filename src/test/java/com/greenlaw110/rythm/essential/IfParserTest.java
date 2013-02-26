@@ -146,6 +146,15 @@ public class IfParserTest extends TestBase {
         eq("abc\n\t\tfalse\nxyz");
     }
     
+    @Test
+    public void testShortNotation() {
+        t = "@if(@1)true@else false@";
+        s = r(t, true);
+        eq("true");
+        s = r(t, false);
+        eq("false");
+    }
+    
     private void yes(Object p) {
         assertEquals("yes", r(t, p, null));
     }

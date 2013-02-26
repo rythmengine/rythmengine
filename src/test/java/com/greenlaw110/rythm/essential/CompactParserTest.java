@@ -36,6 +36,13 @@ public class CompactParserTest extends TestBase {
         eq("abc\n  1 2 3\nxyz");
     }
 
+    @Test
+    public void testShortNotation() {
+        t = "@compact()1 2   3@";
+        s = r(t);
+        eq("1 2 3");
+    }
+    
     public static void main(String[] args) {
         run(CompactParserTest.class);
     }

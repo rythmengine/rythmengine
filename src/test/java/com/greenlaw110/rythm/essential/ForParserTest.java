@@ -264,6 +264,13 @@ public class ForParserTest extends TestBase {
     }
     
     @Test
+    public void testShortNotation() {
+        t = "@for(@1)@__sep @else empty list@";
+        assertEquals("a,b,c", r(t, Arrays.asList("a,b,c".split(","))));
+        assertEquals("empty list", r(t, Arrays.asList(new String[]{})));
+    }
+    
+    @Test
     public void testElseWithLineBreaks() {
         t = "abc\n\t@for(@1){\n\t\t@__sep\n\t} else {\n\t\tempty list\n\t}\n123";
         assertEquals("abc\n\t\tempty list\n123", r(t, ""));

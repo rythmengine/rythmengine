@@ -99,7 +99,7 @@ public class CompactParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(\\n?[ \\t\\x0B\\f]*%s%s\\s*\\(\\s*\\)[\\s]*\\{\\n?).*";
+        return "(\\n?[ \\t\\x0B\\f]*%s%s\\s*\\(\\s*\\)[\\s]*\\{?[ \\t\\x0B\\f]*\\n?).*";
     }
 
 }

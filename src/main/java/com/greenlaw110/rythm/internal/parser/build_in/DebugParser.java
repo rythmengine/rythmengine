@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
@@ -45,14 +46,36 @@ public class DebugParser extends KeywordParserFactory implements IRemoveLeadingL
     }
 
     public IParser create(final IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("error parsing @debug, correct usage: @debug(\"msg\", args...)");
                 }
-                step(r.stringMatched().length());
-                String s = new TextBuilder().p("_logger.debug").p(r.stringMatched(1)).p(";").toString();
+                String matched = r.stringMatched();
+                step(matched.length());
+                boolean leadLB = matched.startsWith("\n"), afterLB = matched.endsWith("\n");
+                if (leadLB || afterLB) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    if (!(leadLB && afterLB)) {
+                        Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                String s = new TextBuilder().p("__logger.debug").p(r.stringMatched(2)).p(";").toString();
                 return new CodeToken(s, ctx());
             }
         };
@@ -60,16 +83,7 @@ public class DebugParser extends KeywordParserFactory implements IRemoveLeadingL
 
     @Override
     protected String patternStr() {
-        return "%s%s\\s*((?@()))[\\n]*";
-    }
-
-    public static void main(String[] args) {
-        String s = "@debug (\"sss\", 1)\naba";
-        DebugParser ap = new DebugParser();
-        Regex r = ap.reg(Rythm.INSTANCE);
-        if (r.search(s)) {
-            p(r);
-        }
+        return "(^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))[\\n]?)";
     }
 
 }

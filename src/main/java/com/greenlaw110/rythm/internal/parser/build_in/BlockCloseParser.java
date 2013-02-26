@@ -72,7 +72,7 @@ public class BlockCloseParser extends ParserBase {
         CodeToken ct = new CodeToken(s, ctx);
         if (!(bh instanceof BlockToken.LiteralBlock)) {
             String bhCls = bh.getClass().getName();
-            if (bhCls.contains("ForEach") || bhCls.contains("ElseFor")) {
+            if (bhCls.contains("ForEach") || bhCls.contains("ElseFor") || bhCls.contains("Assign")) {
                 ctx.getCodeBuilder().removeSpaceTillLastLineBreak(ctx);
                 ct.removeNextLineBreak = true;
             } else {
