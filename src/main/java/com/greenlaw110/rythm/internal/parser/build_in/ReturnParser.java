@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -40,13 +41,32 @@ public class ReturnParser extends KeywordParserFactory {
     }
 
     public IParser create(final IContext ctx) {
-        return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("error parsing @return, correct usage: @return()");
                 }
-                step(r.stringMatched().length());
+                final String matched = r.stringMatched();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    //ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                step(matched.length());
                 return new CodeToken("if (true) {return this;}", ctx());
             }
         };
@@ -54,14 +74,7 @@ public class ReturnParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
-    }
-
-    public static void main(String[] args) {
-        String s = "@return \naba";
-        ReturnParser ap = new ReturnParser();
-        Regex r = ap.reg(Rythm.INSTANCE);
-        p(s, r);
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
     }
 
 }

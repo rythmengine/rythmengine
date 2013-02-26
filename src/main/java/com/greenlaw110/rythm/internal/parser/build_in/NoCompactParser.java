@@ -28,6 +28,7 @@ import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,12 +43,31 @@ public class NoCompactParser extends KeywordParserFactory {
         return Keyword.NOCOMPACT;
     }
 
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public TextBuilder go() {
                 Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;
-                step(m.group(1).length());
+                final String matched = m.group(1);
+                step(matched.length());
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 return new BlockCodeToken("", ctx()) {
                     @Override
                     public void openBlock() {
@@ -78,17 +98,7 @@ public class NoCompactParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(%s%s\\s*\\(\\s*\\)[\\s]*\\{).*";
-    }
-
-    public static void main(String[] args) {
-        Pattern p = new NoCompactParser().ptn(Rythm.INSTANCE);
-        Matcher m = p.matcher("@compact() {\n" +
-                "    @body\n" +
-                "}");
-        if (m.find()) {
-            System.out.println(m.group(1));
-        }
+        return "(\\n?[ \\t\\x0B\\f]*%s%s\\s*\\(\\s*\\)[\\s]*\\{?[ \\t\\x0B\\f]*\\n?).*";
     }
 
 }

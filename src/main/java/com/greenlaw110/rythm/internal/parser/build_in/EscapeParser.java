@@ -49,7 +49,7 @@ public class EscapeParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) return null;
-                String matched = r.stringMatched();
+                final String matched = r.stringMatched();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");

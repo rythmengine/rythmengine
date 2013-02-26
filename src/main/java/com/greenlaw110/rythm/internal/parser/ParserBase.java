@@ -48,7 +48,7 @@ public abstract class ParserBase implements IParser {
 
     public static final Pattern pattern(String regex, Object... args) {
         if (0 < args.length) regex = String.format(regex, args);
-        return Pattern.compile(regex, Pattern.DOTALL);
+        return Pattern.compile(regex, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
     }
 
     private final IDialect d_;

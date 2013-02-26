@@ -44,7 +44,7 @@ public class IfParser extends KeywordParserFactory {
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @if statement. Correct usage: @if (some-condition) {some-template-code}");
                 }
-                String matched = r.stringMatched();
+                final String matched = r.stringMatched();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");

@@ -43,6 +43,13 @@ public class CompactParserTest extends TestBase {
         eq("1 2 3");
     }
     
+    @Test
+    public void testWithNoCompact() {
+        t = "@compact(){@noCompact(){1 2   3} x    y z}";
+        s = r(t);
+        eq("1 2   3 x y z");
+    }
+    
     public static void main(String[] args) {
         run(CompactParserTest.class);
     }

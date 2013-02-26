@@ -26,12 +26,13 @@ import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
+import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 public class VerbatimParser extends KeywordParserFactory {
 
-    private static final String R = "(%s%s\\s*(\\(\\s*\\))?\\s*((?@{})))";
+    private static final String R = "(^\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?\\s*((?@{})))";
 
     public VerbatimParser() {
     }
@@ -40,15 +41,16 @@ public class VerbatimParser extends KeywordParserFactory {
         return R;
     }
 
-    public IParser create(IContext c) {
-        return new RemoveLeadingLineBreakAndSpacesParser(c) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (r.search(remain())) {
-                    step(r.stringMatched().length());
+                    final String matched = r.stringMatched();
+                    step(matched.length());
                     String s0 = r.stringMatched(3);
-                    s0 = s0.substring(1); // strip '{'
-                    s0 = s0.substring(0, s0.length() - 1); // strip '}'
+                    s0 = S.strip(s0, "{", "}");
+                    s0 = S.strip(s0, "\n", "\n");
                     final String s = s0;
                     return new Token(s, ctx(), true) {
                         @Override
@@ -68,17 +70,5 @@ public class VerbatimParser extends KeywordParserFactory {
     @Override
     public Keyword keyword() {
         return Keyword.VERBATIM;
-    }
-
-    public static void main(String[] args) {
-        Regex r = new VerbatimParser().reg(Rythm.INSTANCE);
-        String s = "@verbatim(){\n\tHello world!\n@each X {abc;} \n} xyz";
-        if (r.search(s)) {
-            String s0 = r.stringMatched(3);
-            s0 = s0.substring(1); // strip '{'
-            s0 = s0.substring(0, s0.length() - 1); // strip '}'
-            System.out.println(r.stringMatched());
-            System.out.println(s0);
-        }
     }
 }

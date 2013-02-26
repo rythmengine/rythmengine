@@ -44,7 +44,7 @@ public class TimestampParser extends KeywordParserFactory {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("error parsing @ts, correct usage: @ts()");
+                    return null;
                 }
                 step(r.stringMatched().length());
                 return new CodeToken("p(System.currentTimeMillis());", ctx());
