@@ -55,7 +55,6 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public FileTemplateResource(String path, RythmEngine engine) {
         super(engine);
         File home = engine().conf().templateHome();
-        //File tagHome = engine().tagHome;
         File f = null;
         if (null != home) {
             f = new File(home, path);
@@ -76,6 +75,14 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         super(engine);
         file = templateFile;
         key = file.getPath();
+        File home = engine().conf().templateHome();
+        String homePath = null == home ? null : home.getPath();
+        if (null != homePath && key.startsWith(homePath)) {
+            key = key.replace(homePath, "");
+            if (key.startsWith("/") || key.startsWith("\\")) {
+                key = key.substring(1);
+            }
+        }
     }
 
     private static String retrieveTagName(File tagHome, File tagFile) {

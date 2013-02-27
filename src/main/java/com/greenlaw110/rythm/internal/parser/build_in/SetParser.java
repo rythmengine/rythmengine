@@ -40,17 +40,36 @@ public class SetParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s((?@())))";
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s((?@()))([ \\t\\x0B\\f]*\\n?))";
     }
 
     @Override
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             @Override
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) return null;
-                step(r.stringMatched().length()); // remain: @set("name": val)...
+                final String matched = r.stringMatched();
+                step(matched.length()); // remain: @set("name": val)...
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 String s = r.stringMatched(2); // s: ("name": val)
                 s = s.substring(1); // s: name: val)
                 s = s.substring(0, s.length() - 1); // s: "name": val
@@ -75,24 +94,6 @@ public class SetParser extends KeywordParserFactory {
                 };
             }
         };
-    }
-
-    public static void main(String[] args) {
-//        String s = "@set(name:abc.x())";
-//        SetParser ap = new SetParser();
-//        Regex r = ap.reg(new Rythm());
-//        System.out.println(r);
-//        if (r.search(s)) {
-//            System.out.println("m: " + r.stringMatched());
-//            System.out.println("1: " + r.stringMatched(1));
-//            System.out.println("2: " + r.stringMatched(2));
-//            System.out.println("3: " + r.stringMatched(3));
-//            System.out.println("4: " + r.stringMatched(4));
-//            System.out.println("5: " + r.stringMatched(5));
-//        }
-        Regex r = new Regex("((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)\\s*[=:]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)");
-        String s = " title: title";
-        p(s, r);
     }
 
 }

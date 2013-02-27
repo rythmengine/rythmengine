@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.runner.JUnitCore;
 import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +54,7 @@ public abstract class TestBase extends Assert {
         System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
         System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
         System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
+        System.setProperty("line.separator", "\n");
         t = null;
         s = null;
     }
@@ -79,6 +81,11 @@ public abstract class TestBase extends Assert {
             s = r(t);
         }
         assertEquals(result, s);
+    }
+
+    protected void eqf(String path) {
+        String s0 = Rythm.engine().resourceManager().get(path).asTemplateContent();
+        eq(s0);
     }
     
     protected void getSource() {

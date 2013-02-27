@@ -247,7 +247,13 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         Class<?> pc = c.getSuperclass();
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
-                __parent = (TemplateBase) pc.newInstance();
+                TemplateClass ptc = _engine().classes().getByClassName(pc.getName());
+                if (null != ptc) {
+                    __parent = (TemplateBase)ptc.asTemplate(__curLang());
+                } else {
+                    __parent = (TemplateBase) pc.newInstance();
+                    __parent.__ctx.pushLang(__curLang());
+                }
                 //__parent.setTemplateClass(_engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
