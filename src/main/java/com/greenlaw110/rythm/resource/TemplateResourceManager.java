@@ -54,7 +54,7 @@ public class TemplateResourceManager {
 
     public TemplateClass tryLoadTag(String tagName, TemplateClass tc) {
         if (null != _resourceLoader) return _resourceLoader.tryLoadTag(tagName, tc);
-        else return FileTemplateResource.tryLoadTag(tagName, engine);
+        else return FileTemplateResource.tryLoadTag(tagName, engine, tc);
     }
 
     public String getFullTagName(TemplateClass tc) {

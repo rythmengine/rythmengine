@@ -1,8 +1,12 @@
 <h1>@get(title, "my title")</h1>
 <div id="nav">
-@render(nav)
+@render(nav) {
+def-nav
+}
 </div>
 @render()
 <footer>
-@render(footer)
+@render(footer) {
+def-footer
+}
 </footer>

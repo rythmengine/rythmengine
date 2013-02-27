@@ -45,7 +45,7 @@ public class RenderSectionParser extends KeywordParserFactory {
         public DefaultSectionToken(String section, IContext context) {
             super(null, context);
             if (S.isEmpty(section)) {
-                section = "__CONTENT__";
+                this.section = "__CONTENT__";
             }
             this.section = section;
         }
@@ -84,8 +84,9 @@ public class RenderSectionParser extends KeywordParserFactory {
                 Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;
                 String matched = m.group(1);
+                boolean lineBreak = false;
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
-                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    lineBreak = matched.endsWith("\n");
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                     if (r0.search(matched)) {
                         String blank = r0.stringMatched(1);
@@ -114,7 +115,15 @@ public class RenderSectionParser extends KeywordParserFactory {
                     ctx().step(m1.group(1).length());
                     return new DefaultSectionToken(section, ctx());
                 } else {
-                    String code = S.isEmpty(section) ? "_pLayoutContent();" : "_pLayoutSection(\"" + section + "\");";
+                    boolean isSection = S.notEmpty(section);
+                    if (matched.startsWith("\n") && !isSection) {
+                        ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    }
+                    String code = !isSection ? "_pLayoutContent();" : "_pLayoutSection(\"" + section + "\");";
+                    if (lineBreak && isSection) {
+                        //layout content often come from a file which always gets one additional line break
+                        code = code + ";\npn();\n";
+                    }
                     return new CodeToken(code, ctx());
                 }
             }

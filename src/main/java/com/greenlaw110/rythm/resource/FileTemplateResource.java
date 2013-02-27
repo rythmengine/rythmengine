@@ -28,6 +28,8 @@ import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.utils.IO;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -158,7 +160,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return key.replace('/', '.').replace('\\', '.');
     }
 
-    public static TemplateClass tryLoadTag(String tagName, RythmEngine engine) {
+    public static TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass templateClass) {
         if (null == engine) engine = Rythm.engine();
         if (engine.hasTag(tagName)) return null;
         tagName = tagName.replace('.', '/');
@@ -173,32 +175,61 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ""
         };
         File tagFile;
+        List<String> roots = new ArrayList<String>();
         File home = engine.conf().templateHome();
-        for (String suffix : suffixes) {
-            String name = tagName + suffix;
+        String root = home.getPath();
 
-            tagFile = new File(home, name);
-            ITemplateResource tr = tagFile.canRead() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
-            if (tr.isValid()) {
-                try {
-                    TemplateClass tc = engine.classes().getByTemplate(tr.getKey());
-                    if (null == tc) {
-                        tc = new TemplateClass(tr, engine);
-                    }
+        // call tag with import path
+        if (null != templateClass.importPaths) {
+            for (String s : templateClass.importPaths) {
+                roots.add(root + File.separator + s.replace('.', File.separatorChar));
+            }
+        }
+
+        final String tagName0 = tagName;
+        // call tag using relative path
+        String currentPath = templateClass.getKey().toString();
+        int pos = currentPath.lastIndexOf("/");
+        if (-1 == pos) {
+            pos = currentPath.lastIndexOf(File.separator);
+        }
+        if (-1 != pos) {
+            currentPath = currentPath.substring(0, pos);
+            if (currentPath.startsWith("/") || currentPath.startsWith(File.separator)) currentPath = currentPath.substring(1);
+            if (!currentPath.startsWith(root)) currentPath = root + File.separator + currentPath;
+            roots.add(currentPath);
+        }
+
+        // add the default root at last
+        roots.add(home.getPath());
+
+        for (String r : roots) {
+            tagName = r + File.separator + tagName0;
+            for (String suffix : suffixes) {
+                String name = tagName + suffix;
+
+                tagFile = new File(name);
+                ITemplateResource tr = tagFile.canRead() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
+                if (tr.isValid()) {
                     try {
-                        ITag tag = (ITag) tc.asTemplate();
-                        if (null != tag) {
-                            String fullName = getFullTagName(tc, engine);
-                            tc.setFullName(fullName);
-                            engine.registerTag(fullName, tag);
+                        TemplateClass tc = engine.classes().getByTemplate(tr.getKey());
+                        if (null == tc) {
+                            tc = new TemplateClass(tr, engine);
+                        }
+                        try {
+                            ITag tag = (ITag) tc.asTemplate();
+                            if (null != tag) {
+                                String fullName = getFullTagName(tc, engine);
+                                tc.setFullName(fullName);
+                                engine.registerTag(fullName, tag);
+                                return tc;
+                            }
+                        } catch (Exception e) {
                             return tc;
                         }
                     } catch (Exception e) {
-                        return tc;
+                        // ignore
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    // ignore
                 }
             }
         }

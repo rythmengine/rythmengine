@@ -33,4 +33,32 @@ public class LayoutTest extends TestBase {
         s = r("foo/index5.html");
         eqf("foo/index5.result");
     }
+    
+    @Test
+    public void testRenderSectionWithDefaultContent() {
+        s = r("foo/index6.html");
+        eqf("foo/index6.result");
+    }
+    
+    @Test
+    public void testExtendsTemplateInCurDir() {
+        s = r("foo/index7.html");
+        eqf("foo/index7.result");
+    }
+    
+    @Test
+    public void testExtendsTemplateInImportPaths() {
+        s = r("foo/index8.html");
+        eqf("foo/index8.result");
+    }
+    
+    @Test
+    public void testInit() {
+        s = r("foo/index9.html");
+        eqf("foo/index9.result");
+    }
+
+    public static void main(String[] args) {
+        run(LayoutTest.class);
+    }
 }

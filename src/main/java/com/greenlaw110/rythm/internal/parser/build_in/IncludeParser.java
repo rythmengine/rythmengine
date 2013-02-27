@@ -71,12 +71,4 @@ public class IncludeParser extends KeywordParserFactory {
         return Keyword.INCLUDE;
     }
 
-    public static void main(String[] args) {
-        IncludeParser p = new IncludeParser();
-        Regex r = p.reg(Rythm.INSTANCE);
-        String s = "@include(\"x.y.z,foo.bar\") \n@sayHi(\"green\")";
-        if (r.search(s)) {
-            p(r);
-        }
-    }
 }

@@ -348,9 +348,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     protected void _endSection(boolean def) {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
-        if (!def) {
-            addLayoutSection(section, __buffer.toString());
-        }
+        addLayoutSection(section, __buffer.toString());
         __buffer = tmpOut;
         __caller = tmpCaller;
         tmpOut = null;
