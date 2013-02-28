@@ -73,9 +73,13 @@ public class InvokeTemplateTest extends TestBase {
     
     @Test
     public void testRenderBodyCallback() {
-//        t = "@bar.findEvenElements(Arrays.asList(\"1,2,3,4\".split(\",\")).callback(String s){\nfound: @s\n}";
-//        s = r(t);
-//        System.out.println(s);
+        t = "@bar.findEvenElements(Arrays.asList(\"1,2,3,4\".split(\",\"))).callback(String s){\nfound: @s\n}";
+        s = r(t);
+        // cannot do this as we haven't sorted out redundant empty lines eq("found: 2\nfound: 4");
+        assertContains(s, "found: 2");
+        assertContains(s, "found: 4");
+        assertNotContains(s, "found: 1");
+        assertNotContains(s, "found: 3");
     }
 
     public static void main(String[] args) {
