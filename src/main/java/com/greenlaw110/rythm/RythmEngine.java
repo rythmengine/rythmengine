@@ -76,7 +76,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * TODO: use version marker and be substitute when build
      */
-    private static final String version = "1.0-b2";
+    private static final String version = "1.0-b3";
 
     private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
 
