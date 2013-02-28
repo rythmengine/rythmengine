@@ -155,6 +155,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                     ignoreNonExistsTag = true;
                 } else if ("assign".equals(extension)) {
                     parseAssign(param);
+                    ctx.getCodeBuilder().removeNextLF = true;
                 } else {
                     raiseParseException(ctx, "Unknown tag invocation extension: %s. Currently supported extension: cache, escape, raw, callback, ignoreNonExistsTag", extension);
                 }
@@ -350,9 +351,9 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 ptline("Object ").p(assignTo).p(" = null;");
             }
             pline("{");
-            ptline("com.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; ");
+            ptline("com.greenlaw110.rythm.template.ITag.ParameterList _pl = null; ");
             if (params.pl.size() > 0) {
-                ptline("_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
+                ptline("_pl = new com.greenlaw110.rythm.template.ITag.ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
@@ -373,7 +374,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
             }
-            p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl,  new com.greenlaw110.rythm.runtime.ITag.Body(").p(curClassName).p(".this) {");
+            p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl,  new com.greenlaw110.rythm.template.ITag.Body(").p(curClassName).p(".this) {");
             pline();
             if (null != argList && !argList.isEmpty()) {
                 buildBodyArgList(argList);
@@ -525,7 +526,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
 
 
     private static String patternStr() {
-        return "^(%s([_a-zA-Z][a-zA-Z$_\\.0-9]+)\\s*((?@()))((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
+        return "^(%s([_a-zA-Z][a-zA-Z$_\\.0-9]*)\\s*((?@()))((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
     }
 
     private static void testParseExtension() {

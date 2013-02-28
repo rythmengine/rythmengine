@@ -81,7 +81,7 @@ public class ImportParser extends KeywordParserFactory {
                 }
                 boolean leadingLB = matched.startsWith("\n");
                 boolean afterLB = matched.endsWith("\n"); 
-                if (leadingLB || afterLB) {
+                if (leadingLB) {
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     if (leadingLB ^ afterLB) {
                         Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");

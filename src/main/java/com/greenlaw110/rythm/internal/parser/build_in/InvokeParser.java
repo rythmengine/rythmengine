@@ -19,10 +19,7 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IKeyword;
-import com.greenlaw110.rythm.internal.IParser;
-import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.utils.S;
@@ -42,11 +39,11 @@ public class InvokeParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(^%s(%s\\s*((?@()))\\s*)((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
+        return "(^\\n?[ \\t\\x0B\\f]*%s(%s\\s*((?@()))\\s*)((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
     }
 
     @Override
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
@@ -54,8 +51,30 @@ public class InvokeParser extends KeywordParserFactory {
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @invoke statement. Correct usage: @invoke(\"tagname\", ...)");
                 }
-                String matched = r.stringMatched();
-                step(matched.length());
+                final String matched = r.stringMatched();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                int len = matched.length();
+                if (matched.endsWith("\n")) {
+                    len--;
+                }
+                step(len);
                 //boolean ignoreNonExistsTag = matched.indexOf("ignoreNonExistsTag") != -1;
                 String invocation = r.stringMatched(3);
                 invocation = S.stripBrace(invocation);
@@ -85,20 +104,5 @@ public class InvokeParser extends KeywordParserFactory {
                 }
             }
         };
-    }
-
-    public static void main(String[] args) {
-        Regex r = new InvokeParser().reg(Rythm.INSTANCE);
-        //String s = "@invoke(\"hello.world\" + foo.bar(), foo.bar()).cache(\"1h\", foo).ignoreNonExistsTag() \nxyz";
-        String s = "@invoke(\"testTagCacheTag\", foo.rint())";
-        if (r.search(s)) {
-            p(r, 6);
-        }
-
-        s = r.stringMatched(3);
-        s = S.stripBrace(s);
-        int pos = s.indexOf(",");
-        System.out.println(s.substring(0, pos));
-        System.out.println(s.substring(pos + 1));
     }
 }
