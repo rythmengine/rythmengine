@@ -93,7 +93,7 @@ public class BraceParser implements IParserFactory {
                             if (bhCls.contains("For")) {
                                 cb.addBuilder(new Token.StringToken("\n", ctx));
                                 cb.removeNextLF = true;
-                            } else if (bhCls.contains("Assign")) {
+                            } else if (bhCls.contains("Assign") || bhCls.contains("DefTag")) {
                                 if (m.group(1).endsWith("\n")) {
                                     cb.removeNextLF = true;
                                 }

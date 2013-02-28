@@ -85,9 +85,11 @@ public class IO {
             StringWriter result = new StringWriter();
             PrintWriter out = new PrintWriter(result);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, encoding));
-            String line = null;
+            String line;
+            int lineNo = 0;
             while ((line = reader.readLine()) != null) {
-                out.println(line);
+                if (lineNo++ > 0) out.println();
+                out.print(line);
             }
             return result.toString();
         } catch (IOException e) {

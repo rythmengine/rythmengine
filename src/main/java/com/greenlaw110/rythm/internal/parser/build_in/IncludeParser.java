@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
+import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -32,7 +33,7 @@ import com.stevesoft.pat.Regex;
 
 public class IncludeParser extends KeywordParserFactory {
 
-    private static final String R = "(^%s(%s\\s*((?@()))\\s*))";
+    private static final String R = "(^\\n?[ \\t\\x0B\\f]*%s(%s\\s*((?@()))\\s*))";
 
     public IncludeParser() {
     }
@@ -41,22 +42,44 @@ public class IncludeParser extends KeywordParserFactory {
         return R;
     }
 
-    public IParser create(IContext c) {
-        return new RemoveLeadingLineBreakAndSpacesParser(c) {
+    public IParser create(final IContext ctx) {
+        return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @include statement. Correct usage: @include(\"foo.bar, a.b.c, ...\")");
                 }
+                final String matched = r.stringMatched();
+                if (matched.startsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
                 int lineNo = ctx().currentLine();
-                step(r.stringMatched().length());
+                step(matched.length());
                 String s = r.stringMatched(3);
                 if (S.isEmpty(s)) {
-                    raiseParseException("Error parsing @include statement. Correct usage: @include(\"foo.bar, a.b.c, ...\")");
+                    raiseParseException("Error parsing @include statement. Correct usage: @include(foo.bar, a.b.c, ...)");
                 }
                 s = S.stripBraceAndQuotation(s);
                 try {
                     String code = ctx().getCodeBuilder().addIncludes(s, lineNo);
+                    if (matched.endsWith("\n")) {
+                        code = code + ";p(\"\\n\");";
+                    }
                     return new CodeToken(code, ctx());
                 } catch (NoClassDefFoundError e) {
                     raiseParseException("error adding includes: " + e.getMessage() + "\n possible cause: lower/upper case issue on windows platform");

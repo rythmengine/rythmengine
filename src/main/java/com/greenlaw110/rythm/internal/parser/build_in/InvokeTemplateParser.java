@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
@@ -41,7 +40,7 @@ import java.util.regex.Pattern;
  * @myApp.myTag(...) Note since this is also a pattern for expression parser, InvokeTagParser must
  * be put in front of expression parser
  */
-public class InvokeTagParser extends CaretParserFactoryBase {
+public class InvokeTemplateParser extends CaretParserFactoryBase {
 
     public static class ParameterDeclaration {
         public String nameDef;
@@ -242,9 +241,9 @@ public class InvokeTagParser extends CaretParserFactoryBase {
                 pline();
             }
             pline("{");
-            ptline("com.greenlaw110.rythm.runtime.ITag.ParameterList _pl = null; ");
+            ptline("com.greenlaw110.rythm.template.ITag.ParameterList _pl = null; ");
             if (params.pl.size() > 0) {
-                ptline("_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
+                ptline("_pl = new com.greenlaw110.rythm.template.ITag.ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
@@ -537,7 +536,7 @@ public class InvokeTagParser extends CaretParserFactoryBase {
 
     private static void testOuterMatch() {
         IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null, null));
-        String ps = String.format(new InvokeTagParser().patternStr(), "@");
+        String ps = String.format(new InvokeTemplateParser().patternStr(), "@");
         Regex r = new Regex(ps);
         String s = "@xyz(xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cache(ab, d).escape()  Gren";
         //String s = "@xyz().cacheFor(\"1h\")";

@@ -38,9 +38,9 @@ public class RenderBodyParser extends KeywordParserFactory {
     }
 
     private static class RenderBodyToken extends CodeToken {
-        protected InvokeTagParser.ParameterDeclarationList params;
+        protected InvokeTemplateParser.ParameterDeclarationList params;
 
-        RenderBodyToken(InvokeTagParser.ParameterDeclarationList params, IContext ctx) {
+        RenderBodyToken(InvokeTemplateParser.ParameterDeclarationList params, IContext ctx) {
             super("", ctx);
             this.params = params;
         }
@@ -52,7 +52,7 @@ public class RenderBodyParser extends KeywordParserFactory {
             if (params.pl.size() > 0) {
                 ptline("_pl = new com.greenlaw110.rythm.runtime.ITag.ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
-                    InvokeTagParser.ParameterDeclaration pd = params.pl.get(i);
+                    InvokeTemplateParser.ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
                     pt("_pl.add(\"").p(pd.nameDef == null ? "" : pd.nameDef).p("\",").p(pd.valDef).p(");");
                     pline();
@@ -72,8 +72,8 @@ public class RenderBodyParser extends KeywordParserFactory {
                 }
                 step(r.stringMatched().length());
                 String paramS = r.stringMatched(3);
-                InvokeTagParser.ParameterDeclarationList params = new InvokeTagParser.ParameterDeclarationList();
-                InvokeTagParser.InvokeTagToken.parseParams(paramS, params, ctx());
+                InvokeTemplateParser.ParameterDeclarationList params = new InvokeTemplateParser.ParameterDeclarationList();
+                InvokeTemplateParser.InvokeTagToken.parseParams(paramS, params, ctx());
                 return new RenderBodyToken(params, ctx());
             }
         };

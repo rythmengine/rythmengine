@@ -70,8 +70,8 @@ public class DefTagParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @def, correct usage: @def tagName([arguments...])");
                 }
                 final String matched = r.stringMatched();
-                if (matched.startsWith("\n") || matched.endsWith("\n")) {
-                    //ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                if (matched.startsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                     if (r0.search(matched)) {
                         String blank = r0.stringMatched(1);

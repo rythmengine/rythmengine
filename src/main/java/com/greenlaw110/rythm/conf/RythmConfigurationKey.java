@@ -493,7 +493,7 @@ public enum RythmConfigurationKey {
             String k = getKey();
             Object v = configuration.get(k);
             if (null == v) {
-                return (T) (Integer) 1000;
+                return (T) (Integer) 2000;
             }
             if (v instanceof Number) {
                 return (T) v;

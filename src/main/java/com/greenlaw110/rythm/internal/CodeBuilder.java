@@ -34,7 +34,7 @@ import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
-import com.greenlaw110.rythm.internal.parser.build_in.InvokeTagParser;
+import com.greenlaw110.rythm.internal.parser.build_in.InvokeTemplateParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
@@ -171,7 +171,7 @@ public class CodeBuilder extends TextBuilder {
         return extendedTemplateClass;
     }
 
-    private InvokeTagParser.ParameterDeclarationList extendArgs = null;
+    private InvokeTemplateParser.ParameterDeclarationList extendArgs = null;
     public Set<String> imports = new HashSet<String>();
     private int extendDeclareLineNo = -1;
     // <argName, argClass>
@@ -412,7 +412,7 @@ public class CodeBuilder extends TextBuilder {
         this.extended = c.getName();
     }
 
-    public void setExtended(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
+    public void setExtended(String extended, InvokeTemplateParser.ParameterDeclarationList args, int lineNo) {
         if (simpleTemplate()) {
             throw new ParseException(engine, templateClass, lineNo, "Simple template does not allow to extend layout template");
         }
@@ -436,7 +436,7 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    public void setExtended_deprecated(String extended, InvokeTagParser.ParameterDeclarationList args, int lineNo) {
+    public void setExtended_deprecated(String extended, InvokeTemplateParser.ParameterDeclarationList args, int lineNo) {
         if (null != this.extended) {
             throw new IllegalStateException("Extended template already declared");
         }
@@ -891,7 +891,7 @@ public class CodeBuilder extends TextBuilder {
         pn();
         ptn("@Override protected void loadExtendingArgs() {");
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
-            InvokeTagParser.ParameterDeclaration pd = extendArgs.pl.get(i);
+            InvokeTemplateParser.ParameterDeclaration pd = extendArgs.pl.get(i);
             if (S.isEmpty(pd.nameDef)) {
                 p2t("__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
             } else {

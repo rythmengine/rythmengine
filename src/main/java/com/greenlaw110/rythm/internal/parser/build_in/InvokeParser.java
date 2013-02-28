@@ -70,18 +70,18 @@ public class InvokeParser extends KeywordParserFactory {
                     params = invocation.substring(pos + 1);
                 }
                 String s = remain();
-                Matcher m0 = InvokeTagParser.P_HEREDOC_SIMBOL.matcher(s);
-                Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
+                Matcher m0 = InvokeTemplateParser.P_HEREDOC_SIMBOL.matcher(s);
+                Matcher m1 = InvokeTemplateParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
-                    TextBuilder tb = InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    TextBuilder tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m0.group(1).length());
                     return tb;
                 } else if (m1.matches()) {
-                    TextBuilder tb = InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    TextBuilder tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m1.group(1).length());
                     return tb;
                 } else {
-                    return InvokeTagParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    return InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                 }
             }
         };

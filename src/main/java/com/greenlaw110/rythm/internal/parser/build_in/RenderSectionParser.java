@@ -32,7 +32,6 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parse @render section|content
@@ -106,8 +105,8 @@ public class RenderSectionParser extends KeywordParserFactory {
                 step(matched.length());
                 String section = m.group(4);
                 String s = remain();
-                Matcher m0 = InvokeTagParser.P_HEREDOC_SIMBOL.matcher(s);
-                Matcher m1 = InvokeTagParser.P_STANDARD_BLOCK.matcher(s);
+                Matcher m0 = InvokeTemplateParser.P_HEREDOC_SIMBOL.matcher(s);
+                Matcher m1 = InvokeTemplateParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
                     ctx().step(m0.group(1).length());
                     return new DefaultSectionToken(section, ctx());
@@ -132,7 +131,7 @@ public class RenderSectionParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(^\\n?[ \\t\\x0B\\f]*%s%s\\s*[\\s\\(]\"?'?(" + Patterns.VarName + ")?\"?'?\\)?[ \\t\\x0B\\f]*\\n?).*";
+        return "(^\\n?[ \\t\\x0B\\f]*%s%s\\s*[\\s\\(]\"?'?(" + Patterns.VarName + ")?\"?'?\\)?).*";
     }
 
 }
