@@ -145,7 +145,7 @@ public class Rythm {
      * Return the default engine. If the default engine is not initialized yet, then initialize it and
      * then return
      *
-     * @return
+     * @return default engine
      */
     public static RythmEngine engine() {
         checkInit();
@@ -153,7 +153,7 @@ public class Rythm {
     }
 
     /**
-     * @return
+     * @return true if the current thread is in sandbox mode
      * @see com.greenlaw110.rythm.RythmEngine#insideSandbox()
      */
     public static boolean insideSandbox() {
@@ -161,7 +161,7 @@ public class Rythm {
     }
 
     /**
-     * @return
+     * @return an new sandbox
      * @see com.greenlaw110.rythm.RythmEngine#sandbox()
      */
     public static Sandbox sandbox() {
@@ -178,7 +178,7 @@ public class Rythm {
 
     /**
      * @param tag
-     * @return
+     * @return true if registered the tag
      * @see RythmEngine#registerTag(com.greenlaw110.rythm.template.ITag)
      */
     public static boolean registerTag(ITag tag) {
@@ -188,7 +188,7 @@ public class Rythm {
     /**
      * @param name
      * @param tag
-     * @return
+     * @return true if registered the tag
      * @see RythmEngine#registerTag(String, com.greenlaw110.rythm.template.ITag)
      */
     public boolean registerTag(String name, ITag tag) {
@@ -198,7 +198,7 @@ public class Rythm {
     /**
      * Check if default engine is running in {@link Mode#prod production} mode
      *
-     * @return
+     * @return true if default engine is in prod mode
      */
     public boolean isProdMode() {
         return engine().isProdMode();
@@ -207,7 +207,7 @@ public class Rythm {
     /**
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#render(String, Object...)
      */
     public static String render(String template, Object... args) {
@@ -217,7 +217,7 @@ public class Rythm {
     /**
      * @param file
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#render(java.io.File, Object...)
      */
     public static String render(File file, Object... args) {
@@ -227,7 +227,7 @@ public class Rythm {
     /**
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#substitute(String, Object...)
      */
     public static String substitute(String template, Object... args) {
@@ -237,7 +237,7 @@ public class Rythm {
     /**
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#substitute(java.io.File, Object...)
      */
     public static String substitute(File template, Object... args) {
@@ -247,7 +247,7 @@ public class Rythm {
     /**
      * @param template
      * @param obj
-     * @return
+     * @return render result
      * @see RythmEngine#toString(String, Object)
      */
     public static String toString(String template, Object obj) {
@@ -256,7 +256,7 @@ public class Rythm {
     
     /**
      * @param obj
-     * @return
+     * @return render result
      * @see RythmEngine#toString(Object)
      */
     public static String toString(Object obj) {
@@ -267,7 +267,7 @@ public class Rythm {
      * @param obj
      * @param option
      * @param style
-     * @return
+     * @return render result
      * @see RythmEngine#toString(Object, com.greenlaw110.rythm.toString.ToStringOption, com.greenlaw110.rythm.toString.ToStringStyle)
      */
     public static String toString(Object obj, ToStringOption option, ToStringStyle style) {
@@ -278,7 +278,7 @@ public class Rythm {
      * @param obj
      * @param option
      * @param style
-     * @return
+     * @return render result
      * @see RythmEngine#commonsToString(Object, com.greenlaw110.rythm.toString.ToStringOption, org.apache.commons.lang3.builder.ToStringStyle)
      */
     public static String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
@@ -290,7 +290,7 @@ public class Rythm {
      *
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#renderString(String, Object...)
      */
     public static String renderStr(String template, Object... args) {
@@ -300,7 +300,7 @@ public class Rythm {
     /**
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#renderString(String, Object...)
      */
     public static String renderString(String template, Object... args) {
@@ -310,7 +310,7 @@ public class Rythm {
     /**
      * @param template
      * @param args
-     * @return
+     * @return render result
      * @see RythmEngine#renderIfTemplateExists(String, Object...)
      */
     public static String renderIfTemplateExists(String template, Object... args) {

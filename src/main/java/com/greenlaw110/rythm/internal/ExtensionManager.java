@@ -57,7 +57,7 @@ public class ExtensionManager {
      * Is a specified method name a java extension?
      *
      * @param s
-     * @return
+     * @return true if the name is a java extension
      */
     public boolean isJavaExtension(String s) {
         for (IJavaExtension ext : _extensions) {

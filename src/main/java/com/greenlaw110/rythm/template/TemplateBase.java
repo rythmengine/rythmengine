@@ -57,7 +57,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * The template class
      */
-    private transient TemplateClass _templateClass = null;
+    private transient TemplateClass __templateClass = null;
 
     /**
      * Set template class and template lang to this template instance
@@ -67,8 +67,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param templateClass
      * @param lang
      */
-    public void setTemplateClass(TemplateClass templateClass, ILang lang) {
-        this._templateClass = templateClass;
+    public void __setTemplateClass(TemplateClass templateClass, ILang lang) {
+        this.__templateClass = templateClass;
         __ctx.init(this, lang);
     }
 
@@ -77,11 +77,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * template authoring. For example:
      * <p/>
      * <pre><code>
-     *
-     * @return }
-     *         }
-     *         </code></pre>
-     * @{ if (s().empty(userRight)) {
+     * @if (s().empty(userRight)) {
+     *      @return 
+     * }
+     * </code></pre>
      */
     protected S s() {
         return S.INSTANCE;
@@ -254,7 +253,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     __parent = (TemplateBase) pc.newInstance();
                     __parent.__ctx.pushLang(__curLang());
                 }
-                //__parent.setTemplateClass(_engine().classes.getByClassName(pc.getName()));
+                //__parent.__setTemplateClass(_engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -375,9 +374,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     /**
-     * Get layout content as {@link RawData}. Not to be used in user application or template
+     * Get layout content as {@link ITemplate.RawData}. Not to be used in user application or template
      *
-     * @return
+     * @return layout content
      */
     protected RawData _getSection() {
         return S.raw(S.isEmpty(layoutContent) ? layoutSections.get("__CONTENT__") : layoutContent);
@@ -426,7 +425,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             tmpl.__parent = (TemplateBase) tmpl.__parent.cloneMe(engine, caller);
         }
         tmpl.__engine = engine;
-        tmpl._templateClass = _templateClass;
+        tmpl.__templateClass = __templateClass;
         if (null != caller) {
             tmpl.__caller = (TextBuilder) caller;
         }
@@ -487,7 +486,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @return
      */
     public TemplateClass getTemplateClass(boolean useCaller) {
-        TemplateClass tc = _templateClass;
+        TemplateClass tc = __templateClass;
         if (useCaller && null == tc) {
             TemplateBase caller = _caller();
             if (null != caller) return caller.getTemplateClass(true);
@@ -1138,7 +1137,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * make it public because ITag.Body will need it
      */
     @Override
-    public Escape defaultEscape() {
+    public Escape __defaultEscape() {
         return __ctx.currentEscape();
     }
 

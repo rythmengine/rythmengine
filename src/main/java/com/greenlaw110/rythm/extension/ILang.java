@@ -36,21 +36,21 @@ public interface ILang {
     /**
      * Return comment start. E.g. for HTML, it should be <code>&lt!--</code>
      *
-     * @return
+     * @return comment start
      */
     String commentStart();
 
     /**
      * Return comment end. For HTML it should be <code>--&gt;</code>
      *
-     * @return
+     * @return comment end
      */
     String commentEnd();
 
     /**
      * Return escape scheme
      *
-     * @return
+     * @return escape
      */
     ITemplate.Escape escape();
 
@@ -64,14 +64,14 @@ public interface ILang {
      * &lt;script type="..."...&gt;, then the <code>blockStart</code> method of JS lang should be
      * <code>(\&lt;\s*script\s*.*?\&lt;).*</code></p>
      *
-     * @return
+     * @return block start
      */
     String blockStart();
 
     /**
      * Return a regex string indicate an end of a lang block
      *
-     * @return
+     * @return block end
      * @see #blockStart() for regex requirement
      */
     String blockEnd();
@@ -82,7 +82,7 @@ public interface ILang {
      * for this method because it allows JS and CSS
      * be embedded inside
      *
-     * @return
+     * @return true if this lang allows embedded lang
      */
     boolean allowInternalLang();
 
@@ -93,7 +93,7 @@ public interface ILang {
      * to embed this lang, then an empty set shall
      * be returned
      *
-     * @return
+     * @return true if this lang allows external lang
      */
     Set<ILang> allowedExternalLangs();
 
@@ -108,7 +108,7 @@ public interface ILang {
      * Return parent lang or null if there is no parent
      * set on it
      *
-     * @return
+     * @return parent lang
      */
     ILang getParent();
 
@@ -117,7 +117,7 @@ public interface ILang {
      * the target java source code to create an instance
      * of this Lang
      *
-     * @return
+     * @return the java code
      */
     String newInstanceStr();
 

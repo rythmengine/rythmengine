@@ -45,7 +45,7 @@ public interface ISourceCodeEnhancer {
      * <p>This method is called by rythm when generating java source
      * code out from a template souce code</p>
      *
-     * @return
+     * @return list of imports
      */
     List<String> imports();
 
@@ -54,6 +54,8 @@ public interface ISourceCodeEnhancer {
      * is called during code generation to inject customized source code
      * into final generated template source. The string returned will be
      * injected into the generated template source code class body directly
+     * 
+     * @return the added source code
      */
     String sourceCode();
 
@@ -71,7 +73,7 @@ public interface ISourceCodeEnhancer {
      * <p>The method is called when {@link com.greenlaw110.rythm.internal.CodeBuilder code builder}
      * generating the java source out from the template source</p>
      *
-     * @return
+     * @return render arg types mapped by name
      */
     Map<String, ?> getRenderArgDescriptions();
 

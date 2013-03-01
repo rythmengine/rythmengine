@@ -56,7 +56,7 @@ public class JSONWrapper {
     /**
      * Return true if the underline JSON data is an array
      *
-     * @return
+     * @return true if the JSON data is an array
      */
     public boolean isArray() {
         return j_ instanceof JSONArray;
@@ -68,7 +68,7 @@ public class JSONWrapper {
      * <p></p>If the data is not a JSON array then a ClassCastException will
      * be thrown out</p>
      *
-     * @return
+     * @return the List of objects
      */
     public List<Object> getArray() {
         return (JSONArray) j_;
@@ -80,12 +80,17 @@ public class JSONWrapper {
      * <p></p>If the data is a JSON array then a ClassCastException will
      * be thrown out</p>
      *
-     * @return
+     * @return the mapped json attributes
      */
     public Map<String, Object> getObject() {
         return (JSONObject) j_;
     }
 
+    /**
+     * Parse the string and return the JSONWrapper
+     * @param s
+     * @return
+     */
     public static JSONWrapper wrap(String s) {
         return new JSONWrapper(s);
     }

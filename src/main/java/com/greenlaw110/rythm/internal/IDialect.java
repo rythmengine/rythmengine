@@ -27,7 +27,7 @@ public interface IDialect {
     /**
      * Return the ID of the dialect, might be something like "rythm" or "play-groovy" etc.
      *
-     * @return
+     * @return dialect id
      */
     String id();
 

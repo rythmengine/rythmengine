@@ -34,9 +34,9 @@ public class TemplateBuilder extends TextBuilder {
      * <p>This implementation returns {@link com.greenlaw110.rythm.template.ITemplate.Escape#RAW}.
      * But the sub class could override this method to return different escape method</p>
      *
-     * @return
+     * @return {@link com.greenlaw110.rythm.template.ITemplate.Escape escape}
      */
-    protected ITemplate.Escape defaultEscape() {
+    protected ITemplate.Escape __defaultEscape() {
         return ITemplate.Escape.RAW;
     }
 
@@ -46,7 +46,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print a char expression. same effect as {@link #p(char)}
      *
      * @param c
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(char c) {
         return p(c);
@@ -56,7 +56,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print a byte expression. same effect as {@link #p(byte)}
      *
      * @param b
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(byte b) {
         return p(b);
@@ -66,7 +66,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print an integer expression. same effect as {@link #p(int)}
      *
      * @param i
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(int i) {
         return p(i);
@@ -76,7 +76,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print a long expression. same effect as {@link #p(long)}
      *
      * @param l
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(long l) {
         return p(l);
@@ -86,7 +86,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print a float expression. same effect as {@link #p(float)}
      *
      * @param f
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(float f) {
         return p(f);
@@ -96,7 +96,7 @@ public class TemplateBuilder extends TextBuilder {
      * Print a double. same effect as {@link #p(double)}
      *
      * @param d
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(double d) {
         return p(d);
@@ -106,29 +106,29 @@ public class TemplateBuilder extends TextBuilder {
      * Print a boolean expression. same effect as {@link #p(boolean)}
      *
      * @param b
-     * @return
+     * @return the current builder
      */
     public final TextBuilder pe(boolean b) {
         return p(b);
     }
 
     /**
-     * Print a general expression with {@link #defaultEscape() default escape} method
+     * Print a general expression with {@link #__defaultEscape() default escape} method
      *
      * @param o
-     * @return
+     * @return the current builder
      */
     public TemplateBuilder pe(Object o) {
         return pe(o, null);
     }
 
     /**
-     * Print a general expression, using specified {@link com.greenlaw110.rythm.template.ITemplate.Escape
-     * escape method}
+     * Print a general expression, using specified 
+     * {@link com.greenlaw110.rythm.template.ITemplate.Escape escape method}
      *
      * @param o
      * @param escape
-     * @return
+     * @return the current builder
      */
     public TemplateBuilder pe(Object o, ITemplate.Escape escape) {
         if (null != o) {
@@ -136,7 +136,7 @@ public class TemplateBuilder extends TextBuilder {
                 return (TemplateBuilder) p(o);
             }
             if (null == escape) {
-                escape = defaultEscape();
+                escape = __defaultEscape();
             }
             switch (escape) {
                 case RAW:
@@ -156,26 +156,44 @@ public class TemplateBuilder extends TextBuilder {
         return this;
     }
 
+    /**
+     * See {@link #p(char)}
+     */
     public final TextBuilder pe(char c, ITemplate.Escape escape) {
         return p(c);
     }
 
+    /**
+     * See {@link #p(int)}
+     */
     public final TextBuilder pe(int i, ITemplate.Escape escape) {
         return p(i);
     }
 
+    /**
+     * See {@link #p(long)}
+     */
     public final TextBuilder pe(long l, ITemplate.Escape escape) {
         return p(l);
     }
 
+    /**
+     * See {@link #p(float)}
+     */
     public final TextBuilder pe(float f, ITemplate.Escape escape) {
         return p(f);
     }
 
+    /**
+     * See {@link #p(double)}
+     */
     public final TextBuilder pe(double d, ITemplate.Escape escape) {
         return p(d);
     }
 
+    /**
+     * See {@link #p(boolean)}
+     */
     public final TextBuilder pe(boolean b, ITemplate.Escape escape) {
         return p(b);
     }

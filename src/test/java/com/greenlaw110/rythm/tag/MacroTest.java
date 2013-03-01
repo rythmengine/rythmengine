@@ -41,4 +41,8 @@ public class MacroTest extends TestBase {
         s = r(t);
         eq("bar");
     }
+
+    public static void main(String[] args) {
+        run(MacroTest.class);
+    }
 }

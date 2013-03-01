@@ -37,7 +37,7 @@ public interface IRenderExceptionHandler {
      *
      * @param e
      * @param template
-     * @return
+     * @return true if exception is handled
      */
     boolean handleTemplateExecutionException(Exception e, TemplateBase template);
 }

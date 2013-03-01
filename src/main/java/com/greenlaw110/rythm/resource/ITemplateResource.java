@@ -33,14 +33,14 @@ public interface ITemplateResource extends Serializable {
     /**
      * The unique identifier used to fetch this resource from ResourceManager
      *
-     * @return
+     * @return the key of the resource
      */
     Object getKey();
 
     /**
      * Propose a name of generated java class for this resource
      *
-     * @return
+     * @return suggested class name
      */
     String getSuggestedClassName();
 
@@ -48,7 +48,7 @@ public interface ITemplateResource extends Serializable {
      * Return template content as a string. Call refresh() first to check
      * if the resource has been modified
      *
-     * @return
+     * @return resource content
      */
     String asTemplateContent();
 
@@ -69,7 +69,7 @@ public interface ITemplateResource extends Serializable {
     /**
      * Return non-null value if this resource present a tag
      *
-     * @return
+     * @return tag name
      */
     String tagName();
 

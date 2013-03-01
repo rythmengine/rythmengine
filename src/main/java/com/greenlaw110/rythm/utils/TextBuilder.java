@@ -191,7 +191,7 @@ public class TextBuilder implements Cloneable {
      * <code>null</code> object will not be printed
      *
      * @param wrapper
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(StrBuf wrapper) {
         if (null != wrapper) p_(wrapper);
@@ -217,7 +217,7 @@ public class TextBuilder implements Cloneable {
      * <code>null</code> object will not be printed
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(Object o) {
         if (null != o) p_(o);
@@ -238,7 +238,7 @@ public class TextBuilder implements Cloneable {
      * Print a char to internal buffer or output (os or writer)
      *
      * @param c
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(char c) {
         if (null != __buffer) append(c);
@@ -260,7 +260,7 @@ public class TextBuilder implements Cloneable {
      * Print a byte to internal buffer or output (os or writer)
      *
      * @param b
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(byte b) {
         if (null != __buffer) append(b);
@@ -281,7 +281,7 @@ public class TextBuilder implements Cloneable {
      * Print an integer to internal buffer or output (os or writer)
      *
      * @param i
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(int i) {
         if (null != __buffer) append(i);
@@ -302,7 +302,7 @@ public class TextBuilder implements Cloneable {
      * Print a long to internal buffer or output (os or writer)
      *
      * @param l
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(long l) {
         if (null != __buffer) append(l);
@@ -323,7 +323,7 @@ public class TextBuilder implements Cloneable {
      * Print a float to internal buffer or output (os or writer)
      *
      * @param f
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(float f) {
         if (null != __buffer) append(f);
@@ -344,7 +344,7 @@ public class TextBuilder implements Cloneable {
      * Print a double to internal buffer or output (os or writer)
      *
      * @param d
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(double d) {
         if (null != __buffer) append(d);
@@ -365,7 +365,7 @@ public class TextBuilder implements Cloneable {
      * Print a boolean to internal buffer or output (os or writer)
      *
      * @param b
-     * @return
+     * @return this builder
      */
     public final TextBuilder p(boolean b) {
         if (null != __buffer) append(b);
@@ -377,7 +377,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by an new line break
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public final TextBuilder pn(Object o) {
         if (null != o) p_(o);
@@ -388,7 +388,7 @@ public class TextBuilder implements Cloneable {
     /**
      * Print an new line break
      *
-     * @return
+     * @return this builder
      */
     public final TextBuilder pn() {
         p_('\n');
@@ -399,7 +399,7 @@ public class TextBuilder implements Cloneable {
      * Print an new line break followed by an object
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public final TextBuilder np(Object o) {
         p_('\n');
@@ -411,7 +411,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by a tab <code>\t</code>
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder pt(Object o) {
         p("\t").p(o);
@@ -422,7 +422,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by a tab <code>\t</code> and an new line break
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder ptn(Object o) {
         p("\t").p(o).pn();
@@ -433,7 +433,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by two tabs <code>\t</code>
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p2t(Object o) {
         p("\t\t").p(o);
@@ -444,7 +444,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by 2 tabs <code>\t</code> and an line break
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p2tn(Object o) {
         p("\t\t").p(o).pn();
@@ -455,7 +455,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by 3 tabs <code>\t</code>
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p3t(Object o) {
         p("\t\t\t").p(o);
@@ -466,7 +466,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by 3 tabs <code>\t</code> and an line break
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p3tn(Object o) {
         p("\t\t\t").p(o).pn();
@@ -477,7 +477,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by 4 tabs <code>\t</code>
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p4t(Object o) {
         p("\t\t\t\t").p(o);
@@ -488,7 +488,7 @@ public class TextBuilder implements Cloneable {
      * Print an object followed by 4 tabs <code>\t</code> and an line break
      *
      * @param o
-     * @return
+     * @return this builder
      */
     public TextBuilder p4tn(Object o) {
         p("\t\t\t\t").p(o).pn();
@@ -499,7 +499,7 @@ public class TextBuilder implements Cloneable {
      * Sub class could implement this method to append the generated
      * source code to the buffer
      *
-     * @return
+     * @return this builder
      */
     public TextBuilder build() {
         return this;
@@ -508,7 +508,7 @@ public class TextBuilder implements Cloneable {
     /**
      * Return the internal buffer or caller's internal buffer if it is null
      *
-     * @return
+     * @return the content
      */
     @Override
     public String toString() {
@@ -519,7 +519,7 @@ public class TextBuilder implements Cloneable {
      * return a clone of this TextBuilder instance
      *
      * @param caller
-     * @return
+     * @return the clone
      */
     public TextBuilder clone(TextBuilder caller) {
         try {
@@ -529,14 +529,5 @@ public class TextBuilder implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new FastRuntimeException("Unexpected");
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-
-        StrBuf x = new StrBuf("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n          \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n <head>\n  <title>Stock Prices - Rythm</title>\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\" />\n  <meta http-equiv=\"Content-Script-Type\" content=\"text/javascript\" />\n  <link rel=\"shortcut icon\" href=\"/images/favicon.ico\" />\n  <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\" media=\"all\" />\n  <script type=\"text/javascript\" src=\"/js/util.js\"></script>\n  <style type=\"text/css\">\n  /*<![CDATA[*/\n\nbody {\n    color: #333333;\n    line-height: 150%;\n}\n\nthead {\n    font-weight: bold;\n    background-color: #CCCCCC;\n}\n\n.odd {\n    background-color: #FFCCCC;\n}\n\n.even {\n    background-color: #CCCCFF;\n}\n\n.minus {\n    color: #FF0000;\n}\n\n  /*]]>*/\n  </style>\n\n </head>\n\n <body>\n\n  <h1>Stock Prices</h1>\n\n  <table>\n   <thead>\n    <tr>\n     <th>#</th><th>symbol</th><th>name</th><th>price</th><th>change</th><th>ratio</th>\n    </tr>\n   </thead>\n   <tbody>\n   \n", new byte[]{60, 63, 120, 109, 108, 32, 118, 101, 114, 115, 105, 111, 110, 61, 92, 34, 49, 46, 48, 92, 34, 32, 101, 110, 99, 111, 100, 105, 110, 103, 61, 92, 34, 85, 84, 70, 45, 56, 92, 34, 63, 62, 92, 110, 60, 33, 68, 79, 67, 84, 89, 80, 69, 32, 104, 116, 109, 108, 32, 80, 85, 66, 76, 73, 67, 32, 92, 34, 45, 47, 47, 87, 51, 67, 47, 47, 68, 84, 68, 32, 88, 72, 84, 77, 76, 32, 49, 46, 48, 32, 84, 114, 97, 110, 115, 105, 116, 105, 111, 110, 97, 108, 47, 47, 69, 78, 92, 34, 92, 110, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 92, 34, 104, 116, 116, 112, 58, 47, 47, 119, 119, 119, 46, 119, 51, 46, 111, 114, 103, 47, 84, 82, 47, 120, 104, 116, 109, 108, 49, 47, 68, 84, 68, 47, 120, 104, 116, 109, 108, 49, 45, 116, 114, 97, 110, 115, 105, 116, 105, 111, 110, 97, 108, 46, 100, 116, 100, 92, 34, 62, 92, 110, 60, 104, 116, 109, 108, 32, 120, 109, 108, 110, 115, 61, 92, 34, 104, 116, 116, 112, 58, 47, 47, 119, 119, 119, 46, 119, 51, 46, 111, 114, 103, 47, 49, 57, 57, 57, 47, 120, 104, 116, 109, 108, 92, 34, 32, 120, 109, 108, 58, 108, 97, 110, 103, 61, 92, 34, 101, 110, 92, 34, 32, 108, 97, 110, 103, 61, 92, 34, 101, 110, 92, 34, 62, 92, 110, 32, 60, 104, 101, 97, 100, 62, 92, 110, 32, 32, 60, 116, 105, 116, 108, 101, 62, 83, 116, 111, 99, 107, 32, 80, 114, 105, 99, 101, 115, 32, 45, 32, 82, 121, 116, 104, 109, 60, 47, 116, 105, 116, 108, 101, 62, 92, 110, 32, 32, 60, 109, 101, 116, 97, 32, 104, 116, 116, 112, 45, 101, 113, 117, 105, 118, 61, 92, 34, 67, 111, 110, 116, 101, 110, 116, 45, 84, 121, 112, 101, 92, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 92, 34, 116, 101, 120, 116, 47, 104, 116, 109, 108, 59, 32, 99, 104, 97, 114, 115, 101, 116, 61, 85, 84, 70, 45, 56, 92, 34, 32, 47, 62, 92, 110, 32, 32, 60, 109, 101, 116, 97, 32, 104, 116, 116, 112, 45, 101, 113, 117, 105, 118, 61, 92, 34, 67, 111, 110, 116, 101, 110, 116, 45, 83, 116, 121, 108, 101, 45, 84, 121, 112, 101, 92, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 92, 34, 116, 101, 120, 116, 47, 99, 115, 115, 92, 34, 32, 47, 62, 92, 110, 32, 32, 60, 109, 101, 116, 97, 32, 104, 116, 116, 112, 45, 101, 113, 117, 105, 118, 61, 92, 34, 67, 111, 110, 116, 101, 110, 116, 45, 83, 99, 114, 105, 112, 116, 45, 84, 121, 112, 101, 92, 34, 32, 99, 111, 110, 116, 101, 110, 116, 61, 92, 34, 116, 101, 120, 116, 47, 106, 97, 118, 97, 115, 99, 114, 105, 112, 116, 92, 34, 32, 47, 62, 92, 110, 32, 32, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 92, 34, 115, 104, 111, 114, 116, 99, 117, 116, 32, 105, 99, 111, 110, 92, 34, 32, 104, 114, 101, 102, 61, 92, 34, 47, 105, 109, 97, 103, 101, 115, 47, 102, 97, 118, 105, 99, 111, 110, 46, 105, 99, 111, 92, 34, 32, 47, 62, 92, 110, 32, 32, 60, 108, 105, 110, 107, 32, 114, 101, 108, 61, 92, 34, 115, 116, 121, 108, 101, 115, 104, 101, 101, 116, 92, 34, 32, 116, 121, 112, 101, 61, 92, 34, 116, 101, 120, 116, 47, 99, 115, 115, 92, 34, 32, 104, 114, 101, 102, 61, 92, 34, 47, 99, 115, 115, 47, 115, 116, 121, 108, 101, 46, 99, 115, 115, 92, 34, 32, 109, 101, 100, 105, 97, 61, 92, 34, 97, 108, 108, 92, 34, 32, 47, 62, 92, 110, 32, 32, 60, 115, 99, 114, 105, 112, 116, 32, 116, 121, 112, 101, 61, 92, 34, 116, 101, 120, 116, 47, 106, 97, 118, 97, 115, 99, 114, 105, 112, 116, 92, 34, 32, 115, 114, 99, 61, 92, 34, 47, 106, 115, 47, 117, 116, 105, 108, 46, 106, 115, 92, 34, 62, 60, 47, 115, 99, 114, 105, 112, 116, 62, 92, 110, 32, 32, 60, 115, 116, 121, 108, 101, 32, 116, 121, 112, 101, 61, 92, 34, 116, 101, 120, 116, 47, 99, 115, 115, 92, 34, 62, 92, 110, 32, 32, 47, 42, 60, 33, 91, 67, 68, 65, 84, 65, 91, 42, 47, 92, 110, 92, 110, 98, 111, 100, 121, 32, 123, 92, 110, 32, 32, 32, 32, 99, 111, 108, 111, 114, 58, 32, 35, 51, 51, 51, 51, 51, 51, 59, 92, 110, 32, 32, 32, 32, 108, 105, 110, 101, 45, 104, 101, 105, 103, 104, 116, 58, 32, 49, 53, 48, 37, 59, 92, 110, 125, 92, 110, 92, 110, 116, 104, 101, 97, 100, 32, 123, 92, 110, 32, 32, 32, 32, 102, 111, 110, 116, 45, 119, 101, 105, 103, 104, 116, 58, 32, 98, 111, 108, 100, 59, 92, 110, 32, 32, 32, 32, 98, 97, 99, 107, 103, 114, 111, 117, 110, 100, 45, 99, 111, 108, 111, 114, 58, 32, 35, 67, 67, 67, 67, 67, 67, 59, 92, 110, 125, 92, 110, 92, 110, 46, 111, 100, 100, 32, 123, 92, 110, 32, 32, 32, 32, 98, 97, 99, 107, 103, 114, 111, 117, 110, 100, 45, 99, 111, 108, 111, 114, 58, 32, 35, 70, 70, 67, 67, 67, 67, 59, 92, 110, 125, 92, 110, 92, 110, 46, 101, 118, 101, 110, 32, 123, 92, 110, 32, 32, 32, 32, 98, 97, 99, 107, 103, 114, 111, 117, 110, 100, 45, 99, 111, 108, 111, 114, 58, 32, 35, 67, 67, 67, 67, 70, 70, 59, 92, 110, 125, 92, 110, 92, 110, 46, 109, 105, 110, 117, 115, 32, 123, 92, 110, 32, 32, 32, 32, 99, 111, 108, 111, 114, 58, 32, 35, 70, 70, 48, 48, 48, 48, 59, 92, 110, 125, 92, 110, 92, 110, 32, 32, 47, 42, 93, 93, 62, 42, 47, 92, 110, 32, 32, 60, 47, 115, 116, 121, 108, 101, 62, 92, 110, 92, 110, 32, 60, 47, 104, 101, 97, 100, 62, 92, 110, 92, 110, 32, 60, 98, 111, 100, 121, 62, 92, 110, 92, 110, 32, 32, 60, 104, 49, 62, 83, 116, 111, 99, 107, 32, 80, 114, 105, 99, 101, 115, 60, 47, 104, 49, 62, 92, 110, 92, 110, 32, 32, 60, 116, 97, 98, 108, 101, 62, 92, 110, 32, 32, 32, 60, 116, 104, 101, 97, 100, 62, 92, 110, 32, 32, 32, 32, 60, 116, 114, 62, 92, 110, 32, 32, 32, 32, 32, 60, 116, 104, 62, 35, 60, 47, 116, 104, 62, 60, 116, 104, 62, 115, 121, 109, 98, 111, 108, 60, 47, 116, 104, 62, 60, 116, 104, 62, 110, 97, 109, 101, 60, 47, 116, 104, 62, 60, 116, 104, 62, 112, 114, 105, 99, 101, 60, 47, 116, 104, 62, 60, 116, 104, 62, 99, 104, 97, 110, 103, 101, 60, 47, 116, 104, 62, 60, 116, 104, 62, 114, 97, 116, 105, 111, 60, 47, 116, 104, 62, 92, 110, 32, 32, 32, 32, 60, 47, 116, 114, 62, 92, 110, 32, 32, 32, 60, 47, 116, 104, 101, 97, 100, 62, 92, 110, 32, 32, 32, 60, 116, 98, 111, 100, 121, 62, 92, 110, 32, 32, 32, 92, 110});// line:118
-
-        OutputStream os = new ByteArrayOutputStream();
-        os.write(x.toBinary());
-        System.out.println(os.toString());
     }
 }

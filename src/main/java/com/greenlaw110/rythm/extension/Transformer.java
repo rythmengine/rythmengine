@@ -68,7 +68,7 @@ public @interface Transformer {
      * 
      * <p>Default value: "app"</p>
      * 
-     * @return
+     * @return the namespace
      */
     String value() default "app";
 }

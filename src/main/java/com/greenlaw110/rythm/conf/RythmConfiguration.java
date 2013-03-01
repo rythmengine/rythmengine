@@ -55,7 +55,7 @@ public class RythmConfiguration {
      *
      * @param key
      * @param <T>
-     * @return
+     * @return the configured item
      */
     public <T> T get(RythmConfigurationKey key) {
         Object o = data.get(key);
@@ -82,7 +82,7 @@ public class RythmConfiguration {
      *
      * @param key
      * @param <T>
-     * @return
+     * @return the configured item
      */
     public <T> T get(String key) {
         if (key.startsWith("rythm.")) {
@@ -102,7 +102,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#ENGINE_PLUGIN_VERSION plugin version} without lookup
      *
-     * @return
+     * @return plugin version
      */
     public String pluginVersion() {
         if (null == _pluginVersion) {
@@ -116,7 +116,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#ENGINE_CLASS_LOADER_BYTECODE_HELPER_IMPL} without lookup
      *
-     * @return
+     * @return the byte code helper
      */
     public IByteCodeHelper byteCodeHelper() {
         if (null == _byteCodeHelper) {
@@ -130,7 +130,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#ENGINE_PLAYFRAMEWORK} without lookup
      *
-     * @return
+     * @return true if the engine is used by playframework
      */
     public boolean playFramework() {
         if (null == _play) {
@@ -145,7 +145,7 @@ public class RythmConfiguration {
      * Return {@link RythmConfigurationKey#LOG_TIME_RENDER_ENABLED} without
      * look up
      *
-     * @return
+     * @return true if enable log render time
      */
     public boolean logRenderTime() {
         if (null == _logRenderTime) {
@@ -160,7 +160,7 @@ public class RythmConfiguration {
      * Return {@link RythmConfigurationKey#ENGINE_LOAD_PRECOMPILED_ENABLED}
      * without lookup
      *
-     * @return
+     * @return true if load precompiled
      */
     public boolean loadPrecompiled() {
         if (null == _loadPrecompiled) {
@@ -174,7 +174,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#ENGINE_PRECOMPILE_MODE} without lookup
      *
-     * @return
+     * @return true if precompiling
      */
     public boolean precompileMode() {
         if (null == _precompileMode) {
@@ -189,7 +189,7 @@ public class RythmConfiguration {
      * Return inversed value of {@link RythmConfigurationKey#ENGINE_FILE_WRITE_ENABLED}
      * without lookup
      *
-     * @return
+     * @return true if file write is disabled
      */
     public boolean disableFileWrite() {
         if (null == _disableFileWrite) {
@@ -206,7 +206,7 @@ public class RythmConfiguration {
      * <p/>
      * <p>Note, the return value also contains rythm's built-in restricted classes</p>
      *
-     * @return
+     * @return a set of restricted classes
      */
     public Set<String> restrictedClasses() {
         if (null == _restrictedClasses) {
@@ -223,7 +223,7 @@ public class RythmConfiguration {
      * Get {@link RythmConfigurationKey#FEATURE_TYPE_INFERENCE_ENABLED} without
      * lookup
      *
-     * @return
+     * @return true if type inference is enabled
      */
     public boolean typeInferenceEnabled() {
         if (null == _enableTypeInference) {
@@ -237,7 +237,7 @@ public class RythmConfiguration {
     /**
      * Get {@link RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED} without lookup
      *
-     * @return
+     * @return true if smart escape is enabled
      */
     public boolean smartEscapeEnabled() {
         if (null == _smartEscapeEnabled) {
@@ -248,6 +248,11 @@ public class RythmConfiguration {
 
     private Boolean _naturalTemplateEnabled = null;
 
+    /**
+     * Get {@link RythmConfigurationKey#FEATURE_NATURAL_TEMPLATE_ENABLED} without lookup
+     *
+     * @return true if natural template is enabled
+     */
     public boolean naturalTemplateEnabled() {
         if (null == _naturalTemplateEnabled) {
             _naturalTemplateEnabled = (Boolean)get(FEATURE_NATURAL_TEMPLATE_ENABLED);
@@ -257,6 +262,11 @@ public class RythmConfiguration {
     
     private Boolean _debugJavaSourceEnabled = null;
     
+    /**
+     * Get {@link RythmConfigurationKey#ENGINE_OUTPUT_JAVA_SOURCE_ENABLED} without lookup
+     *
+     * @return true if debug java source is enabled 
+     */
     public boolean debugJavaSourceEnabled() {
         if (null == _debugJavaSourceEnabled) {
             _debugJavaSourceEnabled = (Boolean)get(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED);
@@ -271,10 +281,10 @@ public class RythmConfiguration {
      * <ul>
      * <li>{@link RythmConfigurationKey#CACHE_ENABLED} is <code>true</code> or</li>
      * <li>{@link RythmConfigurationKey#CACHE_PROD_ONLY_ENABLED} is <code>true</code> and
-     * {@link RythmConfigurationKey#ENGINE_MODE} is {@link Rythm.Mode#dev}</li>
+     * {@link RythmConfigurationKey#ENGINE_MODE} is {@link com.greenlaw110.rythm.Rythm.Mode#dev}</li>
      * </ul>
      *
-     * @return
+     * @return true if cache enabled
      */
     public boolean cacheEnabled() {
         if (null == _cacheEnabled) {
@@ -297,7 +307,7 @@ public class RythmConfiguration {
     /**
      * Return true if cache is disabled for the engine instance.
      *
-     * @return
+     * @return false if cache enabled
      * @see #cacheEnabled()
      */
     public boolean cacheDisabled() {
@@ -309,7 +319,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#FEATURE_TRANSFORM_ENABLED} without look up
      *
-     * @return
+     * @return true if transform enabled
      */
     public boolean transformEnabled() {
         if (null == _transformEnabled) {
@@ -321,6 +331,11 @@ public class RythmConfiguration {
     private Boolean _compactEnabled = null;
 
 
+    /**
+     * Return {@link RythmConfigurationKey#CODEGEN_COMPACT_ENABLED} without look up
+     *
+     * @return true if compact mode is enabled
+     */
     public boolean compactModeEnabled() {
         if (null == _compactEnabled) {
             _compactEnabled = get(CODEGEN_COMPACT_ENABLED);
@@ -333,7 +348,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#CACHE_DURATION_PARSER_IMPL} without lookup
      *
-     * @return
+     * @return the duration parser implementation
      */
     public IDurationParser durationParser() {
         if (null == _durationParser) {
@@ -347,7 +362,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#DEFAULT_TEMPLATE_LANG_IMPL} without lookup
      *
-     * @return
+     * @return default lang
      */
     public ILang defaultLang() {
         if (null == _defaultLang) {
@@ -361,7 +376,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#HOME_TMP} without lookup
      *
-     * @return
+     * @return temp dir
      */
     public File tmpDir() {
         if (null == _tmpDir) {
@@ -375,7 +390,7 @@ public class RythmConfiguration {
     /**
      * Return {@link RythmConfigurationKey#HOME_TEMPLATE} without lookup
      *
-     * @return
+     * @return template home
      */
     public File templateHome() {
         if (null == _templateHome) {
@@ -396,6 +411,11 @@ public class RythmConfiguration {
 
     private IByteCodeEnhancer _byteCodeEnhancer = IByteCodeEnhancer.INSTS.NULL;
 
+    /**
+     * Return {@link RythmConfigurationKey#CODEGEN_BYTE_CODE_ENHANCER} without lookup
+     *
+     * @return the byte code enhancer implementation
+     */
     public IByteCodeEnhancer byteCodeEnhancer() {
         if (IByteCodeEnhancer.INSTS.NULL == _byteCodeEnhancer) {
             _byteCodeEnhancer = get(CODEGEN_BYTE_CODE_ENHANCER);
@@ -408,7 +428,7 @@ public class RythmConfiguration {
     /**
      * Get {@link RythmConfigurationKey#I18N_LANG} without lookup
      *
-     * @return
+     * @return lang
      */
     public String lang() {
         if (null == _lang) {
@@ -422,7 +442,7 @@ public class RythmConfiguration {
     /**
      * Get {@link RythmConfigurationKey#I18N_LOCALE} without lookup
      *
-     * @return
+     * @return locale
      */
     public String locale() {
         if (null == _locale) {

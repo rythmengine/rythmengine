@@ -64,7 +64,7 @@ public interface ICacheService {
      * Check if the cache contains key
      *
      * @param key
-     * @return
+     * @return true if key is found in the cache
      */
     boolean contains(String key);
 

@@ -353,7 +353,7 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
-                templateInstance.setTemplateClass(this, lang);
+                templateInstance.__setTemplateClass(this, lang);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;

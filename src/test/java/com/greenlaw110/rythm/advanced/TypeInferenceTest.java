@@ -45,7 +45,7 @@ public class TypeInferenceTest extends TestBase {
     public void test() {
         t = "@1.size() and @2.size()";
         Map m1 = new HashMap();
-        m1.put("foo", "bar");
+        m1.put("root/foo", "root/bar");
         Map m2 = new HashMap();
         s = r(t, m1, m2);
         assertEquals("1 and 0", s);
@@ -56,7 +56,7 @@ public class TypeInferenceTest extends TestBase {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
         t = "@1.size() and @2.size()";
         Map m1 = new HashMap();
-        m1.put("foo", "bar");
+        m1.put("root/foo", "root/bar");
         Map m2 = new HashMap();
         s = r(t, m1, m2);
         assertEquals("1 and 0", s);
@@ -66,7 +66,7 @@ public class TypeInferenceTest extends TestBase {
     public void testCallingWithDifferentType() {
         t = "@1.size() and @2.size()";
         Map m1 = new HashMap();
-        m1.put("foo", "bar");
+        m1.put("root/foo", "root/bar");
         Map m2 = new HashMap();
         s = r(t, m1, m2);
         assertEquals("1 and 0", s);

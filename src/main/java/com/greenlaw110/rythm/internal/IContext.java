@@ -29,31 +29,31 @@ public interface IContext {
     /**
      * Return the root source code builder
      *
-     * @return
+     * @return the code builder
      */
     CodeBuilder getCodeBuilder();
 
     /**
      * Return the remaining template string that has not parsed yet
      *
-     * @return
+     * @return remaining text to be parsed
      */
     String getRemain();
 
     /**
      * Do have have remain template content to be parsed
      *
-     * @return
+     * @return true if there are remaining text to be parsed
      */
     boolean hasRemain();
 
     /**
-     * return the first remain character without moving cursor
+     * @return the first remain character without moving cursor
      */
     char peek();
 
     /**
-     * return the first remain character and move the cursor one step
+     * @return the first remain character and move the cursor one step
      */
     char pop();
 
@@ -69,7 +69,7 @@ public interface IContext {
      *
      * @param start
      * @param end
-     * @return
+     * @return template source
      */
     String getTemplateSource(int start, int end);
 
@@ -81,9 +81,9 @@ public interface IContext {
     void openBlock(IBlockHandler bh);
 
     /**
-     * Return current block handleer
+     * Return current block handler
      *
-     * @return
+     * @return current block handler
      * @throws ParseException
      */
     IBlockHandler currentBlock();
@@ -103,7 +103,7 @@ public interface IContext {
     /**
      * Return current line number
      *
-     * @return
+     * @return current parsing line
      */
     int currentLine();
 

@@ -99,7 +99,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, this method is NOT an API to be called by user application</p>
      *
-     * @return
+     * @return the engine
      */
     public static RythmEngine get() {
         return _engine.get();

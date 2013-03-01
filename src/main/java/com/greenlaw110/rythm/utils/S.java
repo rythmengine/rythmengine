@@ -21,6 +21,7 @@ package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -67,7 +68,7 @@ public class S {
      * Alias of {@link #isEmpty(String)}
      *
      * @param s
-     * @return
+     * @return true if the given string is empty
      */
     public static boolean empty(String s) {
         return null == s || "".equals(s.trim());
@@ -88,7 +89,7 @@ public class S {
      * Alias of {@link #isNotEmpty(String)}
      *
      * @param s
-     * @return
+     * @return true if the give string is not empty
      */
     public static boolean notEmpty(String s) {
         return !isEmpty(s);
@@ -110,7 +111,7 @@ public class S {
      * Alias of {@link #isEmpty(Object)}
      *
      * @param o
-     * @return
+     * @return true if the object string representation is empty
      */
     public static boolean empty(Object o) {
         return null == o || "".equals(str(o).trim());
@@ -131,7 +132,7 @@ public class S {
      * Alias of {@link #isNotEmpty(Object)}
      *
      * @param o
-     * @return
+     * @return true if object str representation is not empty
      */
     public static boolean notEmpty(Object o) {
         return !isEmpty(o);
@@ -170,7 +171,7 @@ public class S {
      *
      * @param s1
      * @param s2
-     * @return
+     * @return true if s1 equals s2
      */
     public static boolean eq(String s1, String s2) {
         return isEqual(s1, s2, 0);
@@ -192,7 +193,7 @@ public class S {
      *
      * @param o1
      * @param o2
-     * @return
+     * @return true if o1's str equals o2's str
      */
     public static boolean eq(Object o1, Object o2) {
         return isEqual(str(o1), str(o2), 0);
@@ -204,7 +205,7 @@ public class S {
      * @param s1
      * @param s2
      * @param modifier
-     * @return
+     * @return true if o1's str equals o2's str
      */
     public static boolean eq(String s1, String s2, int modifier) {
         return isEqual(s1, s2, modifier);
@@ -227,7 +228,7 @@ public class S {
      * @param s1
      * @param s2
      * @param modifier
-     * @return
+     * @return true if s1 equals s2
      */
     public static boolean isEqual(String s1, String s2, int modifier) {
         if (null == s1) {
@@ -250,7 +251,7 @@ public class S {
      * Alias of {@link #toString(Object)}
      *
      * @param o
-     * @return
+     * @return the string representation of object
      */
     public static String str(Object o) {
         return null == o ? "" : o.toString();
@@ -262,7 +263,7 @@ public class S {
      * returned
      *
      * @param o
-     * @return
+     * @return String representation of the object
      */
     public static String toString(Object o) {
         return null == o ? "" : o.toString();
@@ -272,7 +273,7 @@ public class S {
      * Remove all line breaks from string representation of specified object O
      *
      * @param o
-     * @return
+     * @return String
      */
     public static String removeAllLineBreaks(Object o) {
         String s = str(o);
@@ -284,7 +285,7 @@ public class S {
      * an object without any escaping.
      *
      * @param o
-     * @return
+     * @return raw data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData raw(Object o) {
@@ -293,16 +294,29 @@ public class S {
 
     /**
      * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
-     * an object with {@link #escapeXml(Object)} escaping.
+     * an object with default {@link #escapeXml(Object)} escaping or if the current
+     * render engine exists return the escape specified by the default lang of the 
+     * current render engine
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
      *
      * @param s
-     * @return
+     * @return escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escape(Object s) {
-        return escapeXml(s);
+        RythmEngine engine = RythmEngine.get();
+        ITemplate.Escape escape = ITemplate.Escape.XML;
+        if (null != engine) {
+            ILang lang = engine.conf().defaultLang();
+            if (null != lang) {
+                escape = lang.escape();
+                if (null == escape) {
+                    escape = ITemplate.Escape.XML;
+                }
+            }
+        }
+        return escape.apply(s);
     }
 
     /**
@@ -327,7 +341,7 @@ public class S {
      *
      * @param o
      * @param escape
-     * @return
+     * @return escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escape(Object o, Object escape) {
@@ -353,7 +367,7 @@ public class S {
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
      *
      * @param o
-     * @return
+     * @return html escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeHTML(Object o) {
@@ -367,7 +381,7 @@ public class S {
      * Alias of {@link #escapeHTML(Object)}
      *
      * @param o
-     * @return
+     * @return html escaped data
      */
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeHtml(Object o) {
         return escapeHTML(o);
@@ -380,7 +394,7 @@ public class S {
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
      *
      * @param o
-     * @return
+     * @return csv escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeCSV(Object o) {
@@ -410,7 +424,7 @@ public class S {
      * JSON block</p>
      *
      * @param o
-     * @return
+     * @return JSON escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJSON(Object o) {
@@ -426,7 +440,7 @@ public class S {
      * Alias of {@link #escapeCSV(Object)}
      *
      * @param o
-     * @return
+     * @return JSON escaped data
      */
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJson(Object o) {
         return escapeJSON(o);
@@ -442,7 +456,7 @@ public class S {
      * JavaScript quotation marks</p>
      *
      * @param o
-     * @return
+     * @return JavaScript escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJavaScript(Object o) {
@@ -456,7 +470,7 @@ public class S {
      * Alias of {@link #escapeJavaScript(Object)}
      *
      * @param o
-     * @return
+     * @return JavaScript escaped data
      */
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJavascript(Object o) {
         return escapeJavaScript(o);
@@ -466,7 +480,7 @@ public class S {
      * Alias of {@link #escapeJavaScript(Object)}
      *
      * @param o
-     * @return
+     * @return JavaScript escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJS(Object o) {
@@ -483,7 +497,7 @@ public class S {
      * attribute
      *
      * @param o
-     * @return
+     * @return XML escaped data
      */
     @Transformer
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeXML(Object o) {
@@ -497,7 +511,7 @@ public class S {
      * Alias of {@link #escapeXML(Object)}
      *
      * @param o
-     * @return
+     * @return XML escaped data
      */
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeXml(Object o) {
         if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
@@ -510,7 +524,7 @@ public class S {
      * Escape for regular expression
      *
      * @param o
-     * @return
+     * @return Regex escaped data
      */
     public static com.greenlaw110.rythm.template.ITemplate.RawData escapeRegex(Object o) {
         if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
@@ -534,7 +548,7 @@ public class S {
      * @param o
      * @param prefix
      * @param suffix
-     * @return
+     * @return the String result
      */
     public static final String strip(Object o, String prefix, String suffix) {
         if (null == o) return "";
@@ -549,7 +563,7 @@ public class S {
      * Strip the brace from an object's string representation and return the result
      *
      * @param o
-     * @return
+     * @return the string result
      */
     public static final String stripBrace(Object o) {
         return strip(o, "(", ")");
@@ -559,7 +573,7 @@ public class S {
      * Strip the quotation mark from an object's string representation and return the result
      *
      * @param o
-     * @return
+     * @return the String result
      */
     public static final String stripQuotation(Object o) {
         return strip(o, "\"", "\"");
@@ -569,7 +583,7 @@ public class S {
      * Strip off both brace and quotation
      *
      * @param o
-     * @return
+     * @return the string result
      */
     public static final String stripBraceAndQuotation(Object o) {
         if (null == o) return "";
@@ -583,7 +597,7 @@ public class S {
      * spaces, tabs into one space, and multiple line breaks into one line break
      *
      * @param o
-     * @return
+     * @return the string result
      */
     public static String shrinkSpace(Object o) {
         if (null == o) return "";
@@ -595,8 +609,8 @@ public class S {
      * Capitalize the first character of every word of the specified object's
      * string representation. Words are separated by space
      *
-     * @param o
-     * @return
+     * @param o 
+     * @return the string result
      */
     @Transformer
     public static String capitalizeWords(Object o) {
@@ -621,7 +635,7 @@ public class S {
      * give object to non-accent char.
      *
      * @param o
-     * @return
+     * @return the string result
      */
     @Transformer
     public static String noAccents(Object o) {
@@ -634,7 +648,7 @@ public class S {
      * Make the first character be lowercase of the given object's string representation
      *
      * @param o
-     * @return
+     * @return the string result
      */
     @Transformer
     public static String lowerFirst(Object o) {
@@ -650,7 +664,7 @@ public class S {
      * Make the first character be uppercase of the given object's string representation
      *
      * @param o
-     * @return
+     * @return the string result
      */
     @Transformer
     public static String capFirst(Object o) {
@@ -666,7 +680,7 @@ public class S {
      * Turn an object's String representation into Camel Case
      *
      * @param obj
-     * @return
+     * @return the string result
      */
     @Transformer
     public static String camelCase(Object obj) {
@@ -686,6 +700,15 @@ public class S {
         return result.toString();
     }
 
+    /**
+     * Format the number with specified pattern, language and locale
+     * @param number
+     * @param pattern
+     * @param lang
+     * @param locale
+     * @return the formatted String
+     * @see {@link DecimalFormatSymbols}
+     */
     @Transformer
     public static String format(Number number, String pattern, String lang, String locale) {
         RythmConfiguration conf = RythmEngine.get().conf();
@@ -699,21 +722,50 @@ public class S {
         return new DecimalFormat(pattern, symbols).format(number);
     }
 
+    /**
+     * Format a number with specified pattern
+     * 
+     * @param number
+     * @param pattern
+     * @return formatted String
+     */
     @Transformer
     public static String format(Number number, String pattern) {
         return format(number, pattern, null, null);
     }
 
+    /**
+     * Format a date with engine's default format corresponding
+     * to the engine's locale configured
+     * 
+     * @param date
+     * @return the formatted String
+     */
     @Transformer
     public static String format(Date date) {
         return new SimpleDateFormat(I18N.getDateFormat()).format(date);
     }
 
+    /**
+     * Format a date with specified pattern
+     * 
+     * @param date
+     * @param pattern
+     * @return
+     */
     @Transformer
     public static String format(Date date, String pattern) {
         return format(date, pattern, null, null);
     }
 
+    /**
+     * Format a date with specified pattern, language and locale
+     * @param date
+     * @param pattern
+     * @param lang
+     * @param locale
+     * @return the formatted String
+     */
     @Transformer
     public static String format(Date date, String pattern, String lang, String locale) {
         RythmConfiguration conf = RythmEngine.get().conf();
@@ -726,6 +778,17 @@ public class S {
         return new SimpleDateFormat(pattern, new Locale(lang, locale)).format(date);
     }
 
+    /**
+     * Format a date with specified pattern, lang, locale and timezone.
+     * 
+     * @param date
+     * @param pattern
+     * @param lang
+     * @param locale
+     * @param timezone
+     * @return the formatted String
+     * @See {@link SimpleDateFormat}
+     */
     @Transformer
     public static String format(Date date, String pattern, String lang, String locale, String timezone) {
         RythmConfiguration conf = RythmEngine.get().conf();

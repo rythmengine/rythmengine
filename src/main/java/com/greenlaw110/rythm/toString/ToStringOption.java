@@ -97,7 +97,7 @@ public class ToStringOption {
      * instance and set on the clone and return the clone
      *
      * @param appendTransient
-     * @return
+     * @return this option instance or clone if this is the {@link #DEFAULT_OPTION}
      */
     public ToStringOption setAppendTransient(boolean appendTransient) {
         ToStringOption op = this;
@@ -115,7 +115,7 @@ public class ToStringOption {
      * instance and set on the clone and return the clone
      *
      * @param appendStatic
-     * @return
+     * @return this option instance or clone if this is the {@link #DEFAULT_OPTION}
      */
     public ToStringOption setAppendStatic(boolean appendStatic) {
         ToStringOption op = this;
@@ -133,7 +133,7 @@ public class ToStringOption {
      * instance and set on the clone and return the clone
      *
      * @param c
-     * @return
+     * @return this option instance or clone if this is the {@link #DEFAULT_OPTION}
      */
     public ToStringOption setUpToClass(Class<?> c) {
         ToStringOption op = this;
@@ -154,7 +154,7 @@ public class ToStringOption {
      *    upToClass: @_.upToClass?.getName()}", this);
      * </code></pre>
      *
-     * @return
+     * @return String representation of this option
      */
     @Override
     public String toString() {
@@ -182,7 +182,7 @@ public class ToStringOption {
      * method
      *
      * @param s
-     * @return
+     * @return an option instance corresponding to the string specified
      */
     public static ToStringOption valueOf(String s) {
         Pattern p = Pattern.compile("\\{appendStatic *\\: *(true|false) *; *appendTransient *\\: *(true|false) *; *upToClass *: *(.*)\\}");
@@ -199,11 +199,5 @@ public class ToStringOption {
             throw new IllegalArgumentException("Cannot find upToClass: " + upToClassStr);
         }
         return new ToStringOption(appendStatic, appendTransient, upToClass);
-    }
-
-    public static void main(String[] args) {
-        ToStringOption o = ToStringOption.DEFAULT_OPTION;
-        System.out.println(o.toString());
-        System.out.println(ToStringOption.valueOf(o.setAppendStatic(true).setUpToClass(String.class).toString()));
     }
 }

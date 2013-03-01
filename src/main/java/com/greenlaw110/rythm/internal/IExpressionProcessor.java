@@ -32,7 +32,7 @@ public interface IExpressionProcessor {
      *
      * @param exp
      * @param token
-     * @return
+     * @return processed result
      */
     String process(String exp, Token token);
 

@@ -37,7 +37,7 @@ public interface IByteCodeHelper {
      * parameter
      *
      * @param typeName The full name of the class who's byte code to be located
-     * @return
+     * @return the bytecode
      */
     byte[] findByteCode(String typeName);
 }

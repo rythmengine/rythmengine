@@ -29,7 +29,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified byte <code>b != 0</code>
      * @param b
-     * @return
+     * @return boolean result
      */
     public static boolean eval(byte b) {
         return b != 0;
@@ -38,7 +38,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified char <code>c != 0</code>
      * @param c
-     * @return
+     * @return boolean result
      */
     public static boolean eval(char c) {
         return c != 0;
@@ -47,7 +47,7 @@ public class Eval {
     /**
      * return the specified boolean directly
      * @param b
-     * @return
+     * @return boolean result
      */
     public static boolean eval(boolean b) {
         return b;
@@ -56,7 +56,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified integer <code>n != 0</code>
      * @param n
-     * @return
+     * @return boolean result
      */
     public static boolean eval(int n) {
         return n != 0;
@@ -65,7 +65,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified long <code>l != 0</code>
      * @param l
-     * @return
+     * @return boolean result
      */
     public static boolean eval(long l) {
         return l != 0L;
@@ -74,7 +74,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified float <code>Math.abs(f) > 0.00000001</code>
      * @param f
-     * @return
+     * @return boolean result
      */
     public static boolean eval(float f) {
         return Math.abs(f) > 0.00000001;
@@ -83,7 +83,7 @@ public class Eval {
     /**
      * return <code>true</code> if the specified double <code>Math.abs(f) > 0.00000001</code>
      * @param d
-     * @return
+     * @return boolean result
      */
     public static boolean eval(double d) {
         return Math.abs(d) > 0.00000001;
@@ -91,6 +91,9 @@ public class Eval {
 
     /**
      * Return true if the specified string does not equals, ignore case, to "false" or "no"
+     * 
+     * @param s
+     * @return boolean result
      */
     public static boolean eval(String s) {
         if (S.isEmpty(s)) return false;
@@ -102,7 +105,7 @@ public class Eval {
     /**
      * Return <code>true</code> if the collection is not empty
      * @param c
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Collection c) {
         return !c.isEmpty();
@@ -111,7 +114,7 @@ public class Eval {
     /**
      * Return <code>true</code> if the map is not empty
      * @param m
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Map m) {
         return !m.isEmpty();
@@ -120,7 +123,7 @@ public class Eval {
     /**
      * @see #eval(boolean) 
      * @param b
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Boolean b) {
         return b;
@@ -129,7 +132,7 @@ public class Eval {
     /**
      * @see #eval(char) 
      * @param c
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Character c) {
         return eval(c.charValue());
@@ -138,7 +141,7 @@ public class Eval {
     /**
      * @see #eval(float) 
      * @param f
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Float f) {
         return eval(f.floatValue());
@@ -147,7 +150,7 @@ public class Eval {
     /**
      * @see #eval(double) 
      * @param d
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Double d) {
         return eval(d.doubleValue());
@@ -157,7 +160,7 @@ public class Eval {
      * Evaluate the number's int value
      * @see #eval(int) 
      * @param n
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Number n) {
         return eval(n.intValue());
@@ -173,7 +176,7 @@ public class Eval {
      * </ul>
      * 
      * @param condition
-     * @return
+     * @return boolean result
      */
     public static boolean eval(Object condition) {
         if (condition == null) {

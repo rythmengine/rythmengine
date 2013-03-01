@@ -560,7 +560,7 @@ public enum RythmConfigurationKey {
     /**
      * Return the key string
      *
-     * @return
+     * @return the key of the configuration
      */
     public String getKey() {
         return key;
@@ -573,7 +573,7 @@ public enum RythmConfigurationKey {
      * setting depend on the value of {@link #ENGINE_MODE mode} setting
      *
      * @param configuration
-     * @return
+     * @return return the default value
      */
     protected Object getDefVal(Map<String, ?> configuration) {
         return defVal;
@@ -582,7 +582,7 @@ public enum RythmConfigurationKey {
     /**
      * Calling to this method is equals to calling {@link #getKey()}
      *
-     * @return
+     * @return key of the configuration
      */
     @Override
     public String toString() {
@@ -681,7 +681,20 @@ public enum RythmConfigurationKey {
         if (v instanceof File) {
             return (File) v;
         }
-        return new File(v.toString());
+        String s = v.toString();
+        boolean isAbsolute = false;
+        if (s.startsWith("/") || s.startsWith(File.separator)) {
+            isAbsolute = true;
+        } else if (s.matches("^[a-zA-Z]:.*")) {
+            isAbsolute = true;
+        }
+        if (isAbsolute) return new File(s);
+        try {
+            File base = new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
+            return new File(base, s);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -690,7 +703,7 @@ public enum RythmConfigurationKey {
      *
      * @param configuration
      * @param <T>
-     * @return
+     * @return return the configuration
      */
     public <T> T getConfiguration(Map<String, ?> configuration) {
         String key = this.key;
@@ -722,7 +735,7 @@ public enum RythmConfigurationKey {
      * Return key enum instance from the string in case insensitive mode
      *
      * @param s
-     * @return
+     * @return configuration key from the string
      */
     public static RythmConfigurationKey valueOfIgnoreCase(String s) {
         if (S.empty(s)) throw new IllegalArgumentException();

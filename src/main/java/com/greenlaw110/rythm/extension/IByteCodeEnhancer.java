@@ -34,7 +34,7 @@ public interface IByteCodeEnhancer {
      *
      * @param className
      * @param classBytes
-     * @return
+     * @return the bytecode
      * @throws Exception
      */
     byte[] enhance(String className, byte[] classBytes) throws Exception;

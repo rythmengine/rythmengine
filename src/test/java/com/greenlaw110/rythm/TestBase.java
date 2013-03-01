@@ -48,6 +48,7 @@ public abstract class TestBase extends Assert {
     @Before
     public void initRythm() {
         Rythm.shutdown();
+        System.setProperty(HOME_TEMPLATE.getKey(), "root");
         System.setProperty(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
         System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");

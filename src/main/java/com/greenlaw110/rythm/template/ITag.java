@@ -240,7 +240,7 @@ public interface ITag extends ITemplate {
             if (o instanceof ITemplate.RawData) {
                 return (Body) p(o);
             }
-            ITemplate.Escape escape = _context.defaultEscape();
+            ITemplate.Escape escape = _context.__defaultEscape();
             return (Body) pe(o, escape);
         }
 
