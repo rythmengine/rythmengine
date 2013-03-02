@@ -39,13 +39,13 @@ public class SandboxTest extends TestBase {
     
     @Test(expected = RythmException.class)
     public void testSecurityViolation1() {
-        String t = "@System.getProperty(\"xxx\")";
+        String t = "@System.__getProperty(\"xxx\")";
         Rythm.sandbox().render(t);
     }
     
     @Test(expected = RythmException.class)
     public void testSecurityViolation2() {
-        String t = "@{System.getProperty(\"xxx\")}";
+        String t = "@{System.__getProperty(\"xxx\")}";
         Rythm.sandbox().render(t);
     }
     

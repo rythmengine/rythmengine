@@ -339,7 +339,7 @@ public enum RythmConfigurationKey {
      * <p/>
      * <p>Default value: a file created with the following logic</p>
      * <p/>
-     * <pre><code>new File(System.getProperty("java.io.tmpdir"), "__rythm")</code></pre>
+     * <pre><code>new File(System.__getProperty("java.io.tmpdir"), "__rythm")</code></pre>
      */
     HOME_TMP("home.tmp") {
         @Override
@@ -450,14 +450,14 @@ public enum RythmConfigurationKey {
      * invocation listener} implementation.
      * <p>Default value: <code>null</code></p>
      */
-    RENDER_TAG_INVOCATION_LISTENER("render.tag_invocation_listener.impl"),
+    RENDER_TAG_INVOCATION_LISTENER("__render.tag_invocation_listener.impl"),
 
     /**
      * "render.exception_handler.impl": Set {@link com.greenlaw110.rythm.extension.IRenderExceptionHandler
      * render exception handler} implementation.
      * <p>Default value: <code>null</code></p>
      */
-    RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
+    RENDER_EXCEPTION_HANDLER("__render.exception_handler.impl"),
 
     /**
      * "resource.loader.impl": The {@link com.greenlaw110.rythm.resource.ITemplateResourceLoader resource loader}

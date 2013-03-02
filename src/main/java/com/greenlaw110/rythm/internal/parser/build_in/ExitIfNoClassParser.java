@@ -21,7 +21,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;

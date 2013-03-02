@@ -19,9 +19,10 @@
 */
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
+import com.greenlaw110.rythm.utils.RawData;
 
 /**
  * A special TextBuilder provides additional print utilities for expressions
@@ -29,15 +30,15 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 public class TemplateBuilder extends TextBuilder {
 
     /**
-     * Return the default {@link com.greenlaw110.rythm.template.ITemplate.Escape escape method}.
+     * Return the default {@link com.greenlaw110.rythm.utils.Escape escape method}.
      * <p/>
-     * <p>This implementation returns {@link com.greenlaw110.rythm.template.ITemplate.Escape#RAW}.
+     * <p>This implementation returns {@link com.greenlaw110.rythm.utils.Escape#RAW}.
      * But the sub class could override this method to return different escape method</p>
      *
-     * @return {@link com.greenlaw110.rythm.template.ITemplate.Escape escape}
+     * @return {@link com.greenlaw110.rythm.utils.Escape escape}
      */
-    protected ITemplate.Escape __defaultEscape() {
-        return ITemplate.Escape.RAW;
+    protected Escape __defaultEscape() {
+        return Escape.RAW;
     }
 
     // --- print expression interface
@@ -124,15 +125,15 @@ public class TemplateBuilder extends TextBuilder {
 
     /**
      * Print a general expression, using specified 
-     * {@link com.greenlaw110.rythm.template.ITemplate.Escape escape method}
+     * {@link com.greenlaw110.rythm.utils.Escape escape method}
      *
      * @param o
      * @param escape
      * @return the current builder
      */
-    public TemplateBuilder pe(Object o, ITemplate.Escape escape) {
+    public TemplateBuilder pe(Object o, Escape escape) {
         if (null != o) {
-            if (o instanceof ITemplate.RawData) {
+            if (o instanceof RawData) {
                 return (TemplateBuilder) p(o);
             }
             if (null == escape) {
@@ -159,42 +160,42 @@ public class TemplateBuilder extends TextBuilder {
     /**
      * See {@link #p(char)}
      */
-    public final TextBuilder pe(char c, ITemplate.Escape escape) {
+    public final TextBuilder pe(char c, Escape escape) {
         return p(c);
     }
 
     /**
      * See {@link #p(int)}
      */
-    public final TextBuilder pe(int i, ITemplate.Escape escape) {
+    public final TextBuilder pe(int i, Escape escape) {
         return p(i);
     }
 
     /**
      * See {@link #p(long)}
      */
-    public final TextBuilder pe(long l, ITemplate.Escape escape) {
+    public final TextBuilder pe(long l, Escape escape) {
         return p(l);
     }
 
     /**
      * See {@link #p(float)}
      */
-    public final TextBuilder pe(float f, ITemplate.Escape escape) {
+    public final TextBuilder pe(float f, Escape escape) {
         return p(f);
     }
 
     /**
      * See {@link #p(double)}
      */
-    public final TextBuilder pe(double d, ITemplate.Escape escape) {
+    public final TextBuilder pe(double d, Escape escape) {
         return p(d);
     }
 
     /**
      * See {@link #p(boolean)}
      */
-    public final TextBuilder pe(boolean b, ITemplate.Escape escape) {
+    public final TextBuilder pe(boolean b, Escape escape) {
         return p(b);
     }
 

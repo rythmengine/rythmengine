@@ -22,9 +22,6 @@ package com.greenlaw110.rythm.utils;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.template.ITemplate;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-
 /**
  * This class defines a chained text/string builder
  *
@@ -42,7 +39,7 @@ public class TextBuilder implements Cloneable {
      * If the buffer of this instance is null then return
      * the {@link #caller()} instance's buffer
      *
-     * @return
+     * @return a <code>StringBuilder</code>
      */
     public StringBuilder buffer() {
         return null == __buffer ? __caller.buffer() : __buffer;
@@ -56,7 +53,7 @@ public class TextBuilder implements Cloneable {
     /**
      * Return the caller in {@link ITemplate} type
      *
-     * @return
+     * @return a <code>ITemplate</code>
      */
     protected ITemplate caller() {
         return (ITemplate) __caller;
@@ -65,9 +62,9 @@ public class TextBuilder implements Cloneable {
     /**
      * Alias of {@link #buffer()}
      *
-     * @return
+     * @return buffer as {@link StringBuilder}
      */
-    public StringBuilder getBuffer() {
+    public StringBuilder __getBuffer() {
         return buffer();
     }
 
@@ -77,8 +74,8 @@ public class TextBuilder implements Cloneable {
      *
      * @param buffer
      */
-    public void setBuffer(StringBuilder buffer) {
-        if (null != __caller) ((TextBuilder) __caller).setBuffer(buffer);
+    public void __setBuffer(StringBuilder buffer) {
+        if (null != __caller) ((TextBuilder) __caller).__setBuffer(buffer);
         else __buffer = buffer;
     }
 
@@ -94,7 +91,7 @@ public class TextBuilder implements Cloneable {
     /**
      * Get the buffer out from this instance
      *
-     * @return
+     * @return a <code>StringBuilder</code>
      */
     public StringBuilder getSelfOut() {
         return __buffer;
@@ -177,12 +174,12 @@ public class TextBuilder implements Cloneable {
      *
      * @param wrapper
      */
-    protected void append(StrBuf wrapper) {
+    protected void __append(StrBuf wrapper) {
         __buffer.append(wrapper.toString());
     }
 
     private void p_(StrBuf wrapper) {
-        if (null != __buffer) append(wrapper);
+        if (null != __buffer) __append(wrapper);
         else __caller.p(wrapper);
     }
 
@@ -203,12 +200,12 @@ public class TextBuilder implements Cloneable {
      *
      * @param o
      */
-    protected void append(Object o) {
+    protected void __append(Object o) {
         __buffer.append(o.toString());
     }
 
     private void p_(Object o) {
-        if (null != __buffer) append(o);
+        if (null != __buffer) __append(o);
         else __caller.p(o);
     }
 
@@ -230,7 +227,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param c
      */
-    protected void append(char c) {
+    protected void __append(char c) {
         __buffer.append(c);
     }
 
@@ -241,7 +238,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(char c) {
-        if (null != __buffer) append(c);
+        if (null != __buffer) __append(c);
         else __caller.p(c);
         return this;
     }
@@ -252,7 +249,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param b
      */
-    protected void append(byte b) {
+    protected void __append(byte b) {
         __buffer.append(b);
     }
 
@@ -263,7 +260,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(byte b) {
-        if (null != __buffer) append(b);
+        if (null != __buffer) __append(b);
         else __caller.p(b);
         return this;
     }
@@ -273,7 +270,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param i
      */
-    protected void append(int i) {
+    protected void __append(int i) {
         __buffer.append(i);
     }
 
@@ -284,7 +281,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(int i) {
-        if (null != __buffer) append(i);
+        if (null != __buffer) __append(i);
         else __caller.p(i);
         return this;
     }
@@ -294,7 +291,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param l
      */
-    protected void append(long l) {
+    protected void __append(long l) {
         __buffer.append(l);
     }
 
@@ -305,7 +302,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(long l) {
-        if (null != __buffer) append(l);
+        if (null != __buffer) __append(l);
         else __caller.p(l);
         return this;
     }
@@ -315,7 +312,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param f
      */
-    protected void append(float f) {
+    protected void __append(float f) {
         __buffer.append(f);
     }
 
@@ -326,7 +323,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(float f) {
-        if (null != __buffer) append(f);
+        if (null != __buffer) __append(f);
         else __caller.p(f);
         return this;
     }
@@ -336,7 +333,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param d
      */
-    protected void append(double d) {
+    protected void __append(double d) {
         __buffer.append(d);
     }
 
@@ -347,7 +344,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(double d) {
-        if (null != __buffer) append(d);
+        if (null != __buffer) __append(d);
         else __caller.p(d);
         return this;
     }
@@ -357,7 +354,7 @@ public class TextBuilder implements Cloneable {
      *
      * @param b
      */
-    protected void append(boolean b) {
+    protected void __append(boolean b) {
         __buffer.append(b);
     }
 
@@ -368,7 +365,7 @@ public class TextBuilder implements Cloneable {
      * @return this builder
      */
     public final TextBuilder p(boolean b) {
-        if (null != __buffer) append(b);
+        if (null != __buffer) __append(b);
         else __caller.p(b);
         return this;
     }

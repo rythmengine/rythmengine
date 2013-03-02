@@ -23,11 +23,8 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.parser.IRemoveLeadingLineBreakAndSpaces;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -60,17 +57,17 @@ public class CacheParser extends KeywordParserFactory {
 
     /*
     {
-      String s = _engine().cached("key", 1, foo.bar());
+      String s = __engine().cached("key", 1, foo.bar());
       if (null != s) {
         p(s);
       } else {
-        StringBuilder sbOld = getBuffer();
+        StringBuilder sbOld = __getBuffer();
         StringBuilder sbNew = new StringBuilder()
-        setBuffer(sbNew);
+        __setBuffer(sbNew);
         ...
         s = sbNew.toString();
-        setBuffer(sbOld);
-        _engine().cache("key", s, duration, 1, foo.bar());
+        __setBuffer(sbOld);
+        __engine().cache("key", s, duration, 1, foo.bar());
         p(s)
       }
     }
@@ -95,7 +92,7 @@ public class CacheParser extends KeywordParserFactory {
         public void output() {
             p("{");
             pline();
-            pt("java.io.Serializable s = _engine().cached(\"").p(key).p("\"").p(args).p(");");
+            pt("java.io.Serializable s = __engine().cached(\"").p(key).p("\"").p(args).p(");");
             pline();
             pt("if (null != s) {");
             pline();
@@ -103,11 +100,11 @@ public class CacheParser extends KeywordParserFactory {
             pline();
             pt("} else {");
             pline();
-            p2t("StringBuilder sbOld = getBuffer();");
+            p2t("StringBuilder sbOld = __getBuffer();");
             pline();
             p2t("StringBuilder sbNew = new StringBuilder();");
             pline();
-            p2t("setBuffer(sbNew);");
+            p2t("__setBuffer(sbNew);");
             pline();
         }
 
@@ -118,14 +115,14 @@ public class CacheParser extends KeywordParserFactory {
             String tmplName = ctx.getTemplateClass().name();
             String keySeed = body + tmplName;
             key = UUID.nameUUIDFromBytes(keySeed.getBytes()).toString();
-            StringBuilder sbOld = getBuffer();
+            StringBuilder sbOld = __getBuffer();
             StringBuilder sbNew = new StringBuilder();
-            setBuffer(sbNew);
+            __setBuffer(sbNew);
             p2t("s = sbNew.toString();");
             pline();
-            p2t("setBuffer(sbOld);");
+            p2t("__setBuffer(sbOld);");
             pline();
-            p2t("_engine().cache(\"").p(key).p("\",s,").p(duration).p(args).p(");");
+            p2t("__engine().cache(\"").p(key).p("\",s,").p(duration).p(args).p(");");
             pline();
             p2t("p(s);");
             pline();
@@ -134,7 +131,7 @@ public class CacheParser extends KeywordParserFactory {
             p("}");
             pline();
             String s = sbNew.toString();
-            setBuffer(sbOld);
+            __setBuffer(sbOld);
             return s;
         }
     }

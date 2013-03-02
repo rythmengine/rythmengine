@@ -51,23 +51,23 @@ public class RenderSectionParser extends KeywordParserFactory {
 
         @Override
         public void output() {
-            p2t("_startSection(\"").p(section).p("\");");
+            p2t("__startSection(\"").p(section).p("\");");
             pline();
         }
 
         @Override
         public String closeBlock() {
             StringBuilder sbNew = new StringBuilder();
-            StringBuilder sbOld = getBuffer();
-            setBuffer(sbNew);
-            p2tline("_endSection(true);");
+            StringBuilder sbOld = __getBuffer();
+            __setBuffer(sbNew);
+            p2tline("__endSection(true);");
             if ("__CONTENT__".equals(section)) {
-                p2tline("_pLayoutContent();");
+                p2tline("__pLayoutContent();");
             } else {
-                p2t("_pLayoutSection(\"").p(section).p("\");");
+                p2t("__pLayoutSection(\"").p(section).p("\");");
                 pline();
             }
-            setBuffer(sbOld);
+            __setBuffer(sbOld);
             return sbNew.toString();
         }
     }
@@ -118,7 +118,7 @@ public class RenderSectionParser extends KeywordParserFactory {
                     if (matched.startsWith("\n") && !isSection) {
                         ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     }
-                    String code = !isSection ? "_pLayoutContent();" : "_pLayoutSection(\"" + section + "\");";
+                    String code = !isSection ? "__pLayoutContent();" : "__pLayoutSection(\"" + section + "\");";
                     if (lineBreak && isSection) {
                         //layout content often come from a file which always gets one additional line break
                         code = code + ";\npn();\n";

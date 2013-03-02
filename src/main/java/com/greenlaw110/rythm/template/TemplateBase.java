@@ -73,12 +73,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     /**
-     * Return {@link S#INSTANCE String helper instance}. Could be used in
+     * Return {@link com.greenlaw110.rythm.utils.S#INSTANCE String helper instance}. Could be used in
      * template authoring. For example:
      * <p/>
      * <pre><code>
-     * @if (s().empty(userRight)) {
-     *      @return 
+     * {@literal @}if (s().empty(userRight)){
+     *    {@literal @}return
      * }
      * </code></pre>
      */
@@ -86,20 +86,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return S.INSTANCE;
     }
 
-    /**
-     * Return {@link #__engine rythm engine} that run this template. Could
-     * be used in template authoring
-     *
-     * @return
-     */
-    protected RythmEngine r() {
-        return _engine();
-    }
-
     private Writer w;
     private OutputStream os;
 
-    public void setWriter(Writer writer) {
+    public void __setWriter(Writer writer) {
         if (null == writer) throw new NullPointerException();
         if (null != os) throw new IllegalStateException("Cannot set writer to template when outputstream is presented");
         if (null != this.w)
@@ -107,7 +97,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         this.w = writer;
     }
 
-    public void setOutputStream(OutputStream os) {
+    public void __setOutputStream(OutputStream os) {
         if (null == os) throw new NullPointerException();
         if (null != w) throw new IllegalStateException("Cannot set output stream to template when writer is presented");
         if (null != this.os)
@@ -123,11 +113,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected Map<String, Object> __renderArgs = new HashMap<String, Object>();
 
     /**
-     * Alias of {@link #r()}
+     * Return the {@link RythmEngine engine} running this template
      *
-     * @return
+     * @return the engine running the template
      */
-    protected RythmEngine _engine() {
+    protected RythmEngine __engine() {
         return null == __engine ? Rythm.engine() : __engine;
     }
 
@@ -137,7 +127,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param line
      * @param name
      */
-    protected void _invokeTag(int line, String name) {
+    protected void __invokeTag(int line, String name) {
         __engine.invokeTag(line, name, this, null, null, null);
     }
 
@@ -148,7 +138,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param ignoreNonExistsTag
      */
-    protected void _invokeTag(int line, String name, boolean ignoreNonExistsTag) {
+    protected void __invokeTag(int line, String name, boolean ignoreNonExistsTag) {
         __engine.invokeTag(line, name, this, null, null, null, ignoreNonExistsTag);
     }
 
@@ -159,7 +149,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param params
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params) {
         __engine.invokeTag(line, name, this, params, null, null);
     }
 
@@ -171,7 +161,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param params
      * @param ignoreNonExistsTag
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params, boolean ignoreNonExistsTag) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params, boolean ignoreNonExistsTag) {
         __engine.invokeTag(line, name, this, params, null, null, ignoreNonExistsTag);
     }
 
@@ -183,7 +173,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param params
      * @param body
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params, ITag.Body body) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body) {
         __engine.invokeTag(line, name, this, params, body, null);
     }
 
@@ -196,7 +186,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param body
      * @param ignoreNoExistsTag
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params, ITag.Body body, boolean ignoreNoExistsTag) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, boolean ignoreNoExistsTag) {
         __engine.invokeTag(line, name, this, params, body, null, ignoreNoExistsTag);
     }
 
@@ -209,7 +199,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param body
      * @param context
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context) {
         __engine.invokeTag(line, name, this, params, body, context);
     }
 
@@ -223,7 +213,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param context
      * @param ignoreNonExistsTag
      */
-    protected void _invokeTag(int line, String name, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
+    protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
         __engine.invokeTag(line, name, this, params, body, context, ignoreNonExistsTag);
     }
 
@@ -246,14 +236,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         Class<?> pc = c.getSuperclass();
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
-                TemplateClass ptc = _engine().classes().getByClassName(pc.getName());
+                TemplateClass ptc = __engine().classes().getByClassName(pc.getName());
                 if (null != ptc) {
-                    __parent = (TemplateBase)ptc.asTemplate(__curLang());
+                    __parent = (TemplateBase) ptc.asTemplate(__curLang());
                 } else {
                     __parent = (TemplateBase) pc.newInstance();
                     __parent.__ctx.pushLang(__curLang());
                 }
-                //__parent.__setTemplateClass(_engine().classes.getByClassName(pc.getName()));
+                //__parent.__setTemplateClass(__engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -265,17 +255,17 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * For example:
      * <p/>
      * <pre><code>
-     *
-     * @param template
-     * @param args
-     * @return
-     * @args String customTemplate, Map<String, Object> customParams
-     * @{ Object renderResult = _render(customTemplate, customParams);
+     * {@literal @}args String customTemplate, Map<String, Object> customParams
+     * {@literal @}{ Object renderResult = render(customTemplate, customParams);
      * }
      * <p class="customer_content">@renderResult</p>
      * </code></pre>
+     *
+     * @param template
+     * @param args
+     * @return render result
      */
-    protected RawData _render(String template, Object... args) {
+    protected RawData __render(String template, Object... args) {
         if (null == template) return new RawData("");
         return S.raw(__engine.sandbox().render(template, args));
     }
@@ -285,10 +275,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * of this template.
      *
      * @param template
-     * @return
-     * @see #_render(String, Object...)
+     * @return render result as {@link com.greenlaw110.rythm.utils.RawData}
+     * @see #__render(String, Object...)
      */
-    protected RawData _render(String template) {
+    protected RawData __render(String template) {
         if (null == template) return new RawData("");
         return S.raw(__engine.sandbox().render(template, __renderArgs));
     }
@@ -298,7 +288,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param body
      */
-    protected final void setLayoutContent(String body) {
+    protected final void __setLayoutContent(String body) {
         layoutContent = body;
     }
 
@@ -308,7 +298,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param section
      */
-    private void addLayoutSection(String name, String section) {
+    private void __addLayoutSection(String name, String section) {
         if (layoutSections.containsKey(name)) return;
         layoutSections.put(name, section);
     }
@@ -322,7 +312,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param name
      */
-    protected void _startSection(String name) {
+    protected void __startSection(String name) {
         if (null == name) throw new NullPointerException("section name cannot be null");
         if (null != tmpOut) throw new IllegalStateException("section cannot be nested");
         tmpCaller = __caller;
@@ -335,8 +325,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * End a layout section. Not to be used in user application or template
      */
-    protected void _endSection() {
-        _endSection(false);
+    protected void __endSection() {
+        __endSection(false);
     }
 
     /**
@@ -345,9 +335,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param def
      */
-    protected void _endSection(boolean def) {
+    protected void __endSection(boolean def) {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
-        addLayoutSection(section, __buffer.toString());
+        __addLayoutSection(section, __buffer.toString());
         __buffer = tmpOut;
         __caller = tmpCaller;
         tmpOut = null;
@@ -359,34 +349,34 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param name
      */
-    protected void _pLayoutSection(String name) {
+    protected void __pLayoutSection(String name) {
         p(layoutSections.get(name));
     }
 
     /**
-     * Get a section content as {@link RawData} by name. Not to be used in user application or template
+     * Get a section content as {@link com.greenlaw110.rythm.utils.RawData} by name. Not to be used in user application or template
      *
      * @param name
-     * @return
+     * @return section data by name
      */
-    protected RawData _getSection(String name) {
+    protected RawData __getSection(String name) {
         return S.raw(layoutSections.get(name));
     }
 
     /**
-     * Get layout content as {@link ITemplate.RawData}. Not to be used in user application or template
+     * Get layout content as {@link com.greenlaw110.rythm.utils.RawData}. Not to be used in user application or template
      *
      * @return layout content
      */
-    protected RawData _getSection() {
+    protected RawData __getSection() {
         return S.raw(S.isEmpty(layoutContent) ? layoutSections.get("__CONTENT__") : layoutContent);
     }
 
     /**
      * Print the layout content. Not to be used in user application or template
      */
-    protected void _pLayoutContent() {
-        p(_getSection());
+    protected void __pLayoutContent() {
+        p(__getSection());
     }
 
     private void addAllLayoutSections(Map<String, String> sections) {
@@ -400,9 +390,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * Not to be used in user application or template
      *
-     * @return
+     * @return a <code>TemplateBase</code>
      */
-    protected TemplateBase internalClone() {
+    protected TemplateBase __internalClone() {
         try {
             return (TemplateBase) super.clone();
         } catch (CloneNotSupportedException e) {
@@ -415,21 +405,21 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param engine the rythm engine
      * @param caller the caller template
-     * @return
+     * @return cloned template
      */
     @Override
-    public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
+    public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
         if (null == engine) throw new NullPointerException();
-        TemplateBase tmpl = internalClone();
+        TemplateBase tmpl = __internalClone();
         if (tmpl.__parent != null) {
-            tmpl.__parent = (TemplateBase) tmpl.__parent.cloneMe(engine, caller);
+            tmpl.__parent = (TemplateBase) tmpl.__parent.__cloneMe(engine, caller);
         }
         tmpl.__engine = engine;
         tmpl.__templateClass = __templateClass;
         if (null != caller) {
             tmpl.__caller = (TextBuilder) caller;
         }
-        tmpl.__ctx = new Context(__ctx);
+        tmpl.__ctx = new __Context(__ctx);
         //if (null != buffer) tmpl.__buffer = buffer;
         if (null != __buffer) tmpl.__buffer = new StringBuilder();
         tmpl.__renderArgs = new HashMap<String, Object>(__renderArgs.size());
@@ -448,23 +438,23 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * Not to be used in user application or template
      */
-    protected void internalInit() {
-        loadExtendingArgs();
-        init();
+    protected void __internalInit() {
+        __loadExtendingArgs();
+        __init();
     }
 
     /**
      * the implementation of this method is to be generated by {@link com.greenlaw110.rythm.internal.CodeBuilder}.
      * Not to be used in user application or template
      */
-    protected void setup() {
+    protected void __setup() {
     }
 
     /**
      * the implementation of this method is to be generated by {@link com.greenlaw110.rythm.internal.CodeBuilder}.
      * Not to be used in user application or template
      */
-    protected void loadExtendingArgs() {
+    protected void __loadExtendingArgs() {
     }
 
     /**
@@ -472,10 +462,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * Not to be used in user application or template
      */
     @Override
-    public void init() {
+    public void __init() {
     }
 
-    private boolean _logTime() {
+    private boolean __logTime() {
         return __logger.isDebugEnabled() && (__logTime || __engine.conf().logRenderTime());
     }
 
@@ -483,13 +473,13 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * Get the template class of this template. Not to be used in user application or template
      *
      * @param useCaller
-     * @return
+     * @return a <code>TemplateClass</code>
      */
-    public TemplateClass getTemplateClass(boolean useCaller) {
+    public TemplateClass __getTemplateClass(boolean useCaller) {
         TemplateClass tc = __templateClass;
         if (useCaller && null == tc) {
-            TemplateBase caller = _caller();
-            if (null != caller) return caller.getTemplateClass(true);
+            TemplateBase caller = __caller();
+            if (null != caller) return caller.__getTemplateClass(true);
         }
         return tc;
     }
@@ -502,7 +492,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     @Override
     public final void render(OutputStream os) {
-        setOutputStream(os);
+        __setOutputStream(os);
         render();
     }
 
@@ -514,7 +504,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     @Override
     public final void render(Writer w) {
-        setWriter(w);
+        __setWriter(w);
         render();
     }
 
@@ -524,22 +514,22 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     @Override
     public final String render() {
-        RythmEngine engine = _engine();
+        RythmEngine engine = __engine();
         RythmEngine.set(engine);
         try {
             long l = 0l;
-            if (_logTime()) {
+            if (__logTime()) {
                 l = System.currentTimeMillis();
             }
 
             RythmEvents.ON_RENDER.trigger(engine, this);
-            setup();
-            if (_logTime()) {
+            __setup();
+            if (__logTime()) {
                 __logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 l = System.currentTimeMillis();
             }
-            String s = internalRender();
-            if (_logTime()) {
+            String s = __internalRender();
+            if (__logTime()) {
                 __logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
             }
             return s;
@@ -567,7 +557,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param path
      */
-    protected void _setOutput(String path) {
+    protected void __setOutput(String path) {
         try {
             w_ = new BufferedWriter(new FileWriter(path));
         } catch (Exception e) {
@@ -580,7 +570,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param file
      */
-    protected void _setOutput(File file) {
+    protected void __setOutput(File file) {
         try {
             w_ = new BufferedWriter(new FileWriter(file));
         } catch (Exception e) {
@@ -593,7 +583,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param os
      */
-    protected void _setOutput(OutputStream os) {
+    protected void __setOutput(OutputStream os) {
         w_ = new OutputStreamWriter(os);
     }
 
@@ -602,29 +592,29 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param w
      */
-    protected void _setOutput(Writer w) {
+    protected void __setOutput(Writer w) {
         w_ = w;
     }
 
     /**
      * Not to be used in user application or template
      */
-    protected void internalBuild() {
+    protected void __internalBuild() {
         w_ = null; // reset output destination
         //if (!(engine.recordTemplateSourceOnError || engine.recordJavaSourceOnError)) {
         if (false) {
-            internalInit();
+            __internalInit();
             build();
         } else {
             try {
                 try {
                     long l = 0l;
-                    if (_logTime()) {
+                    if (__logTime()) {
                         l = System.currentTimeMillis();
                     }
-                    internalInit();
+                    __internalInit();
                     build();
-                    if (_logTime()) {
+                    if (__logTime()) {
                         __logger.debug("<<<<<<<<<<<< [%s] build: %sms", getClass().getName(), System.currentTimeMillis() - l);
                     }
                 } catch (RythmException e) {
@@ -695,13 +685,13 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * Not to be used in user application or template
      */
-    protected String internalRender() {
-        internalBuild();
+    protected String __internalRender() {
+        __internalBuild();
         if (null != __parent && __parent != this) {
-            __parent.setLayoutContent(toString());
+            __parent.__setLayoutContent(toString());
             __parent.addAllLayoutSections(layoutSections);
             __parent.addAllRenderProperties(renderProperties);
-            __parent.setRenderArgs(__renderArgs);
+            __parent.__setRenderArgs(__renderArgs);
             //__parent.__renderArgs.putAll(__renderArgs);
             return __parent.render();
         } else {
@@ -713,7 +703,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * The {@link com.greenlaw110.rythm.internal.CodeBuilder} will generate the
      * implementation of this method usually
      *
-     * @return
+     * @return this template as a {@link com.greenlaw110.rythm.utils.TextBuilder}
      */
     @Override
     public TextBuilder build() {
@@ -723,26 +713,26 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * Return render arg type in array. Not to be used in user application or template
      */
-    protected Class[] renderArgTypeArray() {
+    protected Class[] __renderArgTypeArray() {
         return null;
     }
 
     /**
      * Return render arg type in Map. Not to be used in user application or template
      *
-     * @return
+     * @return render args types mapped by name
      */
-    protected Map<String, Class> renderArgTypeMap() {
+    protected Map<String, Class> __renderArgTypeMap() {
         return Collections.EMPTY_MAP;
     }
 
     @Override
-    public void setRenderArgs(Map<String, Object> args) {
+    public void __setRenderArgs(Map<String, Object> args) {
         __renderArgs.putAll(args);
     }
 
     @Override
-    public void setRenderArg(JSONWrapper jsonData) {
+    public void __setRenderArg(JSONWrapper jsonData) {
         if (jsonData.isArray()) {
             setJSONArray(jsonData.getArray());
         } else {
@@ -751,7 +741,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     private void setJSONArray(List<Object> jsonArray) {
-        Class[] types = renderArgTypeArray();
+        Class[] types = __renderArgTypeArray();
         List<Object> args = new ArrayList<Object>(types.length);
         int paraNo = jsonArray.size();
         for (int i = 0; i < types.length; ++i) {
@@ -764,12 +754,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } else {
                 p = JSON.parseObject(o.toString(), c);
             }
-            setRenderArg(i, p);
+            __setRenderArg(i, p);
         }
     }
 
     private void setJSONObject(Map<String, Object> jsonObject) {
-        Map<String, Class> types = renderArgTypeMap();
+        Map<String, Class> types = __renderArgTypeMap();
         for (String nm : jsonObject.keySet()) {
             if (types.containsKey(nm)) {
                 Class c = types.get(nm);
@@ -780,69 +770,69 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 } else {
                     p = JSON.parseObject(o.toString(), c);
                 }
-                setRenderArg(nm, p);
+                __setRenderArg(nm, p);
             }
         }
     }
 
     /**
-     * Set render arg from {@link ITag.ParameterList tag params}
+     * Set render arg from {@link com.greenlaw110.rythm.template.ITag.__ParameterList tag params}
      * Not to be used in user application or template
      *
      * @param params
      */
-    protected void setRenderArgs(ITag.ParameterList params) {
+    protected void __setRenderArgs0(ITag.__ParameterList params) {
         for (int i = 0; i < params.size(); ++i) {
-            ITag.Parameter param = params.get(i);
-            if (null != param.name) setRenderArg(param.name, param.value);
-            else setRenderArg(i, param.value);
+            ITag.__Parameter param = params.get(i);
+            if (null != param.name) __setRenderArg(param.name, param.value);
+            else __setRenderArg(i, param.value);
         }
     }
 
     @Override
-    public void setRenderArgs(Object... args) {
+    public void __setRenderArgs(Object... args) {
     }
 
     @Override
-    public void setRenderArg(String name, Object arg) {
+    public void __setRenderArg(String name, Object arg) {
         __renderArgs.put(name, arg);
     }
 
     /**
-     * alias of {@link #setRenderArg(String, Object)}
+     * alias of {@link #__setRenderArg(String, Object)}
      *
      * @param name
      * @param arg
      */
-    protected final void _set(String name, Object arg) {
-        setRenderArg(name, arg);
+    protected final void __set(String name, Object arg) {
+        __setRenderArg(name, arg);
     }
 
     /**
      * Return caller of the template when this template is
      * invoked as a {@link ITag tag}
      *
-     * @return
+     * @return caller template
      */
-    protected final TemplateBase _caller() {
+    protected final TemplateBase __caller() {
         return null == __caller ? null : (TemplateBase) __caller;
     }
 
     @Override
-    public <T> T getRenderArg(String name) {
+    public <T> T __getRenderArg(String name) {
         Object val = __renderArgs.get(name);
-        return (T) (null != val ? val : (null != __caller ? caller().getRenderArg(name) : null));
+        return (T) (null != val ? val : (null != __caller ? caller().__getRenderArg(name) : null));
     }
 
     /**
-     * Alias of {@link #getRenderArg(String)}
+     * Alias of {@link #__getRenderArg(String)}
      *
      * @param name
      * @param <T>
-     * @return
+     * @return a render argument
      */
-    protected final <T> T _get(String name) {
-        return getRenderArg(name);
+    protected final <T> T __get(String name) {
+        return __getRenderArg(name);
     }
 
     /**
@@ -851,10 +841,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param c
      * @param <T>
-     * @return
+     * @return a render argument
      */
-    protected final <T> T _getAs(String name, Class<T> c) {
-        Object o = getRenderArg(name);
+    protected final <T> T __getAs(String name, Class<T> c) {
+        Object o = __getRenderArg(name);
         if (null == o) return null;
         return (T) o;
     }
@@ -867,9 +857,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param def
      * @param <T>
-     * @return
+     * @return a render property
      */
-    protected final <T> T _getRenderProperty(String name, T def) {
+    protected final <T> T __getRenderProperty(String name, T def) {
         Object o = renderProperties.get(name);
         return (T) (null == o ? def : o);
     }
@@ -879,11 +869,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param name
      * @param <T>
-     * @return
-     * @see #_setRenderProperty(String, Object)
+     * @return a render property
+     * @see #__setRenderProperty(String, Object)
      */
-    protected final <T> T _getRenderProperty(String name) {
-        return (T) _getRenderProperty(name, null);
+    protected final <T> T __getRenderProperty(String name) {
+        return (T) __getRenderProperty(name, null);
     }
 
     /**
@@ -893,11 +883,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param def
      * @param <T>
-     * @return
-     * @see #_getRenderProperty(String)
+     * @return a render property
+     * @see #__getRenderProperty(String)
      */
-    protected final <T> T _getRenderPropertyAs(String name, T def) {
-        Object o = _getRenderProperty(name, def);
+    protected final <T> T __getRenderPropertyAs(String name, T def) {
+        Object o = __getRenderProperty(name, def);
         return null == o ? def : (T) o;
     }
 
@@ -908,10 +898,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param name
      * @param val
-     * @see #_getRenderProperty(String)
-     * @see #_getRenderProperty(String, Object)
+     * @see #__getRenderProperty(String)
+     * @see #__getRenderProperty(String, Object)
      */
-    protected final void _setRenderProperty(String name, Object val) {
+    protected final void __setRenderProperty(String name, Object val) {
         renderProperties.put(name, val);
     }
 
@@ -920,9 +910,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param e
      */
-    protected final void handleTemplateExecutionException(Exception e) {
+    protected final void __handleTemplateExecutionException(Exception e) {
         try {
-            if (!(Boolean) RythmEvents.ON_RENDER_EXCEPTION.trigger(_engine(), F.T2(this, e))) {
+            if (!RythmEvents.ON_RENDER_EXCEPTION.trigger(__engine(), F.T2(this, e))) {
                 throw e;
             }
         } catch (RuntimeException e0) {
@@ -933,18 +923,18 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    public void setRenderArg(int position, Object arg) {
+    public void __setRenderArg(int position, Object arg) {
     }
 
     /**
      * The render context
      */
-    protected Context __ctx = new Context();
+    protected __Context __ctx = new __Context();
 
     /**
      * Return current template lang. Not to be used in user application or template
      *
-     * @return
+     * @return current {@link com.greenlaw110.rythm.extension.ILang lang}
      */
     public ILang __curLang() {
         return __ctx.currentLang();
@@ -963,9 +953,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(StrBuf wrapper) {
+    protected void __append(StrBuf wrapper) {
         if (appendToBuffer()) {
-            super.append(wrapper);
+            super.__append(wrapper);
             return;
         }
 
@@ -986,8 +976,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(Object o) {
-        if (appendToBuffer()) super.append(o);
+    protected void __append(Object o) {
+        if (appendToBuffer()) super.__append(o);
 
         StrBuf wrapper = new StrBuf(o.toString());
         if (appendToOutputStream()) {
@@ -1007,8 +997,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(char c) {
-        if (appendToBuffer()) super.append(c);
+    protected void __append(char c) {
+        if (appendToBuffer()) super.__append(c);
 
         if (appendToOutputStream()) {
             try {
@@ -1027,8 +1017,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(int i) {
-        if (appendToBuffer()) super.append(i);
+    protected void __append(int i) {
+        if (appendToBuffer()) super.__append(i);
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(i));
@@ -1048,8 +1038,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(long l) {
-        if (appendToBuffer()) super.append(l);
+    protected void __append(long l) {
+        if (appendToBuffer()) super.__append(l);
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(l));
@@ -1069,8 +1059,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(float f) {
-        if (appendToBuffer()) super.append(f);
+    protected void __append(float f) {
+        if (appendToBuffer()) super.__append(f);
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(f));
@@ -1090,8 +1080,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(double d) {
-        if (appendToBuffer()) super.append(d);
+    protected void __append(double d) {
+        if (appendToBuffer()) super.__append(d);
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(d));
@@ -1111,8 +1101,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    protected void append(boolean b) {
-        if (appendToBuffer()) super.append(b);
+    protected void __append(boolean b) {
+        if (appendToBuffer()) super.__append(b);
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(b));
@@ -1147,36 +1137,36 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    public final TemplateBase pe(Object o, ITemplate.Escape escape) {
+    public final TemplateBase pe(Object o, Escape escape) {
         return (TemplateBase) super.pe(o, escape);
     }
 
     // --- debugging interface
-    protected static void _log(String msg, Object... args) {
+    protected static void __log(String msg, Object... args) {
         __logger.info(msg, args);
     }
 
-    protected static void _debug(String msg, Object... args) {
+    protected static void __debug(String msg, Object... args) {
         __logger.debug(msg, args);
     }
 
-    protected static void _info(String msg, Object... args) {
+    protected static void __info(String msg, Object... args) {
         __logger.info(msg, args);
     }
 
-    protected static void _warn(String msg, Object... args) {
+    protected static void __warn(String msg, Object... args) {
         __logger.error(msg, args);
     }
 
-    protected static void _warn(Throwable t, String msg, Object... args) {
+    protected static void __warn(Throwable t, String msg, Object... args) {
         __logger.error(t, msg, args);
     }
 
-    protected static void _error(String msg, Object... args) {
+    protected static void __error(String msg, Object... args) {
         __logger.error(msg, args);
     }
 
-    protected static void _error(Throwable t, String msg, Object... args) {
+    protected static void __error(Throwable t, String msg, Object... args) {
         __logger.error(t, msg, args);
     }
 
@@ -1188,13 +1178,13 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param <T>
      */
-    protected static class _Itr<T> implements Iterable<T> {
+    protected static class __Itr<T> implements Iterable<T> {
         private Object _o = null;
         private int _size = -1;
         private Iterator<T> iterator = null;
         private int cursor = 0;
 
-        public _Itr(T[] ta) {
+        public __Itr(T[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1215,7 +1205,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(int[] ta) {
+        public __Itr(int[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1236,7 +1226,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(long[] ta) {
+        public __Itr(long[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1257,7 +1247,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(float[] ta) {
+        public __Itr(float[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1278,7 +1268,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(double[] ta) {
+        public __Itr(double[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1299,7 +1289,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(short[] ta) {
+        public __Itr(short[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1320,7 +1310,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(char[] ta) {
+        public __Itr(char[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1341,7 +1331,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(byte[] ta) {
+        public __Itr(byte[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1362,7 +1352,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             };
         }
 
-        public _Itr(boolean[] ta) {
+        public __Itr(boolean[] ta) {
             _o = ta;
             _size = ta.length;
             iterator = new Iterator<T>() {
@@ -1382,14 +1372,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 }
             };
         }
-        
-        public _Itr(Range range) {
+
+        public __Itr(Range range) {
             _o = range;
             _size = range.size();
             iterator = range.iterator();
         }
-        
-        public _Itr(Object obj) {
+
+        public __Itr(Object obj) {
             if (null == obj) {
                 throw new NullPointerException();
             }
@@ -1409,16 +1399,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 seps.add("\n");
             }
             seps.addAll(Arrays.asList(";^,^:^_^-".split("\\^")));
-            for(String sep: seps) {
+            for (String sep : seps) {
                 if (s.contains(sep)) {
                     List<String> ls = Arrays.asList(s.split(sep));
                     List<String> ls0 = new ArrayList<String>();
-                    for(String s0: ls) {
+                    for (String s0 : ls) {
                         ls0.add(s0.trim());
                     }
                     _o = ls0;
                     _size = ls.size();
-                    iterator = (Iterator<T>)ls0.iterator();
+                    iterator = (Iterator<T>) ls0.iterator();
                     break;
                 }
             }
@@ -1426,11 +1416,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 List<String> ls = new ArrayList<String>();
                 ls.add(s);
                 _size = 1;
-                iterator = (Iterator<T>)ls.iterator();
+                iterator = (Iterator<T>) ls.iterator();
             }
         }
 
-        public _Itr(Iterable<T> tc) {
+        public __Itr(Iterable<T> tc) {
             _o = tc;
             if (tc instanceof Collection) {
                 _size = ((Collection) tc).size();

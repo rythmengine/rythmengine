@@ -340,7 +340,7 @@ public class TemplateClass {
 
     private static final ITemplate NULL_TEMPLATE = new TemplateBase() {
         @Override
-        public ITemplate cloneMe(RythmEngine engine, ITemplate caller) {
+        public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
             return null;
         }
     };
@@ -375,7 +375,7 @@ public class TemplateClass {
     public ITemplate asTemplate(ILang lang) {
         RythmEngine e = engine();
         if (null == name || e.mode().isDev()) refresh();
-        return templateInstance_(lang).cloneMe(engine(), null);
+        return templateInstance_(lang).__cloneMe(engine(), null);
     }
 
     public ITemplate asTemplate() {
@@ -384,7 +384,7 @@ public class TemplateClass {
 
     public ITemplate asTemplate(ITemplate caller) {
         TemplateBase tb = (TemplateBase) caller;
-        return templateInstance_(tb.__curLang()).cloneMe(engine(), caller);
+        return templateInstance_(tb.__curLang()).__cloneMe(engine(), caller);
     }
 
     private boolean refreshing = false;

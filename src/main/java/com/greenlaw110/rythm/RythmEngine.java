@@ -128,7 +128,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p>Usually user application should not call this method</p>
      *
-     * @return
+     * @return rythm configuration
      */
     public RythmConfiguration conf() {
         if (null == _conf) {
@@ -146,7 +146,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><code>Note</code>, this method is not generally used by user application</p>
      *
-     * @return
+     * @return engine version along with plugin version
      */
     public String version() {
         return version + "-" + conf().pluginVersion();
@@ -157,7 +157,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Return the engine {@link Rythm.Mode mode}
      *
-     * @return
+     * @return engine running mode
      */
     public Rythm.Mode mode() {
         if (null == _mode) {
@@ -171,7 +171,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, not to be used by user application</p>
      *
-     * @return
+     * @return true if this is the default engine
      */
     public boolean isSingleton() {
         return Rythm.engine == this;
@@ -180,7 +180,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Is the engine running in {@link Rythm.Mode#prod product} mode?
      *
-     * @return
+     * @return true if engine is running in prod mode
      */
     public boolean isProdMode() {
         return mode() == Rythm.Mode.prod;
@@ -189,7 +189,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Is the engine running in {@link Rythm.Mode#dev development} mode?
      *
-     * @return
+     * @return true if engine is running is debug mode
      */
     public boolean isDevMode() {
         return mode() != Rythm.Mode.prod;
@@ -202,7 +202,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, this method should not be used by user application</p>
      *
-     * @return
+     * @return resource manager
      */
     public TemplateResourceManager resourceManager() {
         return _resourceManager;
@@ -215,7 +215,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, this method should not be used by user application</p>
      *
-     * @return
+     * @return template class manager
      */
     public TemplateClassManager classes() {
         return _classes;
@@ -228,7 +228,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, this method should not be used by user application</p>
      *
-     * @return
+     * @return template class loader
      */
     public TemplateClassLoader classLoader() {
         return _classLoader;
@@ -241,7 +241,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p><b>Note</b>, this method should not be used by user application</p>
      *
-     * @return
+     * @return template class cache
      */
     public TemplateClassCache classCache() {
         return _classCache;
@@ -252,7 +252,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Return {@link ExtensionManager} of this engine
      *
-     * @return
+     * @return extension manager
      */
     public ExtensionManager extensionManager() {
         return _extensionManager;
@@ -395,8 +395,8 @@ public class RythmEngine implements IEventDispatcher {
         _tags.clear();
         _tags.put("chain", new JavaTagBase() {
             @Override
-            protected void call(ParameterList params, Body body) {
-                body.render(getBuffer());
+            protected void call(__ParameterList params, __Body body) {
+                body.render(__getBuffer());
             }
         });
 
@@ -474,14 +474,14 @@ public class RythmEngine implements IEventDispatcher {
         if (1 == args.length) {
             Object o0 = args[0];
             if (o0 instanceof Map) {
-                t.setRenderArgs((Map<String, Object>) args[0]);
+                t.__setRenderArgs((Map<String, Object>) args[0]);
             } else if (o0 instanceof JSONWrapper) {
-                t.setRenderArg((JSONWrapper) o0);
+                t.__setRenderArg((JSONWrapper) o0);
             } else {
-                t.setRenderArgs(args);
+                t.__setRenderArgs(args);
             }
         } else {
-            t.setRenderArgs(args);
+            t.__setRenderArgs(args);
         }
         //if (mode.isDev()) cceCounter.remove();
     }
@@ -524,7 +524,7 @@ public class RythmEngine implements IEventDispatcher {
         ITemplate t = tc.asTemplate();
         setRenderArgs(t, args);
 //        try {
-//            setRenderArgs(t, args);
+//            __setRenderArgs(t, args);
 //        } catch (ClassCastException ce) {
 //            if (mode.isDev()) {
 //                handleCCE(ce);
@@ -542,12 +542,12 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      * <p>When the args array contains only one element and is of {@link java.util.Map} type
      * the the render args are passed to template
-     * {@link ITemplate#setRenderArgs(java.util.Map) by name},
+     * {@link ITemplate#__setRenderArgs(java.util.Map) by name},
      * otherwise they passes to template instance by position</p>
      *
      * @param template
      * @param args
-     * @return
+     * @return template instance
      */
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(String template, Object... args) {
@@ -560,12 +560,12 @@ public class RythmEngine implements IEventDispatcher {
      *
      * <p>When the args array contains only one element and is of {@link java.util.Map} type
      * the the render args are passed to template
-     * {@link ITemplate#setRenderArgs(java.util.Map) by name},
+     * {@link ITemplate#__setRenderArgs(java.util.Map) by name},
      * otherwise they passes to template instance by position</p>
      *
      * @param file the template source file
      * @param args the render args. See {@link #getTemplate(String, Object...)}
-     * @return
+     * @return template instance
      */
     @SuppressWarnings("unchecked")
     public ITemplate getTemplate(File file, Object... args) {
@@ -587,7 +587,7 @@ public class RythmEngine implements IEventDispatcher {
         if (null == t) return null;
         setRenderArgs(t, args);
 //        try {
-//            setRenderArgs(t, args);
+//            __setRenderArgs(t, args);
 //        } catch (ClassCastException ce) {
 //            if (mode.isDev()) {
 //                handleCCE(ce);
@@ -611,7 +611,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template either the path of template source file or inline template content
      * @param args     render args array
-     * @return
+     * @return render result
      */
     public String render(String template, Object... args) {
         ITemplate t = getTemplate(template, args);
@@ -667,7 +667,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param file the template source file
      * @param args render args array
-     * @return
+     * @return render result
      */
     public String render(File file, Object... args) {
         ITemplate t = getTemplate(file, args);
@@ -685,7 +685,6 @@ public class RythmEngine implements IEventDispatcher {
      * @param os   the output stream
      * @param file the template source file
      * @param args render args array
-     * @return
      */
     public void render(OutputStream os, File file, Object... args) {
         outputMode.set(OutputMode.os);
@@ -704,7 +703,6 @@ public class RythmEngine implements IEventDispatcher {
      * @param w    the writer
      * @param file the template source file
      * @param args render args array
-     * @return
      */
     public void render(Writer w, File file, Object... args) {
         outputMode.set(OutputMode.writer);
@@ -721,6 +719,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template the inline template content
      * @param args     the render args array
+     * @return render result
      */
     public String renderStr(String template, Object... args) {
         return renderString(template, args);
@@ -734,7 +733,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template the inline template content
      * @param args     the render args array
-     * @return
+     * @return render result
      */
     @SuppressWarnings("unchecked")
     public String renderString(String template, Object... args) {
@@ -768,7 +767,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template either the template source file path or the inline template content
      * @param args     the render args array
-     * @return
+     * @return render result
      */
     public String substitute(String template, Object... args) {
         ITemplate t = getTemplate(BasicRythm.INSTANCE, template, args);
@@ -784,7 +783,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param file the template source file
      * @param args the render args array
-     * @return
+     * @return render result
      */
     public String substitute(File file, Object... args) {
         ITemplate t = getTemplate(file, args, BasicRythm.INSTANCE);
@@ -800,7 +799,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template either the template source file path or the inline template content
      * @param obj      the object instance which state is to be output as a string
-     * @return
+     * @return render result
      */
     public String toString(String template, Object obj) {
         Class argClass = obj.getClass();
@@ -815,7 +814,7 @@ public class RythmEngine implements IEventDispatcher {
             classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
-        t.setRenderArg(0, obj);
+        t.__setRenderArg(0, obj);
         return t.render();
     }
 
@@ -824,7 +823,7 @@ public class RythmEngine implements IEventDispatcher {
      * to be output. Return render result as String
      *
      * @param obj the object instance which state is to be output as a string
-     * @return
+     * @return render result
      */
     public String toString(Object obj) {
         return toString(obj, ToStringOption.DEFAULT_OPTION, (ToStringStyle) null);
@@ -838,7 +837,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param obj    the object instance which state is to be output as a string
      * @param option the output option
      * @param style  the output style
-     * @return
+     * @return render result
      */
     public String toString(Object obj, ToStringOption option, ToStringStyle style) {
         Class<?> c = obj.getClass();
@@ -850,7 +849,7 @@ public class RythmEngine implements IEventDispatcher {
             classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
-        t.setRenderArg(0, obj);
+        t.__setRenderArg(0, obj);
         return t.render();
     }
 
@@ -863,7 +862,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param obj    the object instance which state is to be output as a string
      * @param option the output option
      * @param style  the output style specified as apache commons ToStringStyle
-     * @return
+     * @return render result
      */
     public String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
         return toString(obj, option, ToStringStyle.fromApacheStyle(style));
@@ -908,7 +907,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param template the template source path
      * @param args     render args. See {@link #getTemplate(String, Object...)}
-     * @return
+     * @return render result
      */
     public String renderIfTemplateExists(String template, Object... args) {
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
@@ -955,7 +954,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p>Not an API for user application</p>
      *
      * @param tagName
-     * @return
+     * @return true if there is a tag with the name specified
      */
     public boolean hasTag(String tagName) {
         return _tags.containsKey(tagName);
@@ -967,7 +966,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p>Not an API for user application</p>
      *
      * @param tagName
-     * @return
+     * @return the tag
      */
     public ITag getTag(String tagName) {
         return _tags.get(tagName);
@@ -979,12 +978,12 @@ public class RythmEngine implements IEventDispatcher {
      * <p>Not an API for user application</p>
      *
      * @param name
-     * @return
+     * @return template class
      */
     public TemplateClass getTemplateClassFromTagName(String name) {
         TemplateBase tag = (TemplateBase) _tags.get(name);
         if (null == tag) return null;
-        return tag.getTemplateClass(false);
+        return tag.__getTemplateClass(false);
     }
 
     /**
@@ -994,7 +993,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param name
      * @param tc
-     * @return
+     * @return tag name
      */
     public String testTag(String name, TemplateClass tc) {
         if (Keyword.THIS.toString().equals(name)) {
@@ -1047,7 +1046,7 @@ public class RythmEngine implements IEventDispatcher {
      * @return true if registration success
      */
     public boolean registerTag(ITag tag) {
-        String name = tag.getName();
+        String name = tag.__getName();
         return registerTag(name, tag);
     }
 
@@ -1082,7 +1081,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param body
      * @param context
      */
-    public void invokeTag(int line, String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context) {
+    public void invokeTag(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context) {
         invokeTag(line, name, caller, params, body, context, false);
     }
 
@@ -1101,14 +1100,14 @@ public class RythmEngine implements IEventDispatcher {
      * @param context
      * @param ignoreNonExistsTag
      */
-    public void invokeTag(int line, String name, ITemplate caller, ITag.ParameterList params, ITag.Body body, ITag.Body context, boolean ignoreNonExistsTag) {
+    public void invokeTag(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
         if (_nonExistsTags.contains(name)) return;
         // try tag registry first
         ITag tag = _tags.get(name);
-        TemplateClass tc = ((TemplateBase) caller).getTemplateClass(true);
+        TemplateClass tc = ((TemplateBase) caller).__getTemplateClass(true);
         if (null == tag) {
             // is calling self
-            if (S.isEqual(name, ((TagBase) caller).getName())) tag = (TagBase) caller;
+            if (S.isEqual(name, ((TagBase) caller).__getName())) tag = (TagBase) caller;
         }
 
         if (null == tag) {
@@ -1149,7 +1148,7 @@ public class RythmEngine implements IEventDispatcher {
                         throw new NullPointerException("cannot find tag: " + name);
                     }
                 }
-                tag = (ITag) tag.cloneMe(this, caller);
+                tag = (ITag) tag.__cloneMe(this, caller);
             }
         }
 
@@ -1172,27 +1171,27 @@ public class RythmEngine implements IEventDispatcher {
             }
             tag = (ITag) tc0.asTemplate(caller);
         } else {
-            tag = (ITag) tag.cloneMe(this, caller);
+            tag = (ITag) tag.__cloneMe(this, caller);
         }
 
         if (null != params) {
             if (tag instanceof JavaTagBase) {
-                ((JavaTagBase) tag).setRenderArgs(params);
+                ((JavaTagBase) tag).__setRenderArgs0(params);
             } else {
                 for (int i = 0; i < params.size(); ++i) {
-                    ITag.Parameter param = params.get(i);
-                    if (null != param.name) tag.setRenderArg(param.name, param.value);
-                    else tag.setRenderArg(i, param.value);
+                    ITag.__Parameter param = params.get(i);
+                    if (null != param.name) tag.__setRenderArg(param.name, param.value);
+                    else tag.__setRenderArg(i, param.value);
                 }
             }
         }
-        if (null != body) tag.setRenderArg("_body", body);
+        if (null != body) tag.__setRenderArg("_body", body);
         RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, tag));
         try {
             if (null != context) {
                 ((TagBase) tag).setBodyContext(context);
             }
-            tag.call(line);
+            tag.__call(line);
         } finally {
             RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase) caller, tag));
         }
@@ -1252,7 +1251,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param key
      * @param args
-     * @return
+     * @return cached item
      */
     public Serializable cached(String key, Object... args) {
         if (conf().cacheDisabled()) return null;
@@ -1320,7 +1319,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Create a {@link Sandbox} instance to render the template
      *
-     * @return
+     * @return an new sandbox instance
      */
     public Sandbox sandbox() {
         return new Sandbox(this, secureExecutor());
@@ -1341,7 +1340,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param event
      * @param param
-     * @return
+     * @return event handler process result
      */
     @Override
     public Object accept(IEvent event, Object param) {
@@ -1374,7 +1373,7 @@ public class RythmEngine implements IEventDispatcher {
          * Return true if the current output mode is to output to {@link java.io.OutputStream}
          * or {@link java.io.Writer}
          *
-         * @return
+         * @return true if output mode is not return string
          */
         public boolean writeOutput() {
             return true;
@@ -1391,7 +1390,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Return current {@link OutputMode}. Not to be used in user application
      *
-     * @return
+     * @return output mode
      */
     public final static OutputMode outputMode() {
         return outputMode.get();

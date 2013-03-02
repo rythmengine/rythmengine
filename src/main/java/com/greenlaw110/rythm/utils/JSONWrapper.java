@@ -89,7 +89,7 @@ public class JSONWrapper {
     /**
      * Parse the string and return the JSONWrapper
      * @param s
-     * @return
+     * @return JSON wrapper of the string
      */
     public static JSONWrapper wrap(String s) {
         return new JSONWrapper(s);

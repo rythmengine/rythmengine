@@ -366,7 +366,7 @@ public class CodeBuilder extends TextBuilder {
         inlineTagBodies.push(builders);
         builders = tag.builders;
         if ("void".equals(tag.retType)) {
-            tag.retType = "com.greenlaw110.rythm.template.ITemplate.RawData";
+            tag.retType = "com.greenlaw110.rythm.utils.RawData";
             tag.autoRet = true;
             String code = "StringBuilder __sb = this.getSelfOut();this.setSelfOut(new StringBuilder());";
             builders.add(new CodeToken(code, parser));
@@ -401,7 +401,7 @@ public class CodeBuilder extends TextBuilder {
         if (includeTag instanceof JavaTagBase) {
             throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
         }
-        TemplateClass includeTc = includeTag.getTemplateClass(false);
+        TemplateClass includeTc = includeTag.__getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);
@@ -426,7 +426,7 @@ public class CodeBuilder extends TextBuilder {
             logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager().getFullTagName(extendedTemplateClass));
         } else {
             TemplateBase tb = (TemplateBase) engine.getTag(fullName);
-            TemplateClass tc = tb.getTemplateClass(false);
+            TemplateClass tc = tb.__getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;
             this.templateClass.extendedTemplateClass = tc;
@@ -783,9 +783,9 @@ public class CodeBuilder extends TextBuilder {
             else pn();
         }
 
-        // -- output renderArgTypeMap method
+        // -- output __renderArgTypeMap method
         pn();
-        ptn("protected Map<String, Class> renderArgTypeMap() {");
+        ptn("protected Map<String, Class> __renderArgTypeMap() {");
         p2tn("Map<String, Class> m = new HashMap<String, Class>();");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -794,11 +794,11 @@ public class CodeBuilder extends TextBuilder {
         p2tn("return m;");
         ptn("}");
 
-        // -- output setRenderArgs method
+        // -- output __setRenderArgs method
         pn();
-        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void setRenderArgs(java.util.Map<String, Object> args) {");
+        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<String, Object> args) {");
         p2tn("if (null == args) throw new NullPointerException();\n\t\tif (args.isEmpty()) return;");
-        p2tn("super.setRenderArgs(args);");
+        p2tn("super.__setRenderArgs(args);");
         boolean first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
@@ -815,9 +815,9 @@ public class CodeBuilder extends TextBuilder {
         ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
         int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == ce) ? 0 : ce.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
-            // -- output setRenderArgs method with args passed in positioned order
+            // -- output __setRenderArgs method with args passed in positioned order
             pn();
-            ptn("@SuppressWarnings(\"unchecked\") public void setRenderArgs(Object... args) {");
+            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(Object... args) {");
             {
                 p2tn("int __p = 0, __l = args.length;");
                 int i = userDefinedArgNumber;
@@ -830,9 +830,9 @@ public class CodeBuilder extends TextBuilder {
             }
             ptn("}");
 
-            // -- output renderArgTypeArray method with args passed in positioned order
+            // -- output __renderArgTypeArray method with args passed in positioned order
             pn();
-            ptn("protected Class[] renderArgTypeArray() {");
+            ptn("protected Class[] __renderArgTypeArray() {");
             {
                 p2t("return new Class[]{");
                 int i = userDefinedArgNumber;
@@ -845,9 +845,9 @@ public class CodeBuilder extends TextBuilder {
             ptn("}");
         }
 
-        // -- output setRenderArg by name
+        // -- output __setRenderArg by name
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") @Override public void setRenderArg(String name, Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(String name, Object arg) {");
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
@@ -861,11 +861,11 @@ public class CodeBuilder extends TextBuilder {
                 p("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
             }
         }
-        p2t("super.setRenderArg(name, arg);\n\t}\n");
+        p2t("super.__setRenderArg(name, arg);\n\t}\n");
 
-        // -- output setRenderArg by position
+        // -- output __setRenderArg by position
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") public void setRenderArg(int pos, Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int pos, Object arg) {");
         p2tn("int _p = 0;");
         if (true) {
             first = true;
@@ -882,20 +882,20 @@ public class CodeBuilder extends TextBuilder {
             }
         }
         // the first argument has a default name "arg"
-        p2tn("if(0 == pos) setRenderArg(\"arg\", arg);");
+        p2tn("if(0 == pos) __setRenderArg(\"arg\", arg);");
         ptn("}");
     }
 
     protected void pExtendInitArgCode() {
         if (null == extendArgs || extendArgs.pl.size() < 1) return;
         pn();
-        ptn("@Override protected void loadExtendingArgs() {");
+        ptn("@Override protected void __loadExtendingArgs() {");
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
             InvokeTemplateParser.ParameterDeclaration pd = extendArgs.pl.get(i);
             if (S.isEmpty(pd.nameDef)) {
-                p2t("__parent.setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
+                p2t("__parent.__setRenderArg(").p(i).p(", ").p(pd.valDef).p(");");
             } else {
-                p2t("__parent.setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).p(");");
+                p2t("__parent.__setRenderArg(\"").p(pd.nameDef).p("\", ").p(pd.valDef).p(");");
             }
             if (extendDeclareLineNo != -1) {
                 p(" //line: ").pn(extendDeclareLineNo);
@@ -909,7 +909,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pSetup() {
         if (!logTime && renderArgs.isEmpty()) return;
         pn();
-        ptn("@Override protected void setup() {");
+        ptn("@Override protected void __setup() {");
         if (logTime) {
             p2tn("__logTime = true;");
         }
@@ -917,7 +917,7 @@ public class CodeBuilder extends TextBuilder {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (").p(argName).p(" == null) {");
             //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-            p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");}\n");
+            p(argName).p("=(").p(arg.type).p(")__get(\"").p(argName).p("\");}\n");
         }
         ptn("}");
     }
@@ -925,13 +925,13 @@ public class CodeBuilder extends TextBuilder {
     protected void pInitCode() {
         if (S.isEmpty(initCode)) return;
         pn();
-        pt("@Override public void init() {").p(initCode).p(";").pn("\n\t}");
+        pt("@Override public void __init() {").p(initCode).p(";").pn("\n\t}");
     }
 
     protected void pTagImpl() {
         if (!isTag()) return;
         pn();
-        pt("@Override public java.lang.String getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
+        pt("@Override public java.lang.String __getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
     public String buildBody = null;
@@ -1015,14 +1015,14 @@ public class CodeBuilder extends TextBuilder {
         p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
         StringBuilder old = buffer();
-        setBuffer(sb);
+        __setBuffer(sb);
         // try merge strings
         List<TextBuilder> merged = mergeStringTokens(this.builders);
         for (TextBuilder b : merged) {
             b.build();
         }
         buildBody = sb.toString();
-        setBuffer(old);
+        __setBuffer(old);
         p(buildBody);
         p("\n\t\treturn this;\n\t}\n");
 

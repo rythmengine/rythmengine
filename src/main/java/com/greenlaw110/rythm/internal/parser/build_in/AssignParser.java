@@ -69,8 +69,8 @@ public class AssignParser extends KeywordParserFactory {
             String assignTo = this.assignTo;
             if (isFinal) assignTo = this.assignTo + "___";
             StringBuilder sbNew = new StringBuilder();
-            StringBuilder sbOld = getBuffer();
-            setBuffer(sbNew);
+            StringBuilder sbOld = __getBuffer();
+            __setBuffer(sbNew);
             p3tline("String s = sbNew.toString();");
             p3tline("setSelfOut(sbOld);");
             p3t(assignTo).p(" = s;");
@@ -81,7 +81,7 @@ public class AssignParser extends KeywordParserFactory {
                 pline();
             }
             String s = sbNew.toString();
-            setBuffer(sbOld);
+            __setBuffer(sbOld);
             return s;
         }
     }

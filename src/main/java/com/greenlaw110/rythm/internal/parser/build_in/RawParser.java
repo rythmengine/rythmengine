@@ -23,15 +23,12 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parse @raw() {...}
@@ -68,7 +65,7 @@ public class RawParser extends KeywordParserFactory {
                     }
                 }
                 step(matched.length());
-                return new BlockCodeToken("__ctx.pushEscape(com.greenlaw110.rythm.template.ITemplate.Escape.RAW);", ctx()) {
+                return new BlockCodeToken("__ctx.pushEscape(com.greenlaw110.rythm.utils.Escape.RAW);", ctx()) {
                     @Override
                     public void openBlock() {
                     }

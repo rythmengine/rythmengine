@@ -19,10 +19,12 @@
 */
 package com.greenlaw110.rythm.template;
 
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.RawData;
 
 import java.util.*;
 
@@ -34,7 +36,7 @@ public interface ITag extends ITemplate {
     /**
      * A datastructure to store tag calling parameter
      */
-    public static class Parameter {
+    public static class __Parameter {
         /**
          * Parameter name
          */
@@ -50,7 +52,7 @@ public interface ITag extends ITemplate {
          * @param name
          * @param value
          */
-        public Parameter(String name, Object value) {
+        public __Parameter(String name, Object value) {
             this.name = "".equals(name) ? null : name;
             this.value = value;
         }
@@ -62,10 +64,10 @@ public interface ITag extends ITemplate {
     }
 
     /**
-     * A list of {@link Parameter}
+     * A list of {@link com.greenlaw110.rythm.template.ITag.__Parameter}
      */
-    public static class ParameterList implements Iterable<Parameter> {
-        private List<Parameter> lp = new ArrayList<Parameter>();
+    public static class __ParameterList implements Iterable<__Parameter> {
+        private List<__Parameter> lp = new ArrayList<__Parameter>();
 
         /**
          * Add an new parameter to the list specified by name and value
@@ -74,17 +76,17 @@ public interface ITag extends ITemplate {
          * @param value
          */
         public void add(String name, Object value) {
-            lp.add(new Parameter(name, value));
+            lp.add(new __Parameter(name, value));
         }
 
         /**
          * Return parameter value by name from the list
          *
          * @param name
-         * @return
+         * @return parameter by name
          */
         public Object getByName(String name) {
-            for (Parameter para : lp) {
+            for (__Parameter para : lp) {
                 if (name.equals(para.name)) return para.value;
             }
             return null;
@@ -98,10 +100,10 @@ public interface ITag extends ITemplate {
          * @param name
          * @param defVal
          * @param <T>
-         * @return
+         * @return parameter by name
          */
         public <T> T getByName(String name, T defVal) {
-            for (Parameter para : lp) {
+            for (__Parameter para : lp) {
                 if (name.equals(para.name)) return (T) para.value;
             }
             return defVal;
@@ -110,7 +112,7 @@ public interface ITag extends ITemplate {
         /**
          * Get default parameter value. Which is the first parameter in the list
          *
-         * @return
+         * @return default parameter
          */
         public Object getDefault() {
             return getByPosition(0);
@@ -120,7 +122,7 @@ public interface ITag extends ITemplate {
          * Get parameter value by position in the list
          *
          * @param pos
-         * @return
+         * @return parameter by position
          */
         public Object getByPosition(int pos) {
             if (pos >= lp.size()) return null;
@@ -128,37 +130,37 @@ public interface ITag extends ITemplate {
         }
 
         @Override
-        public Iterator<Parameter> iterator() {
+        public Iterator<__Parameter> iterator() {
             return lp.iterator();
         }
 
         /**
          * How many parameters are stored in the list
          *
-         * @return
+         * @return size of the param list
          */
         public int size() {
             return lp.size();
         }
 
         /**
-         * Get a {@link Parameter} instance by position in the list
+         * Get a {@link com.greenlaw110.rythm.template.ITag.__Parameter} instance by position in the list
          *
          * @param i
-         * @return
+         * @return parameter by position
          */
-        public Parameter get(int i) {
+        public __Parameter get(int i) {
             return lp.get(i);
         }
 
         /**
          * Convert the parameter list into a map mapped values to names
          *
-         * @return
+         * @return parameter as map mapped by name
          */
         public Map<String, Object> asMap() {
             Map<String, Object> m = new HashMap<String, Object>();
-            for (Parameter p : lp) {
+            for (__Parameter p : lp) {
                 if (p.name != null) m.put(p.name, p.value);
             }
             return m;
@@ -169,12 +171,12 @@ public interface ITag extends ITemplate {
         /**
          * Used to create unique key for <code>@cacheFor()</code> transformer
          *
-         * @return
+         * @return the UUID string
          */
         public String toUUID() {
             if (null == uuid) {
                 StringBuilder sb = new StringBuilder();
-                for (Parameter p : lp) {
+                for (__Parameter p : lp) {
                     sb.append(";").append(p.name).append("=").append(p.value);
                 }
                 String s = sb.toString();
@@ -188,65 +190,53 @@ public interface ITag extends ITemplate {
     /**
      * Defines a tag body type
      */
-    public abstract static class Body extends TemplateBuilder {
+    public abstract static class __Body extends TemplateBuilder {
 
         /**
          * the body logger
          */
-        protected ILogger __bodyLogger = Logger.get(Body.class);
+        protected ILogger __bodyLogger = Logger.get(__Body.class);
 
         /**
          * The context template
          */
-        protected TemplateBase _context;
+        protected TemplateBase __context;
 
         /**
          * This body itself.
          */
-        protected Body self = this;
+        protected __Body __self = this;
 
         /**
          * Construct a body with context template instance
          *
          * @param context
          */
-        public Body(TemplateBase context) {
-            _context = context;
-        }
-
-        public StringBuilder getBuffer() {
-            return __buffer;
-        }
-
-        public ITemplate getContext() {
-            return _context;
-        }
-
-        public void setOut(StringBuilder out) {
-            //_context.setBuffer(buffer);
+        public __Body(TemplateBase context) {
+            __context = context;
         }
 
         private void call(StringBuilder out) {
             __buffer = out;
             try {
-                _call();
+                __call();
             } finally {
                 __buffer = null;
             }
         }
 
-        public final Body pe(Object o) {
+        public final __Body pe(Object o) {
             if (null == o) return this;
-            if (o instanceof ITemplate.RawData) {
-                return (Body) p(o);
+            if (o instanceof RawData) {
+                return (__Body) p(o);
             }
-            ITemplate.Escape escape = _context.__defaultEscape();
-            return (Body) pe(o, escape);
+            Escape escape = __context.__defaultEscape();
+            return (__Body) pe(o, escape);
         }
 
-        protected abstract void setBodyArgByName(String name, Object val);
+        protected abstract void __setBodyArgByName(String name, Object val);
 
-        protected abstract void setBodyArgByPos(int pos, Object val);
+        protected abstract void __setBodyArgByPos(int pos, Object val);
 
         public String render(Object... vals) {
             StringBuilder sb = new StringBuilder();
@@ -256,54 +246,43 @@ public interface ITag extends ITemplate {
 
         public void render(StringBuilder out, Object... vals) {
             for (int i = vals.length - 1; i > -1; --i) {
-                setBodyArgByPos(i, vals[i]);
+                __setBodyArgByPos(i, vals[i]);
             }
             call(out);
         }
 
-        public void render(ParameterList parameterList, StringBuilder out) {
+        public void render(__ParameterList parameterList, StringBuilder out) {
             if (null != parameterList) {
                 for (int i = 0; i < parameterList.size(); ++i) {
-                    Parameter p = parameterList.get(i);
+                    __Parameter p = parameterList.get(i);
                     if (!S.isEmpty(p.name)) {
-                        setBodyArgByName(p.name, p.value);
+                        __setBodyArgByName(p.name, p.value);
                     } else {
-                        setBodyArgByPos(i, p.value);
+                        __setBodyArgByPos(i, p.value);
                     }
                 }
             }
             call(out);
         }
 
-        protected abstract void _call();
+        protected abstract void __call();
 
-        public abstract void setProperty(String name, Object val);
+        public abstract void __setProperty(String name, Object val);
 
-        public abstract Object getProperty(String name);
-//        @Override
-//        public String toString() {
-////            StringBuilder old = getBuffer();
-////            setBuffer(new StringBuilder());
-////            call();
-////            String s = getBuffer().toString();
-////            setBuffer(old);
-////            return s;
-//            StringBuilder sbNew = new StringBuilder();
-//            StringBuilder sbOld = _context.getBuffer();
-//            _context.setBuffer(sbNew);
-//            this.__buffer = sbNew;
-//            _call();
-//            String s = sbNew.toString();
-//            _context.setBuffer(sbOld);
-//            this.__buffer = null;
-//            return s;
-////            __buffer.setLength(0);
-////            call();
-////            return __buffer.toString();
-//        }
+        public abstract Object __getProperty(String name);
     }
 
-    String getName();
+    /**
+     * Get the tag name
+     * 
+     * @return tag name
+     */
+    String __getName();
 
-    void call(int line);
+    /**
+     * Call this tag
+     * 
+     * @param line the number of the caller template line which invoke this tag
+     */
+    void __call(int line);
 }

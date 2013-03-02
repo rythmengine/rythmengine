@@ -22,7 +22,6 @@ package com.greenlaw110.rythm.internal.compiler;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.utils.S;
 
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

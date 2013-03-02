@@ -84,8 +84,8 @@ public interface ISourceCodeEnhancer {
      * render args described in {@link #getRenderArgDescriptions()} method. E.g.
      * <p/>
      * <pre><code>
-     * template.setRenderArg("_play", new play.Play());
-     * template.setRenderArg("request", play.mvc.Request.current());
+     * template.__setRenderArg("_play", new play.Play());
+     * template.__setRenderArg("request", play.mvc.Request.current());
      * </code></pre>
      * <p/>
      * <p>This method is called before {@link com.greenlaw110.rythm.RythmEngine rythm engine} start

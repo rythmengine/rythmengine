@@ -23,7 +23,6 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.Transformer;
-import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.text.*;
@@ -42,8 +41,7 @@ import java.util.TimeZone;
  * in template source code freely. E.g.</p>
  * <p/>
  * <pre><code>
- *
- * @if(s().empty(name)) {
+ * {@literal @}if(s().empty(name)) {
  * <div class="alert alert-error">user name is empty!</div>
  * }
  * </code></pre>
@@ -100,7 +98,7 @@ public class S {
      * converted to a String.
      *
      * @param o
-     * @return
+     * @return true if the object string representation is empty
      * @see #isEmpty(String)
      */
     public static boolean isEmpty(Object o) {
@@ -281,19 +279,19 @@ public class S {
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object without any escaping.
      *
      * @param o
      * @return raw data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData raw(Object o) {
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(o);
+    public static RawData raw(Object o) {
+        return new RawData(o);
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with default {@link #escapeXml(Object)} escaping or if the current
      * render engine exists return the escape specified by the default lang of the 
      * current render engine
@@ -304,15 +302,15 @@ public class S {
      * @return escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escape(Object s) {
+    public static RawData escape(Object s) {
         RythmEngine engine = RythmEngine.get();
-        ITemplate.Escape escape = ITemplate.Escape.XML;
+        Escape escape = Escape.XML;
         if (null != engine) {
             ILang lang = engine.conf().defaultLang();
             if (null != lang) {
                 escape = lang.escape();
                 if (null == escape) {
-                    escape = ITemplate.Escape.XML;
+                    escape = Escape.XML;
                 }
             }
         }
@@ -320,7 +318,7 @@ public class S {
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with specified escaping scheme.
      * <p/>
      * <p>
@@ -344,11 +342,11 @@ public class S {
      * @return escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escape(Object o, Object escape) {
-        if (isEmpty(o)) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        if (escape instanceof ITemplate.Escape) return ((ITemplate.Escape) escape).apply(o);
+    public static RawData escape(Object o, Object escape) {
+        if (isEmpty(o)) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        if (escape instanceof Escape) return ((Escape) escape).apply(o);
         if (isEmpty(escape)) return escape(o);
         String se = escape.toString();
         if ("json".equalsIgnoreCase(se)) return escapeJson(o);
@@ -361,7 +359,7 @@ public class S {
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with HTML escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -370,11 +368,11 @@ public class S {
      * @return html escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeHTML(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(StringEscapeUtils.escapeHtml4(o.toString()));
+    public static RawData escapeHTML(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeHtml4(o.toString()));
     }
 
     /**
@@ -383,12 +381,12 @@ public class S {
      * @param o
      * @return html escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeHtml(Object o) {
+    public static RawData escapeHtml(Object o) {
         return escapeHTML(o);
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with CSV escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -397,25 +395,25 @@ public class S {
      * @return csv escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeCSV(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(StringEscapeUtils.escapeCsv(o.toString()));
+    public static RawData escapeCSV(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeCsv(o.toString()));
     }
 
     /**
      * Alias of {@link #escapeCSV(Object)}
      *
      * @param o
-     * @return
+     * @return CSV escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeCsv(Object o) {
+    public static RawData escapeCsv(Object o) {
         return escapeCSV(o);
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with JSON escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -427,13 +425,13 @@ public class S {
      * @return JSON escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJSON(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
+    public static RawData escapeJSON(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
         String s0 = o.toString();
         s0 = s0.replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(s0);
+        return new RawData(s0);
     }
 
     /**
@@ -442,12 +440,12 @@ public class S {
      * @param o
      * @return JSON escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJson(Object o) {
+    public static RawData escapeJson(Object o) {
         return escapeJSON(o);
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with JavaScript escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -459,11 +457,11 @@ public class S {
      * @return JavaScript escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJavaScript(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(StringEscapeUtils.escapeEcmaScript(o.toString()));
+    public static RawData escapeJavaScript(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeEcmaScript(o.toString()));
     }
 
     /**
@@ -472,7 +470,7 @@ public class S {
      * @param o
      * @return JavaScript escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJavascript(Object o) {
+    public static RawData escapeJavascript(Object o) {
         return escapeJavaScript(o);
     }
 
@@ -483,12 +481,12 @@ public class S {
      * @return JavaScript escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeJS(Object o) {
+    public static RawData escapeJS(Object o) {
         return escapeJavaScript(o);
     }
 
     /**
-     * Return a {@link com.greenlaw110.rythm.template.ITemplate.RawData} type wrapper of
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with XML escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -500,11 +498,11 @@ public class S {
      * @return XML escaped data
      */
     @Transformer
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeXML(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
+    public static RawData escapeXML(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
 
     /**
@@ -513,11 +511,11 @@ public class S {
      * @param o
      * @return XML escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeXml(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(StringEscapeUtils.escapeXml(o.toString()));
+    public static RawData escapeXml(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeXml(o.toString()));
     }
 
     /**
@@ -526,12 +524,12 @@ public class S {
      * @param o
      * @return Regex escaped data
      */
-    public static com.greenlaw110.rythm.template.ITemplate.RawData escapeRegex(Object o) {
-        if (null == o) return com.greenlaw110.rythm.template.ITemplate.RawData.NULL;
-        if (o instanceof com.greenlaw110.rythm.template.ITemplate.RawData)
-            return (com.greenlaw110.rythm.template.ITemplate.RawData) o;
+    public static RawData escapeRegex(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
         String s = o.toString();
-        return new com.greenlaw110.rythm.template.ITemplate.RawData(s.replaceAll("([\\/\\*\\{\\}\\<\\>\\-\\\\\\!])", "\\\\$1"));
+        return new RawData(s.replaceAll("([\\/\\*\\{\\}\\<\\>\\-\\\\\\!])", "\\\\$1"));
     }
 
     /**
@@ -707,7 +705,7 @@ public class S {
      * @param lang
      * @param locale
      * @return the formatted String
-     * @see {@link DecimalFormatSymbols}
+     * @see DecimalFormatSymbols
      */
     @Transformer
     public static String format(Number number, String pattern, String lang, String locale) {
@@ -751,7 +749,7 @@ public class S {
      * 
      * @param date
      * @param pattern
-     * @return
+     * @return formated string
      */
     @Transformer
     public static String format(Date date, String pattern) {
@@ -787,7 +785,7 @@ public class S {
      * @param locale
      * @param timezone
      * @return the formatted String
-     * @See {@link SimpleDateFormat}
+     * @see SimpleDateFormat
      */
     @Transformer
     public static String format(Date date, String pattern, String lang, String locale, String timezone) {

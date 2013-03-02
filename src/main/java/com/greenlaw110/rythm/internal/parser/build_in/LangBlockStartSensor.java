@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.parser.CodeToken;

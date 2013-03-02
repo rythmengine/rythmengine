@@ -19,16 +19,14 @@
 */
 package com.greenlaw110.rythm.template;
 
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.utils.JSONWrapper;
-import com.greenlaw110.rythm.utils.S;
 
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Stack;
 
@@ -42,34 +40,34 @@ public interface ITemplate extends Cloneable {
      *
      * @param os
      * @throws NullPointerException  if os specified is null
-     * @throws IllegalStateException if output stream or {@link #setWriter(java.io.Writer) writer}
+     * @throws IllegalStateException if output stream or {@link #__setWriter(java.io.Writer) writer}
      *                               is already set
      */
-    void setOutputStream(OutputStream os);
+    void __setOutputStream(OutputStream os);
 
     /**
      * Set a character based writer to the template instance
      *
      * @param writer
      * @throws NullPointerException  if os specified is null
-     * @throws IllegalStateException if {@link #setOutputStream(java.io.OutputStream) output stream}
+     * @throws IllegalStateException if {@link #__setOutputStream(java.io.OutputStream) output stream}
      *                               or writer is already set
      */
-    void setWriter(Writer writer);
+    void __setWriter(Writer writer);
 
     /**
      * Set renderArgs in name-value pair
      *
      * @param args
      */
-    void setRenderArgs(Map<String, Object> args);
+    void __setRenderArgs(Map<String, Object> args);
 
     /**
      * Set renderArgs in position
      *
      * @param args
      */
-    void setRenderArgs(Object... args);
+    void __setRenderArgs(Object... args);
 
     /**
      * Set a render arg by name
@@ -77,16 +75,16 @@ public interface ITemplate extends Cloneable {
      * @param name
      * @param arg
      */
-    void setRenderArg(String name, Object arg);
+    void __setRenderArg(String name, Object arg);
 
     /**
      * Return a render arg value by name
      *
      * @param name
      * @param <T>
-     * @return
+     * @return render arg by name
      */
-    <T> T getRenderArg(String name);
+    <T> T __getRenderArg(String name);
 
     /**
      * Set a render arg by position
@@ -94,19 +92,19 @@ public interface ITemplate extends Cloneable {
      * @param position
      * @param arg
      */
-    void setRenderArg(int position, Object arg);
+    void __setRenderArg(int position, Object arg);
 
     /**
      * Set renderArgs using JSON data
      *
      * @param jsonData
      */
-    void setRenderArg(JSONWrapper jsonData);
+    void __setRenderArg(JSONWrapper jsonData);
 
     /**
      * Render the template and return result as String
      *
-     * @return
+     * @return render result
      */
     String render();
 
@@ -127,23 +125,23 @@ public interface ITemplate extends Cloneable {
     /**
      * Must be called before real render() happened.
      * Also if the template extends a parent template, then
-     * the parent template's init() must be called before this template's init()
+     * the parent template's __init() must be called before this template's __init()
      */
-    void init();
+    void __init();
 
     /**
      * Return the internal buffer
      *
-     * @return
+     * @return buffer
      */
-    StringBuilder getBuffer();
+    StringBuilder __getBuffer();
 
     /**
      * Set the internal buffer
      *
      * @param sb
      */
-    void setBuffer(StringBuilder sb);
+    void __setBuffer(StringBuilder sb);
 
     /**
      * Get a copy of this template instance and pass in the engine and caller
@@ -152,12 +150,12 @@ public interface ITemplate extends Cloneable {
      * @param caller the caller template
      * @return a cloned instance of this template class
      */
-    ITemplate cloneMe(RythmEngine engine, ITemplate caller);
+    ITemplate __cloneMe(RythmEngine engine, ITemplate caller);
 
     /**
      * The render time context. Not to be used in user application or template
      */
-    public static class Context {
+    public static class __Context {
 
         /**
          * template lang stack. Used to enable the
@@ -179,8 +177,8 @@ public interface ITemplate extends Cloneable {
          */
         public void init(TemplateBase templateBase, ILang lang) {
             if (null == lang) {
-                TemplateClass tc = templateBase.getTemplateClass(true);
-                lang = ILang.DefImpl.probeFileName(tc.name(), templateBase._engine().conf().defaultLang());
+                TemplateClass tc = templateBase.__getTemplateClass(true);
+                lang = ILang.DefImpl.probeFileName(tc.name(), templateBase.__engine().conf().defaultLang());
             }
             langStack.push(lang);
         }
@@ -223,12 +221,12 @@ public interface ITemplate extends Cloneable {
             return escapeStack.pop();
         }
 
-        public Context() {
+        public __Context() {
             langStack = new Stack<ILang>();
             escapeStack = new Stack<Escape>();
         }
 
-        public Context(Context clone) {
+        public __Context(__Context clone) {
             langStack = new Stack<ILang>();
             escapeStack = new Stack<Escape>();
             langStack.addAll(clone.langStack);
@@ -236,87 +234,4 @@ public interface ITemplate extends Cloneable {
         }
     }
 
-    /**
-     * Define different escape method
-     */
-    public static enum Escape {
-        RAW,
-        CSV {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeCsv(s);
-            }
-        },
-        HTML {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeHtml(s);
-            }
-        },
-        JS {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeJavaScript(s);
-            }
-        },
-        JSON {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeJson(s);
-            }
-        },
-        XML {
-            @Override
-            protected RawData apply_(String s) {
-                return S.escapeXml(s);
-            }
-        };
-
-        public RawData apply(Object o) {
-            if (null == o) return RawData.NULL;
-            String s = o.toString();
-            return apply_(s);
-        }
-
-        protected RawData apply_(String s) {
-            return new RawData(s);
-        }
-
-        private static String[] sa_ = null;
-
-        public static String[] stringValues() {
-            if (null == sa_) {
-                Escape[] ea = values();
-                String[] sa = new String[ea.length];
-                for (int i = 0; i < ea.length; ++i) {
-                    sa[i] = ea[i].toString();
-                }
-                Arrays.sort(sa);
-                sa_ = sa;
-            }
-            return sa_.clone();
-        }
-    }
-
-    /**
-     * Used for escaping
-     */
-    public static class RawData implements Serializable {
-        public String data;
-
-        public RawData(Object val) {
-            if (val == null) {
-                data = "";
-            } else {
-                data = val.toString();
-            }
-        }
-
-        @Override
-        public String toString() {
-            return data;
-        }
-
-        public static final RawData NULL = new RawData(null);
-    }
 }

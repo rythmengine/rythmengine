@@ -19,7 +19,7 @@
 */
 package com.greenlaw110.rythm.extension;
 
-import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.Escape;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public interface ILang {
      *
      * @return escape
      */
-    ITemplate.Escape escape();
+    Escape escape();
 
     /**
      * Some lang could be embedded into another. E.g. JS and CSS could be
@@ -124,7 +124,7 @@ public interface ILang {
 
     public static class DefImpl implements ILang, Cloneable {
 
-        public static final DefImpl HTML = new DefImpl("HTML", "<!--", "-->", ITemplate.Escape.XML) {
+        public static final DefImpl HTML = new DefImpl("HTML", "<!--", "-->", Escape.XML) {
             @Override
             public boolean allowInternalLang() {
                 // HTML allow CSS and JS inside
@@ -132,9 +132,9 @@ public interface ILang {
             }
         };
         
-        public static final DefImpl XML = new DefImpl("XML", "<!--", "-->", ITemplate.Escape.XML);
+        public static final DefImpl XML = new DefImpl("XML", "<!--", "-->", Escape.XML);
 
-        public static final DefImpl JS = new DefImpl("JS", "/*", "*/", ITemplate.Escape.JS, "(<\\s*script[^<>]*?>).*", "(\\<\\/\\s*script\\s*\\>).*") {
+        public static final DefImpl JS = new DefImpl("JS", "/*", "*/", Escape.JS, "(<\\s*script[^<>]*?>).*", "(\\<\\/\\s*script\\s*\\>).*") {
             @Override
             public Set<ILang> allowedExternalLangs() {
                 Set<ILang> set = new HashSet<ILang>();
@@ -143,7 +143,7 @@ public interface ILang {
             }
         };
 
-        public static final DefImpl CSS = new DefImpl("CSS", "/*", "*/", ITemplate.Escape.JS, "(<\\s*style[^<>]*?>).*", "(\\<\\/\\s*style\\s*\\>).*") {
+        public static final DefImpl CSS = new DefImpl("CSS", "/*", "*/", Escape.JS, "(<\\s*style[^<>]*?>).*", "(\\<\\/\\s*style\\s*\\>).*") {
             @Override
             public Set<ILang> allowedExternalLangs() {
                 Set<ILang> set = new HashSet<ILang>();
@@ -152,24 +152,24 @@ public interface ILang {
             }
         };
 
-        public static final DefImpl JSON = new DefImpl("JSON", null, null, ITemplate.Escape.JSON);
-        public static final DefImpl CSV = new DefImpl("CSV", null, null, ITemplate.Escape.CSV);
+        public static final DefImpl JSON = new DefImpl("JSON", null, null, Escape.JSON);
+        public static final DefImpl CSV = new DefImpl("CSV", null, null, Escape.CSV);
 
         private final String id;
         private final String commentStart;
         private final String commentEnd;
-        private final ITemplate.Escape escape;
+        private final Escape escape;
 
         private final String blockStart;
         private final String blockEnd;
 
         private ILang parent;
 
-        protected DefImpl(String id, String commentStart, String commentEnd, ITemplate.Escape escape) {
+        protected DefImpl(String id, String commentStart, String commentEnd, Escape escape) {
             this(id, commentStart, commentEnd, escape, null, null);
         }
 
-        protected DefImpl(String id, String commentStart, String commentEnd, ITemplate.Escape escape, String blockStart, String blockEnd) {
+        protected DefImpl(String id, String commentStart, String commentEnd, Escape escape, String blockStart, String blockEnd) {
             this.id = id;
             this.commentEnd = commentEnd;
             this.commentStart = commentStart;
@@ -197,7 +197,7 @@ public interface ILang {
         }
 
         @Override
-        public ITemplate.Escape escape() {
+        public Escape escape() {
             return escape;
         }
 

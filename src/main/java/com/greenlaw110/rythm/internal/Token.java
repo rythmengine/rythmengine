@@ -254,8 +254,8 @@ public class Token extends TextBuilder {
     protected final void outputExpression(boolean needsPrint) {
         if (S.isEmpty(s)) return;
         String s = processExtensions(false);
-        if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
-        else p("\ntry{").p(s).p(";} catch (RuntimeException e) {handleTemplateExecutionException(e);} ");
+        if (needsPrint) p("\ntry{pe(").p(s).p(");} catch (RuntimeException e) {__handleTemplateExecutionException(e);} ");
+        else p("\ntry{").p(s).p(";} catch (RuntimeException e) {__handleTemplateExecutionException(e);} ");
         pline();
     }
 

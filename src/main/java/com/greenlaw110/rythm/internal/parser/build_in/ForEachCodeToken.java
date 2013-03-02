@@ -131,7 +131,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varUtils = prefix + "_utils";
 
         String varItr = cb.newVarName();
-        p("{\n_Itr<").p(type).p("> ").p(varItr).p(" = new _Itr(").p(iterable).p(");");
+        p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = new __Itr(").p(iterable).p(");");
         pline();
         p("int ").p(varSize).p(" = ").p(varItr).p(".size();");
         pline();
@@ -158,35 +158,8 @@ public class ForEachCodeToken extends BlockCodeToken {
         p("com.greenlaw110.rythm.internal.LoopUtil ").p(varUtils).p(" = new com.greenlaw110.rythm.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(");");
         pline();
     }
-
-//    public void output1() {
-//        String prefix = "_".equals(varname) ? "" : varname;
-//        String curClassName = ctx.getCodeBuilder().includingClassName();
-//        int bodySize = closePos - openPos;
-//        String varName = ctx.getCodeBuilder().newVarName();
-//        p("_Itr<").p(type).p("> ").p(varName).p(" = new _Itr(").p(iterable).p(");");
-//        pline();
-//        p("if (").p(varName).p(".size() > 0) {");
-//        pline();
-//        p("com.greenlaw110.rythm.runtime.Each.INSTANCE.render(").p(varName);
-//        p(", new com.greenlaw110.rythm.runtime.Each.Looper<").p(type).p(">(");
-//        p(curClassName).p(".this,").p(bodySize).p("){");
-//        pline();
-//        pt("public boolean render(final ");
-//        p(type).p(" ").p(varname).p(", final int ").p(prefix).p("_size, final int ").p(prefix).p("_index, final boolean ");
-//        p(prefix).p("_isOdd, final String ").p(prefix).p("_parity, final boolean ");
-//        p(prefix).p("_isFirst, final boolean ").p(prefix).p("_isLast, final String ").p(prefix).p("_sep, final com.greenlaw110.rythm.runtime.Each.IBody.LoopUtils ").p(prefix).p("_utils) { ");
-//        pline();
-//    }
-//
     @Override
     public String closeBlock() {
         return "\n\t}\n}\n}\n";
     }
-
-//    public String closeBlock1() {
-//        ctx.popBreak();
-//        closePos = ctx.cursor();
-//        return "\n\t return true;\n\t}});\n}\n";
-//    }
 }

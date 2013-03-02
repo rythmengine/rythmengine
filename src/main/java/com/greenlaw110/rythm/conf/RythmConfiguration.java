@@ -24,7 +24,7 @@ import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.extension.ILang;
-import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.RawData;
 
 import java.io.File;
 import java.util.*;
@@ -64,10 +64,10 @@ public class RythmConfiguration {
             if (null != o) {
                 data.put(key, o);
             } else {
-                data.put(key, ITemplate.RawData.NULL);
+                data.put(key, RawData.NULL);
             }
         }
-        if (o == ITemplate.RawData.NULL) {
+        if (o == RawData.NULL) {
             return null;
         } else {
             return (T) o;

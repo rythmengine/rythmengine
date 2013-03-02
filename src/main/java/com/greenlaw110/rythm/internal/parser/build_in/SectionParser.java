@@ -24,7 +24,6 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -45,12 +44,12 @@ public class SectionParser extends KeywordParserFactory {
 
         @Override
         public void output() {
-            p("\n_startSection(\"").p(section).p("\");\n");
+            p("\n__startSection(\"").p(section).p("\");\n");
         }
 
         @Override
         public String closeBlock() {
-            return "\n_endSection();";
+            return "\n__endSection();";
         }
     }
 

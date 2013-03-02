@@ -2293,7 +2293,7 @@ public abstract class ToStringStyle implements Serializable {
     /**
      * Output the style's class name
      *
-     * @return
+     * @return class name of this style
      */
     @Override
     public String toString() {
@@ -2327,7 +2327,7 @@ public abstract class ToStringStyle implements Serializable {
      * name, then an {@link IllegalArgumentException} will be thrown out</p>
      *
      * @param s
-     * @return
+     * @return a <code>ToStringStyle</code> from the give string
      */
     public static ToStringStyle valueOf(String s) {
         if (S.isEqual(DEFAULT_STYLE.getClass().getName(), s)) return DEFAULT_STYLE;
@@ -2342,7 +2342,7 @@ public abstract class ToStringStyle implements Serializable {
      * Convert a {@link org.apache.commons.lang3.builder.ToStringStyle} to the {@link ToStringStyle}
      *
      * @param apacheStyle
-     * @return
+     * @return a <code>ToStringString</code> from apache style
      */
     public static ToStringStyle fromApacheStyle(org.apache.commons.lang3.builder.ToStringStyle apacheStyle) {
         if (apacheStyle == org.apache.commons.lang3.builder.ToStringStyle.SIMPLE_STYLE) return SIMPLE_STYLE;
@@ -2353,6 +2353,11 @@ public abstract class ToStringStyle implements Serializable {
         return DEFAULT_STYLE;
     }
 
+    /**
+     * Return Java code reference of this style
+     * 
+     * @return Java code reference to this style
+     */
     public String toCode() {
         if (this == DEFAULT_STYLE) return "com.greenlaw110.rythm.toString.ToStringStyle.DEFAULT_STYLE";
         if (this == SIMPLE_STYLE) return "com.greenlaw110.rythm.toString.ToStringStyle.SIMPLE_STYLE";

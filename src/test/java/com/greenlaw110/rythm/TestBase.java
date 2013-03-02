@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.runner.JUnitCore;
 import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
-import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,7 +90,7 @@ public abstract class TestBase extends Assert {
     
     protected void getSource() {
         TemplateBase tb = (TemplateBase) Rythm.engine().getTemplate(t);
-        TemplateClass tc = tb.getTemplateClass(false);
+        TemplateClass tc = tb.__getTemplateClass(false);
         s = tc.javaSource;
     }
     

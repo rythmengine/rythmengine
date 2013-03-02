@@ -58,7 +58,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
 
     @Override
     protected void pSetup() {
-        ptn("@Override protected void setup() {");
+        ptn("@Override protected void __setup() {");
         if (logTime) {
             p2tn("__logTime = true;");
         }
@@ -67,7 +67,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (").p(argName).p(" == null) {");
             //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-            p(argName).p("=(").p(arg.type).p(")_get(\"").p(argName).p("\");}\n");
+            p(argName).p("=(").p(arg.type).p(")__get(\"").p(argName).p("\");}\n");
         }
         ptn("}");
     }

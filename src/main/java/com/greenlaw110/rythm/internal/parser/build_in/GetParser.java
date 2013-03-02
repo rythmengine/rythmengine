@@ -71,7 +71,7 @@ public class GetParser extends KeywordParserFactory {
                 return new Token("", ctx()) {
                     @Override
                     protected void output() {
-                        p("\np(_getRenderProperty(\"").p(propName).p("\", ").p(propDefVal == null ? "null" : propDefVal).p("));");
+                        p("\np(__getRenderProperty(\"").p(propName).p("\", ").p(propDefVal == null ? "null" : propDefVal).p("));");
                     }
                 };
             }

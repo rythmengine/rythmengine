@@ -19,11 +19,11 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.Patterns;
-import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -83,7 +83,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
         protected boolean enableCache = false;
         protected String cacheDuration = null;
         protected String cacheArgs = null;
-        protected ITemplate.Escape escape = null;
+        protected Escape escape = null;
         protected boolean ignoreNonExistsTag = false;
         protected String assignTo = null;
         protected boolean assignToFinal = false;
@@ -148,7 +148,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 } else if ("escape".equals(extension)) {
                     parseEscape(param);
                 } else if ("raw".equals(extension)) {
-                    escape = ITemplate.Escape.RAW;
+                    escape = Escape.RAW;
                 } else if ("callback".equals(extension)) {
                     parseCallback(param);
                 } else if ("ignoreNonExistsTag".equals(extension)) {
@@ -182,11 +182,11 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
 
         private void parseEscape(String param) {
             if (S.isEmpty(param)) {
-                escape = ITemplate.Escape.HTML;
+                escape = Escape.HTML;
             } else {
                 param = S.stripQuotation(param).trim();
                 try {
-                    escape = ITemplate.Escape.valueOf(param.toUpperCase());
+                    escape = Escape.valueOf(param.toUpperCase());
                 } catch (Exception e) {
                     raiseParseException(ctx, "Unknown escape type: %s. Supported escape: RAW, HTML(default), JAVA, JS, JSON, CSV, XML", param);
                 }
@@ -242,9 +242,9 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 pline();
             }
             pline("{");
-            ptline("com.greenlaw110.rythm.template.ITag.ParameterList _pl = null; ");
+            ptline("com.greenlaw110.rythm.template.ITag.__ParameterList _pl = null; ");
             if (params.pl.size() > 0) {
-                ptline("_pl = new com.greenlaw110.rythm.template.ITag.ParameterList();");
+                ptline("_pl = new com.greenlaw110.rythm.template.ITag.__ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
@@ -256,26 +256,26 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 ptline("Object _r_s = null;");
                 if (enableCache) {
                     ptline("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
-                    pt("_r_s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
+                    pt("_r_s = __engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
                     pline();
                 }
                 ptline("if (null == _r_s) {");
-                p2tline("StringBuilder sbOld = getBuffer();");
+                p2tline("StringBuilder sbOld = __getBuffer();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
                 if (ctx.peekInsideBody()) {
-                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                    p2t("__invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, __self, ").p(ignoreNonExistsTag).p(");");
                 } else {
-                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                    p2t("__invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 }
                 pline();
                 p2tline("_r_s = sbNew.toString();");
                 p2tline("setSelfOut(sbOld);");
                 if (escape != null) {
-                    p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
+                    p2tline(String.format("_r_s = com.greenlaw110.rythm.utils.Escape.%s.apply(_r_s);", escape.name()));
                 }
                 if (enableCache) {
-                    p2t("_engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
+                    p2t("__engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
                     pline();
                 }
                 ptline("}");
@@ -291,9 +291,9 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 }
             } else {
                 if (ctx.peekInsideBody()) {
-                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, self, ").p(ignoreNonExistsTag).p(");");
+                    p2t("__invokeTag(").p(line).p(", ").p(tagName).p(", _pl, null, __self, ").p(ignoreNonExistsTag).p(");");
                 } else {
-                    p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
+                    p2t("__invokeTag(").p(line).p(", ").p(tagName).p(", _pl, ").p(ignoreNonExistsTag).p(");");
                 }
                 pline();
             }
@@ -351,9 +351,9 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 ptline("Object ").p(assignTo).p(" = null;");
             }
             pline("{");
-            ptline("com.greenlaw110.rythm.template.ITag.ParameterList _pl = null; ");
+            ptline("com.greenlaw110.rythm.template.ITag.__ParameterList _pl = null; ");
             if (params.pl.size() > 0) {
-                ptline("_pl = new com.greenlaw110.rythm.template.ITag.ParameterList();");
+                ptline("_pl = new com.greenlaw110.rythm.template.ITag.__ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";
@@ -366,36 +366,36 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 pline("Object _r_s = null;");
                 if (enableCache) {
                     ptline("String _plUUID = null == _pl ? \"\" : _pl.toUUID();");
-                    pt("_r_s = _engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
+                    pt("_r_s = __engine().cached(").p(cacheKey()).p(cacheArgs).p(");");
                     pline();
                 }
                 ptline("if (null == _r_s) {");
-                p2tline("StringBuilder sbOld = getBuffer();");
+                p2tline("StringBuilder sbOld = __getBuffer();");
                 p2tline("StringBuilder sbNew = new StringBuilder();");
                 p2tline("setSelfOut(sbNew);");
             }
-            p2t("_invokeTag(").p(line).p(", ").p(tagName).p(", _pl,  new com.greenlaw110.rythm.template.ITag.Body(").p(curClassName).p(".this) {");
+            p2t("__invokeTag(").p(line).p(", ").p(tagName).p(", _pl,  new com.greenlaw110.rythm.template.ITag.__Body(").p(curClassName).p(".this) {");
             pline();
             if (null != argList && !argList.isEmpty()) {
                 buildBodyArgList(argList);
             }
-            p3tline("@Override public void setProperty(String name, Object val) {");
-            p4tline("setRenderArg(name, val);");
+            p3tline("@Override public void __setProperty(String name, Object val) {");
+            p4tline("__setRenderArg(name, val);");
             p3tline("}");
-            p3tline("@Override public Object getProperty(String name) {");
-            p4tline("return getRenderArg(name); ");
+            p3tline("@Override public Object __getProperty(String name) {");
+            p4tline("return __getRenderArg(name); ");
             p3tline("}");
-            p3tline("@Override protected void setBodyArgByName(String name, Object val) {");
+            p3tline("@Override protected void __setBodyArgByName(String name, Object val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByName(argList);
             }
             p3tline("}");
-            p3tline("@Override protected void setBodyArgByPos(int pos, Object val) {");
+            p3tline("@Override protected void __setBodyArgByPos(int pos, Object val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByPos(argList);
             }
             p3tline("}");
-            p3tline("@Override protected void _call() {");
+            p3tline("@Override protected void __call() {");
         }
 
         private void buildBodyArgList(List<CodeBuilder.RenderArgDeclaration> al) {
@@ -439,7 +439,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             });
             if (!needsNewOut()) {
                 if (ctx.peekInsideBody2()) {
-                    return "\n\t\t}\n\t}, self);\n}";
+                    return "\n\t\t}\n\t}, __self);\n}";
                 } else {
                     return "\n\t\t}\n\t});\n}";
                 }
@@ -449,12 +449,12 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 String body = ctx.getTemplateSource(startIndex, endIndex);
                 key = UUID.nameUUIDFromBytes(body.getBytes()).toString();
             }
-            StringBuilder sbOld = getBuffer();
+            StringBuilder sbOld = __getBuffer();
             StringBuilder sbNew = new StringBuilder();
-            setBuffer(sbNew);
+            __setBuffer(sbNew);
             p3tline("}");
             if (ctx.peekInsideBody2()) {
-                p2t("}, self, ").p(ignoreNonExistsTag).p(");");
+                p2t("}, __self, ").p(ignoreNonExistsTag).p(");");
             } else {
                 p2t("}, ").p(ignoreNonExistsTag).p(");");
             }
@@ -462,10 +462,10 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             p2tline("_r_s = sbNew.toString();");
             p2tline("setSelfOut(sbOld);");
             if (escape != null) {
-                p2tline(String.format("_r_s = com.greenlaw110.rythm.template.ITemplate.Escape.%s.apply(_r_s);", escape.name()));
+                p2tline(String.format("_r_s = com.greenlaw110.rythm.utils.Escape.%s.apply(_r_s);", escape.name()));
             }
             if (enableCache) {
-                p2t("_engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
+                p2t("__engine().cache(").p(cacheKey()).p(", _r_s, ").p(cacheDuration).p(cacheArgs).p(");");
                 pline();
             }
             ptline("}");
@@ -477,7 +477,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             }
             p2tline("}");
             String s = sbNew.toString();
-            setBuffer(sbOld);
+            __setBuffer(sbOld);
 
             return s;
         }

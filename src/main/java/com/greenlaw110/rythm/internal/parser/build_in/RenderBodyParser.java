@@ -51,9 +51,9 @@ public class RenderBodyParser extends KeywordParserFactory {
         @Override
         public void output() {
             pline("{");
-            ptline("com.greenlaw110.rythm.template.ITag.ParameterList _pl = null; ");
+            ptline("com.greenlaw110.rythm.template.ITag.__ParameterList _pl = null; ");
             if (params.pl.size() > 0) {
-                ptline("_pl = new com.greenlaw110.rythm.template.ITag.ParameterList();");
+                ptline("_pl = new com.greenlaw110.rythm.template.ITag.__ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     InvokeTemplateParser.ParameterDeclaration pd = params.pl.get(i);
                     //if (i == 0 && pd.nameDef == null) pd.nameDef = "arg";

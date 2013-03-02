@@ -23,9 +23,7 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -89,17 +87,5 @@ public class InitCodeParser extends KeywordParserFactory {
     @Override
     public Keyword keyword() {
         return Keyword.INIT;
-    }
-
-    public static void main(String[] args) {
-        Regex r = new InitCodeParser().reg(Rythm.INSTANCE);
-        String s = "@init ( ) {\n\tHello world!\n@each X {abc;} \n} xyz";
-        if (r.search(s)) {
-            String s0 = r.stringMatched(3);
-            s0 = s0.substring(1); // strip '{'
-            s0 = s0.substring(0, s0.length() - 1); // strip '}'
-            System.out.println(r.stringMatched());
-            System.out.println(s0);
-        }
     }
 }

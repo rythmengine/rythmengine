@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.DialectNotSupportException;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;

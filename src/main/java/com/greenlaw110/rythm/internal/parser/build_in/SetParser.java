@@ -23,7 +23,6 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -89,7 +88,7 @@ public class SetParser extends KeywordParserFactory {
                 return new Token("", ctx()) {
                     @Override
                     protected void output() {
-                        p("\n_setRenderProperty(\"").p(propName).p("\",").p(propVal).p(");");
+                        p("\n__setRenderProperty(\"").p(propName).p("\",").p(propVal).p(");");
                     }
                 };
             }
