@@ -21,9 +21,6 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
-import com.greenlaw110.rythm.extension.IRenderExceptionHandler;
-import com.greenlaw110.rythm.extension.ITagInvokeListener;
-import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.utils.S;
 
 import java.util.ArrayList;
@@ -87,17 +84,6 @@ public class ExtensionManager {
         return this;
     }
 
-    private List<IRenderExceptionHandler> exceptionHandlers = new ArrayList<IRenderExceptionHandler>();
-
-    public ExtensionManager registerTemplateExecutionExceptionHandler(IRenderExceptionHandler h) {
-        if (!exceptionHandlers.contains(h)) exceptionHandlers.add(h);
-        return this;
-    }
-
-    public Iterable<IRenderExceptionHandler> exceptionHandlers() {
-        return exceptionHandlers;
-    }
-
     private List<IExpressionProcessor> expressionProcessors = new ArrayList<IExpressionProcessor>();
 
     public ExtensionManager registerExpressionProcessor(IExpressionProcessor p) {
@@ -107,17 +93,6 @@ public class ExtensionManager {
 
     public Iterable<IExpressionProcessor> expressionProcessors() {
         return expressionProcessors;
-    }
-
-    private List<ITagInvokeListener> tagInvokeListeners = new ArrayList<ITagInvokeListener>();
-
-    public ExtensionManager registerTagInvoeListener(ITagInvokeListener l) {
-        if (!tagInvokeListeners.contains(l)) tagInvokeListeners.add(l);
-        return this;
-    }
-
-    public Iterable<ITagInvokeListener> tagInvokeListeners() {
-        return tagInvokeListeners;
     }
 
     private List<ILang> templateLangList = new ArrayList<ILang>();
@@ -133,11 +108,6 @@ public class ExtensionManager {
 
     public boolean hasTemplateLangs() {
         return !templateLangList.isEmpty();
-    }
-
-    public ExtensionManager registerJavaExtensions(Class<? extends Transformer> c) {
-        //TODO
-        return this;
     }
 
 }

@@ -23,9 +23,13 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.Transformer;
+import com.greenlaw110.rythm.logger.Logger;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.*;
+import java.util.Currency;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -799,6 +803,146 @@ public class S {
         DateFormat df = new SimpleDateFormat(pattern, new Locale(lang, locale));
         df.setTimeZone(TimeZone.getTimeZone(timezone));
         return df.format(date);
+    }
+
+    /**
+     * Change line break in the data string into <tt><br/></tt>
+     * @param data
+     * @return raw data of transformed result
+     */
+    @Transformer
+    public static RawData nl2br(RawData data) {
+        return new RawData(data.toString().replace("\n", "<br/>"));
+    }
+
+    /**
+     * Change line break in the data string into <tt><br/></tt>
+     * @param data
+     * @return raw data of transformed result
+     */
+    @Transformer
+    public static RawData nl2br(Object data) {
+        return new RawData(StringEscapeUtils.escapeHtml4(str(data)).replace("\n", "<br/>"));
+    }
+
+    /**
+     * encode using utf-8
+     * 
+     * @param data
+     * @return encoded 
+     */
+    @Transformer
+    public static String urlEncode(Object data) {
+        if (null == data) return "";
+        String entity = data.toString();
+        try {
+            String encoding = "utf-8";
+            return URLEncoder.encode(entity, encoding);
+        } catch (UnsupportedEncodingException e) {
+            Logger.error(e, entity);
+        }
+        return entity;
+    }
+
+    /**
+     * Format size (e.g. disk space in bytes) into human readable style
+     * <ul>
+     * <li>When size is smaller than <code>1024L</code>, return size + <code>B</code></li>
+     * <li>When size is smaller than <code>1024L ^ 2</code>, return size/1024L + <code>KB</code></li>
+     * <li>When size is smaller than <code>1024L ^ 3</code>, return size/1048576L + <code>MB</code></li>
+     * <li>When size is smaller than <code>1024L ^ 4</code>, return size/1073741824L + <code>GB</code></li>
+     * </ul>
+     * 
+     * <p>The method accept any data type. When <code>null</code> is found then 
+     * <code>NullPointerException</code> will be thrown out; if an <code>Number</code>
+     * is passed in, it will be type cast to <code>Long</code>; otherwise 
+     * a <code>Long.valueOf(data.toString())</code> is used to find out
+     * the number</p>
+     * 
+     * @param data
+     * @return formatted string result
+     */
+    @Transformer
+    public static String formatSize(Object data) {
+        if (null == data) throw new NullPointerException();
+        Long bytes;
+        if (data instanceof Number) {
+            bytes = (Long)data;
+        } else {
+            bytes = Long.valueOf(data.toString());
+        }
+        if (bytes < 1024L) {
+            return bytes + " B";
+        }
+        if (bytes < 1048576L) {
+            return bytes / 1024L + "KB";
+        }
+        if (bytes < 1073741824L) {
+            return bytes / 1048576L + "MB";
+        }
+        return bytes / 1073741824L + "GB";
+    }
+
+    /**
+     * Format give data into currency
+     * 
+     * <p>The method accept any data type. When <code>null</code> is found then 
+     * <code>NullPointerException</code> will be thrown out; if an <code>Number</code>
+     * is passed in, it will be type cast to <code>Number</code>; otherwise 
+     * a <code>Double.valueOf(data.toString())</code> is used to find out
+     * the number</p>
+
+     * @param data
+     * @param currencyCode
+     * @return the currency
+     */
+    @Transformer
+    public static String formatCurrency(Object data, String currencyCode) {
+        if (null == data) throw new NullPointerException();
+        Number number;
+        if (data instanceof Number) {
+            number = (Number)data;
+        } else {
+            number = Double.parseDouble(data.toString());
+        }
+        Currency currency = Currency.getInstance(currencyCode);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale(I18N.getLocale()));
+        numberFormat.setCurrency(currency);
+        numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        String s = numberFormat.format(number);
+        s = s.replace(currencyCode, I18N.getCurrencySymbol(currencyCode));
+        return s;
+    }
+
+    /**
+     * Format give data into currency
+     * 
+     * <p>The method accept any data type. When <code>null</code> is found then 
+     * <code>NullPointerException</code> will be thrown out; if an <code>Number</code>
+     * is passed in, it will be type cast to <code>Number</code>; otherwise 
+     * a <code>Double.valueOf(data.toString())</code> is used to find out
+     * the number</p>
+
+     * @param data
+     * @param locale
+     * @return the currency
+     */
+    @Transformer
+    public static String formatCurrency(Object data, Locale locale) {
+        if (null == data) throw new NullPointerException();
+        Number number;
+        if (data instanceof Number) {
+            number = (Number)data;
+        } else {
+            number = Double.parseDouble(data.toString());
+        }
+        Currency currency = Currency.getInstance(locale);
+        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
+        numberFormat.setCurrency(currency);
+        numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        String s = numberFormat.format(number);
+        s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
+        return s;
     }
 
 }

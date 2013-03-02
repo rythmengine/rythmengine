@@ -74,11 +74,6 @@ public interface ICacheService {
     void clear();
 
     /**
-     * Alias of {@link #clear()}
-     */
-    void clean();
-
-    /**
      * Set default ttl value which will be used if user pass 0 as ttl or not specified ttl
      *
      * @param ttl

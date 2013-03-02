@@ -26,6 +26,7 @@ import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.internal.RythmEvents;
 import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.internal.compiler.ClassReloadException;
@@ -509,6 +510,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     /**
+     * Trigger render events.
+     * <p>Not an API for user application</p>
+     * @param event
+     * @param engine
+     */
+    protected void __triggerRenderEvent(IEvent<Void, ITemplate> event, RythmEngine engine) {
+        event.trigger(engine, this);
+    }
+
+    /**
      * Render and return result in String. This method is usually called from API defined in
      * {@link RythmEngine}
      */
@@ -522,13 +533,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 l = System.currentTimeMillis();
             }
 
-            RythmEvents.ON_RENDER.trigger(engine, this);
+            __triggerRenderEvent(RythmEvents.ON_RENDER, engine);
             __setup();
             if (__logTime()) {
                 __logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 l = System.currentTimeMillis();
             }
             String s = __internalRender();
+            __triggerRenderEvent(RythmEvents.RENDERED, engine);
             if (__logTime()) {
                 __logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
             }

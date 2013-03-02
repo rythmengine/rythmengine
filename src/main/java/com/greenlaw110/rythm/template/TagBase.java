@@ -21,6 +21,7 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
@@ -34,21 +35,34 @@ import java.util.Map;
 public abstract class TagBase extends TemplateBase implements ITag {
     protected ILogger logger = Logger.get(TagBase.class);
 
-    protected __Body _body;
+    protected __Body __body;
 
-    protected __Body _context;
+    protected __Body __context;
 
-    private int _line;
-
+    private int __line;
+    
     protected int __line() {
-        return _line;
+        return __line;
+    }
+
+    private boolean calling;
+
+    /**
+     * Check if inside a tag calling context 
+     * 
+     * <p>Note this is not an API for user application</p>
+     * 
+     * @return true if is inside a tag calling context
+     */
+    public boolean __calling() {
+        return calling;
     }
 
     @Override
     public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
         TagBase newTag = (TagBase) super.__cloneMe(engine, caller);
-        newTag._body = null;
+        newTag.__body = null;
         //newTag.__buffer = new StringBuilder();
         return newTag;
     }
@@ -56,30 +70,40 @@ public abstract class TagBase extends TemplateBase implements ITag {
     @Override
     public void __setRenderArgs(Map<String, Object> args) {
         super.__setRenderArgs(args);
-        if (args.containsKey("_body")) _body = (__Body) args.get("_body");
+        if (args.containsKey("__body")) __body = (__Body) args.get("__body");
     }
 
     @Override
     public void __setRenderArg(String name, Object arg) {
-        if ("_body".equals(name)) _body = (__Body) arg;
+        if ("__body".equals(name)) __body = (__Body) arg;
         super.__setRenderArg(name, arg);
     }
 
     public TextBuilder setBodyContext(__Body body) {
-        this._context = body;
+        this.__context = body;
         return this;
+    }
+    
+    protected void __triggerRenderEvent(IEvent<Void, ITemplate> event, RythmEngine engine) {
+        if (calling) return; // do not trigger render events while calling as a tag
+        event.trigger(engine, this);
     }
 
     @Override
     public void __call(int line) {
-        _line = line;
-        if (null != _context) {
-            __buffer = new StringBuilder();
-            _context.p(S.raw(renderWithParent()));
-        } else if (null != __caller && null != __buffer) {
-            __caller.p(S.raw(renderWithParent())); // a real tag
-        } else {
-            render(); // an normal template
+        __line = line;
+        calling = true;
+        try {
+            if (null != __context) {
+                __buffer = new StringBuilder();
+                __context.p(S.raw(renderWithParent()));
+            } else if (null != __caller && null != __buffer) {
+                __caller.p(S.raw(renderWithParent())); // a real tag
+            } else {
+                render(); // an normal template
+            }
+        } finally {
+            calling = false;
         }
     }
 
@@ -95,13 +119,13 @@ public abstract class TagBase extends TemplateBase implements ITag {
     }
 
     protected void _pTagBody(__ParameterList parameterList, StringBuilder out) {
-        if (null == _body) return;
-        _body.render(parameterList, out);
+        if (null == __body) return;
+        __body.render(parameterList, out);
     }
 
     @Override
     protected void __pLayoutContent() {
-        if (null != _body) _body.render(null, buffer());
+        if (null != __body) __body.render(null, buffer());
         else super.__pLayoutContent();
     }
 

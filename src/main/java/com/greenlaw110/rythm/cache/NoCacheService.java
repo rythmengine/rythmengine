@@ -59,10 +59,6 @@ public class NoCacheService implements ICacheService {
     }
 
     @Override
-    public void clean() {
-    }
-    
-    @Override
     public void clear() {
     }
 

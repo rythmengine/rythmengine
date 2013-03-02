@@ -23,8 +23,8 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.extension.IRenderExceptionHandler;
+import com.greenlaw110.rythm.extension.IRythmListener;
 import com.greenlaw110.rythm.extension.ISourceCodeEnhancer;
-import com.greenlaw110.rythm.extension.ITagInvokeListener;
 import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -41,7 +41,7 @@ public class EventBus implements IEventDispatcher {
     private final ISourceCodeEnhancer sourceCodeEnhancer;
     //private final IByteCodeEnhancer byteCodeEnhancer;
     private final IRenderExceptionHandler exceptionHandler;
-    private final ITagInvokeListener tagInvokeListener;
+    private final IRythmListener renderListener;
 
     public EventBus(RythmEngine engine) {
         this.engine = engine;
@@ -49,7 +49,7 @@ public class EventBus implements IEventDispatcher {
         sourceCodeEnhancer = conf.get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
         //byteCodeEnhancer = conf.get(RythmConfigurationKey.CODEGEN_BYTE_CODE_ENHANCER);
         exceptionHandler = conf.get(RythmConfigurationKey.RENDER_EXCEPTION_HANDLER);
-        tagInvokeListener = conf.get(RythmConfigurationKey.RENDER_TAG_INVOCATION_LISTENER);
+        renderListener = conf.get(RythmConfigurationKey.RENDER_LISTENER);
         registerHandlers();
     }
 
@@ -120,10 +120,36 @@ public class EventBus implements IEventDispatcher {
                 return null;
             }
         });
+        m.put(RythmEvents.ON_RENDER, new IEventHandler<Void, ITemplate>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, ITemplate template) {
+                ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
+                if (null != ce) {
+                    ce.setRenderArgs(template);
+                }
+                IRythmListener l = renderListener;
+                if (null == l) {
+                    return null;
+                }
+                l.onRender(template);
+                return null;
+            }
+        });
+        m.put(RythmEvents.RENDERED, new IEventHandler<Void, ITemplate>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, ITemplate template) {
+                IRythmListener l = renderListener;
+                if (null == l) {
+                    return null;
+                }
+                l.rendered(template);
+                return null;
+            }
+        });
         m.put(RythmEvents.ON_TAG_INVOCATION, new IEventHandler<Void, F.T2<ITemplate, ITag>>() {
             @Override
             public Void handleEvent(RythmEngine engine, F.T2<ITemplate, ITag> param) {
-                ITagInvokeListener l = tagInvokeListener;
+                IRythmListener l = renderListener;
                 if (null == l) {
                     return null;
                 }
@@ -135,7 +161,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.TAG_INVOKED, new IEventHandler<Void, F.T2<TemplateBase, ITag>>() {
             @Override
             public Void handleEvent(RythmEngine engine, F.T2<TemplateBase, ITag> param) {
-                ITagInvokeListener l = tagInvokeListener;
+                IRythmListener l = renderListener;
                 if (null == l) {
                     return null;
                 }

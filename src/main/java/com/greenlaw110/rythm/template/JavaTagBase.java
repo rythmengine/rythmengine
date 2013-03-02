@@ -35,7 +35,7 @@ public abstract class JavaTagBase extends TagBase {
 
     @Override
     public void __setRenderArg(String name, Object val) {
-        if ("_body".equals(name)) _body = (__Body) val;
+        if ("__body".equals(name)) _body = (__Body) val;
         super.__setRenderArg(name, val);
     }
 

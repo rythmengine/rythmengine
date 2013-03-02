@@ -112,11 +112,6 @@ public class SimpleCacheService implements ICacheService {
     }
     
     @Override
-    public void clean() {
-        clear();
-    }
-
-    @Override
     public Serializable get(String key) {
         Item item = cache_.get(key);
         return null == item ? null : item.value;

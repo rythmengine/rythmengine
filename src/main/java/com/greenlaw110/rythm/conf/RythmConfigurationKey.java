@@ -90,7 +90,7 @@ public enum RythmConfigurationKey {
      */
     CACHE_SERVICE_IMPL("cache.service.impl") {
         @Override
-        protected Object getDefVal(Map<String, ?> configuration) {
+        public Object getDefVal(Map<String, ?> configuration) {
             Boolean cacheEnabled = CACHE_ENABLED.getConfiguration(configuration);
             return cacheEnabled ? SimpleCacheService.INSTANCE : NoCacheService.INSTANCE;
         }
@@ -193,7 +193,7 @@ public enum RythmConfigurationKey {
      */
     ENGINE_CLASS_LOADER_PARENT_IMPL("engine.class_loader.parent.impl") {
         @Override
-        protected Object getDefVal(Map<String, ?> configuration) {
+        public Object getDefVal(Map<String, ?> configuration) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (null == cl) {
                 cl = Rythm.class.getClassLoader();
@@ -405,9 +405,9 @@ public enum RythmConfigurationKey {
 
     /**
      * "i18n.locale": Set the locale. Used to provide localized format to date or currency.
-     * <p>Default value: <code>us</code></p>
+     * <p>Default value: <code>au</code></p>
      */
-    I18N_LOCALE("i18n.locale", "us"),
+    I18N_LOCALE("i18n.locale", "au"),
 
     /**
      * "log.enabled": Enable disable log in Rythm. Default value: true
@@ -446,18 +446,18 @@ public enum RythmConfigurationKey {
     LOG_TIME_RENDER_ENABLED("log.time.render.enabled", false),
 
     /**
-     * "render.tag_invocation_listener.impl": Set {@link com.greenlaw110.rythm.extension.ITagInvokeListener tag
+     * "render.listener.impl": Set {@link com.greenlaw110.rythm.extension.IRythmListener tag
      * invocation listener} implementation.
      * <p>Default value: <code>null</code></p>
      */
-    RENDER_TAG_INVOCATION_LISTENER("__render.tag_invocation_listener.impl"),
+    RENDER_LISTENER("render.listener.impl"),
 
     /**
      * "render.exception_handler.impl": Set {@link com.greenlaw110.rythm.extension.IRenderExceptionHandler
      * render exception handler} implementation.
      * <p>Default value: <code>null</code></p>
      */
-    RENDER_EXCEPTION_HANDLER("__render.exception_handler.impl"),
+    RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
 
     /**
      * "resource.loader.impl": The {@link com.greenlaw110.rythm.resource.ITemplateResourceLoader resource loader}
@@ -575,7 +575,7 @@ public enum RythmConfigurationKey {
      * @param configuration
      * @return return the default value
      */
-    protected Object getDefVal(Map<String, ?> configuration) {
+    public Object getDefVal(Map<String, ?> configuration) {
         return defVal;
     }
 

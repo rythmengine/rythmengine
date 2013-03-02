@@ -20,7 +20,9 @@
 package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -167,11 +169,22 @@ public class I18N {
         symbols.put("ZWD", "Z$");
     }
 
+    //TODO add more date formats
     static final Map<String, String> dateFormats = new HashMap<String, String>();
 
     static {
         dateFormats.put("us", "MM/dd/yyyy");
         dateFormats.put("au", "dd/MM/yyyy");
+        dateFormats.put("cn", "yyyy-MM-dd");
+    }
+
+    //TODO add more langs
+    static final Map<String, String> langs = new HashMap<String, String>();
+    
+    static {
+        langs.put("us", "en");
+        langs.put("au", "en");
+        langs.put("cn", "zh");
     }
 
     /**
@@ -187,9 +200,41 @@ public class I18N {
         return currency;
     }
 
-    public static String getDateFormat() {
+    /**
+     * Return engine's configured locale. If no current engine
+     * found then it returns default locale 
+     * 
+     * @return the locale string
+     */
+    public static String getLocale() {
         RythmEngine engine = RythmEngine.get();
-        String locale = engine.conf().locale();
+        if (null != engine) {
+            return engine.conf().locale();
+        } else {
+            return RythmConfigurationKey.I18N_LOCALE.getDefVal(Collections.EMPTY_MAP).toString();
+        }
+    }
+
+    /**
+     * Return language corresponding to current {@link #getLocale() locale}
+     * 
+     * @return language string
+     */
+    public static String getLanguage() {
+        String lang = langs.get(getLocale());
+        if (null == lang) {
+            lang = "en";
+        }
+        return lang;
+    }
+
+    /**
+     * Get date format string corresponding to the current {@link #getLocale() locale}
+     * 
+     * @return the date format string
+     */
+    public static String getDateFormat() {
+        String locale = getLocale();
         final String dateFormat = dateFormats.get(locale);
         if (null != dateFormat) {
             return dateFormat;
