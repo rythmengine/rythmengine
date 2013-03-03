@@ -1462,9 +1462,31 @@ public class RythmEngine implements IEventDispatcher {
      * Shutdown this rythm engine
      */
     public void shutdown() {
-        if (null != _cacheService) _cacheService.shutdown();
-        if (null != _secureExecutor) _secureExecutor.shutdown();
-        if (null != shutdownListener) shutdownListener.onShutdown();
+        if (null != _cacheService) {
+            try {
+                _cacheService.shutdown();
+            } catch (Exception e) {
+                logger.error(e, "Error shutdown cache service");
+            }
+        }
+        if (null != _secureExecutor) {
+            try {
+                _secureExecutor.shutdown();
+            } catch (Exception e) {
+                logger.error(e, "Error shutdown secure executor");
+            }
+        }
+        if (null != shutdownListener) {
+            try {
+                shutdownListener.onShutdown();
+            } catch (Exception e) {
+                logger.error(e, "Error execute shutdown listener");
+            }
+        }
+        if (null != _tags) _tags.clear();
+        if (null != _classes) _classes.clear();
+        if (null != _nonExistsTags) _nonExistsTags.clear();
+        if (null != _nonTags) _nonTags.clear();;
     }
 
 }

@@ -752,6 +752,15 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     /**
+     * Return render arg name by position
+     * @param i
+     * @return render argument name by position
+     */
+    protected String __renderArgName(int i) {
+        return null;
+    }
+
+    /**
      * Return render arg type in Map. Not to be used in user application or template
      *
      * @return render args types mapped by name
@@ -776,19 +785,26 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     private void setJSONArray(List<Object> jsonArray) {
         Class[] types = __renderArgTypeArray();
-        List<Object> args = new ArrayList<Object>(types.length);
         int paraNo = jsonArray.size();
-        for (int i = 0; i < types.length; ++i) {
-            if (i >= paraNo) break;
-            Object o = jsonArray.get(i);
-            Class c = types[i];
-            Object p;
-            if (o instanceof List) {
-                p = JSON.parseArray(o.toString(), c);
-            } else {
-                p = JSON.parseObject(o.toString(), c);
+        if (types.length == 1 && types[0].equals(List.class)) {
+            Map<String, Class> typeMap = __renderArgTypeMap();
+            String vn = __renderArgName(0);
+            Class c = typeMap.get(vn + "__0");
+            Object p = JSON.parseArray(jsonArray.toString(), c);
+            __setRenderArg(vn, p);
+        } else {
+            for (int i = 0; i < types.length; ++i) {
+                if (i >= paraNo) break;
+                Object o = jsonArray.get(i);
+                Class c = types[i];
+                Object p;
+                if (o instanceof List) {
+                    p = JSON.parseArray(o.toString(), c);
+                } else {
+                    p = JSON.parseObject(o.toString(), c);
+                }
+                __setRenderArg(i, p);
             }
-            __setRenderArg(i, p);
         }
     }
 
@@ -800,7 +816,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 Object o = jsonObject.get(nm);
                 Object p;
                 if (o instanceof List) {
-                    p = JSON.parseArray(o.toString(), c);
+                    Map<String, Class> typeMap = __renderArgTypeMap();
+                    String vn = __renderArgName(0);
+                    Class c0 = typeMap.get(vn + "__0");
+                    p = JSON.parseArray(o.toString(), c0);
                 } else {
                     p = JSON.parseObject(o.toString(), c);
                 }

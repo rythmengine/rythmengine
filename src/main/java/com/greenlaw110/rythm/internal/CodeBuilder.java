@@ -753,6 +753,11 @@ public class CodeBuilder extends TextBuilder {
         return regex.replaceAll(type);
     }
     
+    private static boolean isGeneric(String type) {
+        Regex regex = new Regex(".*(?@<>)");
+        return regex.search(type);
+    }
+    
     private void addInferencedRenderArgs() {
         if (renderArgs.isEmpty() && conf.typeInferenceEnabled()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
@@ -780,47 +785,92 @@ public class CodeBuilder extends TextBuilder {
             if (arg.lineNo > -1) p(" //line: ").pn(arg.lineNo);
             else pn();
         }
+ 
+        List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
+        Collections.sort(renderArgList);
+        
+        // -- output __renderArgName method
+        pn();
+        boolean first = true; 
+        ptn("protected java.lang.String __renderArgName(int __pos) {");
+        p2tn("int __p = 0;");
+        if (true) {
+            first = true;
+            for (RenderArgDeclaration arg : renderArgList) {
+                if (first) {
+                    first = false;
+                    p2t("");
+                } else {
+                    p2t("else ");
+                }
+                p("if (__p++ == __pos) return \"").p(arg.name).p("\";").pn();
+            }
+            p2tn("throw new ArrayIndexOutOfBoundsException();");
+        }
+        ptn("}");
 
         // -- output __renderArgTypeMap method
         pn();
         ptn("protected java.util.Map<java.lang.String, java.lang.Class> __renderArgTypeMap() {");
-        p2tn("java.util.Map<java.lang.String, java.lang.Class> m = new java.util.HashMap<String, Class>();");
+        p2tn("java.util.Map<java.lang.String, java.lang.Class> __m = new java.util.HashMap<String, Class>();");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
+            boolean isGeneric = isGeneric(arg.type);
+            if (isGeneric) {
+                p2t("__m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
+                Regex regex = new Regex(".*((?@<>))");
+                regex.search(arg.type);
+                String s = regex.stringMatched(1);
+                s = S.strip(s, "<", ">");
+                if (s.contains("<")) {
+                    // not support embedded <> yet
+                } else {
+                    String[] sa = s.split(",");
+                    for (int i = 0; i < sa.length; ++i) {
+                        String type = sa[i];
+                        if ("?".equals(type)) {
+                            type = "Object";
+                        }
+                        p2t("__m.put(\"").p(argName).p("__").p(i).p("\", ").p(type).pn(".class);");
+                    }
+                }
+            } else {
+                String type = arg.type;
+                if ("?".equals(type)) {
+                    type = "Object";
+                }
+                p2t("__m.put(\"").p(argName).p("\", ").p(type).pn(".class);");
+            }
         }
-        p2tn("return m;");
+        p2tn("return __m;");
         ptn("}");
 
         // -- output __setRenderArgs method
         pn();
-        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<java.lang.String, java.lang.Object> args) {");
-        p2tn("if (null == args) throw new NullPointerException();\n\t\tif (args.isEmpty()) return;");
-        p2tn("super.__setRenderArgs(args);");
-        boolean first = true;
+        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<java.lang.String, java.lang.Object> __args) {");
+        p2tn("if (null == __args) throw new NullPointerException();\n\t\tif (__args.isEmpty()) return;");
+        p2tn("super.__setRenderArgs(__args);");
+        first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")args.get(\"").p(argName).pn("\");");
+            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")__args.get(\"").p(argName).pn("\");");
         }
 //        for (String argName : renderArgs.keySet()) {
 //            p2t("System.err.println(\"").p(argName).p("=\" + this.").p(argName).pn(");");
 //        }
         ptn("}");
 
-        List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
-        Collections.sort(renderArgList);
-
         ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
         int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == ce) ? 0 : ce.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
             // -- output __setRenderArgs method with args passed in positioned order
             pn();
-            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(java.lang.Object... args) {");
+            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(java.lang.Object... __args) {");
             {
-                p2tn("int __p = 0, __l = args.length;");
+                p2tn("int __p = 0, __l = __args.length;");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
-                    p2t("if (__p < __l) { Object v = args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                    p2t("if (__p < __l) { Object v = __args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                             .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
                     if (--i == 0) break;
@@ -845,7 +895,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArg by name
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(java.lang.String name, java.lang.Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(java.lang.String __name, java.lang.Object __arg) {");
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
@@ -856,15 +906,15 @@ public class CodeBuilder extends TextBuilder {
                     p2t("else ");
                 }
                 String argName = arg.name;
-                p("if (\"").p(argName).p("\".equals(name)) this.").p(argName).p("=(").p(arg.type).pn(")arg;");
+                p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p("=(").p(arg.type).pn(")__arg;");
             }
         }
-        p2t("super.__setRenderArg(name, arg);\n\t}\n");
+        p2t("super.__setRenderArg(__name, __arg);\n\t}\n");
 
         // -- output __setRenderArg by position
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int pos, java.lang.Object arg) {");
-        p2tn("int _p = 0;");
+        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int __pos, java.lang.Object __arg) {");
+        p2tn("int __p = 0;");
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
@@ -874,13 +924,13 @@ public class CodeBuilder extends TextBuilder {
                 } else {
                     p2t("else ");
                 }
-                p("if (_p++ == pos) { Object v = arg; boolean isString = (\"java.lang.String\".equals(\"")
+                p("if (__p++ == __pos) { Object v = __arg; boolean isString = (\"java.lang.String\".equals(\"")
                         .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
                         .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
             }
         }
         // the first argument has a default name "arg"
-        p2tn("if(0 == pos) __setRenderArg(\"arg\", arg);");
+        p2tn("if(0 == __pos) __setRenderArg(\"arg\", __arg);");
         ptn("}");
     }
 

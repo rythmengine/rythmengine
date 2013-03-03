@@ -88,12 +88,12 @@ public class ForEachCodeToken extends BlockCodeToken {
                         int pos = itrType.lastIndexOf("[");
                         this.type = itrType.substring(0, pos);
                     } else {
-                        this.type = "Object";
+                        this.type = "java.lang.Object";
                     }
                 }
                 if (S.isEqual(this.type, this.varname)) this.varname = "_";
             } else {
-                this.type = "Object";
+                this.type = "java.lang.Object";
             }
         } else if (isBasic) {
             throw new TemplateParser.TypeDeclarationException(ctx);
@@ -130,6 +130,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varSep = prefix + "_sep";
         String varWithSep = prefix + "__sep";
         String varUtils = prefix + "_utils";
+        String varWithUtils = prefix + "__utils";
 
         String varItr = cb.newVarName();
         p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = new __Itr(").p(iterable).p(");");
@@ -140,23 +141,25 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("int ").p(varId).p(" = 0;");
         pline();
-        p("for(").p(type).p(" ").p(varname).p(" : ").p(varItr).p(") {");
+        p("for(").p("?".equals(type) ? "java.lang.Object" : type).p(" ").p(varname).p(" : ").p(varItr).p(") {");
         pline();
         p(varId).p("++;");
         pline();
         p("boolean ").p(varIsOdd).p(" = ").p(varId).p(" % 2 == 1;");
         pline();
-        p("String ").p(varParity).p(" = ").p(varIsOdd).p(" ? \"odd\" : \"even\";");
+        p("java.lang.String ").p(varParity).p(" = ").p(varIsOdd).p(" ? \"odd\" : \"even\";");
         pline();
         p("boolean ").p(varIsFirst).p(" = ").p(varId).p(" == 1;");
         pline();
         p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");
         pline();
-        p("String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");
+        p("java.lang.String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");
         pline();
-        p("String ").p(varWithSep).p(" = com.greenlaw110.rythm.utils.S.str(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\");");
+        p("java.lang.String ").p(varWithSep).p(" = com.greenlaw110.rythm.utils.S.str(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\");");
         pline();
         p("com.greenlaw110.rythm.internal.LoopUtil ").p(varUtils).p(" = new com.greenlaw110.rythm.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(");");
+        pline();
+        p("com.greenlaw110.rythm.internal.LoopUtil ").p(varWithUtils).p(" = new com.greenlaw110.rythm.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(", ").p(varname).p(");");
         pline();
     }
     @Override

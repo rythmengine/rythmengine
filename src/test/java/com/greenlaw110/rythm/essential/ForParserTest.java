@@ -215,18 +215,27 @@ public class ForParserTest extends TestBase {
     @Test
     public void testLoopVarSeparator() {
         t = "@for(\"a:b:c\"){@__sep}";
+        s = r(t);
         assertEquals("a,b,c", r(t));
         
         t = "@for(\"a:b:c\"){@_ @_sep}";
+        s = r(t);
         assertEquals("a ,b ,c ", r(t));
 
         t = "@for(s in \"a:b:c\"){@s__sep}";
+        s = r(t);
         assertEquals("a,b,c", r(t)); 
 
         t = "@for(s in \"a:b:c\"){@s @s_sep}";
+        s = r(t);
         assertEquals("a ,b ,c ", r(t));
         
+        t = "@for(\"a:b:c\"){@__utils.sep(\"|\")}";
+        s = r(t);
+        assertEquals("a|b|c", r(t));
+
         t = "@for(\"a:b:c\"){@(_)@_utils.sep(\"|\")}";
+        s = r(t);
         assertEquals("a|b|c", r(t));
     }
     
@@ -322,6 +331,23 @@ public class ForParserTest extends TestBase {
         t = "@args List items\n     @for(Object item: items) {\n@{}}";
         s = r(t, Collections.EMPTY_LIST);
         eq("\n");
+    }
+    
+    @Test
+    public void test4() {
+        t = "@for(\"a:b:c\"){@(_)@_utils.sep(\"|\")}";
+        s = r(t);
+        assertEquals("a|b|c", r(t));
+        t = "@for(channels){@__utils.sep(\"|\")}";
+        s = r(t, from(p("channels", "a,b".split(","))));
+        eq("a|b");
+    }
+    
+    @Test
+    public void test5() {
+        t = "@for(items){@__sep}";
+        s = r(t, from(p("items", Collections.EMPTY_LIST)));
+        eq("");
     }
 
     public static void main(String[] args) {

@@ -19,16 +19,26 @@
 */
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.utils.S;
+
 /**
  * Used to help track loop state
  */
 public class LoopUtil {
+    private final Object obj;
     private final boolean isFirst;
     private final boolean isLast;
 
     public LoopUtil(boolean isFirst, boolean isLast) {
         this.isFirst = isFirst;
         this.isLast = isLast;
+        this.obj = null;
+    }
+    
+    public LoopUtil(boolean isFirst, boolean isLast, Object obj) {
+        this.isFirst = isFirst;
+        this.isLast = isLast;
+        this.obj = obj;
     }
 
     public String sep(String sep) {
@@ -36,10 +46,18 @@ public class LoopUtil {
     }
 
     public String preSep(String sep) {
-        return isFirst ? "" : sep;
+        String result = "";
+        if (null != obj) {
+            result += S.str(obj);
+        }
+        return result + (isFirst ? "" : sep);
     }
 
     public String postSep(String sep) {
-        return isLast ? "" : sep;
+        String result = "";
+        if (null != obj) {
+            result += S.str(obj);
+        }
+        return result + (isLast ? "" : sep);
     }
 }

@@ -63,6 +63,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         public ExpressionToken(String s, IContext context) {
             super(s, context);
             checkRestrictedClass(ctx, s);
+            if (s.contains("_utils.sep(\"")) return;
             if (context.getDialect() instanceof BasicRythm) {
                 if (s.startsWith("(")) {
                     s = S.stripBrace(s);
