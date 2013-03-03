@@ -91,7 +91,8 @@ public class ArgsParser extends KeywordParserFactory {
                 if (r0.search(remain)) {
                     space = r0.stringMatched(1);
                 }
-                space = startWithLineBreak ? "\n" + space : space;
+                //space = startWithLineBreak ? "\n" + space : space;
+                step(space.length());
                 remain = remain.replaceFirst("^\\s+", "");
                 String key = String.format("%s%s ", a(), keyword());
                 if (!remain.startsWith(key)) {
@@ -121,10 +122,13 @@ public class ArgsParser extends KeywordParserFactory {
                 char c;
                 while (true) {
                     c = peek();
-                    if ((' ' == c || ';' == c || '\r' == c || '\n' == c) && ctx.hasRemain()) {
+                    if ((' ' == c || ';' == c || '\n' == c) && ctx.hasRemain()) {
                         step(1);
                         if (space.length() > 0) {
                             ctx.getCodeBuilder().addBuilder(new Token.StringToken(space, ctx));
+                        }
+                        if ('\n' == c && startWithLineBreak) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                         }
                     } else {
                         break;

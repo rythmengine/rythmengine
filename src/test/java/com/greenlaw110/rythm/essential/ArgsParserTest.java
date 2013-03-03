@@ -24,8 +24,6 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.greenlaw110.rythm.conf.RythmConfigurationKey.ENGINE_OUTPUT_JAVA_SOURCE_ENABLED;
-
 /**
  * Test @args parser
  */
@@ -83,6 +81,13 @@ public class ArgsParserTest extends TestBase {
         t = "abc\n\t@args(){\nString @1\n}\nxyz@1";
         s = r(t, "s");
         eq("abc\nxyzs");
+    }
+    
+    @Test
+    public void testWithBlankInFront() {
+        t = "\n</style>\n  @args String _cur_page @// layout template parameter\n@_cur_page";
+        s = r(t, "s");
+        eq("\n</style>  \ns");
     }
 
     public static void main(String[] args) {

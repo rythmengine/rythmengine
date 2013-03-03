@@ -28,8 +28,9 @@ import com.stevesoft.pat.Regex;
 public class IfParser extends KeywordParserFactory {
 
     public static class IfBlockCodeToken extends BlockCodeToken {
-        public IfBlockCodeToken(String s, IContext context) {
+        public IfBlockCodeToken(String s, IContext context, int line) {
             super(s, context);
+            this.line = line;
         }
     }
     
@@ -43,7 +44,9 @@ public class IfParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @if statement. Correct usage: @if (some-condition) {some-template-code}");
                 }
                 final String matched = r.stringMatched();
+                int line = ctx.currentLine();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    if (matched.startsWith("\n")) line = line + 1;
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                     if (r0.search(matched)) {
@@ -72,7 +75,7 @@ public class IfParser extends KeywordParserFactory {
                     s = "\nif (!com.greenlaw110.rythm.utils.Eval.eval(" + s + ")) {";
                 }
                 //if (!s.endsWith("{")) s = "\n" + s + " {";
-                return new IfBlockCodeToken(s, ctx());
+                return new IfBlockCodeToken(s, ctx(), line);
             }
         };
     }

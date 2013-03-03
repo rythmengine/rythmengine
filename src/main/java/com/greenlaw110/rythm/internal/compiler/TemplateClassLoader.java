@@ -23,6 +23,7 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.sandbox.RythmSecurityManager;
@@ -229,17 +230,13 @@ public class TemplateClassLoader extends ClassLoader {
         RythmSecurityManager rsm = null;
         String pass = null;
         if (Rythm.insideSandbox()) {
+            if (conf.restrictedClasses().contains(name)) {
+                throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
+            }
             sm = System.getSecurityManager();
             if (null != sm && sm instanceof RythmSecurityManager) {
                 rsm = (RythmSecurityManager) sm;
                 pass = sandboxPassword.get();
-            }
-        }
-
-        // check if the class is restricted when run in sandbox mode
-        if (Rythm.insideSandbox()) {
-            if (conf.restrictedClasses().contains(name)) {
-                throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
             }
         }
 
@@ -384,33 +381,62 @@ public class TemplateClassLoader extends ClassLoader {
             loadTemplateClass(className);
         }
     }
+    
+    private Set<String> notFoundTypes = null;
+    private boolean typeNotFound(String name) {
+        if (null == notFoundTypes) {
+            notFoundTypes = engine.classes().compiler.notFoundTypes;
+        }
+        return notFoundTypes.contains(name);
+    }
+    private void setTypeNotFound(String name) {
+        if (null == notFoundTypes) {
+            notFoundTypes = engine.classes().compiler.notFoundTypes;
+        }
+        if (engine.isProdMode()) {
+            notFoundTypes.add(name);
+        } else if (name.matches("^(java\\.|play\\.|com\\.greenlaw110\\.).*")) {
+            notFoundTypes.add(name);
+        }
+    }
 
     /**
      * Search for the byte code of the given class.
      */
-    protected byte[] getClassDefinition(String name) {
-        name = name.replace(".", "/") + ".class";
+    protected byte[] getClassDefinition(final String name0) {
+        if (typeNotFound(name0)) return null;
+        byte[] ba = null;
+        String name = name0.replace(".", "/") + ".class";
         InputStream is = getResourceAsStream(name);
-        if (is == null) {
-            return null;
-        }
-        try {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            byte[] buffer = new byte[8192];
-            int count;
-            while ((count = is.read(buffer, 0, buffer.length)) > 0) {
-                os.write(buffer, 0, count);
-            }
-            return os.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
+        if (null != is) {
             try {
-                is.close();
-            } catch (IOException e) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = is.read(buffer, 0, buffer.length)) > 0) {
+                    os.write(buffer, 0, count);
+                }
+                ba = os.toByteArray();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
+        if (null == ba) {
+            IByteCodeHelper helper = engine.conf().byteCodeHelper();
+            if (null != helper) {
+                ba = helper.findByteCode(name0);
+            }
+        }
+        if (null == ba) {
+            setTypeNotFound(name0);
+        }
+        return ba;
     }
 
     public void detectChange(TemplateClass tc) {

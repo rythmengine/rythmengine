@@ -21,7 +21,6 @@ package com.greenlaw110.rythm.internal.compiler;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
-import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import org.eclipse.jdt.core.compiler.IProblem;
@@ -36,10 +35,7 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -150,6 +146,8 @@ public class TemplateCompiler {
         }
     }
 
+    final Set<String> notFoundTypes = new HashSet<String>();
+
     /**
      * Please compile this className
      */
@@ -190,15 +188,19 @@ public class TemplateCompiler {
             }
 
             private NameEnvironmentAnswer findStandType(final String name) throws ClassFormatException {
-                RythmEngine engine = engine();
-                IByteCodeHelper helper = engine.conf().byteCodeHelper();
-                byte[] bytes = engine.classLoader().getClassDefinition(name);
-                if (null == bytes && null != helper) {
-                    bytes = helper.findByteCode(name);
+                if (notFoundTypes.contains(name)) {
+                    return null;
                 }
+                RythmEngine engine = engine();
+                byte[] bytes = engine.classLoader().getClassDefinition(name);
                 if (bytes != null) {
                     ClassFileReader classFileReader = new ClassFileReader(bytes, name.toCharArray(), true);
                     return new NameEnvironmentAnswer(classFileReader, null);
+                }
+                if (engine.isProdMode()) {
+                    notFoundTypes.add(name);
+                } else if (name.matches("^(java\\.|play\\.|com\\.greenlaw110\\.).*")) {
+                    notFoundTypes.add(name);
                 }
                 return null;
             }
@@ -246,7 +248,7 @@ public class TemplateCompiler {
                 if (packagesCache.containsKey(name)) {
                     return packagesCache.get(name).booleanValue();
                 }
-                // Check if thera a .java or .class for this ressource
+                // Check if thera a .java or .class for this resource
                 if (engine().classLoader().getClassDefinition(name) != null) {
                     packagesCache.put(name, false);
                     return false;

@@ -417,9 +417,6 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
         tmpl.__engine = engine;
         tmpl.__templateClass = __templateClass;
-        if (null != caller) {
-            tmpl.__caller = (TextBuilder) caller;
-        }
         tmpl.__ctx = new __Context(__ctx);
         //if (null != buffer) tmpl.__buffer = buffer;
         if (null != __buffer) tmpl.__buffer = new StringBuilder();
@@ -433,6 +430,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.__logTime = __logTime;
         tmpl.w = null;
         tmpl.os = null;
+        if (null != caller) {
+            tmpl.__caller = (TextBuilder) caller;
+            tmpl.__setRenderArgs(((TemplateBase)caller).__renderArgs);
+        }
         return tmpl;
     }
 
@@ -551,15 +552,18 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
             engine.restart(e);
             return render();
-        } catch (ClassCastException e) {
-            if (__logger.isDebugEnabled()) {
-                __logger.debug("ClassCastException found, force refresh template and try again...");
-            }
-            TemplateClass tc = engine.classes().getByClassName(getClass().getName());
-            tc.refresh(true);
-            ITemplate t = tc.asTemplate(__ctx.currentLang());
-            return t.render();
-        }
+        } 
+//        catch (ClassCastException e) {
+//            if (__logger.isDebugEnabled()) {
+//                __logger.debug("ClassCastException found, force refresh template and try again...");
+//            }
+//            engine.restart(e);
+//            TemplateClass tc = engine.classes().getByClassName(getClass().getName());
+//            tc.refresh(true);
+//            ITemplate t = tc.asTemplate(__ctx.currentLang());
+//            t.__setRenderArgs(__renderArgs);
+//            return t.render();
+//        }
     }
 
     private Writer w_ = null;
@@ -608,17 +612,24 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         w_ = w;
     }
 
+    private static final ThreadLocal<Boolean> cce_ = new ThreadLocal<Boolean>(){
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
     /**
      * Not to be used in user application or template
      */
     protected void __internalBuild() {
         w_ = null; // reset output destination
+        RythmEngine engine = __engine();
         //if (!(engine.recordTemplateSourceOnError || engine.recordJavaSourceOnError)) {
         if (false) {
             __internalInit();
             build();
         } else {
-            try {
+//            try {
                 try {
                     long l = 0l;
                     if (__logTime()) {
@@ -632,6 +643,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 } catch (RythmException e) {
                     throw e;
                 } catch (Throwable e) {
+//                    if (engine.isDevMode() && e instanceof ClassCastException) {
+//                        // give one time retry for CCE
+//                        boolean cce = cce_.get();
+//                        if (!cce) {
+//                            cce_.set(true);
+//                            throw (ClassCastException)e;
+//                        } else {
+//                            cce_.set(false);
+//                        }
+//                    }
                     StackTraceElement[] stackTrace = e.getStackTrace();
                     String msg = null;
                     for (StackTraceElement se : stackTrace) {
@@ -672,17 +693,18 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     }
                     throw (e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e));
                 }
-            } catch (RuntimeException e) {
-                // try to restart engine
-                if (!Rythm.insideSandbox()) {
-                    try {
-                        __engine.restart(e);
-                    } catch (RuntimeException e0) {
-                        // ignore it because we already thrown it out
-                    }
-                }
-                throw e;
-            }
+//            }
+//            } catch (RuntimeException e) {
+//                // try to restart engine
+//                if (!Rythm.insideSandbox()) {
+//                    try {
+//                        __engine.restart(e);
+//                    } catch (RuntimeException e0) {
+//                        // ignore it because we already thrown it out
+//                    }
+//                }
+//                throw e;
+//            }
         }
         if (null != w_) {
             try {

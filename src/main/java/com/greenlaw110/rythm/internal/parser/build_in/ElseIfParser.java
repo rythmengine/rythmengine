@@ -26,7 +26,6 @@ import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
-import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -56,9 +55,10 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 Regex r2 = new Regex(String.format("^((\\n\\r|\\r\\n|[\\n\\r])?[ \\t\\x0B\\f]*(%s\\}?|%s?\\})\\s*(else([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?))).*", a, a));
 
                 final String s = ctx.getRemain();
+                int line = ctx.currentLine();
                 String s1;
                 boolean expression = false;
-                String matched;
+                final String matched;
                 if (r1.search(s)) {
                     s1 = r1.stringMatched(1);
                     matched = s1;
@@ -88,6 +88,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 }
                 try {
                     if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                        if (matched.startsWith("\n")) line++;
                         ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                         Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                         if (r0.search(matched)) {
@@ -112,7 +113,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
 //                if (needsToAddLF) {
 //                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
 //                }
-                return new IfParser.IfBlockCodeToken(s1, ctx);
+                return new IfParser.IfBlockCodeToken(s1, ctx, line);
             }
 
         };

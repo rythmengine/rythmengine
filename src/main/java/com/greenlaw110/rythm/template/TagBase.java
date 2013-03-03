@@ -36,6 +36,13 @@ public abstract class TagBase extends TemplateBase implements ITag {
     protected ILogger logger = Logger.get(TagBase.class);
 
     protected __Body __body;
+    
+    protected __Body _body; // keep compatibility with previous version
+    
+    private void setBody(__Body b) {
+        __body = b;
+        _body = b;
+    }
 
     protected __Body __context;
 
@@ -62,7 +69,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
     public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
         Map<String, String> m = null;
         TagBase newTag = (TagBase) super.__cloneMe(engine, caller);
-        newTag.__body = null;
+        newTag.setBody(null);
         //newTag.__buffer = new StringBuilder();
         return newTag;
     }
@@ -70,12 +77,12 @@ public abstract class TagBase extends TemplateBase implements ITag {
     @Override
     public void __setRenderArgs(Map<String, Object> args) {
         super.__setRenderArgs(args);
-        if (args.containsKey("__body")) __body = (__Body) args.get("__body");
+        if (args.containsKey("__body")) setBody((__Body) args.get("__body"));
     }
 
     @Override
     public void __setRenderArg(String name, Object arg) {
-        if ("__body".equals(name)) __body = (__Body) arg;
+        if ("__body".equals(name)) setBody((__Body) arg);
         super.__setRenderArg(name, arg);
     }
 

@@ -279,17 +279,29 @@ public class RythmEngine implements IEventDispatcher {
             Logger.registerLoggerFactory(new NullLogger.Factory());
         }
     }
+    
+    // trim "rythm." from conf keys
+    private Map<String, Object> _processConf(Map<String, ?> conf) {
+        Map<String, Object> m = new HashMap<String, Object>(conf.size());
+        for (String s : conf.keySet()) {
+            Object o = conf.get(s);
+            if (s.startsWith("rythm.")) s = s.replaceFirst("rythm\\.", "");
+            m.put(s, o);
+        }
+        return m;
+    }
 
     private void _initConf(Map<String, ?> conf) {
         // load conf from disk
         Map<String, ?> rawConf = _loadConfFromDisk();
+        rawConf = _processConf(rawConf);
 
         // load conf from System.properties
         Properties sysProps = System.getProperties();
         rawConf.putAll((Map) sysProps);
 
         // load conf from user supplied configuration
-        if (null != conf) rawConf.putAll((Map) conf);
+        if (null != conf) rawConf.putAll((Map)_processConf(conf));
         
         _initLogger(rawConf);
 
