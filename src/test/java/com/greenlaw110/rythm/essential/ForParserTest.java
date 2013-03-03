@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static com.greenlaw110.rythm.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static com.greenlaw110.rythm.utils.NamedParams.from;
@@ -303,6 +304,24 @@ public class ForParserTest extends TestBase {
         t = "@for(int i in 1..10){@if((i % 2) == 0){\n\tE\n\t@continue\n}@i}";
         s = r(t);
         eq("1\tE3\tE5\tE7\tE9");
+    }
+
+    /**
+     * bug: @for(T<String, String> x: itr) {...} coz trouble b/c space
+     * between , and String
+     */
+    @Test
+    public void test2() {
+        t = "@args Set<Map<String,String>> mset;@for(Map<String, String> m: mset){123}";
+        s = r(t, Collections.EMPTY_SET);
+        eq("");
+    }
+    
+    @Test
+    public void test3() {
+        t = "@args List items\n     @for(Object item: items) {\n@{}}";
+        s = r(t, Collections.EMPTY_LIST);
+        eq("\n");
     }
 
     public static void main(String[] args) {

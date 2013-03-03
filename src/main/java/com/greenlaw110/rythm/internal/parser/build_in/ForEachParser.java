@@ -40,8 +40,10 @@ public class ForEachParser extends KeywordParserFactory {
                 if (!r.search(remain)) {
                     raiseParseException("Error parsing @for statement, correct usage: @for(Type var: Iterable){...} or @for(int i = ...)");
                 }
-                String matched = r.stringMatched();
+                int lineNo = ctx.currentLine();
+                final String matched = r.stringMatched();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    if (matched.startsWith("\n")) lineNo++;
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                     if (r0.search(matched)) {
@@ -65,7 +67,7 @@ public class ForEachParser extends KeywordParserFactory {
                     if (!ctx().getDialect().enableFreeForLoop()) {
                         throw new TemplateParser.NoFreeLoopException(ctx());
                     }
-                    return new BlockCodeToken("for " + s + "{ //line: " + ctx().currentLine() + "\n\t", ctx()) {
+                    return new BlockCodeToken("for " + s + "{ //line: " + lineNo + "\n\t", ctx()) {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);
@@ -106,14 +108,14 @@ public class ForEachParser extends KeywordParserFactory {
                         String s1 = s.substring(0, pos0).trim();
                         iterable = s.substring(pos1, s.length());
                         if (s1.contains(" ")) {
-                            pos0 = s1.indexOf(" ");
+                            pos0 = s1.lastIndexOf(" ");
                             type = s1.substring(0, pos0);
                             varname = s1.substring(pos0, s1.length());
                         } else {
                             varname = s1;
                         }
                     }
-                    return new ForEachCodeToken(type, varname, iterable, ctx());
+                    return new ForEachCodeToken(type, varname, iterable, ctx(), lineNo);
                 }
             }
         };

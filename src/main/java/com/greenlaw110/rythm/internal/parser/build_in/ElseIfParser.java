@@ -82,7 +82,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                     s1 = ExpressionParser.processPositionPlaceHolder(s1);
                     s1 = "\n} else if (com.greenlaw110.rythm.utils.Eval.eval(" + s1 + ")) {";
                 } else {
-                    Pattern p = Pattern.compile(".*\\{(\\n\\r|\\r\\n|[\\n\\r])?", Pattern.DOTALL);
+                    Pattern p = Pattern.compile(".*\\{\\s?", Pattern.DOTALL);
                     if (!p.matcher(s1).matches()) s1 = s1 + "{";
                     if (!s1.startsWith("}")) s1 = "}" + s1;
                 }

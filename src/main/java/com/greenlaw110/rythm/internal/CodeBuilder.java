@@ -46,8 +46,6 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class CodeBuilder extends TextBuilder {
@@ -785,8 +783,8 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __renderArgTypeMap method
         pn();
-        ptn("protected Map<String, Class> __renderArgTypeMap() {");
-        p2tn("Map<String, Class> m = new HashMap<String, Class>();");
+        ptn("protected java.util.Map<java.lang.String, java.lang.Class> __renderArgTypeMap() {");
+        p2tn("java.util.Map<java.lang.String, java.lang.Class> m = new java.util.HashMap<String, Class>();");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
@@ -796,7 +794,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArgs method
         pn();
-        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<String, Object> args) {");
+        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<java.lang.String, java.lang.Object> args) {");
         p2tn("if (null == args) throw new NullPointerException();\n\t\tif (args.isEmpty()) return;");
         p2tn("super.__setRenderArgs(args);");
         boolean first = true;
@@ -817,7 +815,7 @@ public class CodeBuilder extends TextBuilder {
         if (0 < userDefinedArgNumber) {
             // -- output __setRenderArgs method with args passed in positioned order
             pn();
-            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(Object... args) {");
+            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(java.lang.Object... args) {");
             {
                 p2tn("int __p = 0, __l = args.length;");
                 int i = userDefinedArgNumber;
@@ -832,9 +830,9 @@ public class CodeBuilder extends TextBuilder {
 
             // -- output __renderArgTypeArray method with args passed in positioned order
             pn();
-            ptn("protected Class[] __renderArgTypeArray() {");
+            ptn("protected java.lang.Class[] __renderArgTypeArray() {");
             {
-                p2t("return new Class[]{");
+                p2t("return new java.lang.Class[]{");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
                     p(toNonGeneric(arg.type)).p(".class").p(", ");
@@ -847,7 +845,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArg by name
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(String name, Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(java.lang.String name, java.lang.Object arg) {");
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
@@ -865,7 +863,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArg by position
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int pos, Object arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int pos, java.lang.Object arg) {");
         p2tn("int _p = 0;");
         if (true) {
             first = true;
@@ -1004,7 +1002,7 @@ public class CodeBuilder extends TextBuilder {
                     b.build();
                 }
             }
-            p("\n}catch(Exception __e){\nthrow new RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
+            p("\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
         }
     }
 
@@ -1040,7 +1038,7 @@ public class CodeBuilder extends TextBuilder {
         } else {
             s0 = s.replaceAll("(\\r?\\n)", "\\\\n").replaceAll("\"", "\\\\\"");
         }
-        np("private static final StrBuf ").p(constId).p(" = new StrBuf(\"").p(s0);
+        np("private static final com.greenlaw110.rythm.utils.TextBuilder.StrBuf ").p(constId).p(" = new com.greenlaw110.rythm.utils.TextBuilder.StrBuf(\"").p(s0);
         StrBuf sw = new StrBuf(s);
         if (outputMode == RythmEngine.OutputMode.os) {
             p("\", new byte[]{");
@@ -1073,7 +1071,7 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    public static final String INTERRUPT_CODE = "\n{if (Thread.interrupted()) throw new RuntimeException(\"interrupted\");}";
+    public static final String INTERRUPT_CODE = "\n{if (java.lang.Thread.interrupted()) throw new RuntimeException(\"interrupted\");}";
 
     private static final Regex R_FOR_0 = new Regex("([\\s;]for\\s*(?@())\\s*\\{(\\s*//\\s*line:\\s*[0-9]+)?)", "${1}" + INTERRUPT_CODE + "${2}" + "\n");
     private static final Regex R_FOR_1 = new Regex("([\\s;]for\\s*(?@()))\\s*([^\\{]+;)", "${1} \\{" + INTERRUPT_CODE + "${2} \n\\}");
@@ -1092,14 +1090,6 @@ public class CodeBuilder extends TextBuilder {
         code = R_DO_0.replaceAll(code);
         code = R_DO_1.replaceAll(code);
         return code;
-    }
-
-    public static void main(String[] args) {
-        String s = "<!-- @dsfs --> dfds -->dfs <!-- xx -->";
-        Pattern p = Pattern.compile("\\<\\!\\-\\-\\s*(@.*?)\\-\\-\\>");
-        Matcher m = p.matcher(s);
-        s = m.replaceAll("$1");
-        System.out.println(s);
     }
 
 }

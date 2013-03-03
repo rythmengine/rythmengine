@@ -20,14 +20,13 @@
 package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
-import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
-import static com.greenlaw110.rythm.utils.NamedParams.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 
 /**
  * Test @if parser
@@ -184,6 +183,16 @@ public class IfParserTest extends TestBase {
         no(sa);
         Integer[] ia = {1}; //note cannot use int[] here, it will cause type cast exception
         yes(ia);
+    }
+
+    /**
+     * bug: trouble due to space between ' and {
+     */
+    @Test
+    public void test2() {
+        t = "@if(channel == null) {null} else { '@channel'}";
+        s = r(t, "abc");
+        eq("'abc'");
     }
     
     public static void main(String[] args) {

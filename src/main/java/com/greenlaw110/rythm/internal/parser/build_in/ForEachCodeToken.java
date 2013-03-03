@@ -46,8 +46,9 @@ public class ForEachCodeToken extends BlockCodeToken {
      * |     |       |        |
      * type varname  iterable endloop
      */
-    public ForEachCodeToken(String type, String varname, String iterable, IContext context) {
+    public ForEachCodeToken(String type, String varname, String iterable, IContext context, int lineNo) {
         super(null, context);
+        line = lineNo;
         if (null == iterable) throw new NullPointerException();
         iterable = iterable.trim();
         iterable = ExpressionParser.processPositionPlaceHolder(iterable);

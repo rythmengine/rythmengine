@@ -141,7 +141,7 @@ public abstract class TagBase extends TemplateBase implements ITag {
         return null;
     }
 
-    public String str() {
+    public String __str() {
         return Rythm.renderStr("@args com.greenlaw110.rythm.template.ITag tag; Tag[tag.__getName()|tag.getClass()]", this);
     }
 }
