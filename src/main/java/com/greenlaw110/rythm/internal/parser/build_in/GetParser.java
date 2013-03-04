@@ -39,17 +39,38 @@ public class GetParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s((?@())))";
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s((?@())))";
     }
 
     @Override
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             @Override
             public TextBuilder go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @get call. Correct usage: @get(\"myVal\")");
+                }
+                final String matched = r.stringMatched();
+                int line = ctx.currentLine();
+                if (matched.startsWith("\n") || matched.endsWith("\n")) {
+                    if (matched.startsWith("\n")) line = line + 1;
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
                 }
                 step(r.stringMatched().length()); // remain: @get("name")...
                 String s = r.stringMatched(2); // s: ("name")
@@ -76,32 +97,6 @@ public class GetParser extends KeywordParserFactory {
                 };
             }
         };
-    }
-
-    public static void main(String[] args) {
-//        String s = "@get(\"var\":A.b())";
-//        GetParser ap = new GetParser();
-//        Regex r = ap.reg(new Rythm());
-//        System.out.println(r);
-//        if (r.search(s)) {
-//            System.out.println("m: " + r.stringMatched());
-//            System.out.println("1: " + r.stringMatched(1));
-//            System.out.println("2: " + r.stringMatched(2));
-//            System.out.println("3: " + r.stringMatched(3));
-//            System.out.println("4: " + r.stringMatched(4));
-//            System.out.println("5: " + r.stringMatched(5));
-//        }
-        Regex r = new Regex("(((?@\"\")|(?@'')|[a-zA-Z_][\\w_]+)(\\s*[:=,]\\s*('.'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?)");
-        String s = "(\"sammyRoute\", \"#/\")";
-        s = s.substring(1); // s: "name")
-        System.out.println(s);
-        s = s.substring(0, s.length() - 1); // s: "name"
-        System.out.println(s);
-        if (r.search(s)) {
-            System.out.println("1 " + r.stringMatched(1));
-            System.out.println("2 " + r.stringMatched(2));
-            System.out.println("4 " + r.stringMatched(4));
-        }
     }
 
 }
