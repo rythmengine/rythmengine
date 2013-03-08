@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.utils.RawData;
 import com.greenlaw110.rythm.utils.S;
 
 /**
@@ -41,23 +42,23 @@ public class LoopUtil {
         this.obj = obj;
     }
 
-    public String sep(String sep) {
+    public RawData sep(String sep) {
         return postSep(sep);
     }
 
-    public String preSep(String sep) {
+    public RawData preSep(String sep) {
         String result = "";
         if (null != obj) {
-            result += S.str(obj);
+            result += S.escape(obj);
         }
-        return result + (isFirst ? "" : sep);
+        return RawData.valueOf(result);
     }
 
-    public String postSep(String sep) {
+    public RawData postSep(String sep) {
         String result = "";
         if (null != obj) {
-            result += S.str(obj);
+            result += S.escape(obj);
         }
-        return result + (isLast ? "" : sep);
+        return RawData.valueOf(result + (isLast ? "" : sep));
     }
 }

@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
@@ -138,6 +139,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.RENDERED, new IEventHandler<Void, ITemplate>() {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
+                Rythm.RenderTime.clear();
                 IRythmListener l = renderListener;
                 if (null == l) {
                     return null;

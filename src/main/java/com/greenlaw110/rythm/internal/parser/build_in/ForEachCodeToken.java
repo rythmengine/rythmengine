@@ -153,9 +153,9 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("boolean ").p(varIsLast).p(" = ").p(varId).p(" >= ").p(varSize).p(";");
         pline();
-        p("java.lang.String ").p(varSep).p(" = ").p(varIsLast).p(" ? \"\" : \",\";");
+        p("com.greenlaw110.rythm.utils.RawData ").p(varSep).p(" = new com.greenlaw110.rythm.utils.RawData(").p(varIsLast).p(" ? \"\" : \",\");");
         pline();
-        p("java.lang.String ").p(varWithSep).p(" = com.greenlaw110.rythm.utils.S.str(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\");");
+        p("com.greenlaw110.rythm.utils.RawData ").p(varWithSep).p(" = new com.greenlaw110.rythm.utils.RawData(com.greenlaw110.rythm.utils.S.escape(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\"));");
         pline();
         p("com.greenlaw110.rythm.internal.LoopUtil ").p(varUtils).p(" = new com.greenlaw110.rythm.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(");");
         pline();

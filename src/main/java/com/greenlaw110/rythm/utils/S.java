@@ -19,9 +19,9 @@
 */
 package com.greenlaw110.rythm.utils;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.logger.Logger;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -302,23 +302,14 @@ public class S {
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
      *
-     * @param s
+     * @param o
      * @return escaped data
      */
     @Transformer
-    public static RawData escape(Object s) {
-        RythmEngine engine = RythmEngine.get();
-        Escape escape = Escape.XML;
-        if (null != engine) {
-            ILang lang = engine.conf().defaultLang();
-            if (null != lang) {
-                escape = lang.escape();
-                if (null == escape) {
-                    escape = Escape.XML;
-                }
-            }
-        }
-        return escape.apply(s);
+    public static RawData escape(Object o) {
+        if (empty(o)) return RawData.NULL;
+        Escape escape = Rythm.RenderTime.getEscape();
+        return escape.apply(o);
     }
 
     /**

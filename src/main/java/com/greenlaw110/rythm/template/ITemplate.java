@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.template;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
@@ -197,6 +198,7 @@ public interface ITemplate extends Cloneable {
                 lang.setParent(cur);
             }
             langStack.push(lang);
+            Rythm.RenderTime.setLang(lang);
         }
 
         public ILang popLang() {
@@ -215,6 +217,7 @@ public interface ITemplate extends Cloneable {
 
         public void pushEscape(Escape escape) {
             escapeStack.push(escape);
+            Rythm.RenderTime.setEscape(escape);
         }
 
         public Escape popEscape() {

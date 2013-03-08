@@ -19,11 +19,13 @@
 */
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.logger.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
+import com.greenlaw110.rythm.utils.Escape;
 
 import java.io.File;
 import java.util.Map;
@@ -324,6 +326,35 @@ public class Rythm {
         if (null == engine) return;
         engine.shutdown();
         engine = null;
+    }
+    
+    public static final class RenderTime {
+        private static final ThreadLocal<Escape> escape_ = new ThreadLocal<Escape>();
+        public static void setEscape(Escape e) {
+            escape_.set(e);
+        }
+        public static Escape getEscape() {
+            Escape e = escape_.get();
+            if (null == e) {
+                ILang lang = getLang();
+                e = null == lang ? Escape.XML : lang.escape();
+            }
+            return e;
+        }
+        
+        private static final ThreadLocal<ILang> lang_ = new ThreadLocal<ILang>();
+        public static void setLang(ILang lang) {
+            lang_.set(lang);
+        }
+
+        public static ILang getLang() {
+            return lang_.get();
+        }
+        
+        public static void clear() {
+            escape_.remove();
+            lang_.remove();
+        }
     }
 
 }
