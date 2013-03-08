@@ -14,7 +14,8 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -69,6 +70,29 @@
     -->
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+            <!-- When having mixed filtered and non-filtered resurces
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>version</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>version</exclude>
+                </excludes>
+                <filtering>false</filtering>
+            </resource>
+            -->
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -96,7 +120,7 @@
                 <configuration>
                     <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
                     <excludePackageNames>com.greenlaw110.rythm.internal.*</excludePackageNames>
-                    <quiet />
+                    <quiet/>
                 </configuration>
                 <executions>
                     <execution>

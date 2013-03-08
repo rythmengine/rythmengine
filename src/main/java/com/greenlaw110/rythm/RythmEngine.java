@@ -46,6 +46,7 @@ import com.greenlaw110.rythm.template.*;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.F;
+import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 import com.greenlaw110.rythm.utils.S;
 
@@ -74,9 +75,11 @@ public class RythmEngine implements IEventDispatcher {
      * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#ENGINE_PLUGIN_VERSION plugin version} to
      * check if the cached template bytecode need to be refreshed or not
      * <p/>
-     * TODO: use version marker and be substitute when build
      */
-    private static final String version = "1.0-b5-SNAPSHOT";
+    private static final String version;
+    static {
+        version = IO.readContentAsString(RythmEngine.class.getClassLoader().getResourceAsStream("rythm-engine-version"));
+    }
 
     private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
 
@@ -412,7 +415,7 @@ public class RythmEngine implements IEventDispatcher {
             }
         });
 
-        logger.debug("Rythm started in %s mode", mode());
+        logger.debug("Rythm-%s started in %s mode", version, mode());
     }
 
     /* -----------------------------------------------------------------------------

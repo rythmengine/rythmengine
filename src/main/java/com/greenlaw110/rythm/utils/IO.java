@@ -70,7 +70,7 @@ public class IO {
      */
     public static String readContentAsString(File file, String encoding) {
         try {
-            return readContentAsString(new FileInputStream(file));
+            return readContentAsString(new FileInputStream(file), encoding);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
