@@ -22,11 +22,7 @@ package com.greenlaw110.rythm.cache;
 import java.io.Serializable;
 
 /**
- * Created with IntelliJ IDEA.
- * User: luog
- * Date: 2/05/12
- * Time: 8:37 PM
- * To change this template use File | Settings | File Templates.
+ * A do-nothing implementation of {@link ICacheService}
  */
 public class NoCacheService implements ICacheService {
 
