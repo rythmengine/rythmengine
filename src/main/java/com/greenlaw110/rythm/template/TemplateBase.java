@@ -25,6 +25,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.extension.II18nMessageResolver;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.internal.RythmEvents;
@@ -1229,6 +1230,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected boolean __logTime = false;
+    
+    private II18nMessageResolver i18n = null;
+    protected String __i18n(String key, Object ... args) {
+        if (i18n == null) {
+            i18n = __engine().conf().i18nMessageResolver();
+        }
+        return i18n.getMessage(__engine(), key, args);
+    }
 
     /**
      * The helper class to facilitate generating code for the "for" loop in

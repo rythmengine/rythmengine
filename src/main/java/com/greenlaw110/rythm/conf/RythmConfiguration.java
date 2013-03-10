@@ -21,10 +21,7 @@ package com.greenlaw110.rythm.conf;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
-import com.greenlaw110.rythm.extension.IByteCodeHelper;
-import com.greenlaw110.rythm.extension.IDurationParser;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.*;
 import com.greenlaw110.rythm.utils.RawData;
 
 import java.io.File;
@@ -448,6 +445,18 @@ public class RythmConfiguration {
             _messageSources = Arrays.asList(get(I18N_MESSAGE_SOURCES).toString().split("[, \\t]+"));
         }
         return _messageSources;
+    }
+    
+    private II18nMessageResolver _i18n = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#I18N_MESSAGE_RESOLVER} without lookup
+     */
+    public II18nMessageResolver i18nMessageResolver() {
+        if (null == _i18n) {
+            _i18n = get(I18N_MESSAGE_RESOLVER);
+        }
+        return _i18n;
     }
 
     public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 

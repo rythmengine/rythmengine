@@ -103,6 +103,10 @@ public enum Keyword implements IKeyword {
      */
     INVOKE,
     /**
+     * Define a different locale block
+     */
+    LOCALE,
+    /**
      * Instruct that this template needs to log execution time
      */
     LOG_TIME("__logTime__"),

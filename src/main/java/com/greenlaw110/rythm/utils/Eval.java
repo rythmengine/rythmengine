@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.utils;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -185,5 +186,45 @@ public class Eval {
             return ((Object[])condition).length > 0;
         }
         return true;
+    }
+
+    /**
+     * Eval Locale from a Locale
+     * @param locale
+     * @return the specified locale directly
+     */
+    public static Locale locale(Locale locale) {
+        if (null == locale) throw new NullPointerException();
+        return locale;
+    }
+
+    /**
+     * Eval locale from language string
+     * @param language
+     * @return new Locale constructed from the language
+     */
+    public static Locale locale(String language) {
+        return new Locale(language);
+    }
+
+    /**
+     * Eval locale from language and region
+     * @param language
+     * @param region
+     * @return new Locale constructed from the lauguage and region 
+     */
+    public static Locale locale(String language, String region) {
+        return new Locale(language, region);
+    }
+
+    /**
+     * Eval locale from language, region and variant
+     * @param language
+     * @param region
+     * @param variant
+     * @return the new Locale constructed
+     */
+    public static Locale locale(String language, String region, String variant) {
+        return new Locale(language, region, variant);
     }
 }

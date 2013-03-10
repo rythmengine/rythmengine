@@ -50,6 +50,9 @@ import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 import com.greenlaw110.rythm.utils.S;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -1034,6 +1037,28 @@ public class RythmEngine implements IEventDispatcher {
         ITemplate t = tc.asTemplate();
         setRenderArgs(t, args);
         return t.render();
+    }
+    
+    /* -----------------------------------------------------------------------------
+      Eval
+    -------------------------------------------------------------------------------*/
+
+    /**
+     * Evaluate a script and return executing result. Note the API is not mature yet
+     * don't use it in your application
+     * 
+     * @param script
+     * @return the result
+     */
+    public Object eval(String script) {
+        // use Java's ScriptEngine at the moment
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
+        try {
+            return jsEngine.eval(script);
+        } catch (ScriptException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /* -----------------------------------------------------------------------------

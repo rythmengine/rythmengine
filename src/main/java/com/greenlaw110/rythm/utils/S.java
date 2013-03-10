@@ -1050,6 +1050,31 @@ public class S {
     }
 
     /**
+     * Not an API. Don't not use this method
+     * @param locale
+     * @param engine
+     * @param key
+     * @return String
+     */
+    public static String i18n(Locale locale, RythmEngine engine, String key) {
+        String cacheKey = CacheKey.i18nMsg(engine, key, false, locale);
+        Object cached = engine.cached(cacheKey);
+        if (S.notEmpty(cached)) return S.str(cached);
+        ResourceBundle bundle;
+        for (String msgSrc: RythmConfiguration.get().messageSources()) {
+            bundle = I18N.bundle(engine, msgSrc, locale);
+            if (null != bundle) {
+                String data = getMessage(engine, bundle, key, locale, new Object[0]);
+                if (null != data) {
+                    engine.cache(cacheKey, data, -1);
+                    return data;
+                }
+            }
+        }
+        return key;
+    }
+    
+    /**
      * <p>Return i18n message of a given key and args, use the locale info from the engine specified. 
      * if <tt>null</tt> engine instance passed in then it will try to guess the current engine via
      * {@link com.greenlaw110.rythm.RythmEngine#get()}</p>
@@ -1079,13 +1104,13 @@ public class S {
             engine = RythmEngine.get();
         }
         if (null != engine) {
-            cacheKey = CacheKey.i18nMsg(engine, key, useFormat);
+            cacheKey = CacheKey.i18nMsg(engine, key, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);
         }
         ResourceBundle bundle;
         for (String msgSrc: RythmConfiguration.get().messageSources()) {
-            bundle = I18N.bundle(engine, msgSrc);
+            bundle = I18N.bundle(engine, msgSrc, locale);
             if (null != bundle) {
                 String data = getMessage(engine, bundle, key, locale, args);
                 if (null != data) {

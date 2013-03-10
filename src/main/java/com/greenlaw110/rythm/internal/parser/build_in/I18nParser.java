@@ -1,11 +1,14 @@
 package com.greenlaw110.rythm.internal.parser.build_in;
 
+import com.greenlaw110.rythm.extension.II18nMessageResolver;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
+
+import java.util.Locale;
 
 /**
  * Parsing @i18n() directive
@@ -47,7 +50,9 @@ public class I18nParser extends KeywordParserFactory {
                     if (S.empty(args)) {
                         // get the String directly
                         s = S.stripQuotation(s);
-                        s = S.i18n(ctx.getEngine(), s);
+                        Locale locale = ctx.peekLocale();
+                        II18nMessageResolver i18n = ctx.getEngine().conf().i18nMessageResolver();
+                        s = i18n.getMessage(locale, ctx.getEngine(), s);
                         s = ExpressionParser.processPositionPlaceHolder(s);
                         return new CodeToken(s, ctx()) {
                             @Override
@@ -62,7 +67,7 @@ public class I18nParser extends KeywordParserFactory {
                     }
                 }
                 // cannot pre-resolve, output S.i18n directly
-                s = String.format("%s.i18n(__engine(), %s)", S.class.getName(), s);
+                s = String.format("__i18n(%s)", s);
                 s = ExpressionParser.processPositionPlaceHolder(s);
                 return new CodeToken(s, ctx()) {
                     @Override

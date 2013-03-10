@@ -2,6 +2,7 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.template.TemplateBase;
 
 import java.util.Locale;
 
@@ -14,7 +15,15 @@ import java.util.Locale;
  */
 public class CacheKey {
     public static String i18nMsg(RythmEngine engine, String key, boolean useFormat) {
-        Locale locale = engine.conf().locale();
+        return i18nMsg(engine, key, useFormat, null);
+    }
+    
+    public static String i18nMsg(RythmEngine engine, String key, boolean useFormat, Locale locale) {
+        if (null == engine) return "";
+        if (null == locale) {
+            TemplateBase tmpl = engine.currentTemplate();
+            locale = null == tmpl ? engine.locale() : tmpl.__curLocale();
+        }
         return Rythm.substitute("@1-i18nM-@2-@3-@4", key, locale, useFormat, engine);
     }
     

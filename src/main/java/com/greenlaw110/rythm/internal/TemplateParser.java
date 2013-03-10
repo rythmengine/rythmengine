@@ -32,6 +32,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Locale;
 import java.util.Stack;
 
 public class TemplateParser implements IContext {
@@ -97,6 +98,7 @@ public class TemplateParser implements IContext {
             this.inBodyStack2.clear();
             this.compactStack.clear();
             this.continueStack.clear();
+            this.localeStack.clear();
             this.insideDirectiveComment = false;
             this.blocks.clear();
             cursor = 0;
@@ -374,6 +376,23 @@ public class TemplateParser implements IContext {
         cur.setParent(null);
         langStack.pop();
         return cur;
+    }
+
+    private Stack<Locale> localeStack = new Stack<Locale>();
+
+    @Override
+    public Locale peekLocale() {
+        return localeStack.isEmpty() ? null : localeStack.peek();
+    }
+
+    @Override
+    public void pushLocale(Locale locale) {
+        localeStack.push(locale);
+    }
+
+    @Override
+    public Locale popLocale() {
+        return localeStack.isEmpty() ? null : localeStack.pop();
     }
 
     public void shutdown() {

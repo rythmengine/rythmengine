@@ -24,6 +24,8 @@ import com.greenlaw110.rythm.exception.ParseException;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
+import java.util.Locale;
+
 public interface IContext {
 
     /**
@@ -186,5 +188,11 @@ public interface IContext {
     void pushLang(ILang lang);
 
     ILang popLang();
+    
+    Locale peekLocale();
+
+    void pushLocale(Locale locale);
+    
+    Locale popLocale();
     
 }

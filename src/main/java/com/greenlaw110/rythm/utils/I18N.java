@@ -56,30 +56,36 @@ public class I18N {
         }
         return retval;
     }
-    
+
     public static Locale locale() {
         return locale(null);
     }
-    
+
     public static ResourceBundle bundle(String name) {
-        return bundle(null, name);
+        return bundle(null, name, null);
     }
 
     private static final Map<String, ResourceBundle> bundleCache = new HashMap<String, ResourceBundle>();
-    
-    public static ResourceBundle bundle(RythmEngine engine, String name) {
+
+    public static ResourceBundle bundle(RythmEngine engine, String name, Locale locale) {
         if (null == name) throw new NullPointerException();
         String cacheKey = null;
         ResourceBundle retval = null;
-        Locale locale = null;
-        if (null == engine) {
+        if (null == locale) {
+            if (null == engine) {
+                engine = RythmEngine.get();
+            }
+            if (null != engine) {
+                locale = locale(engine);
+            }
+        } else if (null == engine) {
             engine = RythmEngine.get();
         }
-        if (null != engine) {
-            locale = locale(engine);
+        if (null != engine && null != locale) {
             cacheKey = CacheKey.i18nBundle(engine, locale);
             retval = bundleCache.get(cacheKey);
         }
+
         if (null == retval) {
             try {
                 if (null == locale) locale = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
@@ -91,5 +97,5 @@ public class I18N {
         }
         return retval;
     }
-    
+
 }

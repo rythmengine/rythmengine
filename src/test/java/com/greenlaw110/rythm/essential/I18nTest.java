@@ -31,13 +31,24 @@ import java.util.Locale;
 /**
  * Test i18n
  */
-public class I18nParserTest extends TestBase {
+public class I18nTest extends TestBase {
 
     @Test
     public void testBasic() {
         t = "@i18n('foo.bar')";
         s = r(t);
         eq("foobar");
+        
+        t = "@i18n('foo.bar', Locale.CHINA)";
+        s = r(t);
+        eq("福吧");
+    }
+    
+    @Test
+    public void testLocaleBlock() {
+        t = "@i18n('foo.bar') @locale(java.util.Locale.CHINA){@i18n('foo.bar')} @i18n('foo.bar')";
+        s = r(t);
+        eq("foobar 福吧 foobar");
     }
         
     @Test
@@ -46,7 +57,10 @@ public class I18nParserTest extends TestBase {
         s = r(t);
         assertContains(s, "we detected 7 spaceships on the planet Mars.");
         assertContains(s, DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
-        
+    }
+    
+    @Test
+    public void testConfiguration() {    
         System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.CHINA);
         System.setProperty(RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
         Rythm.shutdown();
@@ -65,6 +79,6 @@ public class I18nParserTest extends TestBase {
     
 
     public static void main(String[] args) {
-        run(I18nParserTest.class);
+        run(I18nTest.class);
     }
 }

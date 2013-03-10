@@ -24,6 +24,7 @@ import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
 import com.greenlaw110.rythm.extension.IDurationParser;
+import com.greenlaw110.rythm.extension.II18nMessageResolver;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.logger.JDKLogger;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
@@ -447,6 +448,13 @@ public enum RythmConfigurationKey {
      * @see <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#context-functionality-messagesource">[Spring]Internationalization using MessageSource</a>
      */
     I18N_MESSAGE_SOURCES("i18n.message.sources", "messages"),
+
+    /**
+     * "i18n.message.resolver.impl": Set i18n message resolver. Should implement {@link com.greenlaw110.rythm.extension.II18nMessageResolver}
+     * interface. Default value: {@link com.greenlaw110.rythm.extension.II18nMessageResolver.DefaultImpl#INSTANCE}, which delegate
+     * to {@link com.greenlaw110.rythm.utils.S#i18n(com.greenlaw110.rythm.RythmEngine, String, Object...)} method
+     */
+    I18N_MESSAGE_RESOLVER("i18n.message.resolver.impl", II18nMessageResolver.DefaultImpl.INSTANCE),
 
     /**
      * "log.enabled": Enable disable log in Rythm. Default value: true
