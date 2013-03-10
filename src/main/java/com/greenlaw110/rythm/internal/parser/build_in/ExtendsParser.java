@@ -22,7 +22,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
@@ -100,57 +99,6 @@ public class ExtendsParser extends KeywordParserFactory {
 
     protected String patternStr0() {
         return "(%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
-    }
-
-    public static void main(String[] args) {
-        test2();
-    }
-
-    public static void test2() {
-        Regex r = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
-        String s = "(ab().fpp[9]+xx)";
-        while (r.search(s)) {
-            System.out.println(r.stringMatched());
-        }
-    }
-
-    public static void test0() {
-        Regex r = new ExtendsParser().reg(Rythm.INSTANCE);
-        String s = "@extends('ab/cd.foo', 'a': 6, \"b\"=null); acd";
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-            System.out.println(r.stringMatched(2));
-            System.out.println(r.stringMatched(3));
-        }
-        System.out.println("--------------------");
-        s = r.stringMatched(2);
-        r = innerPattern;
-        if (r.search(s)) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-            System.out.println(r.stringMatched(2));
-            System.out.println(r.stringMatched(3));
-        }
-        System.out.println("-----------------");
-        s = r.stringMatched(1);
-        if (s.startsWith("\"") || s.startsWith("'")) {
-            s = s.substring(1);
-        }
-        if (s.endsWith("\"") || s.endsWith("'")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        System.out.println(s);
-
-//        //s = "main/rythm.html";
-//
-//        //Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
-//        Pattern p = Pattern.compile("('([_a-zA-Z][\\w_\\.]*)'|([_a-zA-Z][\\w_\\.]*)|\"([_a-zA-Z][\\w_\\.]*)\")");
-//        Matcher m = p.matcher(s);
-//        if (m.matches()) {
-//            System.out.println(m.group(1));
-//            System.out.println(m.group(4));
-//        }
     }
 
 }

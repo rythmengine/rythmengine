@@ -132,10 +132,5 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
         return path2CN(key);
     }
 
-    public static void main(String[] args) {
-        ClasspathTemplateResource cr = new ClasspathTemplateResource("abc23.x");
-        System.out.println(cr.isValid());
-    }
-
 
 }

@@ -59,34 +59,36 @@ public class DirectiveCommentStartSensor extends RemoveLeadingLineBreakAndSpaces
         ILang lang = ctx.peekLang();
         while (null != lang) {
             String sCommentStart = lang.commentStart();
-            sCommentStart = S.escapeRegex(sCommentStart).toString();
-            // try <!-- @ first
-            String s = "(" + sCommentStart + "\\s*" + ")" + ctx.getDialect().a() + ".*";
-            Pattern p = patterns.get(s);
-            if (null == p) {
-                p = Pattern.compile(s, Pattern.DOTALL);
-                patterns.put(s, p);
-            }
-            Matcher m = p.matcher(remain());
-            if (m.matches()) {
-                s = m.group(1);
-                ctx.step(s.length());
-                ctx.enterDirectiveComment();
-                return Token.EMPTY_TOKEN;
-            }
-            // try <!-- }
-            s = "(" + sCommentStart + "\\s*)\\}.*";
-            p = patterns.get(s);
-            if (null == p) {
-                p = Pattern.compile(s, Pattern.DOTALL);
-                patterns.put(s, p);
-            }
-            m = p.matcher(remain());
-            if (m.matches()) {
-                s = m.group(1);
-                ctx.step(s.length());
-                ctx.enterDirectiveComment();
-                return Token.EMPTY_TOKEN;
+            if (!S.empty(sCommentStart)) {
+                sCommentStart = S.escapeRegex(sCommentStart).toString();
+                // try <!-- @ first
+                String s = "(" + sCommentStart + "\\s*" + ")" + ctx.getDialect().a() + ".*";
+                Pattern p = patterns.get(s);
+                if (null == p) {
+                    p = Pattern.compile(s, Pattern.DOTALL);
+                    patterns.put(s, p);
+                }
+                Matcher m = p.matcher(remain());
+                if (m.matches()) {
+                    s = m.group(1);
+                    ctx.step(s.length());
+                    ctx.enterDirectiveComment();
+                    return Token.EMPTY_TOKEN;
+                }
+                // try <!-- }
+                s = "(" + sCommentStart + "\\s*)\\}.*";
+                p = patterns.get(s);
+                if (null == p) {
+                    p = Pattern.compile(s, Pattern.DOTALL);
+                    patterns.put(s, p);
+                }
+                m = p.matcher(remain());
+                if (m.matches()) {
+                    s = m.group(1);
+                    ctx.step(s.length());
+                    ctx.enterDirectiveComment();
+                    return Token.EMPTY_TOKEN;
+                }
             }
             lang = lang.getParent();
         }

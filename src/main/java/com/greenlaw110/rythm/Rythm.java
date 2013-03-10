@@ -20,14 +20,12 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.extension.ILang;
-import com.greenlaw110.rythm.logger.ILoggerFactory;
-import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.Escape;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -171,30 +169,14 @@ public class Rythm {
     }
 
     /**
-     * @param fact
-     * @see Logger#registerLoggerFactory(com.greenlaw110.rythm.logger.ILoggerFactory)
+     * Set ThreadLocal locale. This method could be called before calling render methods.
+     * Useful to set the locale for web end users
+     * 
+     * @param locale
      */
-    public static void registerLoggerFactory(ILoggerFactory fact) {
-        Logger.registerLoggerFactory(fact);
-    }
-
-    /**
-     * @param tag
-     * @return true if registered the tag
-     * @see RythmEngine#registerTag(com.greenlaw110.rythm.template.ITag)
-     */
-    public static boolean registerTag(ITag tag) {
-        return engine().registerTag(tag);
-    }
-
-    /**
-     * @param name
-     * @param tag
-     * @return true if registered the tag
-     * @see RythmEngine#registerTag(String, com.greenlaw110.rythm.template.ITag)
-     */
-    public boolean registerTag(String name, ITag tag) {
-        return engine().registerTag(name, tag);
+    public static final RythmEngine setLocale(Locale locale) {
+        RythmEngine engine = engine();
+        return engine.setLocale(locale);
     }
 
     /**

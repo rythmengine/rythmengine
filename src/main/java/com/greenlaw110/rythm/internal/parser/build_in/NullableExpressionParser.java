@@ -122,26 +122,5 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
         return "^([a-zA-Z_][\\w]*((?@())(?@[])?|(?@[])(?@())?)?(\\??\\.)?)+$";
     }
 
-    public static void main(String[] args) {
-        main1(args);
-    }
-
-    public static void main2(String[] args) {
-        String s = "app?.name\"";
-        Regex r = new Regex(new NullableExpressionParser().patternStr4());
-        if (r.search(s)) {
-            p(r, 5);
-        }
-    }
-
-    public static void main1(String[] args) {
-        String ps = String.format(new NullableExpressionParser().patternStr1(), "@");
-        System.out.println(ps);
-        Regex r = new Regex(ps);
-        String s = "@foo?.bar\"dsfsa";
-        if (r.search(s)) {
-            p(r, 5);
-        }
-    }
 
 }

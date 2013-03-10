@@ -21,10 +21,15 @@ package com.greenlaw110.rythm.utils;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.internal.CacheKey;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.template.TemplateBase;
 
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * I18N utils
@@ -32,215 +37,59 @@ import java.util.Map;
 // Most of the code come from Play!Framework I18N.java, under Apache License 2.0
 public class I18N {
 
-    static final Map<String, String> symbols = new HashMap<String, String>();
+    private static final ILogger logger = Logger.get(I18N.class);
 
-    static {
-        symbols.put("ALL", "Lek");
-        symbols.put("USD", "$");
-        symbols.put("AFN", "؋");
-        symbols.put("ARS", "$");
-        symbols.put("AWG", "ƒ");
-        symbols.put("AUD", "$");
-        symbols.put("AZN", "ман");
-        symbols.put("BSD", "$");
-        symbols.put("BBD", "$");
-        symbols.put("BYR", "p.");
-        symbols.put("EUR", "€");
-        symbols.put("BZD", "BZ$");
-        symbols.put("BMD", "$");
-        symbols.put("BOB", "$b");
-        symbols.put("BAM", "KM");
-        symbols.put("BWP", "P");
-        symbols.put("BGN", "лв");
-        symbols.put("BRL", "R$");
-        symbols.put("GBP", "£");
-        symbols.put("BND", "$");
-        symbols.put("KHR", "៛");
-        symbols.put("CAD", "$");
-        symbols.put("KYD", "$");
-        symbols.put("CLP", "$");
-        symbols.put("CNY", "¥");
-        symbols.put("COP", "$");
-        symbols.put("CRC", "₡");
-        symbols.put("HRK", "kn");
-        symbols.put("CUP", "₱");
-        symbols.put("EUR", "€");
-        symbols.put("CZK", "Kč");
-        symbols.put("DKK", "kr");
-        symbols.put("DOP", "RD$");
-        symbols.put("XCD", "$");
-        symbols.put("EGP", "£");
-        symbols.put("SVC", "$");
-        symbols.put("GBP", "£");
-        symbols.put("EEK", "kr");
-        symbols.put("EUR", "€");
-        symbols.put("FKP", "£");
-        symbols.put("FJD", "$");
-        symbols.put("EUR", "€");
-        symbols.put("GHC", "¢");
-        symbols.put("GIP", "£");
-        symbols.put("EUR", "€");
-        symbols.put("GTQ", "Q");
-        symbols.put("GGP", "£");
-        symbols.put("GYD", "$");
-        symbols.put("EUR", "€");
-        symbols.put("HNL", "L");
-        symbols.put("HKD", "$");
-        symbols.put("HUF", "Ft");
-        symbols.put("ISK", "kr");
-        symbols.put("INR", "");
-        symbols.put("IDR", "Rp");
-        symbols.put("IRR", "﷼");
-        symbols.put("EUR", "€");
-        symbols.put("IMP", "£");
-        symbols.put("ILS", "₪");
-        symbols.put("EUR", "€");
-        symbols.put("JMD", "J$");
-        symbols.put("JPY", "¥");
-        symbols.put("JEP", "£");
-        symbols.put("KZT", "лв");
-        symbols.put("KPW", "₩");
-        symbols.put("KRW", "₩");
-        symbols.put("KGS", "лв");
-        symbols.put("LAK", "₭");
-        symbols.put("LVL", "Ls");
-        symbols.put("LBP", "£");
-        symbols.put("LRD", "$");
-        symbols.put("CHF", "CHF");
-        symbols.put("LTL", "Lt");
-        symbols.put("EUR", "€");
-        symbols.put("MKD", "ден");
-        symbols.put("MYR", "RM");
-        symbols.put("EUR", "€");
-        symbols.put("MUR", "₨");
-        symbols.put("MXN", "$");
-        symbols.put("MNT", "₮");
-        symbols.put("MZN", "MT");
-        symbols.put("NAD", "$");
-        symbols.put("NPR", "₨");
-        symbols.put("ANG", "ƒ");
-        symbols.put("EUR", "€");
-        symbols.put("NZD", "$");
-        symbols.put("NIO", "C$");
-        symbols.put("NGN", "₦");
-        symbols.put("KPW", "₩");
-        symbols.put("NOK", "kr");
-        symbols.put("OMR", "﷼");
-        symbols.put("PKR", "₨");
-        symbols.put("PAB", "B/.");
-        symbols.put("PYG", "Gs");
-        symbols.put("PEN", "S/.");
-        symbols.put("PHP", "Php");
-        symbols.put("PLN", "zł");
-        symbols.put("QAR", "﷼");
-        symbols.put("RON", "lei");
-        symbols.put("RUB", "руб.");
-        symbols.put("SHP", "£");
-        symbols.put("SAR", "﷼");
-        symbols.put("RSD", "Дин.");
-        symbols.put("SCR", "₨");
-        symbols.put("SGD", "$");
-        symbols.put("EUR", "€");
-        symbols.put("SBD", "$");
-        symbols.put("SOS", "S");
-        symbols.put("ZAR", "R");
-        symbols.put("KRW", "₩");
-        symbols.put("EUR", "€");
-        symbols.put("LKR", "₨");
-        symbols.put("SEK", "kr");
-        symbols.put("CHF", "CHF");
-        symbols.put("SRD", "$");
-        symbols.put("SYP", "£");
-        symbols.put("TWD", "NT$");
-        symbols.put("THB", "฿");
-        symbols.put("TTD", "TT$");
-        symbols.put("TRY", "TL");
-        symbols.put("TRL", "₤");
-        symbols.put("TVD", "$");
-        symbols.put("UAH", "₴");
-        symbols.put("GBP", "£");
-        symbols.put("USD", "$");
-        symbols.put("UYU", "$U");
-        symbols.put("UZS", "лв");
-        symbols.put("EUR", "€");
-        symbols.put("VEF", "Bs");
-        symbols.put("VND", "₫");
-        symbols.put("YER", "﷼");
-        symbols.put("ZWD", "Z$");
-    }
-
-    //TODO add more date formats
-    static final Map<String, String> dateFormats = new HashMap<String, String>();
-
-    static {
-        dateFormats.put("us", "MM/dd/yyyy");
-        dateFormats.put("au", "dd/MM/yyyy");
-        dateFormats.put("cn", "yyyy-MM-dd");
-    }
-
-    //TODO add more langs
-    static final Map<String, String> langs = new HashMap<String, String>();
-    
-    static {
-        langs.put("us", "en");
-        langs.put("au", "en");
-        langs.put("cn", "zh");
-    }
-
-    /**
-     * Retrieve currency symbol for a currency
-     *
-     * @param currency (JPY,USD,EUR,GBP,...)
-     * @return ($, €, ...)
-     */
-    public static String getCurrencySymbol(String currency) {
-        if (symbols.containsKey(currency)) {
-            return symbols.get(currency);
+    public static Locale locale(RythmEngine engine) {
+        Locale retval;
+        if (null == engine) {
+            engine = RythmEngine.get();
         }
-        return currency;
-    }
-
-    /**
-     * Return engine's configured locale. If no current engine
-     * found then it returns default locale 
-     * 
-     * @return the locale string
-     */
-    public static String getLocale() {
-        RythmEngine engine = RythmEngine.get();
         if (null != engine) {
-            return engine.conf().locale();
+            TemplateBase template = engine.currentTemplate();
+            if (null != template) {
+                retval = template.__curLocale();
+            } else {
+                retval = engine.conf().locale();
+            }
         } else {
-            return RythmConfigurationKey.I18N_LOCALE.getDefVal(Collections.EMPTY_MAP).toString();
+            retval = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
         }
+        return retval;
+    }
+    
+    public static Locale locale() {
+        return locale(null);
+    }
+    
+    public static ResourceBundle bundle(String name) {
+        return bundle(null, name);
     }
 
-    /**
-     * Return language corresponding to current {@link #getLocale() locale}
-     * 
-     * @return language string
-     */
-    public static String getLanguage() {
-        String lang = langs.get(getLocale());
-        if (null == lang) {
-            lang = "en";
+    private static final Map<String, ResourceBundle> bundleCache = new HashMap<String, ResourceBundle>();
+    
+    public static ResourceBundle bundle(RythmEngine engine, String name) {
+        if (null == name) throw new NullPointerException();
+        String cacheKey = null;
+        ResourceBundle retval = null;
+        Locale locale = null;
+        if (null == engine) {
+            engine = RythmEngine.get();
         }
-        return lang;
-    }
-
-    /**
-     * Get date format string corresponding to the current {@link #getLocale() locale}
-     * 
-     * @return the date format string
-     */
-    public static String getDateFormat() {
-        String locale = getLocale();
-        final String dateFormat = dateFormats.get(locale);
-        if (null != dateFormat) {
-            return dateFormat;
-        } else {
-            return "yyyy-MM-dd";
+        if (null != engine) {
+            locale = locale(engine);
+            cacheKey = CacheKey.i18nBundle(engine, locale);
+            retval = bundleCache.get(cacheKey);
         }
+        if (null == retval) {
+            try {
+                if (null == locale) locale = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
+                retval = ResourceBundle.getBundle(name, locale);
+                bundleCache.put(cacheKey, retval);
+            } catch (RuntimeException e) {
+                logger.warn(e, "Error getting resource bundle by name %s", name);
+            }
+        }
+        return retval;
     }
-
+    
 }

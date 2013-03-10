@@ -345,7 +345,7 @@ public class TemplateClass {
         }
     };
 
-    private ITemplate templateInstance_(ILang lang) {
+    private ITemplate templateInstance_(ILang lang, Locale locale) {
         if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
@@ -353,7 +353,7 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
-                templateInstance.__setTemplateClass(this, lang);
+                templateInstance.__setTemplateClass(this, lang, locale);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
@@ -372,19 +372,19 @@ public class TemplateClass {
         return templateInstance;
     }
 
-    public ITemplate asTemplate(ILang lang) {
+    public ITemplate asTemplate(ILang lang, Locale locale) {
         RythmEngine e = engine();
         if (null == name || e.mode().isDev()) refresh();
-        return templateInstance_(lang).__cloneMe(engine(), null);
+        return templateInstance_(lang, locale).__cloneMe(engine(), null);
     }
 
     public ITemplate asTemplate() {
-        return asTemplate((ILang) null);
+        return asTemplate(null, null);
     }
 
     public ITemplate asTemplate(ITemplate caller) {
         TemplateBase tb = (TemplateBase) caller;
-        return templateInstance_(tb.__curLang()).__cloneMe(engine(), caller);
+        return templateInstance_(tb.__curLang(), tb.__curLocale()).__cloneMe(engine(), caller);
     }
 
     private boolean refreshing = false;

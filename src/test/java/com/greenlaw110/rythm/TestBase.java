@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm;
 
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -26,10 +27,12 @@ import com.greenlaw110.rythm.template.TemplateBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.JUnitCore;
-import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
 /**
  * The Test base class
@@ -54,6 +57,7 @@ public abstract class TestBase extends Assert {
         System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
         System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
         System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
+        System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
         System.setProperty("line.separator", "\n");
         t = null;
         s = null;

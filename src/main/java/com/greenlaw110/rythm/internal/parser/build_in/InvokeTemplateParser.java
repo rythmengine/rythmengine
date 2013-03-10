@@ -529,41 +529,4 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
         return "^(%s([_a-zA-Z][a-zA-Z$_\\.0-9]*)\\s*((?@()))((\\.([_a-zA-Z][_a-zA-Z0-9]*)((?@())))*))";
     }
 
-    private static void testParseExtension() {
-        Regex r = new Regex("\\G(\\.)([_a-zA-Z]+)((?@()))");
-        String line = ".cache(\"1h\", foo.bar(), x, 32).callback(String name).escape(\"HTML\")";
-        p(line, r);
-    }
-
-    private static void testOuterMatch() {
-        IContext ctx = new TemplateParser(new CodeBuilder(null, "", null, null, null, null));
-        String ps = String.format(new InvokeTemplateParser().patternStr(), "@");
-        Regex r = new Regex(ps);
-        String s = "@xyz(xyz: zbc, y=component.left[bar.get(bar[123]).foo(\" hello\")].get(v[3])[3](), \"hp\").cache(ab, d).escape()  Gren";
-        //String s = "@xyz().cacheFor(\"1h\")";
-        //s = "<link href=\"http://abc.com/css/xyz.css\" type=\"text/css\">";
-        if (r.search(s)) {
-            p(r, 7);
-            //InvokeTagToken t = new InvokeTagToken(r.stringMatched(2), r.stringMatched(3), ctx);
-            //System.out.println(t.params);
-        } else System.out.println("not found");
-
-//        String s = " << asdfuisf@";
-//        Matcher m = P_HEREDOC_SIMBOL.matcher(s);
-//        if (m.matches()) {
-//            System.out.println(m.group(1));
-//        }
-    }
-
-    public static void main(String[] args) {
-        //testOuterMatch();
-        //testParseExtension();
-        //testParseParams();
-        Regex r = new Regex("\\G(\\s*,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
-        String s = "\"xx dd\".capFirst()";
-        while (r.search(s)) {
-            System.out.println("--------------------------------------------");
-            p(r, 8);
-        }
-    }
 }

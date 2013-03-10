@@ -30,9 +30,10 @@ import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -90,7 +91,7 @@ public enum RythmConfigurationKey {
      */
     CACHE_SERVICE_IMPL("cache.service.impl") {
         @Override
-        public Object getDefVal(Map<String, ?> configuration) {
+        protected Object getDefVal(Map<String, ?> configuration) {
             Boolean cacheEnabled = CACHE_ENABLED.getConfiguration(configuration);
             return cacheEnabled ? SimpleCacheService.INSTANCE : NoCacheService.INSTANCE;
         }
@@ -141,7 +142,7 @@ public enum RythmConfigurationKey {
      * <p/>
      * TODO: what if {@link #BUILT_IN_TEMPLATE_LANG_ENABLED} is false
      */
-    DEFAULT_TEMPLATE_LANG_IMPL("default.template_lang.impl", ILang.DefImpl.HTML),
+    DEFAULT_TEMPLATE_LANG_IMPL("default.template_lang.impl", ILang.DefImpl.RAW),
 
     /**
      * "default.cache_ttl": Set default {@link com.greenlaw110.rythm.cache.ICacheService cache} ttl
@@ -186,6 +187,17 @@ public enum RythmConfigurationKey {
     },
 
     /**
+     * "engine.id": Set the ID of rythm engine instance
+     * <p>Default value: "re-" plus a random String with 3 chars</p>
+     */
+    ENGINE_ID("engine.id") {
+        @Override
+        protected Object getDefVal(Map<String, ?> configuration) {
+            return "re-" + S.random(3);
+        }
+    },
+
+    /**
      * "engine.class_loader.parent.impl": Set the {@link ClassLoader#getParent() parent} class loader of the rythm
      * template class loader
      * <p>Default value: first try to use {@link Thread#getContextClassLoader() current thread's context class loader}
@@ -193,7 +205,7 @@ public enum RythmConfigurationKey {
      */
     ENGINE_CLASS_LOADER_PARENT_IMPL("engine.class_loader.parent.impl") {
         @Override
-        public Object getDefVal(Map<String, ?> configuration) {
+        protected Object getDefVal(Map<String, ?> configuration) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (null == cl) {
                 cl = Rythm.class.getClassLoader();
@@ -312,24 +324,20 @@ public enum RythmConfigurationKey {
             if (null != loader) {
                 return null;
             }
-            try {
-                File f = getFile(getKey(), configuration);
-                if (null == f) {
-                    f = new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
-                }
-                if (!f.exists()) {
-                    throw new ConfigurationException("template root [%s] does not exists", f.getAbsolutePath());
-                }
-                if (!f.isDirectory()) {
-                    throw new ConfigurationException("template root [%s] is not a directory", f.getAbsolutePath());
-                }
-                if (!f.canRead()) {
-                    throw new ConfigurationException("template root [%s] is not readable", f.getAbsolutePath());
-                }
-                return (T) f;
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+            File f = getFile(getKey(), configuration);
+            if (null == f) {
+                f = new File(Thread.currentThread().getContextClassLoader().getResource(".").getFile());
             }
+            if (!f.exists()) {
+                throw new ConfigurationException("template root [%s] does not exists", f.getAbsolutePath());
+            }
+            if (!f.isDirectory()) {
+                throw new ConfigurationException("template root [%s] is not a directory", f.getAbsolutePath());
+            }
+            if (!f.canRead()) {
+                throw new ConfigurationException("template root [%s] is not readable", f.getAbsolutePath());
+            }
+            return (T) f;
         }
     },
 
@@ -398,16 +406,47 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * "i18n.lang": Set the language. Used to get i18n message
-     * <p>Default value: <code>en</code></p>
+     * "i18n.locale": the locale for the rythm runtime environment. This configuration
+     * return the {@link java.util.Locale} type of instance.
+     * 
+     * <p>Default value: <code>java.util.Locale.getDefault()</code></p>
+     * 
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html">Java Locale</a>
      */
-    I18N_LANG("i18n.lang", "en"),
+    I18N_LOCALE("i18n.locale") {
+        @Override
+        public <T> T getConfiguration(Map<String, ?> configuration) {
+            String k = getKey();
+            Object o = configuration.get(k);
+            if (o instanceof Locale) {
+                return (T)o;
+            }
+            // check lang_REGION style
+            String s = S.str(o);
+            if (S.empty(s)) {
+                return (T)Locale.getDefault();
+            }
+            Locale retval;
+            String[] sa = s.split("_");
+            String lang = sa[0];
+            if (sa.length > 1) {
+                String region = sa[1];
+                retval = new Locale(lang, region);
+            } else {
+                retval = new Locale(lang);
+            }
+            return (T)retval;
+        }
+    },
 
     /**
-     * "i18n.locale": Set the locale. Used to provide localized format to date or currency.
-     * <p>Default value: <code>au</code></p>
+     * "i18n.message.sources": Set message sources. Should be a String of message (resource bundle) properties 
+     * file names separated by ",", E.g. "format,exception,windows".
+     * <p>Default value: <code>message</code></p>
+     * 
+     * @see <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#context-functionality-messagesource">[Spring]Internationalization using MessageSource</a>
      */
-    I18N_LOCALE("i18n.locale", "au"),
+    I18N_MESSAGE_SOURCES("i18n.message.sources", "messages"),
 
     /**
      * "log.enabled": Enable disable log in Rythm. Default value: true
@@ -575,7 +614,7 @@ public enum RythmConfigurationKey {
      * @param configuration
      * @return return the default value
      */
-    public Object getDefVal(Map<String, ?> configuration) {
+    protected Object getDefVal(Map<String, ?> configuration) {
         return defVal;
     }
 
@@ -725,6 +764,16 @@ public enum RythmConfigurationKey {
         }
     }
 
+    /**
+     * Return default configuration of this item
+     * 
+     * @param <T>
+     * @return
+     */
+    public <T> T getDefaultConfiguration() {
+        return (T)getConfiguration((Map)Collections.emptyMap());
+    }
+
     private static Map<String, RythmConfigurationKey> lookup = new HashMap<String, RythmConfigurationKey>(50); static {
         for (RythmConfigurationKey k : values()) {
             lookup.put(k.getKey().toLowerCase(), k);
@@ -740,10 +789,6 @@ public enum RythmConfigurationKey {
     public static RythmConfigurationKey valueOfIgnoreCase(String s) {
         if (S.empty(s)) throw new IllegalArgumentException();
         return lookup.get(s.trim().toLowerCase());
-    }
-
-    public static void main(String[] args) {
-        System.out.println(values().length);
     }
 
 }

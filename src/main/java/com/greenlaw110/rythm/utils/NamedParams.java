@@ -19,8 +19,6 @@
 */
 package com.greenlaw110.rythm.utils;
 
-import com.greenlaw110.rythm.Rythm;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +58,4 @@ public class NamedParams {
         return map;
     }
 
-    public static void main(String[] args) {
-        System.out.println(Rythm.render("green@rythmengine.com"));
-    }
 }

@@ -104,12 +104,6 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return tagName;
     }
 
-    public static void main(String[] args) {
-        File tagHome = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\");
-        File tagFile = new File("W:\\_lgl\\greenscript-1.2\\java\\play\\app\\views\\tags\\greenscript\\css.html");
-        System.out.println(retrieveTagName(tagHome, tagFile));
-    }
-
     @Override
     public String getKey() {
         return key;

@@ -78,6 +78,10 @@ public enum Keyword implements IKeyword {
      */
     GET,
     /**
+     * Lookup i18n message
+     */
+    I18N,
+    /**
      * plain java if else block
      */
     IF("(?i)(if|ifNot)"),

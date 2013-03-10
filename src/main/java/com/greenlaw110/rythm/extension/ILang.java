@@ -123,12 +123,19 @@ public interface ILang {
 
 
     public static class DefImpl implements ILang, Cloneable {
+    
+        public static final DefImpl RAW = new DefImpl("RAW", null, null, Escape.RAW);
 
         public static final DefImpl HTML = new DefImpl("HTML", "<!--", "-->", Escape.XML) {
             @Override
             public boolean allowInternalLang() {
                 // HTML allow CSS and JS inside
                 return true;
+            }
+
+            @Override
+            public String toString() {
+                return "HTML";
             }
         };
         

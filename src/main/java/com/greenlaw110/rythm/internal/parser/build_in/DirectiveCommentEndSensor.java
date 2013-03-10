@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.Token;
@@ -56,19 +55,21 @@ public class DirectiveCommentEndSensor extends RemoveLeadingLineBreakAndSpacesPa
         ILang lang = ctx.peekLang();
         while (null != lang) {
             String s = lang.commentEnd();
-            s = S.escapeRegex(s).toString();
-            s = "(\\s*" + s + ")" + ".*";
-            Pattern p = patterns.get(s);
-            if (null == p) {
-                p = Pattern.compile(s, Pattern.DOTALL);
-                patterns.put(s, p);
-            }
-            Matcher m = p.matcher(remain());
-            if (m.matches()) {
-                s = m.group(1);
-                ctx.step(s.length());
-                ctx.leaveDirectiveComment();
-                return Token.EMPTY_TOKEN;
+            if (!S.empty(s)) {
+                s = S.escapeRegex(s).toString();
+                s = "(\\s*" + s + ")" + ".*";
+                Pattern p = patterns.get(s);
+                if (null == p) {
+                    p = Pattern.compile(s, Pattern.DOTALL);
+                    patterns.put(s, p);
+                }
+                Matcher m = p.matcher(remain());
+                if (m.matches()) {
+                    s = m.group(1);
+                    ctx.step(s.length());
+                    ctx.leaveDirectiveComment();
+                    return Token.EMPTY_TOKEN;
+                }
             }
             lang = lang.getParent();
         }
@@ -76,12 +77,4 @@ public class DirectiveCommentEndSensor extends RemoveLeadingLineBreakAndSpacesPa
         return null;
     }
 
-    public static void main(String[] args) {
-        String s = "<!--@if(true){-->123<!--} " +
-                "else  {-->456} 111 " +
-                "<script>/*@for(int i = 0; i < 2; ++i){*/@i,<!--}-->" +
-                "</script>";
-        s = Rythm.render(s);
-        System.out.println(s);
-    }
 }

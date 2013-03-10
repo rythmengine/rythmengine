@@ -71,4 +71,11 @@ public @interface Transformer {
      * @return the namespace
      */
     String value() default "app";
+
+    /**
+     * Require passing {@link com.greenlaw110.rythm.RythmEngine engine} instance as
+     * implicit argument (the first parameter)
+     * @return true if require passing engine instance as the implicit first parameter 
+     */
+    boolean requireEngine() default false;
 }

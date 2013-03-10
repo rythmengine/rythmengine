@@ -68,9 +68,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param templateClass
      * @param lang
      */
-    public void __setTemplateClass(TemplateClass templateClass, ILang lang) {
+    public void __setTemplateClass(TemplateClass templateClass, ILang lang, Locale locale) {
         this.__templateClass = templateClass;
-        __ctx.init(this, lang);
+        __ctx.init(this, lang, locale);
+        if (null != __parent) {
+            __parent.__ctx.init(__parent, lang, locale);
+        }
     }
 
     /**
@@ -118,7 +121,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @return the engine running the template
      */
-    protected RythmEngine __engine() {
+    public RythmEngine __engine() {
         return null == __engine ? Rythm.engine() : __engine;
     }
 
@@ -239,10 +242,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             try {
                 TemplateClass ptc = __engine().classes().getByClassName(pc.getName());
                 if (null != ptc) {
-                    __parent = (TemplateBase) ptc.asTemplate(__curLang());
+                    __parent = (TemplateBase) ptc.asTemplate();
                 } else {
                     __parent = (TemplateBase) pc.newInstance();
-                    __parent.__ctx.pushLang(__curLang());
                 }
                 //__parent.__setTemplateClass(__engine().classes.getByClassName(pc.getName()));
             } catch (Exception e) {
@@ -670,7 +672,6 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                                 msg = e.getMessage();
                                 if (S.isEmpty(msg)) {
                                     msg = "Rythm runtime exception caused by " + e.getClass().getName();
-                                    //System.out.println("<<<<<" + msg);
                                 }
                             }
                             RythmException re = new RythmException(__engine, e, tc, se.getLineNumber(), -1, msg);
@@ -991,6 +992,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     public ILang __curLang() {
         return __ctx.currentLang();
+    }
+    
+    public Locale __curLocale() {
+        return __ctx.currentLocale();
     }
 
     private boolean appendToBuffer() {
@@ -1446,7 +1451,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             List<String> seps = new ArrayList<String>();
             RythmEngine engine = RythmEngine.get();
             RythmConfiguration conf = engine.conf();
-            if ("zh".equals(conf.lang())) {
+            if ("zh".equals(conf.locale().getLanguage())) {
                 seps.addAll(Arrays.asList("\n,、,，,；,。,：".split(",")));
             } else {
                 seps.add("\n");

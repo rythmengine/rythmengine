@@ -19,6 +19,8 @@
 */
 package com.greenlaw110.rythm.internal;
 
+import com.greenlaw110.rythm.Rythm;
+
 import java.util.regex.Pattern;
 
 /**
@@ -40,32 +42,51 @@ public interface IJavaExtension {
     Pattern pattern2();
 
     String methodName();
-
+    
+    boolean requrieEngine();
+    
     static class VoidParameterExtension implements IJavaExtension {
         private String methodName = null;
         private String fullMethodName = null;
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
+        private boolean requireEngine = false;
 
         public VoidParameterExtension(String waiveName, String name, String fullName) {
+            this(waiveName, name, fullName, false);
+        }
+
+        public VoidParameterExtension(String waiveName, String name, String fullName, boolean requireEngine) {
             methodName = name;
             fullMethodName = fullName;
             pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.(?i)%s\\s*\\(\\s*\\)\\s*$", waiveName, methodName));
             pattern2 = Pattern.compile(String.format("\\.(?i)%s\\s*\\(\\s*\\)\\s*$", methodName));
-        }
+            this.requireEngine = requireEngine;
+         }
 
         @Override
         public Pattern pattern1() {
             return pattern1;
         }
 
+        @Override
         public Pattern pattern2() {
             return pattern2;
         }
 
         @Override
+        public boolean requrieEngine() {
+            return requireEngine;
+        }
+
+
+        @Override
         public String extend(String s, String signature) {
-            return String.format("%s(%s)", fullMethodName, s);
+            String ptn = "@raw(){@(1)(@2)}";
+            if (requireEngine) {
+                ptn = "@raw(){@(1)(__engine(), @2)}";
+            }
+            return Rythm.substitute(ptn, fullMethodName, s);
         }
 
         @Override
@@ -80,12 +101,18 @@ public interface IJavaExtension {
         private String fullMethodName = null;
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
+        private boolean requireEngine = false;
 
         public ParameterExtension(String waiveName, String name, String signature, String fullName) {
+            this(waiveName, name, signature, fullName, false);
+        }
+        
+        public ParameterExtension(String waiveName, String name, String signature, String fullName, boolean requireEngine) {
             methodName = name;
             fullMethodName = fullName;
             pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", waiveName, methodName, signature));
             pattern2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", methodName, signature));
+            this.requireEngine = requireEngine;
         }
 
         @Override
@@ -99,8 +126,17 @@ public interface IJavaExtension {
         }
 
         @Override
+        public boolean requrieEngine() {
+            return requireEngine;
+        }
+
+        @Override
         public String extend(String s, String signature) {
-            return String.format("%s(%s, %s)", fullMethodName, s, signature);
+            String ptn = "@raw(){@(1)(@2, @3)}";
+            if (requireEngine) {
+                ptn = "@raw(){@(1)(__engine(), @2, @3)}";
+            }
+            return Rythm.substitute(ptn, fullMethodName, s, signature);
         }
 
         @Override

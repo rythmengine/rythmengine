@@ -19,12 +19,13 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
 import com.greenlaw110.rythm.internal.Token;
-import com.greenlaw110.rythm.internal.parser.*;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
+import com.greenlaw110.rythm.internal.parser.ParserBase;
+import com.greenlaw110.rythm.internal.parser.Patterns;
 import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
@@ -142,11 +143,6 @@ public class AssignParser extends KeywordParserFactory {
     protected String patternStr() {
         //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
         return "\\n?[ \\t\\x0B\\f]*%s%s[ \\t\\x0B\\f]*((?@()))[ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?";
-    }
-
-    public static void main(String[] args) {
-        String s = "@assign(x) {abc} @x.getClass()";
-        System.out.println(new RythmEngine().render(s));
     }
 
 }

@@ -68,15 +68,4 @@ public class StringTokenParser extends ParserBase {
         }
     }
 
-    public static void main(String[] args) {
-        String s = "@@163.com#{verbatim} @{for xb}@";
-        String sp = String.format(PTN, "@", "@", "@");
-        System.out.println(sp);
-        Pattern p = Pattern.compile(sp, Pattern.DOTALL);
-        Matcher m = p.matcher(s);
-        if (m.matches()) {
-            System.out.println(m.group(1));
-        }
-    }
-
 }

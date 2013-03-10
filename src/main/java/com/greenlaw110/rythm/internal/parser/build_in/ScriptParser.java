@@ -72,18 +72,4 @@ public class ScriptParser extends RemoveLeadingLineBreakAndSpacesParser {
         checkRestrictedClass(code);
         return new CodeToken(code, ctx);
     }
-
-    public static void main(String[] args) {
-        String s = "xd@{for() { xb\n\r;}}@\nabc";
-        Regex r = new Regex(String.format(PTN, "@", "@"));
-        if (r.search(s)) {
-            //System.out.println(r.stringMatched());
-            System.out.println(1 + r.stringMatched(1));
-            System.out.println(2 + r.stringMatched(2));
-            s = r.stringMatched(2);
-            s = s.substring(1); // strip left "{"
-            s = s.substring(0, s.length() - 1); // strip right "}"
-            System.out.println(s);
-        }
-    }
 }

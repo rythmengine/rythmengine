@@ -157,9 +157,4 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         // replace characters that are invalid in a java identifier with '_'
         return path.replaceAll("[.\\\\/ -]", "_");
     }
-
-    public static void main(String[] args) {
-        System.out.println(path2CN("http://abc.1.a/Black/jack/k.html"));
-        System.out.println(path2CN("W:\\tm p\\a.b.a.html"));
-    }
 }

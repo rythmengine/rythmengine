@@ -1,0 +1,70 @@
+/* 
+ * Copyright (C) 2013 The Rythm Engine project
+ * Gelin Luo <greenlaw110(at)gmail.com>
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+package com.greenlaw110.rythm.essential;
+
+import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.TestBase;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import org.junit.Test;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+/**
+ * Test i18n
+ */
+public class I18nParserTest extends TestBase {
+
+    @Test
+    public void testBasic() {
+        t = "@i18n('foo.bar')";
+        s = r(t);
+        eq("foobar");
+    }
+        
+    @Test
+    public void testCompound() {
+        t = "@i18n('template', \"planet\", 7, new Date())";
+        s = r(t);
+        assertContains(s, "we detected 7 spaceships on the planet Mars.");
+        assertContains(s, DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+        
+        System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.CHINA);
+        System.setProperty(RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
+        Rythm.shutdown();
+        t = "@i18n(@1, @2, @3, @4)";
+        s = r(t, "template", "planet", 7, new Date());
+        assertContains(s, "在火星上发现了7艘宇宙飞船");
+        assertContains(s, DateFormat.getDateInstance(DateFormat.LONG, Locale.CHINA).format(new Date()));
+    }
+    
+    @Test
+    public void testTransformer() {
+        t = "@args String @1;@1.i18n()";
+        s = r(t, "foo.bar");
+        eq("foobar");
+    }
+    
+
+    public static void main(String[] args) {
+        run(I18nParserTest.class);
+    }
+}

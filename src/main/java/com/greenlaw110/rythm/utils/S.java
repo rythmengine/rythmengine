@@ -23,16 +23,15 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.extension.Transformer;
+import com.greenlaw110.rythm.internal.CacheKey;
+import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.*;
-import java.util.Currency;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * A utility class providing String manipulation methods. Commonly used in template engine process.
@@ -53,6 +52,7 @@ import java.util.TimeZone;
 public class S {
     public static final S INSTANCE = new S();
     public static final String EMPTY_STR = "";
+    private static final ILogger logger = Logger.get(S.class);
 
     /**
      * Determine if a given String is null or empty. By empty it
@@ -569,9 +569,9 @@ public class S {
      * @return the String result
      */
     public static final String stripQuotation(Object o) {
-        return strip(o, "\"", "\"");
+        return strip(strip(o, "\"", "\""), "'", "'");
     }
-
+    
     /**
      * Strip off both brace and quotation
      *
@@ -692,109 +692,7 @@ public class S {
         }
         return result.toString();
     }
-
-    /**
-     * Format the number with specified pattern, language and locale
-     * @param number
-     * @param pattern
-     * @param lang
-     * @param locale
-     * @return the formatted String
-     * @see DecimalFormatSymbols
-     */
-    @Transformer
-    public static String format(Number number, String pattern, String lang, String locale) {
-        RythmConfiguration conf = RythmEngine.get().conf();
-        if (null == lang) {
-            lang = conf.lang();
-        }
-        if (null == locale) {
-            locale = conf.locale();
-        }
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale(lang, locale));
-        return new DecimalFormat(pattern, symbols).format(number);
-    }
-
-    /**
-     * Format a number with specified pattern
-     * 
-     * @param number
-     * @param pattern
-     * @return formatted String
-     */
-    @Transformer
-    public static String format(Number number, String pattern) {
-        return format(number, pattern, null, null);
-    }
-
-    /**
-     * Format a date with engine's default format corresponding
-     * to the engine's locale configured
-     * 
-     * @param date
-     * @return the formatted String
-     */
-    @Transformer
-    public static String format(Date date) {
-        return new SimpleDateFormat(I18N.getDateFormat()).format(date);
-    }
-
-    /**
-     * Format a date with specified pattern
-     * 
-     * @param date
-     * @param pattern
-     * @return formated string
-     */
-    @Transformer
-    public static String format(Date date, String pattern) {
-        return format(date, pattern, null, null);
-    }
-
-    /**
-     * Format a date with specified pattern, language and locale
-     * @param date
-     * @param pattern
-     * @param lang
-     * @param locale
-     * @return the formatted String
-     */
-    @Transformer
-    public static String format(Date date, String pattern, String lang, String locale) {
-        RythmConfiguration conf = RythmEngine.get().conf();
-        if (null == lang) {
-            lang = conf.lang();
-        }
-        if (null == locale) {
-            locale = conf.locale();
-        }
-        return new SimpleDateFormat(pattern, new Locale(lang, locale)).format(date);
-    }
-
-    /**
-     * Format a date with specified pattern, lang, locale and timezone.
-     * 
-     * @param date
-     * @param pattern
-     * @param lang
-     * @param locale
-     * @param timezone
-     * @return the formatted String
-     * @see SimpleDateFormat
-     */
-    @Transformer
-    public static String format(Date date, String pattern, String lang, String locale, String timezone) {
-        RythmConfiguration conf = RythmEngine.get().conf();
-        if (null == lang) {
-            lang = conf.lang();
-        }
-        if (null == locale) {
-            locale = conf.locale();
-        }
-        DateFormat df = new SimpleDateFormat(pattern, new Locale(lang, locale));
-        df.setTimeZone(TimeZone.getTimeZone(timezone));
-        return df.format(date);
-    }
+    
 
     /**
      * Change line break in the data string into <tt><br/></tt>
@@ -836,6 +734,176 @@ public class S {
     }
 
     /**
+     * Format the number with specified pattern, language and locale
+     * @param number
+     * @param pattern
+     * @param locale
+     * @return the formatted String
+     * @see DecimalFormatSymbols
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Number number, String pattern, Locale locale) {
+        return format(null, number, pattern, locale);
+    }
+    
+    /**
+     * Format the number with specified engine, pattern, language and locale
+     * @param number
+     * @param pattern
+     * @param locale
+     * @return the formatted String
+     * @see DecimalFormatSymbols
+     */
+    public static String format(RythmEngine engine, Number number, String pattern, Locale locale) {
+        if (null == locale) {
+            locale = I18N.locale(engine);
+        }
+        
+        NumberFormat nf;
+        if (null == pattern) nf = NumberFormat.getNumberInstance(locale);
+        else {
+            DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+            nf = new DecimalFormat(pattern, symbols);
+        }
+        
+        return nf.format(number);
+    }
+
+    /**
+     * Format a number with specified pattern
+     * 
+     * @param number
+     * @param pattern
+     * @return formatted String
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Number number, String pattern) {
+        return format(null, number, pattern, null);
+    }
+    
+    /**
+     * Format a number with specified engine, pattern
+     * 
+     * @param number
+     * @param pattern
+     * @return formatted String
+     */
+    public static String format(RythmEngine engine, Number number, String pattern) {
+        return format(engine, number, pattern, null);
+    }    
+
+    /**
+     * Format a date with engine's default format corresponding
+     * to the engine's locale configured
+     * 
+     * @param date
+     * @return the formatted String
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Date date) {
+        return format(date, null, null, null);
+    }
+
+    /**
+     * Format a date with specified engine's default format corresponding
+     * to the engine's locale configured
+     * 
+     * @param date
+     * @return the formatted String
+     */
+    public static String format(RythmEngine engine, Date date) {
+        return format(engine, date, null, null, null);
+    }
+
+    /**
+     * Format a date with specified pattern
+     * 
+     * @param date
+     * @param pattern
+     * @return formated string
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Date date, String pattern) {
+        return format(date, pattern, null, null);
+    }
+    
+    /**
+     * Format a date with specified pattern
+     * 
+     * @param engine
+     * @param date
+     * @param pattern
+     * @return formated string
+     */
+    public static String format(RythmEngine engine, Date date, String pattern) {
+        return format(engine, date, pattern, null, null);
+    }
+
+    /**
+     * Transformer. Format a date with specified pattern, language and locale
+     * @param date
+     * @param pattern
+     * @param locale
+     * @return the formatted String
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Date date, String pattern, Locale locale) {
+        return format(date, pattern, locale, null);
+    }
+
+    /**
+     * See {@link #format(com.greenlaw110.rythm.RythmEngine, java.util.Date, String, java.util.Locale, String)}
+     * @param engine
+     * @param date
+     * @param pattern
+     * @param locale
+     * @return formatted date string
+     */
+    public static String format(RythmEngine engine, Date date, String pattern, Locale locale) {
+        return format(engine, date, pattern, locale, null);
+    }
+
+    /**
+     * Transformer. Format a date with specified pattern, lang, locale and timezone.
+     * 
+     * @param date
+     * @param pattern
+     * @param locale
+     * @param timezone
+     * @return the formatted String
+     * @see SimpleDateFormat
+     */
+    @Transformer(requireEngine = true)
+    public static String format(Date date, String pattern, Locale locale, String timezone) {
+        return format(null, date, pattern, locale, timezone);
+    }
+
+    /**
+     * Format a date with specified pattern, lang, locale and timezone. The locale
+     * comes from the engine instance specified
+     * 
+     * @param engine
+     * @param date
+     * @param pattern
+     * @param locale
+     * @param timezone
+     * @return
+     */
+    public static String format(RythmEngine engine, Date date, String pattern, Locale locale, String timezone) {
+        if (null == locale) {
+            locale = I18N.locale(engine);
+        }
+
+        DateFormat df;
+        if (null != pattern) df = new SimpleDateFormat(pattern, locale);
+        else df = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
+        
+        if (null != timezone) df.setTimeZone(TimeZone.getTimeZone(timezone));
+        
+        return df.format(date);
+    }
+    
+    /**
      * Format size (e.g. disk space in bytes) into human readable style
      * <ul>
      * <li>When size is smaller than <code>1024L</code>, return size + <code>B</code></li>
@@ -873,53 +941,72 @@ public class S {
         }
         return bytes / 1073741824L + "GB";
     }
-
+    
     /**
-     * Format give data into currency
+     * Transformer method. Format give data into currency
      * 
-     * <p>The method accept any data type. When <code>null</code> is found then 
-     * <code>NullPointerException</code> will be thrown out; if an <code>Number</code>
-     * is passed in, it will be type cast to <code>Number</code>; otherwise 
-     * a <code>Double.valueOf(data.toString())</code> is used to find out
-     * the number</p>
-
      * @param data
-     * @param currencyCode
      * @return the currency
+     * @see {@link #formatCurrency(RythmEngine, Object, String, java.util.Locale)}
      */
-    @Transformer
-    public static String formatCurrency(Object data, String currencyCode) {
-        if (null == data) throw new NullPointerException();
-        Number number;
-        if (data instanceof Number) {
-            number = (Number)data;
-        } else {
-            number = Double.parseDouble(data.toString());
-        }
-        Currency currency = Currency.getInstance(currencyCode);
-        NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale(I18N.getLocale()));
-        numberFormat.setCurrency(currency);
-        numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
-        String s = numberFormat.format(number);
-        s = s.replace(currencyCode, I18N.getCurrencySymbol(currencyCode));
-        return s;
+    @Transformer(requireEngine = true)
+    public static String formatCurrency(Object data) {
+        return formatCurrency(null, data, null, null);
     }
 
     /**
-     * Format give data into currency
+     * Transformer method. Format currency using specified currency code
+     * 
+     * @param data
+     * @param currencyCode
+     * @return the currency
+     * @see {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     */
+    @Transformer(requireEngine = true)
+    public static String formatCurrency(Object data, String currencyCode) {
+        return formatCurrency(null, data, currencyCode, null);
+    }
+
+    /**
+     * See {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     * 
+     * @param engine
+     * @param data
+     * @param currencyCode
+     * @return the currency string
+     */
+    public static String formatCurrency(RythmEngine engine, Object data, String currencyCode) {
+        return formatCurrency(engine, data, currencyCode, null);
+    }
+
+    /**
+     * See {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     * 
+     * @param data
+     * @param currencyCode
+     * @param locale
+     * @return the currency string
+     */
+    public static String formatCurrency(Object data, String currencyCode, Locale locale) {
+        return formatCurrency(null, data, currencyCode, locale);
+    }
+
+    /**
+     * Format give data into currency using locale info from the engine specified
      * 
      * <p>The method accept any data type. When <code>null</code> is found then 
      * <code>NullPointerException</code> will be thrown out; if an <code>Number</code>
      * is passed in, it will be type cast to <code>Number</code>; otherwise 
      * a <code>Double.valueOf(data.toString())</code> is used to find out
      * the number</p>
-
+     *
+     * @param engine
      * @param data
+     * @param currencyCode
      * @param locale
      * @return the currency
      */
-    @Transformer
-    public static String formatCurrency(Object data, Locale locale) {
+    public static String formatCurrency(RythmEngine engine, Object data, String currencyCode, Locale locale) {
         if (null == data) throw new NullPointerException();
         Number number;
         if (data instanceof Number) {
@@ -927,7 +1014,8 @@ public class S {
         } else {
             number = Double.parseDouble(data.toString());
         }
-        Currency currency = Currency.getInstance(locale);
+        if (null == locale) locale = I18N.locale(engine);
+        Currency currency = null == currencyCode ? Currency.getInstance(locale) : Currency.getInstance(currencyCode);
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
         numberFormat.setCurrency(currency);
         numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
@@ -935,5 +1023,133 @@ public class S {
         s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
         return s;
     }
+    
+    private static String getMessage(RythmEngine engine, ResourceBundle bundle, String key, Locale locale, Object ... args) {
+        if (null == locale) locale = I18N.locale(engine);
+        String s = key;
+        try {
+            s = bundle.getString(key);
+        } catch (RuntimeException e) {
+            //ignore it
+        }
+        int argLen = args.length;
+        if (argLen > 0) {
+            MessageFormat fmt = new MessageFormat(s, locale);
+            Object[] argsResolved = new Object[argLen];
+            for (int i = 0; i < argLen; ++i) {
+                Object arg = args[i];
+                if (arg instanceof String) {
+                    arg = S.i18n(engine, (String)arg);
+                }
+                argsResolved[i] = arg;
+            }
+            return fmt.format(argsResolved);
+        } else {
+            return s;
+        }
+    }
 
+    /**
+     * <p>Return i18n message of a given key and args, use the locale info from the engine specified. 
+     * if <tt>null</tt> engine instance passed in then it will try to guess the current engine via
+     * {@link com.greenlaw110.rythm.RythmEngine#get()}</p>
+     * 
+     * @param engine
+     * @param key
+     * @param args the format arguments. If the first argument is of type Locale then it will be used to specify
+     * the locale of the processing, and the rest elements are used as format arguments
+     * @return the i18n message
+     */
+    public static String i18n(RythmEngine engine, String key, Object... args) {
+        boolean useFormat = args.length > 0;
+        Locale locale = null;
+        if (useFormat) {
+            // check if the first arg is locale
+            Object arg0 = args[0];
+            if (arg0 instanceof Locale) {
+                locale = (Locale)arg0;
+                Object[] args0 = new Object[args.length - 1];
+                System.arraycopy(args, 1, args0, 0, args.length - 1);
+                args = args0;
+                useFormat = args.length > 0;
+            }
+        }
+        String cacheKey = null;
+        if (null == engine) {
+            engine = RythmEngine.get();
+        }
+        if (null != engine) {
+            cacheKey = CacheKey.i18nMsg(engine, key, useFormat);
+            Object cached = engine.cached(cacheKey);
+            if (S.notEmpty(cached)) return S.str(cached);
+        }
+        ResourceBundle bundle;
+        for (String msgSrc: RythmConfiguration.get().messageSources()) {
+            bundle = I18N.bundle(engine, msgSrc);
+            if (null != bundle) {
+                String data = getMessage(engine, bundle, key, locale, args);
+                if (null != data) {
+                    if (null != engine) {
+                        engine.cache(cacheKey, data, -1);
+                    }
+                    return data;
+                }
+            }
+        }
+        return key;
+    }
+
+    /**
+     * Transformer method. Return i18n message of a given key and args.
+     * 
+     * @param key
+     * @param args
+     * @return the i18n message
+     */
+    @Transformer(requireEngine = true)
+    public static String i18n(String key, Object... args) {
+        return i18n(null, key, args);
+    }
+    
+    @Transformer(requireEngine = true)
+    public static String i18n(String key) {
+        return i18n(null, key, new Object[0]);
+    }
+
+
+    /**
+     * Generate random string.
+     *
+     * The generated string is safe to be used as filename
+     * @param len
+     * @return
+     */
+    public static String random(int len) {
+        final char[] chars = {'0', '1', '2', '3', '4',
+                '5', '6', '7', '8', '9', '$', '#', '^', '&', '_',
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+                'u', 'v', 'w', 'x', 'y', 'z',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z',
+                '~', '!', '@'};
+
+        final int max = chars.length;
+        Random r = new Random();
+        StringBuffer sb = new StringBuffer(len);
+        while(len-- > 0) {
+            int i = r.nextInt(max);
+            sb.append(chars[i]);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Return a random string with 8 chars
+     * @return the string generated
+     */
+    public static String random() {
+        return random(8);
+    }
 }

@@ -20,14 +20,15 @@
 package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
-import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
@@ -161,6 +162,12 @@ public interface ITemplate extends Cloneable {
         /**
          * template lang stack. Used to enable the
          * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_NATURAL_TEMPLATE_ENABLED}
+         * 
+         * <p>Note the lang used here is not an end user language, 
+         * like en, zh etc, it is used to refer to the computer 
+         * language/format like html, javascript, csv etc</p>
+         * 
+         * @see {@link #localeStack}
          */
         public Stack<ILang> langStack = new Stack<ILang>();
 
@@ -168,20 +175,34 @@ public interface ITemplate extends Cloneable {
          * template escape stack. Used to enable the
          * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED}
          */
-        public Stack<Escape> escapeStack = new Stack<Escape>();
+        private Stack<Escape> escapeStack = new Stack<Escape>();
+
+        /**
+         * template locale stack. Used to track the locale in the current context.
+         */
+        private Stack<Locale> localeStack = new Stack<Locale>();
+        
+        private TemplateBase tmpl;
 
         /**
          * init the context with template and base lang
          *
          * @param templateBase
          * @param lang
+         * @param locale
          */
-        public void init(TemplateBase templateBase, ILang lang) {
+        public void init(TemplateBase templateBase, ILang lang, Locale locale) {
             if (null == lang) {
                 TemplateClass tc = templateBase.__getTemplateClass(true);
                 lang = ILang.DefImpl.probeFileName(tc.name(), templateBase.__engine().conf().defaultLang());
+            } else {
             }
             langStack.push(lang);
+            if (null == locale) {
+                locale = templateBase.__engine().locale();
+            }
+            localeStack.push(locale);
+            tmpl = templateBase;
         }
 
         public ILang currentLang() {
@@ -206,6 +227,22 @@ public interface ITemplate extends Cloneable {
             cur.setParent(null);
             return cur;
         }
+        
+        public Locale currentLocale() {
+            if (localeStack.isEmpty()) {
+                return tmpl.__engine().conf().locale();
+            } else {
+                return localeStack.peek();
+            }
+        }
+        
+        public void pushLocale(Locale locale) {
+            localeStack.push(locale);
+        }
+        
+        public Locale popLocale() {
+            return localeStack.pop();
+        }
 
         public Escape currentEscape() {
             if (!escapeStack.isEmpty()) {
@@ -227,13 +264,17 @@ public interface ITemplate extends Cloneable {
         public __Context() {
             langStack = new Stack<ILang>();
             escapeStack = new Stack<Escape>();
+            localeStack = new Stack<Locale>();
         }
 
         public __Context(__Context clone) {
             langStack = new Stack<ILang>();
             escapeStack = new Stack<Escape>();
+            localeStack = new Stack<Locale>();
             langStack.addAll(clone.langStack);
             escapeStack.addAll(clone.escapeStack);
+            localeStack.addAll(clone.localeStack);
+            tmpl = clone.tmpl;
         }
     }
 

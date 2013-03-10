@@ -127,11 +127,4 @@ public class AutoToString extends ToString {
         ToStringStyle st = ToStringStyle.valueOf(ss);
         return new AutoToStringData(c, o, st);
     }
-
-    public static void main(String[] args) {
-        String s = templateStr(String.class, ToStringOption.DEFAULT_OPTION.setAppendTransient(true), ToStringStyle.DEFAULT_STYLE);
-        System.out.println(s);
-        AutoToStringData d = parseStr(s);
-        System.out.println(d);
-    }
 }

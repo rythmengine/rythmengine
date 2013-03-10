@@ -22,7 +22,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.Directive;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -56,28 +55,5 @@ public class LogTimeParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         return "%s%s\\s*\\(\\s*\\)[\\r\\n]+";
-    }
-
-    public static void main(String[] args) {
-        String s = "@__logTime__()\nabc";
-        LogTimeParser ap = new LogTimeParser();
-        Regex r = ap.reg(Rythm.INSTANCE);
-        if (r.search(s)) {
-            p(r);
-
-            s = r.stringMatched(1);
-            if (null == s) return;
-            if (s.startsWith("(")) {
-                s = s.substring(1);
-                s = s.substring(0, s.length() - 1);
-            }
-            if (s.startsWith("\"") || s.startsWith("'")) {
-                s = s.substring(1);
-            }
-            if (s.endsWith("\"") || s.endsWith("'")) {
-                s = s.substring(0, s.length() - 1);
-            }
-            System.out.println(s);
-        }
     }
 }

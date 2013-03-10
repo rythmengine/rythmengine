@@ -21,10 +21,13 @@ package com.greenlaw110.rythm.advanced;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
+import com.greenlaw110.rythm.extension.ILang;
 import org.junit.Before;
 import org.junit.Test;
-import static com.greenlaw110.rythm.utils.NamedParams.*;
+
 import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
+import static com.greenlaw110.rythm.utils.NamedParams.from;
+import static com.greenlaw110.rythm.utils.NamedParams.p;
 
 /**
  * Test Natural Template feature
@@ -35,12 +38,12 @@ public class NaturalTemplateTest extends TestBase {
     public void configure() {
         System.setProperty(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
+        System.getProperties().put(DEFAULT_TEMPLATE_LANG_IMPL.getKey(), ILang.DefImpl.HTML);
         Rythm.shutdown();
     }
     
     @Test
     public void testBasicDirectives() {
-        
         String t = "<!-- @args String name, int age -->Hi @name, happy @age!";
         String s = Rythm.render(t, from(p("name", "Green Luo"), p("age", 100)));
         assertEquals("Hi Green Luo, happy 100!", s);

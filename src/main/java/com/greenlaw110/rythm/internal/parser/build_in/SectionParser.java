@@ -22,7 +22,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.S;
@@ -91,14 +90,6 @@ public class SectionParser extends KeywordParserFactory {
     protected String patternStr() {
         //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
         return "%s%s\\s*((?@()))[\\s]*\\{?\\s*";
-    }
-
-    public static void main(String[] args) {
-        Regex r = new SectionParser().reg(Rythm.INSTANCE);
-        if (r.search("@section(\"JS\") \nab")) {
-            System.out.println(r.stringMatched());
-            System.out.println(r.stringMatched(1));
-        }
     }
 
 }

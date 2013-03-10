@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.conf;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
 import com.greenlaw110.rythm.extension.IByteCodeHelper;
 import com.greenlaw110.rythm.extension.IDurationParser;
@@ -33,7 +34,7 @@ import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
 
 /**
  * Store the configuration for a {@link com.greenlaw110.rythm.RythmEngine rythm engine}
- * instance
+ * instance. Different engine instance has different configuration instance.
  */
 public class RythmConfiguration {
     private Map<String, Object> raw;
@@ -423,31 +424,44 @@ public class RythmConfiguration {
         return _byteCodeEnhancer;
     }
 
-    private String _lang = null;
-
-    /**
-     * Get {@link RythmConfigurationKey#I18N_LANG} without lookup
-     *
-     * @return lang
-     */
-    public String lang() {
-        if (null == _lang) {
-            _lang = get(I18N_LANG);
-        }
-        return _lang;
-    }
-
-    private String _locale = null;
+    private Locale _locale = null;
 
     /**
      * Get {@link RythmConfigurationKey#I18N_LOCALE} without lookup
      *
      * @return locale
      */
-    public String locale() {
+    public Locale locale() {
         if (null == _locale) {
             _locale = get(I18N_LOCALE);
         }
         return _locale;
     }
+    
+    private List<String> _messageSources = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#I18N_MESSAGE_SOURCES} without lookup 
+     */
+    public List<String> messageSources() {
+        if (null == _messageSources) {
+            _messageSources = Arrays.asList(get(I18N_MESSAGE_SOURCES).toString().split("[, \\t]+"));
+        }
+        return _messageSources;
+    }
+
+    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 
+    
+    /**
+     * Return <tt>RythmConfiguration</tt> instance of current RythmEngine, or 
+     * if it is not inside a RythmEngine runtime context, an {@link #EMPTY_CONF empty configuration}
+     * is returned
+     * 
+     * @return
+     */
+    public static RythmConfiguration get() {
+        RythmEngine engine = RythmEngine.get();
+        return null != engine ? engine.conf() : EMPTY_CONF;
+    }
+
 }

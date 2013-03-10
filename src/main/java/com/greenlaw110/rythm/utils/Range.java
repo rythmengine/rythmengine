@@ -127,7 +127,4 @@ public abstract class Range<TYPE extends Comparable<TYPE>> implements Iterable<T
         };
     }
 
-    public static void main(String[] args) {
-        System.out.println(valueOf("'a' till 'z'"));
-    }
 }

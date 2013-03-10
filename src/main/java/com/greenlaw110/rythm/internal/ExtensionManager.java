@@ -24,12 +24,14 @@ import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.utils.S;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class ExtensionManager {
 
-    private final List<IJavaExtension> _extensions = new ArrayList<IJavaExtension>();
+    private final Set<IJavaExtension> _extensions = new HashSet<IJavaExtension>();
     private final RythmEngine engine;
 
     public ExtensionManager(RythmEngine engine) {

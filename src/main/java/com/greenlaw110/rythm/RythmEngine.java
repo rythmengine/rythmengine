@@ -60,10 +60,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A Rythm Template Engine is the entry to the Rythm templating system. It provides a set of
+ * <p>Not Thread Safe</p>
+ * 
+ * <p>A Rythm Template Engine is the entry to the Rythm templating system. It provides a set of
  * APIs to render template. Each JVM allows multiple <code>RythmEngine</code> instance, with each
- * one represent a set of configurations.
- * <p/>
+ * one represent a set of configurations.</p> 
+ * 
  * <p>The {@link Rythm} facade contains a default <code>RythmEngine</code> instance to make it
  * easy to use for most cases</p>
  */
@@ -119,6 +121,11 @@ public class RythmEngine implements IEventDispatcher {
     public static boolean insideSandbox() {
         return Sandbox.sandboxMode();
     }
+
+    @Override
+    public String toString() {
+        return null == _conf ? "rythm-engine-uninitialized" : id();
+    }
     
     /* -----------------------------------------------------------------------------
       Fields and Accessors
@@ -167,6 +174,20 @@ public class RythmEngine implements IEventDispatcher {
             _mode = conf().get(RythmConfigurationKey.ENGINE_MODE);
         }
         return _mode;
+    }
+
+    private String _id = null;
+    
+    /**
+     * Return the instance {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#ENGINE_ID}
+     * 
+     * @return the id
+     */
+    public String id() {
+        if (null == _id) {
+            _id = conf().get(RythmConfigurationKey.ENGINE_ID);
+        }
+        return _id;
     }
 
     /**
@@ -268,6 +289,65 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     private ICacheService _cacheService = null;
+
+    private final ThreadLocal<Locale> _locale = new ThreadLocal<Locale>() {
+        @Override
+        protected Locale initialValue() {
+            return RythmEngine.this.conf().locale();
+        }
+    };
+
+    /**
+     * Set ThreadLocal locale. This method could be called before calling render methods.
+     * Useful to set the locale for web end users
+     * 
+     * @param locale
+     */
+    public final RythmEngine setLocale(Locale locale) {
+        _locale.set(locale);
+        return this;
+    }
+
+    /**
+     * Return ThreadLocal locale. Not an API to be used by user apps
+     * 
+     * @return
+     */
+    public final Locale locale() {
+        return _locale.get();
+    }
+
+    private Stack<TemplateBase> _tmpls = new Stack<TemplateBase>();
+    
+
+    /**
+     * Set the current running template. 
+     * 
+     * Not API. Don't call it;
+     * 
+     * @param tmpl
+     */
+    public void pushTemplate(TemplateBase tmpl) {
+        if (null == tmpl) throw new NullPointerException();
+        _tmpls.push(tmpl);
+    }
+
+    /**
+     * Not API. Don't call it;
+     * 
+     * @return the current running template
+     */
+    public TemplateBase currentTemplate() {
+        return _tmpls.isEmpty() ? null : _tmpls.peek();
+    }
+
+    /**
+     * Not API. pop out the current template
+     * @return the current template
+     */
+    public TemplateBase popTemplate() {
+        return _tmpls.pop();
+    }
 
     /* -----------------------------------------------------------------------------
       Constructors, Configuration and Initializing

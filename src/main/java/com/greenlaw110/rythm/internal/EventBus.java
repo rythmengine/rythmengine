@@ -124,6 +124,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.ON_RENDER, new IEventHandler<Void, ITemplate>() {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
+                engine.pushTemplate((TemplateBase) template);
                 ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
                 if (null != ce) {
                     ce.setRenderArgs(template);
@@ -145,6 +146,7 @@ public class EventBus implements IEventDispatcher {
                     return null;
                 }
                 l.rendered(template);
+                engine.popTemplate();
                 return null;
             }
         });

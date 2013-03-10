@@ -121,7 +121,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         if (dialect instanceof Rythm || dialect instanceof SimpleRythm) {
             caret_ = dialect.a();
             r1_ = new Regex(String.format(patternStr(), caret_));
-            r2_ = new Regex(String.format("^(%s(?@())*).*", caret_));
+            r2_ = new Regex(String.format("^(%s(?@())).*", caret_));
         }
         final Regex r1 = r1_, r2 = r2_;
         final String caret = caret_;
