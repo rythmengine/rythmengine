@@ -24,6 +24,7 @@ import com.greenlaw110.rythm.internal.TemplateParser;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
+import com.greenlaw110.rythm.utils.S;
 import com.stevesoft.pat.Regex;
 
 /**
@@ -57,18 +58,26 @@ public class ScriptParser extends RemoveLeadingLineBreakAndSpacesParser {
         s = r.stringMatched(2);
         s = s.substring(1); // strip left "{"
         s = s.substring(0, s.length() - 1); // strip right "}"
+        r = new Regex(".*[ \\t\\n\\r\\}]+if[ \\t]*\\(.*");
+        boolean hasIfStatement = r.search(" " + s);
         String[] lines = s.split("[\\n\\r]+");
         int len = lines.length;
         StringBuilder sb = new StringBuilder(s.length() * 2);
-        //String lastLine = "";
+        String lastLine = "";
         for (int i = 0; i < len; ++i) {
             String line = lines[i];
-            //if (!S.isEmpty(line)) lastLine = line;
+            if (!S.isEmpty(line)) lastLine = line;
             sb.append(line).append(" //line: ").append(curLine++).append("\n");
         }
-        // - comment to fix GH120 if (!lastLine.trim().endsWith(";")) sb.append(";");
+        if (!hasIfStatement && !lastLine.trim().endsWith(";")) sb.append(";");
         String code = sb.toString();
         checkRestrictedClass(code);
         return new CodeToken(code, ctx);
+    }
+
+    public static void main(String[] args) {
+        String s = "adfs\n\tif (sdfs) {\n...}\n";
+        Regex r = new Regex(".*[ \\t\\n\\r\\}]+if[ \\t]*\\(.*");
+        p(s, r);  
     }
 }

@@ -106,6 +106,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>1.2.1</version>
+              <configuration>
+                <mainClass>com.greenlaw110.rythm.sample.HelloWorld</mainClass>
+              </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -113,7 +121,7 @@
         <dependency>
             <groupId>com.greenlaw110.rythm</groupId>
             <artifactId>rythm-engine</artifactId>
-            <version>1.0-b1</version>
+            <version>1.0-b6-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
