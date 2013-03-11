@@ -21,7 +21,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.ParserBase;
-import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
@@ -114,13 +113,13 @@ public class DefTagParser extends KeywordParserFactory {
                     String[] lines = s.split("[\\n\\r]+");
                     int len = lines.length;
                     StringBuilder sb = new StringBuilder(s.length() * 2);
-                    String lastLine = "";
+                    //String lastLine = "";
                     for (int i = 0; i < len; ++i) {
                         String line = lines[i];
-                        if (!S.isEmpty(line)) lastLine = line;
+                        //if (!S.isEmpty(line)) lastLine = line;
                         sb.append(line).append(" //line: ").append(curLine++).append("\n");
                     }
-                    if (!lastLine.trim().endsWith(";")) sb.append(";");
+                    //comment to fix GH120: if (!lastLine.trim().endsWith(";")) sb.append(";");
                     return new DefTagToken(tagName, retType, signature, sb.toString(), ctx());
                 }
                 return new DefTagToken(tagName, retType, signature, null, ctx());

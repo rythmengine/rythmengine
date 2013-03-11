@@ -21,12 +21,20 @@ package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.ILang;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Test inline and block comment
  */
 public class CommentTest extends TestBase {
+
+    @Before
+    public void setUp() {
+        System.getProperties().put(RythmConfigurationKey.DEFAULT_TEMPLATE_LANG_IMPL.getKey(), ILang.DefImpl.HTML);
+    }
+
     @Test
     public void testInlineComment() {
         t = "abc@//adfiauoprquwreqw\nxyz";

@@ -1104,6 +1104,9 @@ public class S {
             engine = RythmEngine.get();
         }
         if (null != engine) {
+            if (null == locale) {
+                locale = I18N.locale(engine);
+            }
             cacheKey = CacheKey.i18nMsg(engine, key, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);

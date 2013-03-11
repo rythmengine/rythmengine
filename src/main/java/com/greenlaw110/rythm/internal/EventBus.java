@@ -142,10 +142,9 @@ public class EventBus implements IEventDispatcher {
             public Void handleEvent(RythmEngine engine, ITemplate template) {
                 Rythm.RenderTime.clear();
                 IRythmListener l = renderListener;
-                if (null == l) {
-                    return null;
+                if (null != l) {
+                    l.rendered(template);
                 }
-                l.rendered(template);
                 engine.popTemplate();
                 return null;
             }

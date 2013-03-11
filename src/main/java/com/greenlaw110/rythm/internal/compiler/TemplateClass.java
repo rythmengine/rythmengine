@@ -353,7 +353,6 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
-                templateInstance.__setTemplateClass(this, lang, locale);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
@@ -361,6 +360,7 @@ public class TemplateClass {
                 throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
+        templateInstance.__setTemplateClass(this, lang, locale);
         if (!engine().isProdMode()) {
             // check parent class change
             Class<?> c = templateInstance.getClass();
