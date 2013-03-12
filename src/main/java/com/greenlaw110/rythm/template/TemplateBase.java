@@ -1236,7 +1236,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (i18n == null) {
             i18n = __engine().conf().i18nMessageResolver();
         }
-        return i18n.getMessage(__engine(), key, args);
+        return i18n.getMessage(this, key, args);
     }
 
     /**

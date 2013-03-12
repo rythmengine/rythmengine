@@ -73,9 +73,9 @@ public @interface Transformer {
     String value() default "app";
 
     /**
-     * Require passing {@link com.greenlaw110.rythm.RythmEngine engine} instance as
+     * Require passing {@link com.greenlaw110.rythm.template.ITemplate template} instance as
      * implicit argument (the first parameter)
-     * @return true if require passing engine instance as the implicit first parameter 
+     * @return true if require passing template instance as the implicit first parameter 
      */
-    boolean requireEngine() default false;
+    boolean requireTemplate() default false;
 }

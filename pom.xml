@@ -124,7 +124,7 @@
                 <executions>
                     <execution>
                         <id>gen-javadoc</id>
-                        <phase>test</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>javadoc</goal>
                         </goals>
@@ -193,6 +193,14 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+    
     </dependencies>
 
     <profiles>

@@ -38,6 +38,13 @@ import java.util.Stack;
 public interface ITemplate extends Cloneable {
 
     /**
+     * Return the engine instance that is running this template
+     * 
+     * @return the {@link com.greenlaw110.rythm.RythmEngine engine} instance
+     */
+    RythmEngine __engine();
+
+    /**
      * Set binary output stream to the template instance.
      *
      * @param os
@@ -153,6 +160,13 @@ public interface ITemplate extends Cloneable {
      * @return a cloned instance of this template class
      */
     ITemplate __cloneMe(RythmEngine engine, ITemplate caller);
+
+    /**
+     * Return the current locale
+     * 
+     * @return the locale
+     */
+    Locale __curLocale();
 
     /**
      * The render time context. Not to be used in user application or template

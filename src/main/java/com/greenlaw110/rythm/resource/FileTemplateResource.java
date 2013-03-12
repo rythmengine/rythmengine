@@ -159,6 +159,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         if (engine.hasTag(tagName)) return null;
         tagName = tagName.replace('.', '/');
         final String[] suffixes = {
+                ".rtl",
                 ".rythm",
                 ".html",
                 ".json",

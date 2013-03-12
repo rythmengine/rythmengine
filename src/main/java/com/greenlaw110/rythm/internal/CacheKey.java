@@ -2,7 +2,8 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.I18N;
 
 import java.util.Locale;
 
@@ -14,17 +15,16 @@ import java.util.Locale;
  * To change this template use File | Settings | File Templates.
  */
 public class CacheKey {
-    public static String i18nMsg(RythmEngine engine, String key, boolean useFormat) {
-        return i18nMsg(engine, key, useFormat, null);
+    public static String i18nMsg(ITemplate template, String key, boolean useFormat) {
+        return i18nMsg(template, key, useFormat, null);
     }
     
-    public static String i18nMsg(RythmEngine engine, String key, boolean useFormat, Locale locale) {
-        if (null == engine) return "";
+    public static String i18nMsg(ITemplate template, String key, boolean useFormat, Locale locale) {
+        if (null == template) return "";
         if (null == locale) {
-            TemplateBase tmpl = engine.currentTemplate();
-            locale = null == tmpl ? engine.locale() : tmpl.__curLocale();
+            locale = I18N.locale();
         }
-        return Rythm.substitute("@1-i18nM-@2-@3-@4", key, locale, useFormat, engine);
+        return Rythm.substitute("@1-i18nM-@2-@3-@4", key, locale, useFormat, template.__engine());
     }
     
     public static String i18nBundle(RythmEngine engine, Locale locale) {

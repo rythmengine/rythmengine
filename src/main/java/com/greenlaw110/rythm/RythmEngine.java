@@ -323,35 +323,6 @@ public class RythmEngine implements IEventDispatcher {
     private Stack<TemplateBase> _tmpls = new Stack<TemplateBase>();
     
 
-    /**
-     * Set the current running template. 
-     * 
-     * Not API. Don't call it;
-     * 
-     * @param tmpl
-     */
-    public void pushTemplate(TemplateBase tmpl) {
-        if (null == tmpl) throw new NullPointerException();
-        _tmpls.push(tmpl);
-    }
-
-    /**
-     * Not API. Don't call it;
-     * 
-     * @return the current running template
-     */
-    public TemplateBase currentTemplate() {
-        return _tmpls.isEmpty() ? null : _tmpls.peek();
-    }
-
-    /**
-     * Not API. pop out the current template
-     * @return the current template
-     */
-    public TemplateBase popTemplate() {
-        return _tmpls.pop();
-    }
-
     /* -----------------------------------------------------------------------------
       Constructors, Configuration and Initializing
     -------------------------------------------------------------------------------*/
@@ -533,6 +504,7 @@ public class RythmEngine implements IEventDispatcher {
             if (classAnnotated && namespaceIsEmpty) {
                 nmsp = t.value();
             }
+            boolean clsRequireTemplate = null == t ? false : t.requireTemplate();
             for (Method m : extensionClass.getDeclaredMethods()) {
                 int flag = m.getModifiers();
                 if (!Modifier.isPublic(flag) || !Modifier.isStatic(flag)) continue;
@@ -547,6 +519,11 @@ public class RythmEngine implements IEventDispatcher {
                 if (methodAnnotated && namespaceIsEmpty) {
                     mnmsp = tm.value();
                 }
+                
+                boolean requireTemplate = clsRequireTemplate;
+                if (null != tm && tm.requireTemplate()) {
+                    requireTemplate = true;
+                }
 
                 String cn = extensionClass.getSimpleName();
                 String cn0 = extensionClass.getName();
@@ -556,9 +533,9 @@ public class RythmEngine implements IEventDispatcher {
                     mn = mnmsp + "_" + mn;
                 }
                 if (len == 1) {
-                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, fullName));
+                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, fullName, requireTemplate));
                 } else {
-                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", fullName));
+                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", fullName, requireTemplate));
                 }
             }
         }

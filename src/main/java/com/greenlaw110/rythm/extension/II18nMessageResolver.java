@@ -20,9 +20,8 @@
 package com.greenlaw110.rythm.extension;
 
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
-
-import java.util.Locale;
 
 /**
  * Define interface for customized i18n message resolver
@@ -30,27 +29,17 @@ import java.util.Locale;
 public interface II18nMessageResolver {
 
     /**
-     * Return message string
-     * 
-     * @param locale
-     * @param engine
-     * @param key
-     * @return message translated
-     */
-    String getMessage(Locale locale, RythmEngine engine, String key);
-    
-    /**
-     * <p>Return i18n message of a given key and args, use the locale info from the engine specified. 
-     * if <tt>null</tt> engine instance passed in then it will try to guess the current engine via
+     * <p>Return i18n message of a given key and args, use the locale info from the template specified. 
+     * if <tt>null</tt> template passed in then it will try to guess from the current engine via
      * {@link com.greenlaw110.rythm.RythmEngine#get()}</p>
      * 
-     * @param engine
+     * @param template
      * @param key
      * @param args the format arguments. If the first argument is of type Locale then it will be used to specify
      * the locale of the processing, and the rest elements are used as format arguments
      * @return the i18n message
      */
-    String getMessage(RythmEngine engine, String key, Object... args);
+    String getMessage(ITemplate template, String key, Object... args);
     
     public static class DefaultImpl implements II18nMessageResolver {
 
@@ -59,13 +48,8 @@ public interface II18nMessageResolver {
         private DefaultImpl() {}
     
         @Override
-        public String getMessage(Locale locale, RythmEngine engine, String key) {
-            return S.i18n(locale, engine, key);
-        }
-
-        @Override
-        public String getMessage(RythmEngine engine, String key, Object... args) {
-            return S.i18n(engine, key, args);
+        public String getMessage(ITemplate template, String key, Object... args) {
+            return S.i18n(template, key, args);
         }
     }
 }

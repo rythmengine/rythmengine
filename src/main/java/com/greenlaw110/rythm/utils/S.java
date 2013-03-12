@@ -26,6 +26,7 @@ import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.internal.CacheKey;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
+import com.greenlaw110.rythm.template.ITemplate;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -741,7 +742,7 @@ public class S {
      * @return the formatted String
      * @see DecimalFormatSymbols
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Number number, String pattern, Locale locale) {
         return format(null, number, pattern, locale);
     }
@@ -754,9 +755,9 @@ public class S {
      * @return the formatted String
      * @see DecimalFormatSymbols
      */
-    public static String format(RythmEngine engine, Number number, String pattern, Locale locale) {
+    public static String format(ITemplate template, Number number, String pattern, Locale locale) {
         if (null == locale) {
-            locale = I18N.locale(engine);
+            locale = I18N.locale(template);
         }
         
         NumberFormat nf;
@@ -776,7 +777,7 @@ public class S {
      * @param pattern
      * @return formatted String
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Number number, String pattern) {
         return format(null, number, pattern, null);
     }
@@ -788,8 +789,8 @@ public class S {
      * @param pattern
      * @return formatted String
      */
-    public static String format(RythmEngine engine, Number number, String pattern) {
-        return format(engine, number, pattern, null);
+    public static String format(ITemplate template, Number number, String pattern) {
+        return format(template, number, pattern, null);
     }    
 
     /**
@@ -799,7 +800,7 @@ public class S {
      * @param date
      * @return the formatted String
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Date date) {
         return format(date, null, null, null);
     }
@@ -811,8 +812,8 @@ public class S {
      * @param date
      * @return the formatted String
      */
-    public static String format(RythmEngine engine, Date date) {
-        return format(engine, date, null, null, null);
+    public static String format(ITemplate template, Date date) {
+        return format(template, date, null, null, null);
     }
 
     /**
@@ -822,7 +823,7 @@ public class S {
      * @param pattern
      * @return formated string
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Date date, String pattern) {
         return format(date, pattern, null, null);
     }
@@ -830,13 +831,13 @@ public class S {
     /**
      * Format a date with specified pattern
      * 
-     * @param engine
+     * @param template
      * @param date
      * @param pattern
      * @return formated string
      */
-    public static String format(RythmEngine engine, Date date, String pattern) {
-        return format(engine, date, pattern, null, null);
+    public static String format(ITemplate template, Date date, String pattern) {
+        return format(template, date, pattern, null, null);
     }
 
     /**
@@ -846,21 +847,21 @@ public class S {
      * @param locale
      * @return the formatted String
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Date date, String pattern, Locale locale) {
         return format(date, pattern, locale, null);
     }
 
     /**
-     * See {@link #format(com.greenlaw110.rythm.RythmEngine, java.util.Date, String, java.util.Locale, String)}
-     * @param engine
+     * See {@link #format(com.greenlaw110.rythm.template.ITemplate, java.util.Date, String, java.util.Locale, String)}
+     * @param template
      * @param date
      * @param pattern
      * @param locale
      * @return formatted date string
      */
-    public static String format(RythmEngine engine, Date date, String pattern, Locale locale) {
-        return format(engine, date, pattern, locale, null);
+    public static String format(ITemplate template, Date date, String pattern, Locale locale) {
+        return format(template, date, pattern, locale, null);
     }
 
     /**
@@ -873,7 +874,7 @@ public class S {
      * @return the formatted String
      * @see SimpleDateFormat
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String format(Date date, String pattern, Locale locale, String timezone) {
         return format(null, date, pattern, locale, timezone);
     }
@@ -882,16 +883,16 @@ public class S {
      * Format a date with specified pattern, lang, locale and timezone. The locale
      * comes from the engine instance specified
      * 
-     * @param engine
+     * @param template
      * @param date
      * @param pattern
      * @param locale
      * @param timezone
      * @return
      */
-    public static String format(RythmEngine engine, Date date, String pattern, Locale locale, String timezone) {
+    public static String format(ITemplate template, Date date, String pattern, Locale locale, String timezone) {
         if (null == locale) {
-            locale = I18N.locale(engine);
+            locale = I18N.locale(template);
         }
 
         DateFormat df;
@@ -947,9 +948,9 @@ public class S {
      * 
      * @param data
      * @return the currency
-     * @see {@link #formatCurrency(RythmEngine, Object, String, java.util.Locale)}
+     * @see {@link #formatCurrency(com.greenlaw110.rythm.template.ITemplate, Object, String, java.util.Locale)}
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String formatCurrency(Object data) {
         return formatCurrency(null, data, null, null);
     }
@@ -960,27 +961,27 @@ public class S {
      * @param data
      * @param currencyCode
      * @return the currency
-     * @see {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     * @see {@link #formatCurrency(com.greenlaw110.rythm.template.ITemplate, Object, String, java.util.Locale)}
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String formatCurrency(Object data, String currencyCode) {
         return formatCurrency(null, data, currencyCode, null);
     }
 
     /**
-     * See {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     * See {@link #formatCurrency(com.greenlaw110.rythm.template.ITemplate, Object, String, java.util.Locale)}
      * 
-     * @param engine
+     * @param template
      * @param data
      * @param currencyCode
      * @return the currency string
      */
-    public static String formatCurrency(RythmEngine engine, Object data, String currencyCode) {
-        return formatCurrency(engine, data, currencyCode, null);
+    public static String formatCurrency(ITemplate template, Object data, String currencyCode) {
+        return formatCurrency(template, data, currencyCode, null);
     }
 
     /**
-     * See {@link #formatCurrency(com.greenlaw110.rythm.RythmEngine, Object, String, java.util.Locale)}
+     * See {@link #formatCurrency(com.greenlaw110.rythm.template.ITemplate, Object, String, java.util.Locale)}
      * 
      * @param data
      * @param currencyCode
@@ -1000,13 +1001,13 @@ public class S {
      * a <code>Double.valueOf(data.toString())</code> is used to find out
      * the number</p>
      *
-     * @param engine
+     * @param template
      * @param data
      * @param currencyCode
      * @param locale
      * @return the currency
      */
-    public static String formatCurrency(RythmEngine engine, Object data, String currencyCode, Locale locale) {
+    public static String formatCurrency(ITemplate template, Object data, String currencyCode, Locale locale) {
         if (null == data) throw new NullPointerException();
         Number number;
         if (data instanceof Number) {
@@ -1014,7 +1015,7 @@ public class S {
         } else {
             number = Double.parseDouble(data.toString());
         }
-        if (null == locale) locale = I18N.locale(engine);
+        if (null == locale) locale = I18N.locale(template);
         Currency currency = null == currencyCode ? Currency.getInstance(locale) : Currency.getInstance(currencyCode);
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
         numberFormat.setCurrency(currency);
@@ -1024,8 +1025,8 @@ public class S {
         return s;
     }
     
-    private static String getMessage(RythmEngine engine, ResourceBundle bundle, String key, Locale locale, Object ... args) {
-        if (null == locale) locale = I18N.locale(engine);
+    private static String getMessage(ITemplate template, ResourceBundle bundle, String key, Locale locale, Object ... args) {
+        if (null == locale) locale = I18N.locale(template);
         String s = key;
         try {
             s = bundle.getString(key);
@@ -1039,7 +1040,7 @@ public class S {
             for (int i = 0; i < argLen; ++i) {
                 Object arg = args[i];
                 if (arg instanceof String) {
-                    arg = S.i18n(engine, (String)arg);
+                    arg = S.i18n(template, (String)arg);
                 }
                 argsResolved[i] = arg;
             }
@@ -1048,44 +1049,19 @@ public class S {
             return s;
         }
     }
-
-    /**
-     * Not an API. Don't not use this method
-     * @param locale
-     * @param engine
-     * @param key
-     * @return String
-     */
-    public static String i18n(Locale locale, RythmEngine engine, String key) {
-        String cacheKey = CacheKey.i18nMsg(engine, key, false, locale);
-        Object cached = engine.cached(cacheKey);
-        if (S.notEmpty(cached)) return S.str(cached);
-        ResourceBundle bundle;
-        for (String msgSrc: RythmConfiguration.get().messageSources()) {
-            bundle = I18N.bundle(engine, msgSrc, locale);
-            if (null != bundle) {
-                String data = getMessage(engine, bundle, key, locale, new Object[0]);
-                if (null != data) {
-                    engine.cache(cacheKey, data, -1);
-                    return data;
-                }
-            }
-        }
-        return key;
-    }
     
     /**
-     * <p>Return i18n message of a given key and args, use the locale info from the engine specified. 
-     * if <tt>null</tt> engine instance passed in then it will try to guess the current engine via
+     * <p>Return i18n message of a given key and args, use the locale info from the template specified. 
+     * if <tt>null</tt> template instance passed in then it will try to guess from the current engine via
      * {@link com.greenlaw110.rythm.RythmEngine#get()}</p>
      * 
-     * @param engine
+     * @param template
      * @param key
      * @param args the format arguments. If the first argument is of type Locale then it will be used to specify
      * the locale of the processing, and the rest elements are used as format arguments
      * @return the i18n message
      */
-    public static String i18n(RythmEngine engine, String key, Object... args) {
+    public static String i18n(ITemplate template, String key, Object... args) {
         boolean useFormat = args.length > 0;
         Locale locale = null;
         if (useFormat) {
@@ -1099,23 +1075,19 @@ public class S {
                 useFormat = args.length > 0;
             }
         }
+        if (null == locale) locale = I18N.locale(template);
+        RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
         String cacheKey = null;
-        if (null == engine) {
-            engine = RythmEngine.get();
-        }
-        if (null != engine) {
-            if (null == locale) {
-                locale = I18N.locale(engine);
-            }
+        if (null != engine && null != locale) {
             cacheKey = CacheKey.i18nMsg(engine, key, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);
         }
         ResourceBundle bundle;
         for (String msgSrc: RythmConfiguration.get().messageSources()) {
-            bundle = I18N.bundle(engine, msgSrc, locale);
+            bundle = I18N.bundle(template, msgSrc, locale);
             if (null != bundle) {
-                String data = getMessage(engine, bundle, key, locale, args);
+                String data = getMessage(template, bundle, key, locale, args);
                 if (null != data) {
                     if (null != engine) {
                         engine.cache(cacheKey, data, -1);
@@ -1134,12 +1106,12 @@ public class S {
      * @param args
      * @return the i18n message
      */
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String i18n(String key, Object... args) {
         return i18n(null, key, args);
     }
     
-    @Transformer(requireEngine = true)
+    @Transformer(requireTemplate = true)
     public static String i18n(String key) {
         return i18n(null, key, new Object[0]);
     }

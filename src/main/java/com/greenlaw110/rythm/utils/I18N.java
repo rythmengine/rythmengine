@@ -24,7 +24,7 @@ import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.CacheKey;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.template.TemplateBase;
+import com.greenlaw110.rythm.template.ITemplate;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -38,19 +38,15 @@ import java.util.ResourceBundle;
 public class I18N {
 
     private static final ILogger logger = Logger.get(I18N.class);
-
-    public static Locale locale(RythmEngine engine) {
-        Locale retval;
-        if (null == engine) {
-            engine = RythmEngine.get();
+    
+    public static Locale locale(ITemplate template) {
+        if (null != template) {
+            return template.__curLocale();
         }
+        Locale retval;
+        RythmEngine engine = RythmEngine.get();
         if (null != engine) {
-            TemplateBase template = engine.currentTemplate();
-            if (null != template) {
-                retval = template.__curLocale();
-            } else {
-                retval = engine.conf().locale();
-            }
+            retval = engine.conf().locale();
         } else {
             retval = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
         }
@@ -67,20 +63,14 @@ public class I18N {
 
     private static final Map<String, ResourceBundle> bundleCache = new HashMap<String, ResourceBundle>();
 
-    public static ResourceBundle bundle(RythmEngine engine, String name, Locale locale) {
+    public static ResourceBundle bundle(ITemplate template, String name, Locale locale) {
         if (null == name) throw new NullPointerException();
         String cacheKey = null;
         ResourceBundle retval = null;
         if (null == locale) {
-            if (null == engine) {
-                engine = RythmEngine.get();
-            }
-            if (null != engine) {
-                locale = locale(engine);
-            }
-        } else if (null == engine) {
-            engine = RythmEngine.get();
+            locale = locale(template);
         }
+        RythmEngine engine = null == template ? RythmEngine.get() : template.__engine(); 
         if (null != engine && null != locale) {
             cacheKey = CacheKey.i18nBundle(engine, locale);
             retval = bundleCache.get(cacheKey);
