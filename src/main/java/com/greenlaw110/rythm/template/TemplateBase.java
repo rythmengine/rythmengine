@@ -25,8 +25,8 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.RythmException;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.extension.II18nMessageResolver;
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.internal.RythmEvents;
 import com.greenlaw110.rythm.internal.TemplateBuilder;
@@ -62,18 +62,18 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     private transient TemplateClass __templateClass = null;
 
     /**
-     * Set template class and template lang to this template instance
+     * Set template class and template code type to this template instance
      * <p/>
      * <p>Not to be called in user application or template</p>
      *
      * @param templateClass
-     * @param lang
+     * @param type
      */
-    public void __setTemplateClass(TemplateClass templateClass, ILang lang, Locale locale) {
+    public void __setTemplateClass(TemplateClass templateClass, ICodeType type, Locale locale) {
         this.__templateClass = templateClass;
-        __ctx.init(this, lang, locale);
+        __ctx.init(this, type, locale);
         if (null != __parent) {
-            __parent.__ctx.init(__parent, lang, locale);
+            __parent.__ctx.init(__parent, type, locale);
         }
     }
 
@@ -563,7 +563,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 //            engine.restart(e);
 //            TemplateClass tc = engine.classes().getByClassName(getClass().getName());
 //            tc.refresh(true);
-//            ITemplate t = tc.asTemplate(__ctx.currentLang());
+//            ITemplate t = tc.asTemplate(__ctx.currentCodeType());
 //            t.__setRenderArgs(__renderArgs);
 //            return t.render();
 //        }
@@ -986,17 +986,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     protected __Context __ctx = new __Context();
 
-    /**
-     * Return current template lang. Not to be used in user application or template
-     *
-     * @return current {@link com.greenlaw110.rythm.extension.ILang lang}
-     */
-    public ILang __curLang() {
-        return __ctx.currentLang();
+    public ICodeType __curCodeType() {
+        return __ctx.currentCodeType();
     }
     
     public Locale __curLocale() {
         return __ctx.currentLocale();
+    }
+    
+    public Escape __curEscape() {
+        return __ctx.currentEscape();
     }
 
     private boolean appendToBuffer() {
@@ -1010,7 +1009,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     private boolean appendToOutputStream() {
         return (null == __parent && null != os);
     }
-
+    
     @Override
     protected void __append(StrBuf wrapper) {
         if (appendToBuffer()) {
@@ -1036,9 +1035,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     @Override
     protected void __append(Object o) {
-        if (appendToBuffer()) super.__append(o);
+        String oStr = o.toString();
+        if (appendToBuffer()) super.__append(oStr);
 
-        StrBuf wrapper = new StrBuf(o.toString());
+        StrBuf wrapper = new StrBuf(oStr);
         if (appendToOutputStream()) {
             try {
                 os.write(wrapper.toBinary());

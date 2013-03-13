@@ -24,7 +24,7 @@ import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.CompileException;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.extension.IByteCodeEnhancer;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.CodeBuilder;
 import com.greenlaw110.rythm.internal.IDialect;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -38,6 +38,7 @@ import com.greenlaw110.rythm.utils.S;
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -234,9 +235,9 @@ public class TemplateClass {
      */
     public Package javaPackage;
     /**
-     * The template lang could be HTML, JS, JSON etc
+     * The code type could be HTML, JS, JSON etc
      */
-    public ILang templateLang;
+    public ICodeType codeType;
     /**
      * Is this class compiled
      */
@@ -333,6 +334,14 @@ public class TemplateClass {
 
     @SuppressWarnings("unchecked")
     private Class<?> getJavaClass() throws Exception {
+        if (null == javaSource) {
+            if (refreshing()) {
+                lock.waitTillOpen();
+            }
+            if (null == javaSource) {
+                refresh();
+            }
+        }
         Class<?> c = engine().classLoader().loadClass(name(), true);
         if (null == javaClass) javaClass = (Class<ITemplate>) c;
         return c;
@@ -345,7 +354,7 @@ public class TemplateClass {
         }
     };
 
-    private ITemplate templateInstance_(ILang lang, Locale locale) {
+    private ITemplate templateInstance_(ICodeType type, Locale locale) {
         if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
@@ -360,7 +369,7 @@ public class TemplateClass {
                 throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
-        templateInstance.__setTemplateClass(this, lang, locale);
+        templateInstance.__setTemplateClass(this, type, locale);
         if (!engine().isProdMode()) {
             // check parent class change
             Class<?> c = templateInstance.getClass();
@@ -372,7 +381,7 @@ public class TemplateClass {
         return templateInstance;
     }
 
-    public ITemplate asTemplate(ILang lang, Locale locale) {
+    public ITemplate asTemplate(ICodeType lang, Locale locale) {
         RythmEngine e = engine();
         if (null == name || e.mode().isDev()) refresh();
         return templateInstance_(lang, locale).__cloneMe(engine(), null);
@@ -384,7 +393,7 @@ public class TemplateClass {
 
     public ITemplate asTemplate(ITemplate caller) {
         TemplateBase tb = (TemplateBase) caller;
-        return templateInstance_(tb.__curLang(), tb.__curLocale()).__cloneMe(engine(), caller);
+        return templateInstance_(tb.__curCodeType(), tb.__curLocale()).__cloneMe(engine(), caller);
     }
 
     private boolean refreshing = false;
@@ -400,6 +409,11 @@ public class TemplateClass {
     private void refreshing(boolean b) {
         synchronized (refreshLock) {
             refreshing = b;
+        }
+        if (b) {
+            lock = new RefreshLock();
+        } else {
+            lock.close();
         }
     }
 
@@ -442,6 +456,21 @@ public class TemplateClass {
             logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
         }
     }
+    
+    private class RefreshLock {
+        CountDownLatch cdl = new CountDownLatch(1);
+        public void close() {
+            cdl.countDown();
+        }
+        public void waitTillOpen() {
+            try {
+                cdl.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
+    }
+    private RefreshLock lock;
 
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
@@ -449,28 +478,36 @@ public class TemplateClass {
     public boolean refresh(boolean forceRefresh) {
         if (refreshing()) return false;
         if (inner) return false;
+        refreshing(true);
         try {
-            RythmEngine e = engine();
-            refreshing(true);
+            RythmEngine engine = engine();
             if (!templateResource.isValid()) {
                 // it is removed?
                 isValid = false;
-                engine().classes().remove(this);
+                engine.classes().remove(this);
                 return false;
             }
+            ICodeType type = engine.renderSettings.codeType();
+            if (null == type) {
+                type = templateResource.codeType();
+            }
+            if (null == type || ICodeType.DefImpl.RAW == type) {
+                type = engine.conf().defaultCodeType();
+            }
+            codeType = type;
             if (null == name) {
                 // this is the root level template class
                 root = this;
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
-                if (engine().conf().typeInferenceEnabled()) {
+                if (engine.conf().typeInferenceEnabled()) {
                     name += ParamTypeInferencer.uuid();
                 }
                 //name = templateResource.getSuggestedClassName();
-                engine().classes().add(this);
+                engine.classes().add(this);
             }
 
             if (null == javaSource) {
-                engine().classCache().loadTemplateClass(this);
+                engine.classCache().loadTemplateClass(this);
                 if (null != javaSource) {
                     // try refresh extended template class if there is
                     Pattern p = Pattern.compile(".*extends\\s+([a-zA-Z0-9_]+)\\s*\\{\\s*\\/\\/<extended_resource_key\\>(.*)\\<\\/extended_resource_key\\>.*", Pattern.DOTALL);
@@ -487,7 +524,7 @@ public class TemplateClass {
                                 extendedTemplateClass.refresh();
                             }
                         }
-                        engine().addExtendRelationship(extendedTemplateClass, this);
+                        engine.addExtendRelationship(extendedTemplateClass, this);
                     }
                 }
             }

@@ -139,6 +139,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.RENDERED, new IEventHandler<Void, ITemplate>() {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
+                engine.renderSettings.clear();
                 Rythm.RenderTime.clear();
                 IRythmListener l = renderListener;
                 if (null != l) {

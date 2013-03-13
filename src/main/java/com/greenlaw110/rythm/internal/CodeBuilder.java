@@ -25,7 +25,7 @@ import com.greenlaw110.rythm.Sandbox;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.extension.ISourceCodeEnhancer;
 import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
@@ -127,7 +127,7 @@ public class CodeBuilder extends TextBuilder {
     private RythmConfiguration conf;
 
     private boolean isNotRythmTemplate = false;
-    public ILang templateDefLang;
+    public ICodeType templateDefLang;
 
     public boolean isRythmTemplate() {
         return !isNotRythmTemplate;
@@ -207,11 +207,8 @@ public class CodeBuilder extends TextBuilder {
         this.conf = this.engine.conf();
         this.requiredDialect = requiredDialect;
         this.templateClass = templateClass;
-        ILang lang = templateClass.templateLang;
-        if (null == lang) {
-            lang = ILang.DefImpl.probeFileName(templateClass.name(), this.engine.conf().defaultLang());
-        }
-        this.templateDefLang = lang;
+        ICodeType type = templateClass.codeType;
+        this.templateDefLang = type;
         String tmpl = RythmEvents.ON_PARSE.trigger(this.engine, this);
         this.tmpl = tmpl;
         this.parser = new TemplateParser(this);
@@ -403,6 +400,13 @@ public class CodeBuilder extends TextBuilder {
         includeTc.buildSourceCode(includingClassName());
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);
+        return includeTc.codeBuilder.buildBody;
+    }
+    
+    public String addInlineInclude(String inlineTemplate, int lineNo) {
+        TemplateClass includeTc = ((TemplateBase) engine.getTemplate(inlineTemplate)).__getTemplateClass(false);
+        includeTc.buildSourceCode(includingClassName());
+        merge(includeTc.codeBuilder);
         return includeTc.codeBuilder.buildBody;
     }
 

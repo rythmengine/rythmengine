@@ -19,6 +19,8 @@
 */
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.extension.ICodeType;
+
 import java.io.Serializable;
 
 /**
@@ -72,5 +74,12 @@ public interface ITemplateResource extends Serializable {
      * @return tag name
      */
     String tagName();
+
+    /**
+     * Return code type suggested by this resource, e.g. html or js etc 
+     * 
+     * @return code type suggested
+     */
+    ICodeType codeType();
 
 }

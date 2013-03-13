@@ -19,9 +19,9 @@
 */
 package com.greenlaw110.rythm.utils;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
+import com.greenlaw110.rythm.extension.II18nMessageResolver;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.internal.CacheKey;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -298,7 +298,7 @@ public class S {
     /**
      * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with default {@link #escapeXml(Object)} escaping or if the current
-     * render engine exists return the escape specified by the default lang of the 
+     * render engine exists return the escape specified by the default code type of the 
      * current render engine
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -308,8 +308,24 @@ public class S {
      */
     @Transformer
     public static RawData escape(Object o) {
+        return escape(null, o);
+    }
+
+    /**
+     * The template implicit argument version of {@link #escape(Object)}
+     * 
+     * @param template
+     * @param o
+     * @return escaped data
+     */
+    public static RawData escape(ITemplate template, Object o) {
         if (empty(o)) return RawData.NULL;
-        Escape escape = Rythm.RenderTime.getEscape();
+        Escape escape;
+        if (null != template) {
+            escape = template.__curEscape();
+        } else {
+            escape = Escape.RAW;
+        }
         return escape.apply(o);
     }
 
@@ -888,7 +904,7 @@ public class S {
      * @param pattern
      * @param locale
      * @param timezone
-     * @return
+     * @return format result
      */
     public static String format(ITemplate template, Date date, String pattern, Locale locale, String timezone) {
         if (null == locale) {
@@ -1062,6 +1078,12 @@ public class S {
      * @return the i18n message
      */
     public static String i18n(ITemplate template, String key, Object... args) {
+        if (null != template) {
+            II18nMessageResolver resolver = template.__engine().conf().i18nMessageResolver();
+            if (null != resolver && II18nMessageResolver.DefaultImpl.INSTANCE != resolver) {
+                return resolver.getMessage(template, key, args);
+            }
+        }
         boolean useFormat = args.length > 0;
         Locale locale = null;
         if (useFormat) {
@@ -1078,8 +1100,8 @@ public class S {
         if (null == locale) locale = I18N.locale(template);
         RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
         String cacheKey = null;
-        if (null != engine && null != locale) {
-            cacheKey = CacheKey.i18nMsg(engine, key, useFormat, locale);
+        if (null != template && null != locale) {
+            cacheKey = CacheKey.i18nMsg(template, key, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);
         }
@@ -1122,7 +1144,7 @@ public class S {
      *
      * The generated string is safe to be used as filename
      * @param len
-     * @return
+     * @return a random string with specified length
      */
     public static String random(int len) {
         final char[] chars = {'0', '1', '2', '3', '4',

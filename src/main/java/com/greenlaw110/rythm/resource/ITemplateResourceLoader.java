@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 
@@ -30,9 +31,41 @@ import com.greenlaw110.rythm.internal.compiler.TemplateClass;
  * To change this template use File | Settings | File Templates.
  */
 public interface ITemplateResourceLoader {
-    ITemplateResource load(String key);
 
-    TemplateClass tryLoadTag(String tagName, TemplateClass tc);
+    /**
+     * Load template resource by path
+     * @param path
+     * @return Loaded template resource
+     */
+    ITemplateResource load(String path);
 
-    String getFullTagName(TemplateClass tc);
+    /**
+     * Try to load a template tag with tag name.
+     * 
+     * @param tagName
+     * @param engine
+     * @param callerTemplateClass
+     * @return template class if found, or <tt>null</tt> if not found
+     */
+    TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass callerTemplateClass);
+
+    /**
+     * Return a template's tag name in full notation 
+     * 
+     * @param tc
+     * @param engine
+     * @return the tag name
+     */
+    String getFullTagName(TemplateClass tc, RythmEngine engine);
+
+    /**
+     * Scan the folder and try to load all template files under the folder.
+     * Once a resource is located, it should be passed to the 
+     * {@link TemplateResourceManager resource manager} by 
+     * {@link TemplateResourceManager#resourceLoaded(ITemplateResource)} call
+     * 
+     * @param root the root folder
+     */
+    void scan(String root, TemplateResourceManager manager);
+
 }

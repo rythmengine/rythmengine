@@ -100,6 +100,17 @@ public class InvokeTemplateTest extends TestBase {
         assertNotContains(s, "found: 1");
         assertNotContains(s, "found: 3");
     }
+    
+    @Test
+    public void testInvokeWithSuffix() {
+        t = "@args String p;@bar.echo(p)";
+        s = r(t, "rythm");
+        eq("rythm");
+        
+        t = "@args String p;@bar.echo.js(p)";
+        s = r(t, "rythm");
+        eq("alert('rythm')");
+    }
 
     public static void main(String[] args) {
         run(InvokeTemplateTest.class);

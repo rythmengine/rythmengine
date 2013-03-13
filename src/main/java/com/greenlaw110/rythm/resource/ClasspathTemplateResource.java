@@ -132,5 +132,4 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
         return path2CN(key);
     }
 
-
 }

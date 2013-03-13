@@ -21,11 +21,17 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.internal.RythmThreadFactory;
+import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.template.ITag;
+import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,10 +47,13 @@ public class TemplateResourceManager {
     private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
 
     private ITemplateResourceLoader _resourceLoader = null;
+    
+    private boolean typeInference;
 
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
         _resourceLoader = engine.conf().get(RythmConfigurationKey.RESOURCE_LOADER_IMPL);
+        typeInference = engine.conf().typeInferenceEnabled();
     }
 
     private ITemplateResource cache(ITemplateResource resource) {
@@ -53,12 +62,12 @@ public class TemplateResourceManager {
     }
 
     public TemplateClass tryLoadTag(String tagName, TemplateClass tc) {
-        if (null != _resourceLoader) return _resourceLoader.tryLoadTag(tagName, tc);
+        if (null != _resourceLoader) return _resourceLoader.tryLoadTag(tagName, engine, tc);
         else return FileTemplateResource.tryLoadTag(tagName, engine, tc);
     }
 
     public String getFullTagName(TemplateClass tc) {
-        if (null != _resourceLoader) return _resourceLoader.getFullTagName(tc);
+        if (null != _resourceLoader) return _resourceLoader.getFullTagName(tc, engine);
         else return FileTemplateResource.getFullTagName(tc, engine);
     }
 
@@ -85,5 +94,60 @@ public class TemplateResourceManager {
             resource = new ClasspathTemplateResource(str, engine);
         }
         return cache(resource);
+    }
+    
+    public void resourceLoaded(ITemplateResource resource) {
+        if (!resource.isValid()) return;
+        String key = S.str(resource.getKey());
+        if (typeInference) {
+            key += ParamTypeInferencer.uuid();
+        }
+        TemplateClass tc = engine.classes().getByTemplate(key);
+        if (null == tc) {
+            tc = new TemplateClass(resource, engine);
+            engine.classes().add(key, tc);
+        }
+        ITemplate t = tc.asTemplate();
+        if (null == t) return;
+        String fullTagName = engine.resourceManager().getFullTagName(tc);
+        tc.setFullName(fullTagName);
+        engine.registerTag(fullTagName, (ITag) t);
+    }
+
+    private static class ScannerThreadFactory extends RythmThreadFactory {
+        private ScannerThreadFactory() {
+            super("rythm-scanner");
+        }
+    }
+
+    private ScheduledExecutorService loadingService = new ScheduledThreadPoolExecutor(10, new ScannerThreadFactory());
+    
+    public void scan(File home) {
+        String path = null == home ? null : home.getAbsolutePath();
+        if (null != _resourceLoader) _resourceLoader.scan(path, this);
+        else {
+            scan_(home);
+        }
+    }
+    
+    private void scan_(File file) {
+        if (file.isFile() && file.canRead()) {
+            load_(file);
+        } else {
+            for (File f: file.listFiles()) {
+                scan_(f);
+            }
+        }
+    }
+    
+    private void load_(final File file) {
+        loadingService.submit(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                ITemplateResource resource = new FileTemplateResource(file, engine);
+                resourceLoaded(resource);
+                return null;
+            }
+        });
     }
 }

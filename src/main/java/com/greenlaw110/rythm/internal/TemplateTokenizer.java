@@ -46,8 +46,8 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         RythmEngine engine = ctx.getEngine();
         RythmConfiguration conf = engine.conf();
         if ((conf.smartEscapeEnabled() || conf.naturalTemplateEnabled()) && engine.extensionManager().hasTemplateLangs()) {
-            parsers.add(new LangBlockStartSensor(ctx));
-            parsers.add(new LangBlockEndSensor(ctx));
+            parsers.add(new CodeTypeBlockStartSensor(ctx));
+            parsers.add(new CodeTypeBlockEndSensor(ctx));
         }
         if (conf.naturalTemplateEnabled() && engine.extensionManager().hasTemplateLangs()) {
             parsers.add(new DirectiveCommentStartSensor(ctx));

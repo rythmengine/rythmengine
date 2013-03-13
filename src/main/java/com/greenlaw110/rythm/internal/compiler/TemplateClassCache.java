@@ -290,10 +290,10 @@ public class TemplateClassCache {
      */
     String hash(TemplateClass tc) {
         try {
-            Object enhancer = engine.conf().byteCodeEnhancer();
+            //Object enhancer = engine.conf().byteCodeEnhancer();
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             messageDigest.reset();
-            messageDigest.update((engine.version() + String.valueOf(enhancer) + tc.getTemplateSource(true)).getBytes("utf-8"));
+            messageDigest.update((engine.version() + tc.getTemplateSource(true)).getBytes("utf-8"));
             byte[] digest = messageDigest.digest();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < digest.length; ++i) {

@@ -23,9 +23,9 @@ import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.extension.II18nMessageResolver;
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.logger.JDKLogger;
 import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.S;
@@ -53,11 +53,11 @@ import java.util.Map;
 public enum RythmConfigurationKey {
 
     /**
-     * "built_in.template_lang.enabled": Enable built-in {@link com.greenlaw110.rythm.extension.ILang template language} implementations
+     * "built_in.code_type.enabled": Enable built-in {@link com.greenlaw110.rythm.extension.ICodeType code type} implementations
      * <p/>
      * <p>Default value: <code>true</code></p>
      */
-    BUILT_IN_TEMPLATE_LANG_ENABLED("built_in.template_lang.enabled", true),
+    BUILT_IN_CODE_TYPE_ENABLED("built_in.code_type.enabled", true),
 
     /**
      * "built_in.transformer.enabled": Enable built-in {@link com.greenlaw110.rythm.extension.Transformer transformer} implementations
@@ -137,13 +137,13 @@ public enum RythmConfigurationKey {
     CODEGEN_BYTE_CODE_ENHANCER("codegen.byte_code_enhancer.impl"),
 
     /**
-     * "default.template_lang.impl": Set default {@link com.greenlaw110.rythm.extension.ILang template lang}
+     * "default.code_type.impl": Set default {@link com.greenlaw110.rythm.extension.ICodeType code type}
      * <p/>
-     * <p>Default value: {@link com.greenlaw110.rythm.extension.ILang.DefImpl#HTML}</p>
+     * <p>Default value: {@link com.greenlaw110.rythm.extension.ICodeType.DefImpl#HTML}</p>
      * <p/>
-     * TODO: what if {@link #BUILT_IN_TEMPLATE_LANG_ENABLED} is false
+     * TODO: what if {@link #BUILT_IN_CODE_TYPE_ENABLED} is false
      */
-    DEFAULT_TEMPLATE_LANG_IMPL("default.template_lang.impl", ILang.DefImpl.RAW),
+    DEFAULT_CODE_TYPE_IMPL("default.code_type.impl", ICodeType.DefImpl.RAW),
 
     /**
      * "default.cache_ttl": Set default {@link com.greenlaw110.rythm.cache.ICacheService cache} ttl
@@ -452,7 +452,7 @@ public enum RythmConfigurationKey {
     /**
      * "i18n.message.resolver.impl": Set i18n message resolver. Should implement {@link com.greenlaw110.rythm.extension.II18nMessageResolver}
      * interface. Default value: {@link com.greenlaw110.rythm.extension.II18nMessageResolver.DefaultImpl#INSTANCE}, which delegate
-     * to {@link com.greenlaw110.rythm.utils.S#i18n(com.greenlaw110.rythm.RythmEngine, String, Object...)} method
+     * to {@link com.greenlaw110.rythm.utils.S#i18n(com.greenlaw110.rythm.template.ITemplate, String, Object...)} method
      */
     I18N_MESSAGE_RESOLVER("i18n.message.resolver.impl", II18nMessageResolver.DefaultImpl.INSTANCE),
 
@@ -517,6 +517,20 @@ public enum RythmConfigurationKey {
      * @see #HOME_TEMPLATE
      */
     RESOURCE_LOADER_IMPL("resource.loader.impl"),
+
+    /**
+     * "resource.name.suffix": does resource name has special rythm suffix attached? 
+     * E.g. <tt>.rythm</tt> or <tt>.rtl</tt> etc. Default is empty string 
+     */
+    RESOURCE_NAME_SUFFIX("resource.name.suffix", "") {
+        @Override
+        public <T> T getConfiguration(Map<String, ?> configuration) {
+            String s = super.getConfiguration(configuration);
+            if (S.empty(s)) return (T)"";
+            if (!s.startsWith(".")) s = "." + s;
+            return (T)s;
+        }
+    },
 
     /**
      * "sandbox.security_manager.impl": Set the security manager to be used when running a template in
@@ -776,7 +790,7 @@ public enum RythmConfigurationKey {
      * Return default configuration of this item
      * 
      * @param <T>
-     * @return
+     * @return default configuration for this item
      */
     public <T> T getDefaultConfiguration() {
         return (T)getConfiguration((Map)Collections.emptyMap());

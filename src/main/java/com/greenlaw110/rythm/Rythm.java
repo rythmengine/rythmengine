@@ -19,13 +19,12 @@
 */
 package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.Escape;
 
 import java.io.File;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -169,17 +168,6 @@ public class Rythm {
     }
 
     /**
-     * Set ThreadLocal locale. This method could be called before calling render methods.
-     * Useful to set the locale for web end users
-     * 
-     * @param locale
-     */
-    public static final RythmEngine setLocale(Locale locale) {
-        RythmEngine engine = engine();
-        return engine.setLocale(locale);
-    }
-
-    /**
      * Check if default engine is running in {@link Mode#prod production} mode
      *
      * @return true if default engine is in prod mode
@@ -318,24 +306,24 @@ public class Rythm {
         public static Escape getEscape() {
             Escape e = escape_.get();
             if (null == e) {
-                ILang lang = getLang();
-                e = null == lang ? Escape.XML : lang.escape();
+                ICodeType type = getCodeType();
+                e = null == type ? Escape.XML : type.escape();
             }
             return e;
         }
         
-        private static final ThreadLocal<ILang> lang_ = new ThreadLocal<ILang>();
-        public static void setLang(ILang lang) {
-            lang_.set(lang);
+        private static final ThreadLocal<ICodeType> type_ = new ThreadLocal<ICodeType>();
+        public static void setCodeType(ICodeType type) {
+            type_.set(type);
         }
 
-        public static ILang getLang() {
-            return lang_.get();
+        public static ICodeType getCodeType() {
+            return type_.get();
         }
         
         public static void clear() {
             escape_.remove();
-            lang_.remove();
+            type_.remove();
         }
     }
 

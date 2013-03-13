@@ -72,11 +72,6 @@ public class Token extends TextBuilder {
             return true;
         }
 
-        @Override
-        public boolean compactMode() {
-            return super.compactMode();
-        }
-
         public int getLineNo() {
             return line;
         }

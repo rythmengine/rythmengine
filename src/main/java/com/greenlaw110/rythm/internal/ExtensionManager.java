@@ -20,7 +20,7 @@
 package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.utils.S;
 
 import java.util.ArrayList;
@@ -97,19 +97,19 @@ public class ExtensionManager {
         return expressionProcessors;
     }
 
-    private List<ILang> templateLangList = new ArrayList<ILang>();
+    private List<ICodeType> codeTypeList = new ArrayList<ICodeType>();
 
-    public ExtensionManager registerTemplateLang(ILang lang) {
-        templateLangList.add(lang);
+    public ExtensionManager registerCodeType(ICodeType type) {
+        codeTypeList.add(type);
         return this;
     }
 
-    public Iterable<ILang> templateLangs() {
-        return templateLangList;
+    public Iterable<ICodeType> templateLangs() {
+        return codeTypeList;
     }
 
     public boolean hasTemplateLangs() {
-        return !templateLangList.isEmpty();
+        return !codeTypeList.isEmpty();
     }
 
 }

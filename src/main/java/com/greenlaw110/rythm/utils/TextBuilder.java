@@ -190,7 +190,7 @@ public class TextBuilder implements Cloneable {
      * @param wrapper
      * @return this builder
      */
-    public final TextBuilder p(StrBuf wrapper) {
+    public TextBuilder p(StrBuf wrapper) {
         if (null != wrapper) p_(wrapper);
         return this;
     }

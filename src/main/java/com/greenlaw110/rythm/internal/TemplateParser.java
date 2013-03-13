@@ -21,10 +21,9 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
-import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.FastRuntimeException;
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -51,8 +50,8 @@ public class TemplateParser implements IContext {
         this.cb = cb;
         this.engine = cb.engine();
         this.conf = this.engine.conf();
-        this.compactMode = (Boolean) this.conf.get(RythmConfigurationKey.CODEGEN_COMPACT_ENABLED);
-        pushLang(cb.templateDefLang);
+        this.compactMode = this.conf.compactModeEnabled();
+        pushCodeType(cb.templateDefLang);
     }
 
     public static class ExitInstruction extends FastRuntimeException {
@@ -92,8 +91,8 @@ public class TemplateParser implements IContext {
         DialectManager dm = engine.dialectManager();
         while (true) {
             this.breakStack.clear();
-            this.langStack.clear();
-            this.pushLang(cb.templateDefLang);
+            this.codeTypeStack.clear();
+            this.pushCodeType(cb.templateDefLang);
             this.inBodyStack.clear();
             this.inBodyStack2.clear();
             this.compactStack.clear();
@@ -350,31 +349,31 @@ public class TemplateParser implements IContext {
         insideDirectiveComment = false;
     }
 
-    private Stack<ILang> langStack = new Stack<ILang>();
+    private Stack<ICodeType> codeTypeStack = new Stack<ICodeType>();
 
     @Override
-    public ILang peekLang() {
-        if (langStack.isEmpty()) return null;
-        return langStack.peek();
+    public ICodeType peekCodeType() {
+        if (codeTypeStack.isEmpty()) return null;
+        return codeTypeStack.peek();
     }
 
     @Override
-    public void pushLang(ILang lang) {
-        ILang cur = peekLang();
+    public void pushCodeType(ICodeType type) {
+        ICodeType cur = peekCodeType();
         if (null != cur) {
-            lang.setParent(cur);
+            type.setParent(cur);
         }
-        langStack.push(lang);
+        codeTypeStack.push(type);
     }
 
     @Override
-    public ILang popLang() {
-        ILang cur = peekLang();
+    public ICodeType popCodeType() {
+        ICodeType cur = peekCodeType();
         if (null == cur) {
             return null;
         }
         cur.setParent(null);
-        langStack.pop();
+        codeTypeStack.pop();
         return cur;
     }
 

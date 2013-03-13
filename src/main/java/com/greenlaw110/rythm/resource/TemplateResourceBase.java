@@ -21,6 +21,8 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.extension.ICodeType;
+import com.greenlaw110.rythm.utils.S;
 
 import java.util.UUID;
 
@@ -140,6 +142,37 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     @Override
     public String tagName() {
         return null;
+    }
+    
+    public static ICodeType getTypeOfPath(RythmEngine engine, String s) {
+        String suffix = engine.conf().resourceNameSuffix();
+        if (s.endsWith(suffix)) {
+            int pos = s.lastIndexOf(suffix);
+            if (pos > -1) s = s.substring(0, pos);
+        }
+        ICodeType codeType = ICodeType.DefImpl.RAW;
+        if (s.endsWith(".html") || s.endsWith(".htm")) {
+            codeType = ICodeType.DefImpl.HTML;
+        } else if (s.endsWith(".js")) {
+            codeType = ICodeType.DefImpl.JS;
+        } else if (s.endsWith(".json")) {    
+            codeType = ICodeType.DefImpl.JSON;
+        } else if (s.endsWith(".xml")) {
+            codeType = ICodeType.DefImpl.XML;
+        } else if (s.endsWith(".csv")) {    
+            codeType = ICodeType.DefImpl.CSV;
+        } else if (s.endsWith(".css")) {
+            codeType = ICodeType.DefImpl.CSS;
+        }
+        return codeType;
+    }
+
+    @Override
+    public ICodeType codeType() {
+        RythmEngine engine = engine();
+        Object key = getKey();
+        String s = S.str(key);
+        return getTypeOfPath(engine, s);
     }
 
     protected static final String path2CN(String path) {

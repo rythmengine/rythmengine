@@ -62,7 +62,7 @@ public class CommentParser extends CaretParserFactoryBase {
                 return Pattern.compile(String.format("^(%s//.*?)(\n.*|$)", a()), Pattern.DOTALL);
 //                IContext ctx = ctx();
 //                if (ctx.insideDirectiveComment()) {
-//                    return Pattern.compile(String.format("^(%s//.*?)(%s|\n).*", a(), S.escapeRegex(ctx.peekLang().commentEnd())), Pattern.DOTALL);
+//                    return Pattern.compile(String.format("^(%s//.*?)(%s|\n).*", a(), S.escapeRegex(ctx.peekCodeType().commentEnd())), Pattern.DOTALL);
 //                } else {
 //                    return Pattern.compile(String.format("^(%s//.*?)\n.*", a()), Pattern.DOTALL);
 //                }

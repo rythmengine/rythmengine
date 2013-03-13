@@ -21,8 +21,7 @@ package com.greenlaw110.rythm.template;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
-import com.greenlaw110.rythm.extension.ILang;
-import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 
@@ -162,6 +161,7 @@ public interface ITemplate extends Cloneable {
     ITemplate __cloneMe(RythmEngine engine, ITemplate caller);
 
     /**
+     * (not API)
      * Return the current locale
      * 
      * @return the locale
@@ -169,21 +169,33 @@ public interface ITemplate extends Cloneable {
     Locale __curLocale();
 
     /**
+     * (not API)
+     * Return the current escape scheme
+     * 
+     * @return the escape
+     */
+    Escape __curEscape();
+    
+    /**
+     * (not API)
+     * Return current code type.
+     *
+     * @return current {@link com.greenlaw110.rythm.extension.ICodeType type}
+     */
+    ICodeType __curCodeType();
+
+    /**
      * The render time context. Not to be used in user application or template
      */
     public static class __Context {
 
         /**
-         * template lang stack. Used to enable the
+         * Code type stack. Used to enable the
          * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#FEATURE_NATURAL_TEMPLATE_ENABLED}
-         * 
-         * <p>Note the lang used here is not an end user language, 
-         * like en, zh etc, it is used to refer to the computer 
-         * language/format like html, javascript, csv etc</p>
          * 
          * @see {@link #localeStack}
          */
-        public Stack<ILang> langStack = new Stack<ILang>();
+        public Stack<ICodeType> codeTypeStack = new Stack<ICodeType>();
 
         /**
          * template escape stack. Used to enable the
@@ -195,49 +207,49 @@ public interface ITemplate extends Cloneable {
          * template locale stack. Used to track the locale in the current context.
          */
         private Stack<Locale> localeStack = new Stack<Locale>();
-        
+
         private TemplateBase tmpl;
 
         /**
-         * init the context with template and base lang
+         * init the context with template and base code type
          *
          * @param templateBase
-         * @param lang
+         * @param type
          * @param locale
          */
-        public void init(TemplateBase templateBase, ILang lang, Locale locale) {
-            if (null == lang) {
-                TemplateClass tc = templateBase.__getTemplateClass(true);
-                lang = ILang.DefImpl.probeFileName(tc.name(), templateBase.__engine().conf().defaultLang());
-            } else {
+        public void init(TemplateBase templateBase, ICodeType type, Locale locale) {
+            RythmEngine engine = templateBase.__engine();
+            if (null == type) {
+                type = engine.renderSettings.codeType();
+                if (null == type) type = templateBase.__getTemplateClass(false).codeType;
             }
-            langStack.push(lang);
             if (null == locale) {
-                locale = templateBase.__engine().locale();
+                locale = engine.renderSettings.locale();
             }
+            codeTypeStack.push(type);
             localeStack.push(locale);
             tmpl = templateBase;
         }
 
-        public ILang currentLang() {
-            if (langStack.isEmpty()) {
+        public ICodeType currentCodeType() {
+            if (codeTypeStack.isEmpty()) {
                 return null;
             } else {
-                return langStack.peek();
+                return codeTypeStack.peek();
             }
         }
 
-        public void pushLang(ILang lang) {
-            ILang cur = currentLang();
+        public void pushCodeType(ICodeType type) {
+            ICodeType cur = currentCodeType();
             if (null != cur) {
-                lang.setParent(cur);
+                type.setParent(cur);
             }
-            langStack.push(lang);
-            Rythm.RenderTime.setLang(lang);
+            codeTypeStack.push(type);
+            Rythm.RenderTime.setCodeType(type);
         }
 
-        public ILang popLang() {
-            ILang cur = langStack.pop();
+        public ICodeType popCodeType() {
+            ICodeType cur = codeTypeStack.pop();
             cur.setParent(null);
             return cur;
         }
@@ -262,7 +274,7 @@ public interface ITemplate extends Cloneable {
             if (!escapeStack.isEmpty()) {
                 return escapeStack.peek();
             } else {
-                return currentLang().escape();
+                return currentCodeType().escape();
             }
         }
 
@@ -274,18 +286,18 @@ public interface ITemplate extends Cloneable {
         public Escape popEscape() {
             return escapeStack.pop();
         }
-
+        
         public __Context() {
-            langStack = new Stack<ILang>();
+            codeTypeStack = new Stack<ICodeType>();
             escapeStack = new Stack<Escape>();
             localeStack = new Stack<Locale>();
         }
 
         public __Context(__Context clone) {
-            langStack = new Stack<ILang>();
+            codeTypeStack = new Stack<ICodeType>();
             escapeStack = new Stack<Escape>();
             localeStack = new Stack<Locale>();
-            langStack.addAll(clone.langStack);
+            codeTypeStack.addAll(clone.codeTypeStack);
             escapeStack.addAll(clone.escapeStack);
             localeStack.addAll(clone.localeStack);
             tmpl = clone.tmpl;

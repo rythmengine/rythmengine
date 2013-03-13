@@ -21,7 +21,7 @@ package com.greenlaw110.rythm.internal;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.exception.ParseException;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 
 import java.util.Locale;
@@ -183,11 +183,11 @@ public interface IContext {
 
     void leaveDirectiveComment();
 
-    ILang peekLang();
+    ICodeType peekCodeType();
 
-    void pushLang(ILang lang);
+    void pushCodeType(ICodeType type);
 
-    ILang popLang();
+    ICodeType popCodeType();
     
     Locale peekLocale();
 

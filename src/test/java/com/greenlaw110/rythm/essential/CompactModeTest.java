@@ -19,9 +19,8 @@
 */
 package com.greenlaw110.rythm.essential;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
-import com.greenlaw110.rythm.internal.Token;
-import com.stevesoft.pat.Regex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -67,6 +66,16 @@ public class CompactModeTest extends TestBase {
         t = "<h1>\n\nabc\n</h1>";
         s = r(t);
         eq("<h1>\n\nabc\n</h1>");
+    }
+
+    @Test
+    public void testFile() {
+        s = r("foo/compact_test.html", "Rythm");
+        eqf("foo/compact_test_compact.result");
+        Rythm.shutdown();
+        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        s = r("foo/compact_test.html", "Rythm");
+        eqf("foo/compact_test_no_compact.result");
     }
 
     public static void main(String[] args) {

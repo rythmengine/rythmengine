@@ -21,7 +21,7 @@ package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class CommentTest extends TestBase {
 
     @Before
     public void setUp() {
-        System.getProperties().put(RythmConfigurationKey.DEFAULT_TEMPLATE_LANG_IMPL.getKey(), ILang.DefImpl.HTML);
+        System.getProperties().put(RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.HTML);
     }
 
     @Test

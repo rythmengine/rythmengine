@@ -19,7 +19,7 @@
 */
 package com.greenlaw110.rythm.internal.parser.build_in;
 
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
@@ -56,9 +56,9 @@ public class DirectiveCommentStartSensor extends RemoveLeadingLineBreakAndSpaces
             return null;
             //raiseParseException("directive comment not closed");
         }
-        ILang lang = ctx.peekLang();
-        while (null != lang) {
-            String sCommentStart = lang.commentStart();
+        ICodeType type = ctx.peekCodeType();
+        while (null != type) {
+            String sCommentStart = type.commentStart();
             if (!S.empty(sCommentStart)) {
                 sCommentStart = S.escapeRegex(sCommentStart).toString();
                 // try <!-- @ first
@@ -90,7 +90,7 @@ public class DirectiveCommentStartSensor extends RemoveLeadingLineBreakAndSpaces
                     return Token.EMPTY_TOKEN;
                 }
             }
-            lang = lang.getParent();
+            type = type.getParent();
         }
 
         return null;

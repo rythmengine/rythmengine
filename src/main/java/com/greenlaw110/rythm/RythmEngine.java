@@ -24,8 +24,8 @@ import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.RythmException;
 import com.greenlaw110.rythm.exception.TagLoadException;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.extension.IDurationParser;
-import com.greenlaw110.rythm.extension.ILang;
 import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.compiler.*;
@@ -293,35 +293,71 @@ public class RythmEngine implements IEventDispatcher {
 
     private ICacheService _cacheService = null;
 
-    private final ThreadLocal<Locale> _locale = new ThreadLocal<Locale>() {
-        @Override
-        protected Locale initialValue() {
-            return RythmEngine.this.conf().locale();
+    /**
+     * Define the render time settings, which is intialized each time a renderXX method
+     * get called
+     */
+    public class RenderSettings {
+        private final ThreadLocal<Locale> _locale = new ThreadLocal<Locale>() {
+            @Override
+            protected Locale initialValue() {
+                return RythmEngine.this.conf().locale();
+            }
+        };
+        private final ThreadLocal<ICodeType> _codeType = new ThreadLocal<ICodeType>() {
+            @Override
+            protected ICodeType initialValue() {
+                //return RythmEngine.this.conf().defaultCodeType();
+                return null; // there are logic in TemplateClass.asTemplate() to further deduct code type from resource 
+            }
+        };
+
+        /**
+         * Init the render time. This method could be called before calling render methods.
+         * The setting will be used to render the template later on
+         * 
+         * @param locale
+         */
+        public final RythmEngine init(ICodeType codeType, Locale locale) {
+            if (null != locale) _locale.set(locale);
+            if (null != codeType) _codeType.set(codeType);
+            return RythmEngine.this;
         }
-    };
-
-    /**
-     * Set ThreadLocal locale. This method could be called before calling render methods.
-     * Useful to set the locale for web end users
-     * 
-     * @param locale
-     */
-    public final RythmEngine setLocale(Locale locale) {
-        _locale.set(locale);
-        return this;
-    }
-
-    /**
-     * Return ThreadLocal locale. Not an API to be used by user apps
-     * 
-     * @return
-     */
-    public final Locale locale() {
-        return _locale.get();
-    }
-
-    private Stack<TemplateBase> _tmpls = new Stack<TemplateBase>();
     
+        /**
+         * (not API)
+         * Return ThreadLocal locale.
+         * 
+         * @return locale setting for this render process
+         */
+        public final Locale locale() {
+            return _locale.get();
+        }
+
+        /**
+         * (not API)
+         * Return thread local code type
+         * 
+         * @return {@link com.greenlaw110.rythm.extension.ICodeType code type} setting for this render process
+         */
+        public final ICodeType codeType() {
+            return _codeType.get();
+        }
+    
+        /**
+         * Clear the render time after render process done
+         * @return
+         */
+        public final RythmEngine clear() {
+            _locale.remove();
+            _codeType.remove();
+            return RythmEngine.this;
+        }
+    
+    }
+    
+    public final RenderSettings renderSettings = new RenderSettings();
+
 
     /* -----------------------------------------------------------------------------
       Constructors, Configuration and Initializing
@@ -451,14 +487,14 @@ public class RythmEngine implements IEventDispatcher {
             registerTransformer("rythm", S.class);
         }
 
-        boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TEMPLATE_LANG_ENABLED);
+        boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED);
         if (enableBuiltInTemplateLang) {
             ExtensionManager em = extensionManager();
-            em.registerTemplateLang(ILang.DefImpl.HTML);
-            em.registerTemplateLang(ILang.DefImpl.JS);
-            em.registerTemplateLang(ILang.DefImpl.JSON);
-            em.registerTemplateLang(ILang.DefImpl.CSV);
-            em.registerTemplateLang(ILang.DefImpl.CSS);
+            em.registerCodeType(ICodeType.DefImpl.HTML);
+            em.registerCodeType(ICodeType.DefImpl.JS);
+            em.registerCodeType(ICodeType.DefImpl.JSON);
+            em.registerCodeType(ICodeType.DefImpl.CSV);
+            em.registerCodeType(ICodeType.DefImpl.CSS);
         }
 
         _tags.clear();
@@ -468,6 +504,10 @@ public class RythmEngine implements IEventDispatcher {
                 body.render(__getBuffer());
             }
         });
+        
+        if (isDevMode()) {
+            resourceManager().scan(conf().templateHome());
+        }
 
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }
@@ -597,6 +637,9 @@ public class RythmEngine implements IEventDispatcher {
             classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
+        String fullTagName = resourceManager().getFullTagName(tc);
+        tc.setFullName(fullTagName);
+        _tags.put(fullTagName, (ITag)t);
         setRenderArgs(t, args);
 //        try {
 //            __setRenderArgs(t, args);
@@ -660,6 +703,9 @@ public class RythmEngine implements IEventDispatcher {
         }
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
+        String fullTagName = resourceManager().getFullTagName(tc);
+        tc.setFullName(fullTagName);
+        _tags.put(fullTagName, (ITag)t);
         setRenderArgs(t, args);
 //        try {
 //            __setRenderArgs(t, args);
@@ -689,6 +735,29 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String render(String template, Object... args) {
+        return render(null, null, template, args);
+    }
+
+    /**
+     * Render template by string parameter and an array of
+     * template args. The string parameter could be either
+     * a path point to the template source file, or the inline
+     * template source content. The render result is returned
+     * as a String. The API allows user to specify the 
+     * {@link com.greenlaw110.rythm.extension.ICodeType code type} and
+     * {@link java.util.Locale locale} before rendering
+     * <p/>
+     * <p>See {@link #getTemplate(java.io.File, Object...)} for note on
+     * render args</p>
+     *
+     * @param codeType
+     * @param locale
+     * @param template
+     * @param args
+     * @return render result
+     */
+    public String render(ICodeType codeType, Locale locale, String template, Object... args) {
+        renderSettings.init(codeType, locale);
         ITemplate t = getTemplate(template, args);
         return t.render();
     }
@@ -1282,7 +1351,16 @@ public class RythmEngine implements IEventDispatcher {
                 }
             }
         }
-        if (null != body) tag.__setRenderArg("__body", body);
+        if (null == body && null != params) {
+            body = (ITag.__Body)params.getByName("__body");
+            if (null == body) {
+                body = (ITag.__Body)params.getByName("_body");
+            }
+        }
+        if (null != body) {
+            tag.__setRenderArg("__body", body);
+            tag.__setRenderArg("_body", body); // for compatiblity
+        }
         RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, tag));
         try {
             if (null != context) {

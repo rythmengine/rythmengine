@@ -355,18 +355,18 @@ public class RythmConfiguration {
         return _durationParser;
     }
 
-    private ILang _defaultLang = null;
+    private ICodeType _defaultCodeType = null;
 
     /**
-     * Return {@link RythmConfigurationKey#DEFAULT_TEMPLATE_LANG_IMPL} without lookup
+     * Return {@link RythmConfigurationKey#DEFAULT_CODE_TYPE_IMPL} without lookup
      *
-     * @return default lang
+     * @return default code type
      */
-    public ILang defaultLang() {
-        if (null == _defaultLang) {
-            _defaultLang = get(DEFAULT_TEMPLATE_LANG_IMPL);
+    public ICodeType defaultCodeType() {
+        if (null == _defaultCodeType) {
+            _defaultCodeType = get(DEFAULT_CODE_TYPE_IMPL);
         }
-        return _defaultLang;
+        return _defaultCodeType;
     }
 
     private File _tmpDir = null;
@@ -458,6 +458,19 @@ public class RythmConfiguration {
         }
         return _i18n;
     }
+    
+    private String _suffix = null;
+    
+    /**
+     * Get {@link RythmConfigurationKey#RESOURCE_NAME_SUFFIX} without lookup
+     */
+    public String resourceNameSuffix() {
+        if (null == _suffix) {
+            _suffix = get(RESOURCE_NAME_SUFFIX);
+        }
+        return _suffix;
+    }
+    
 
     public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 
     
@@ -466,7 +479,7 @@ public class RythmConfiguration {
      * if it is not inside a RythmEngine runtime context, an {@link #EMPTY_CONF empty configuration}
      * is returned
      * 
-     * @return
+     * @return the configuration instance associated with engine running in the current thread
      */
     public static RythmConfiguration get() {
         RythmEngine engine = RythmEngine.get();

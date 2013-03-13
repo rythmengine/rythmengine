@@ -21,14 +21,17 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.utils.IO;
+import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -151,24 +154,65 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
         int pos = key.lastIndexOf(".");
         if (-1 != pos) key = key.substring(0, pos);
-        return key.replace('/', '.').replace('\\', '.');
+        key = key.replace('/', '.').replace('\\', '.');
+        key += tc.codeType.resourceNameSuffix();
+        return key;
     }
 
     public static TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass templateClass) {
+        return tryLoadTag(tagName, engine, templateClass, true);
+    }
+
+    private static TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass templateClass, boolean processTagName) {
         if (null == engine) engine = Rythm.engine();
         if (engine.hasTag(tagName)) return null;
-        tagName = tagName.replace('.', '/');
-        final String[] suffixes = {
-                ".rtl",
-                ".rythm",
+        String rythmSuffix = engine.conf().resourceNameSuffix();
+        final List<String> suffixes = new ArrayList(Arrays.asList(new String[]{
                 ".html",
                 ".json",
-                ".xml",
+                ".js",
+                ".css",
                 ".csv",
-                ".tag",
+                ".xml",
                 ".txt",
                 ""
-        };
+        }));
+        ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tagName);
+        if (ICodeType.DefImpl.RAW == codeType) {
+            // use caller's code type
+            codeType = templateClass.codeType;
+        }
+        final String tagNameOrigin = tagName;
+        if (processTagName) {
+            boolean tagNameProcessed = false;
+            while (!tagNameProcessed) {
+                // process tagName to remove suffixes
+                // 1. check without rythm-suffix
+                for (String s : suffixes) {
+                    if (tagName.endsWith(s)) {
+                        tagName = tagName.substring(0, tagName.lastIndexOf(s));
+                        break;
+                    }
+                }
+                if (S.notEmpty(rythmSuffix)) {
+                    // 2. check with rythm-suffix
+                    for (String s : suffixes) {
+                        s = s + rythmSuffix;
+                        if (tagName.endsWith(s)) {
+                            tagName = tagName.substring(0, tagName.lastIndexOf(s));
+                            break;
+                        }
+                    }
+                }
+                tagNameProcessed = true;
+            }
+        }
+        tagName = tagName.replace('.', '/');
+        String sfx = codeType.resourceNameSuffix();
+        if (S.notEmpty(sfx) && !suffixes.get(0).equals(sfx)) {
+            suffixes.remove(sfx);
+            suffixes.add(0, sfx);
+        }
         File tagFile;
         List<String> roots = new ArrayList<String>();
         File home = engine.conf().templateHome();
@@ -190,7 +234,8 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         }
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
-            if (currentPath.startsWith("/") || currentPath.startsWith(File.separator)) currentPath = currentPath.substring(1);
+            if (currentPath.startsWith("/") || currentPath.startsWith(File.separator))
+                currentPath = currentPath.substring(1);
             if (!currentPath.startsWith(root)) currentPath = root + File.separator + currentPath;
             roots.add(currentPath);
         }
@@ -201,10 +246,10 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         for (String r : roots) {
             tagName = r + File.separator + tagName0;
             for (String suffix : suffixes) {
-                String name = tagName + suffix;
+                String name = tagName + suffix + rythmSuffix;
 
                 tagFile = new File(name);
-                ITemplateResource tr = tagFile.canRead() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
+                ITemplateResource tr = tagFile.canRead() && !tagFile.isDirectory() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
                 if (tr.isValid()) {
                     try {
                         TemplateClass tc = engine.classes().getByTemplate(tr.getKey());
@@ -228,6 +273,6 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 }
             }
         }
-        return null;
+        return processTagName ? tryLoadTag(tagNameOrigin, engine, templateClass, false) : null;
     }
 }

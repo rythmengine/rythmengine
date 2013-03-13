@@ -21,7 +21,7 @@ package com.greenlaw110.rythm.advanced;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
-import com.greenlaw110.rythm.extension.ILang;
+import com.greenlaw110.rythm.extension.ICodeType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class NaturalTemplateTest extends TestBase {
     public void configure() {
         System.setProperty(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
-        System.getProperties().put(DEFAULT_TEMPLATE_LANG_IMPL.getKey(), ILang.DefImpl.HTML);
+        System.getProperties().put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.HTML);
         Rythm.shutdown();
     }
     
