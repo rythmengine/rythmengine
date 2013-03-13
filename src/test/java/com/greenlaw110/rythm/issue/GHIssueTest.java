@@ -3,6 +3,7 @@ package com.greenlaw110.rythm.issue;
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.extension.ICodeType;
+import models.Foo;
 import org.junit.Test;
 
 /**
@@ -37,6 +38,13 @@ public class GHIssueTest extends TestBase {
         t = "@args String src;<script src='@src'></script><script src='@src'></script>";
         s = r(t, "/js/abc");
         eq("<script src='/js/abc'></script><script src='/js/abc'></script>");
+    }
+    
+    @Test
+    public void test123() {
+        t = "@args models.Foo foo;@foo.bar()._x()";
+        s = r(t, new Foo());
+        eq("");
     }
     
     public static void main(String[] args) {

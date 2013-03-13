@@ -167,7 +167,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
     }
 
     protected String patternStr() {
-        return "^(%s[0-9a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
+        return "^(%s[0-9a-zA-Z_][a-zA-Z0-9_\\.]*((\\.[a-zA-Z][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)((\\.[a-zA-Z_][a-zA-Z0-9_\\.]*)*(?@[])*(?@())*)*)*";
     }
 
 }
