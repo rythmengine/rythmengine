@@ -497,8 +497,8 @@ public class RythmEngine implements IEventDispatcher {
             em.registerCodeType(ICodeType.DefImpl.CSS);
         }
 
-        _tags.clear();
-        _tags.put("chain", new JavaTagBase() {
+        _templates.clear();
+        _templates.put("chain", new JavaTagBase() {
             @Override
             protected void call(__ParameterList params, __Body body) {
                 body.render(__getBuffer());
@@ -634,12 +634,12 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(template, this, dialect);
-            classes().add(key, tc);
+            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         String fullTagName = resourceManager().getFullTagName(tc);
         tc.setFullName(fullTagName);
-        _tags.put(fullTagName, (ITag)t);
+        _templates.put(fullTagName, t);
         setRenderArgs(t, args);
 //        try {
 //            __setRenderArgs(t, args);
@@ -673,6 +673,23 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     /**
+     * (3rd party API, not for user application)
+     * Get an new template class by {@link com.greenlaw110.rythm.resource.ITemplateResource template resource}
+     *
+     * @param resource the template resource
+     * @return template class
+     */
+    public TemplateClass getTemplateClass(ITemplateResource resource) {
+        String key = S.str(resource.getKey());
+        TemplateClass tc = classes().getByTemplate(key);
+        if (null == tc) {
+            tc = new TemplateClass(resource, this);
+            //classes().add(key, tc);
+        }
+        return tc;
+    }
+
+    /**
      * Get an new template instance by template source {@link java.io.File file}
      * and an array of arguments.
      *
@@ -699,20 +716,20 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(file, this);
-            classes().add(key, tc);
+            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         if (null == t) return null;
         String fullTagName = resourceManager().getFullTagName(tc);
         tc.setFullName(fullTagName);
-        _tags.put(fullTagName, (ITag)t);
+        _templates.put(fullTagName, t);
         setRenderArgs(t, args);
 //        try {
 //            __setRenderArgs(t, args);
 //        } catch (ClassCastException ce) {
 //            if (mode.isDev()) {
 //                handleCCE(ce);
-//                return getTemplate(template, args);
+//                return etTemplate(template, args);
 //            }
 //            throw ce;
 //        }
@@ -893,7 +910,7 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(new StringTemplateResource(template), this);
-            classes().add(key, tc);
+            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         setRenderArgs(t, args);
@@ -955,7 +972,7 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(template, this, new ToString(argClass));
-            classes().add(key, tc);
+            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         t.__setRenderArg(0, obj);
@@ -990,7 +1007,7 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(new ToStringTemplateResource(key), this, new AutoToString(c, key));
-            classes().add(key, tc);
+            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate();
         t.__setRenderArg(0, obj);
@@ -1033,7 +1050,7 @@ public class RythmEngine implements IEventDispatcher {
                     toBeRemoved.clear();
                     TemplateClass tc = classes().all().get(0);
                     for (String tag : _nonExistsTags) {
-                        if (null != resourceManager().tryLoadTag(tag, tc)) {
+                        if (null != resourceManager().tryLoadTemplate(tag, tc)) {
                             toBeRemoved.add(tag);
                         }
                     }
@@ -1071,7 +1088,7 @@ public class RythmEngine implements IEventDispatcher {
             ITemplateResource rsrc = resourceManager().getFileResource(template);
             if (rsrc.isValid()) {
                 tc = new TemplateClass(rsrc, this);
-                classes().add(key, tc);
+                //classes().add(key, tc);
             } else {
                 nonExistsTemplates.add(template);
                 if (mode().isDev() && nonExistsTemplatesChecker == null) {
@@ -1111,31 +1128,31 @@ public class RythmEngine implements IEventDispatcher {
       Tags
     -------------------------------------------------------------------------------*/
 
-    private final Map<String, ITag> _tags = new HashMap<String, ITag>();
-    private final Set<String> _nonTags = new HashSet<String>();
+    private final Map<String, ITemplate> _templates = new HashMap<String, ITemplate>();
+    private final Set<String> _nonTmpls = new HashSet<String>();
 
     /**
-     * Whether a {@link ITag tag} is registered to the engine by name specified
+     * Whether a {@link ITemplate template} is registered to the engine by name specified
      * <p/>
      * <p>Not an API for user application</p>
      *
-     * @param tagName
-     * @return true if there is a tag with the name specified
+     * @param tmplName
+     * @return true if there is a template with the name specified
      */
-    public boolean hasTag(String tagName) {
-        return _tags.containsKey(tagName);
+    public boolean templateRegistered(String tmplName) {
+        return _templates.containsKey(tmplName);
     }
 
     /**
-     * Get a {@link ITag tag} registered to the engine by name
+     * Get a {@link ITemplate template} registered to the engine by name
      * <p/>
      * <p>Not an API for user application</p>
      *
-     * @param tagName
-     * @return the tag
+     * @param tmplName
+     * @return the template instance
      */
-    public ITag getTag(String tagName) {
-        return _tags.get(tagName);
+    public ITemplate getRegisteredTemplate(String tmplName) {
+        return _templates.get(tmplName);
     }
 
     /**
@@ -1146,51 +1163,63 @@ public class RythmEngine implements IEventDispatcher {
      * @param name
      * @return template class
      */
-    public TemplateClass getTemplateClassFromTagName(String name) {
-        TemplateBase tag = (TemplateBase) _tags.get(name);
-        if (null == tag) return null;
-        return tag.__getTemplateClass(false);
+    public TemplateClass getRegisteredTemplateClass(String name) {
+        TemplateBase tmpl = (TemplateBase) _templates.get(name);
+        if (null == tmpl) return null;
+        return tmpl.__getTemplateClass(false);
     }
 
     /**
-     * Check if a tag exists and return it's tag name
+     * Register a template class and return self
+     * 
+     * @param tc
+     * @return this engine instance
+     */
+    public RythmEngine registerTemplateClass(TemplateClass tc) {
+        String fullName = resourceManager().getFullTagName(tc);
+        tc.setFullName(fullName);
+        classes().add(tc);
+        return this;
+    }
+
+    /**
+     * Check if a template exists and return it's name
      * <p/>
      * <p>Not an API for user application</p>
      *
      * @param name
-     * @param tc
-     * @return tag name
+     * @param callerClass
+     * @return template name
      */
-    public String testTag(String name, TemplateClass tc) {
+    public String testTemplate(String name, TemplateClass callerClass) {
         if (Keyword.THIS.toString().equals(name)) {
-            return resourceManager().getFullTagName(tc);
+            return resourceManager().getFullTagName(callerClass);
         }
-        if (mode().isProd() && _nonTags.contains(name)) return null;
-        boolean isTag = _tags.containsKey(name);
-        if (isTag) return name;
+        if (mode().isProd() && _nonTmpls.contains(name)) return null;
+        if (templateRegistered(name)) return name;
         // try imported path
-        if (null != tc.importPaths) {
-            for (String s : tc.importPaths) {
+        if (null != callerClass.importPaths) {
+            for (String s : callerClass.importPaths) {
                 String name0 = s + "." + name;
-                if (_tags.containsKey(name0)) return name0;
+                if (_templates.containsKey(name0)) return name0;
             }
         }
         // try relative path
-        String callerName = resourceManager().getFullTagName(tc);
+        String callerName = resourceManager().getFullTagName(callerClass);
         int pos = callerName.lastIndexOf(".");
         if (-1 != pos) {
             String name0 = callerName.substring(0, pos) + "." + name;
-            if (_tags.containsKey(name0)) return name0;
+            if (_templates.containsKey(name0)) return name0;
         }
 
         try {
             // try to ask resource manager
-            TemplateClass tagTC = resourceManager().tryLoadTag(name, tc);
-            if (null == tagTC) {
-                if (mode().isProd()) _nonTags.add(name);
+            TemplateClass tc = resourceManager().tryLoadTemplate(name, callerClass);
+            if (null == tc) {
+                if (mode().isProd()) _nonTmpls.add(name);
                 return null;
             }
-            String fullName = tagTC.getFullName();
+            String fullName = tc.getFullName();
             return fullName;
         } catch (TagLoadException e) {
             throw e;
@@ -1204,16 +1233,22 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     /**
-     * Register a tag class. If there is name collision then registration
+     * Register a template. If there is name collision then registration
      * will fail
      * <p/>
      * <p>Not an API for user application</p>
      *
      * @return true if registration success
      */
-    public boolean registerTag(ITag tag) {
-        String name = tag.__getName();
-        return registerTag(name, tag);
+    public boolean registerTemplate(ITemplate template) {
+        //TemplateResourceManager rm = resourceManager();
+        String name;
+        if (template instanceof JavaTagBase) {
+            name = template.__getName();
+        } else {
+            name = template.__getTemplateClass(false).getFullName();
+        }
+        return registerTemplate(name, template);
     }
 
     /**
@@ -1222,21 +1257,21 @@ public class RythmEngine implements IEventDispatcher {
      * <p>Not an API for user application</p>
      *
      * @param name
-     * @param tag
+     * @param template
      * @return false if registration failed
      */
-    public boolean registerTag(String name, ITag tag) {
-        if (null == tag) throw new NullPointerException();
-        if (_tags.containsKey(name)) {
+    public boolean registerTemplate(String name, ITemplate template) {
+        if (null == template) throw new NullPointerException();
+        if (_templates.containsKey(name)) {
             return false;
         }
-        _tags.put(name, tag);
+        _templates.put(name, template);
         logger.trace("tag %s registered", name);
         return true;
     }
 
     /**
-     * Invoke a tag
+     * Invoke a template
      * <p/>
      * <p>Not an API for user application</p>
      *
@@ -1247,8 +1282,8 @@ public class RythmEngine implements IEventDispatcher {
      * @param body
      * @param context
      */
-    public void invokeTag(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context) {
-        invokeTag(line, name, caller, params, body, context, false);
+    public void invokeTemplate(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context) {
+        invokeTemplate(line, name, caller, params, body, context, false);
     }
 
     private Set<String> _nonExistsTags = new HashSet<String>();
@@ -1266,41 +1301,41 @@ public class RythmEngine implements IEventDispatcher {
      * @param context
      * @param ignoreNonExistsTag
      */
-    public void invokeTag(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
+    public void invokeTemplate(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
         if (_nonExistsTags.contains(name)) return;
         // try tag registry first
-        ITag tag = _tags.get(name);
-        TemplateClass tc = ((TemplateBase) caller).__getTemplateClass(true);
-        if (null == tag) {
+        ITemplate t = _templates.get(name);
+        TemplateClass tc = caller.__getTemplateClass(true);
+        if (null == t) {
             // is calling self
-            if (S.isEqual(name, ((TagBase) caller).__getName())) tag = (TagBase) caller;
+            if (S.isEqual(name, caller.__getName())) t = caller;
         }
 
-        if (null == tag) {
+        if (null == t) {
             // try imported path
             if (null != tc.importPaths) {
                 for (String s : tc.importPaths) {
                     String name0 = s + "." + name;
-                    tag = _tags.get(name0);
-                    if (null != tag) break;
+                    t = _templates.get(name0);
+                    if (null != t) break;
                 }
             }
 
             // try relative path
-            if (null == tag) {
+            if (null == t) {
                 String callerName = resourceManager().getFullTagName(tc);
                 int pos = callerName.lastIndexOf(".");
                 if (-1 != pos) {
                     String name0 = callerName.substring(0, pos) + "." + name;
-                    tag = _tags.get(name0);
+                    t = _templates.get(name0);
                 }
             }
 
             // try load the tag from resource
-            if (null == tag) {
-                TemplateClass tagC = resourceManager().tryLoadTag(name, tc);
-                if (null != tagC) tag = _tags.get(tagC.getFullName());
-                if (null == tag) {
+            if (null == t) {
+                tc = resourceManager().tryLoadTemplate(name, tc);
+                if (null != tc) t = _templates.get(tc.getFullName());
+                if (null == t) {
                     if (ignoreNonExistsTag) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("cannot find tag: " + name);
@@ -1314,40 +1349,34 @@ public class RythmEngine implements IEventDispatcher {
                         throw new NullPointerException("cannot find tag: " + name);
                     }
                 }
-                tag = (ITag) tag.__cloneMe(this, caller);
+                t = t.__cloneMe(this, caller);
             }
         }
 
-        if (!(tag instanceof JavaTagBase)) {
+        if (!(t instanceof JavaTagBase)) {
             // try refresh the tag loaded from template file under tag root
             // note Java source tags are not reloaded here
-            String cn = tag.getClass().getName();
-            /*
-            if (reloadByIncClassVersion() && -1 == cn.indexOf("$")) {
-                int pos = cn.lastIndexOf("v");
-                if (-1 < pos) cn = cn.substring(0, pos);
-            }
-            */
+            String cn = t.getClass().getName();
             TemplateClass tc0 = classes().getByClassName(cn);
             if (null == tc0) {
-                System.out.println(tag.getClass());
+                System.out.println(t.getClass());
                 System.out.println(name);
                 System.out.println(cn);
                 System.out.println(caller.getClass());
             }
-            tag = (ITag) tc0.asTemplate(caller);
+            t = tc0.asTemplate(caller);
         } else {
-            tag = (ITag) tag.__cloneMe(this, caller);
+            t = t.__cloneMe(this, caller);
         }
 
         if (null != params) {
-            if (tag instanceof JavaTagBase) {
-                ((JavaTagBase) tag).__setRenderArgs0(params);
+            if (t instanceof JavaTagBase) {
+                ((JavaTagBase) t).__setRenderArgs0(params);
             } else {
                 for (int i = 0; i < params.size(); ++i) {
                     ITag.__Parameter param = params.get(i);
-                    if (null != param.name) tag.__setRenderArg(param.name, param.value);
-                    else tag.__setRenderArg(i, param.value);
+                    if (null != param.name) t.__setRenderArg(param.name, param.value);
+                    else t.__setRenderArg(i, param.value);
                 }
             }
         }
@@ -1358,17 +1387,17 @@ public class RythmEngine implements IEventDispatcher {
             }
         }
         if (null != body) {
-            tag.__setRenderArg("__body", body);
-            tag.__setRenderArg("_body", body); // for compatiblity
+            t.__setRenderArg("__body", body);
+            t.__setRenderArg("_body", body); // for compatiblity
         }
-        RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, tag));
+        RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, t));
         try {
             if (null != context) {
-                ((TagBase) tag).setBodyContext(context);
+                t.__setBodyContext(context);
             }
-            tag.__call(line);
+            t.__call(line);
         } finally {
-            RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase) caller, tag));
+            RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase) caller, t));
         }
     }
 
@@ -1600,14 +1629,14 @@ public class RythmEngine implements IEventDispatcher {
 
         // clear all template tags which is managed by TemplateClassManager
         List<String> templateTags = new ArrayList<String>();
-        for (String name : _tags.keySet()) {
-            ITag tag = _tags.get(name);
+        for (String name : _templates.keySet()) {
+            ITag tag = _templates.get(name);
             if (!(tag instanceof JavaTagBase)) {
                 templateTags.add(name);
             }
         }
         for (String name : templateTags) {
-            _tags.remove(name);
+            _templates.remove(name);
         }
     }
 
@@ -1646,10 +1675,10 @@ public class RythmEngine implements IEventDispatcher {
                 logger.error(e, "Error execute shutdown listener");
             }
         }
-        if (null != _tags) _tags.clear();
+        if (null != _templates) _templates.clear();
         if (null != _classes) _classes.clear();
         if (null != _nonExistsTags) _nonExistsTags.clear();
-        if (null != _nonTags) _nonTags.clear();;
+        if (null != _nonTmpls) _nonTmpls.clear();;
     }
 
 }

@@ -126,12 +126,13 @@ public class TemplateClassManager {
         return l;
     }
     
+    @Deprecated
     public void add(Object key, TemplateClass templateClass) {
-        tmplIdx.put(key, templateClass);
+        //tmplIdx.put(key, templateClass);
     }
 
     public void add(TemplateClass templateClass) {
-        clsNameIdx.put(templateClass.name0(), templateClass);
+        //clsNameIdx.put(templateClass.name0(), templateClass);
         clsNameIdx.put(templateClass.name(), templateClass);
         if (!templateClass.isInner()) {
             tmplIdx.put(templateClass.templateResource.getKey(), templateClass);

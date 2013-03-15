@@ -25,7 +25,6 @@ import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.utils.IO;
 import com.greenlaw110.rythm.utils.S;
 
@@ -159,13 +158,13 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return key;
     }
 
-    public static TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass templateClass) {
-        return tryLoadTag(tagName, engine, templateClass, true);
+    public static TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass) {
+        return tryLoadTemplate(tmplName, engine, callerClass, true);
     }
 
-    private static TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass templateClass, boolean processTagName) {
+    private static TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, boolean processTagName) {
         if (null == engine) engine = Rythm.engine();
-        if (engine.hasTag(tagName)) return null;
+        if (engine.templateRegistered(tmplName)) return null;
         String rythmSuffix = engine.conf().resourceNameSuffix();
         final List<String> suffixes = new ArrayList(Arrays.asList(new String[]{
                 ".html",
@@ -177,20 +176,20 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ".txt",
                 ""
         }));
-        ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tagName);
+        ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
         if (ICodeType.DefImpl.RAW == codeType) {
             // use caller's code type
-            codeType = templateClass.codeType;
+            codeType = callerClass.codeType;
         }
-        final String tagNameOrigin = tagName;
+        final String tagNameOrigin = tmplName;
         if (processTagName) {
             boolean tagNameProcessed = false;
             while (!tagNameProcessed) {
                 // process tagName to remove suffixes
                 // 1. check without rythm-suffix
                 for (String s : suffixes) {
-                    if (tagName.endsWith(s)) {
-                        tagName = tagName.substring(0, tagName.lastIndexOf(s));
+                    if (tmplName.endsWith(s)) {
+                        tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
                         break;
                     }
                 }
@@ -198,8 +197,8 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                     // 2. check with rythm-suffix
                     for (String s : suffixes) {
                         s = s + rythmSuffix;
-                        if (tagName.endsWith(s)) {
-                            tagName = tagName.substring(0, tagName.lastIndexOf(s));
+                        if (tmplName.endsWith(s)) {
+                            tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
                             break;
                         }
                     }
@@ -207,7 +206,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 tagNameProcessed = true;
             }
         }
-        tagName = tagName.replace('.', '/');
+        tmplName = tmplName.replace('.', '/');
         String sfx = codeType.resourceNameSuffix();
         if (S.notEmpty(sfx) && !suffixes.get(0).equals(sfx)) {
             suffixes.remove(sfx);
@@ -219,15 +218,15 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         String root = home.getPath();
 
         // call tag with import path
-        if (null != templateClass.importPaths) {
-            for (String s : templateClass.importPaths) {
+        if (null != callerClass.importPaths) {
+            for (String s : callerClass.importPaths) {
                 roots.add(root + File.separator + s.replace('.', File.separatorChar));
             }
         }
 
-        final String tagName0 = tagName;
+        final String tagName0 = tmplName;
         // call tag using relative path
-        String currentPath = templateClass.getKey().toString();
+        String currentPath = callerClass.getKey().toString();
         int pos = currentPath.lastIndexOf("/");
         if (-1 == pos) {
             pos = currentPath.lastIndexOf(File.separator);
@@ -244,9 +243,9 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         roots.add(home.getPath());
 
         for (String r : roots) {
-            tagName = r + File.separator + tagName0;
+            tmplName = r + File.separator + tagName0;
             for (String suffix : suffixes) {
-                String name = tagName + suffix + rythmSuffix;
+                String name = tmplName + suffix + rythmSuffix;
 
                 tagFile = new File(name);
                 ITemplateResource tr = tagFile.canRead() && !tagFile.isDirectory() ? new FileTemplateResource(tagFile, engine) : new ClasspathTemplateResource(name, engine);
@@ -257,13 +256,15 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                             tc = new TemplateClass(tr, engine);
                         }
                         try {
-                            ITag tag = (ITag) tc.asTemplate();
-                            if (null != tag) {
-                                String fullName = getFullTagName(tc, engine);
-                                tc.setFullName(fullName);
-                                engine.registerTag(fullName, tag);
-                                return tc;
-                            }
+                            tc.asTemplate(); // register the template
+                            return tc;
+//                            ITemplate t = tc.asTemplate();
+//                            if (null != t) {
+//                                String fullName = getFullTagName(tc, engine);
+//                                tc.setFullName(fullName);
+//                                engine.registerTemplate(fullName, t);
+//                                return tc;
+//                            }
                         } catch (Exception e) {
                             return tc;
                         }
@@ -273,6 +274,6 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 }
             }
         }
-        return processTagName ? tryLoadTag(tagNameOrigin, engine, templateClass, false) : null;
+        return processTagName ? tryLoadTemplate(tagNameOrigin, engine, callerClass, false) : null;
     }
 }

@@ -42,12 +42,12 @@ public interface ITemplateResourceLoader {
     /**
      * Try to load a template tag with tag name.
      * 
-     * @param tagName
+     * @param tmplName
      * @param engine
      * @param callerTemplateClass
      * @return template class if found, or <tt>null</tt> if not found
      */
-    TemplateClass tryLoadTag(String tagName, RythmEngine engine, TemplateClass callerTemplateClass);
+    TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerTemplateClass);
 
     /**
      * Return a template's tag name in full notation 
@@ -56,7 +56,7 @@ public interface ITemplateResourceLoader {
      * @param engine
      * @return the tag name
      */
-    String getFullTagName(TemplateClass tc, RythmEngine engine);
+    String getFullName(TemplateClass tc, RythmEngine engine);
 
     /**
      * Scan the folder and try to load all template files under the folder.

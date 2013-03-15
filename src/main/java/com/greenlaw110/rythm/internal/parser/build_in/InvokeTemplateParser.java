@@ -491,7 +491,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
 
             String testTag(String name) {
-                return engine_.testTag(name, ctx().getTemplateClass());
+                return engine_.testTemplate(name, ctx().getTemplateClass());
             }
 
             @Override

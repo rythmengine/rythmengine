@@ -38,6 +38,7 @@ import com.greenlaw110.rythm.internal.parser.build_in.InvokeTemplateParser;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
+import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.template.JavaTagBase;
 import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
@@ -388,15 +389,15 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public String addInclude(String include, int lineNo) {
-        String tagName = engine.testTag(include, templateClass);
-        if (null == tagName) {
+        String tmplName = engine.testTemplate(include, templateClass);
+        if (null == tmplName) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
-        TemplateBase includeTag = (TemplateBase) engine.getTag(tagName);
-        if (includeTag instanceof JavaTagBase) {
+        TemplateBase includeTmpl = (TemplateBase) engine.getRegisteredTemplate(tmplName);
+        if (includeTmpl instanceof JavaTagBase) {
             throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
         }
-        TemplateClass includeTc = includeTag.__getTemplateClass(false);
+        TemplateClass includeTc = includeTmpl.__getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
         merge(includeTc.codeBuilder);
         templateClass.addIncludeTemplateClass(includeTc);
@@ -404,7 +405,7 @@ public class CodeBuilder extends TextBuilder {
     }
     
     public String addInlineInclude(String inlineTemplate, int lineNo) {
-        TemplateClass includeTc = ((TemplateBase) engine.getTemplate(inlineTemplate)).__getTemplateClass(false);
+        TemplateClass includeTc = new TemplateClass(new StringTemplateResource(inlineTemplate), engine, false);
         includeTc.buildSourceCode(includingClassName());
         merge(includeTc.codeBuilder);
         return includeTc.codeBuilder.buildBody;
@@ -421,13 +422,13 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
-        String fullName = engine.testTag(extended, templateClass);
+        String fullName = engine.testTemplate(extended, templateClass);
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
             logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager().getFullTagName(extendedTemplateClass));
         } else {
-            TemplateBase tb = (TemplateBase) engine.getTag(fullName);
+            TemplateBase tb = (TemplateBase) engine.getRegisteredTemplate(fullName);
             TemplateClass tc = tb.__getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;

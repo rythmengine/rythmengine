@@ -133,7 +133,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      */
     protected void __invokeTag(int line, String name) {
-        __engine.invokeTag(line, name, this, null, null, null);
+        __engine.invokeTemplate(line, name, this, null, null, null);
     }
 
     /**
@@ -144,7 +144,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param ignoreNonExistsTag
      */
     protected void __invokeTag(int line, String name, boolean ignoreNonExistsTag) {
-        __engine.invokeTag(line, name, this, null, null, null, ignoreNonExistsTag);
+        __engine.invokeTemplate(line, name, this, null, null, null, ignoreNonExistsTag);
     }
 
     /**
@@ -155,7 +155,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param params
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params) {
-        __engine.invokeTag(line, name, this, params, null, null);
+        __engine.invokeTemplate(line, name, this, params, null, null);
     }
 
     /**
@@ -167,7 +167,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param ignoreNonExistsTag
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params, boolean ignoreNonExistsTag) {
-        __engine.invokeTag(line, name, this, params, null, null, ignoreNonExistsTag);
+        __engine.invokeTemplate(line, name, this, params, null, null, ignoreNonExistsTag);
     }
 
     /**
@@ -179,7 +179,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param body
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body) {
-        __engine.invokeTag(line, name, this, params, body, null);
+        __engine.invokeTemplate(line, name, this, params, body, null);
     }
 
     /**
@@ -192,7 +192,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param ignoreNoExistsTag
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, boolean ignoreNoExistsTag) {
-        __engine.invokeTag(line, name, this, params, body, null, ignoreNoExistsTag);
+        __engine.invokeTemplate(line, name, this, params, body, null, ignoreNoExistsTag);
     }
 
     /**
@@ -205,7 +205,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param context
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context) {
-        __engine.invokeTag(line, name, this, params, body, context);
+        __engine.invokeTemplate(line, name, this, params, body, context);
     }
 
     /**
@@ -219,7 +219,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param ignoreNonExistsTag
      */
     protected void __invokeTag(int line, String name, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
-        __engine.invokeTag(line, name, this, params, body, context, ignoreNonExistsTag);
+        __engine.invokeTemplate(line, name, this, params, body, context, ignoreNonExistsTag);
     }
 
     /* to be used by dynamic generated sub classes */

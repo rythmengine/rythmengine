@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.template.ITag;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.F;
@@ -83,13 +82,13 @@ public class RythmEvents<RETURN, PARAM> implements IEvent<RETURN, PARAM> {
      * Before tag invocation
      */
     public static final
-    IEvent<Void, F.T2<TemplateBase, ITag>> ON_TAG_INVOCATION = new RythmEvents<Void, F.T2<TemplateBase, ITag>>();
+    IEvent<Void, F.T2<TemplateBase, ITemplate>> ON_TAG_INVOCATION = new RythmEvents<Void, F.T2<TemplateBase, ITemplate>>();
 
     /**
      * Before tag invocation
      */
     public static final
-    IEvent<Void, F.T2<TemplateBase, ITag>> TAG_INVOKED = new RythmEvents<Void, F.T2<TemplateBase, ITag>>();
+    IEvent<Void, F.T2<TemplateBase, ITemplate>> TAG_INVOKED = new RythmEvents<Void, F.T2<TemplateBase, ITemplate>>();
 
     /**
      * Render execution exception captured

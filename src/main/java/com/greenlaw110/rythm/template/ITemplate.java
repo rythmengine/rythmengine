@@ -22,6 +22,7 @@ package com.greenlaw110.rythm.template;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ICodeType;
+import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.utils.JSONWrapper;
 
@@ -34,7 +35,7 @@ import java.util.Stack;
 /**
  * Define a template instance API
  */
-public interface ITemplate extends Cloneable {
+public interface ITemplate extends ITag, Cloneable {
 
     /**
      * Return the engine instance that is running this template
@@ -42,6 +43,14 @@ public interface ITemplate extends Cloneable {
      * @return the {@link com.greenlaw110.rythm.RythmEngine engine} instance
      */
     RythmEngine __engine();
+
+    /**
+     * Return the template class of this template instance
+     * 
+     * @param useCaller if set to true then return caller template class if this template has no template class 
+     * @return the template class
+     */
+    TemplateClass __getTemplateClass(boolean useCaller);
 
     /**
      * Set binary output stream to the template instance.

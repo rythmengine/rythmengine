@@ -38,6 +38,10 @@ public class GHIssueTest extends TestBase {
         t = "@args String src;<script src='@src'></script><script src='@src'></script>";
         s = r(t, "/js/abc");
         eq("<script src='/js/abc'></script><script src='/js/abc'></script>");
+        
+        t = "@args models.Foo foo;<script src='@foo.bar()._x()'></script>";
+        s = r(t, new Foo());
+        eq("<script src=''></script>");
     }
     
     @Test

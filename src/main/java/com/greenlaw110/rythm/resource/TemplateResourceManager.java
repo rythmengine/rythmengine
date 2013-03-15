@@ -24,14 +24,14 @@ import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
-import com.greenlaw110.rythm.template.ITag;
-import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,13 +61,13 @@ public class TemplateResourceManager {
         return resource;
     }
 
-    public TemplateClass tryLoadTag(String tagName, TemplateClass tc) {
-        if (null != _resourceLoader) return _resourceLoader.tryLoadTag(tagName, engine, tc);
-        else return FileTemplateResource.tryLoadTag(tagName, engine, tc);
+    public TemplateClass tryLoadTemplate(String tagName, TemplateClass tc) {
+        if (null != _resourceLoader) return _resourceLoader.tryLoadTemplate(tagName, engine, tc);
+        else return FileTemplateResource.tryLoadTemplate(tagName, engine, tc);
     }
 
     public String getFullTagName(TemplateClass tc) {
-        if (null != _resourceLoader) return _resourceLoader.getFullTagName(tc, engine);
+        if (null != _resourceLoader) return _resourceLoader.getFullName(tc, engine);
         else return FileTemplateResource.getFullTagName(tc, engine);
     }
 
@@ -105,13 +105,13 @@ public class TemplateResourceManager {
         TemplateClass tc = engine.classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(resource, engine);
-            engine.classes().add(key, tc);
+            //engine.classes().add(key, tc);
         }
-        ITemplate t = tc.asTemplate();
-        if (null == t) return;
-        String fullTagName = engine.resourceManager().getFullTagName(tc);
-        tc.setFullName(fullTagName);
-        engine.registerTag(fullTagName, (ITag) t);
+        tc.asTemplate();
+//        if (null == t) return;
+//        String fullTagName = engine.resourceManager().getFullTagName(tc);
+//        tc.setFullName(fullTagName);
+//        engine.registerTemplate(fullTagName, t);
     }
 
     private static class ScannerThreadFactory extends RythmThreadFactory {

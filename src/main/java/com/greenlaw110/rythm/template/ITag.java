@@ -19,19 +19,19 @@
 */
 package com.greenlaw110.rythm.template;
 
-import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.internal.TemplateBuilder;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
-import com.greenlaw110.rythm.utils.S;
+import com.greenlaw110.rythm.utils.Escape;
 import com.greenlaw110.rythm.utils.RawData;
+import com.greenlaw110.rythm.utils.S;
 
 import java.util.*;
 
 /**
  * Define a tag interface.
  */
-public interface ITag extends ITemplate {
+public interface ITag {
 
     /**
      * A datastructure to store tag calling parameter
@@ -278,6 +278,13 @@ public interface ITag extends ITemplate {
      * @return tag name
      */
     String __getName();
+
+    /**
+     * Set body context and return this tag
+     * @param body
+     * @return this tag
+     */
+    public ITag __setBodyContext(__Body body);
 
     /**
      * Call this tag

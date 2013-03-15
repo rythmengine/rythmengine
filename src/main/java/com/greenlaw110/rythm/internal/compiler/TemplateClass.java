@@ -32,6 +32,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
 import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.TagBase;
 import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.utils.S;
 
@@ -347,7 +348,7 @@ public class TemplateClass {
         return c;
     }
 
-    private static final ITemplate NULL_TEMPLATE = new TemplateBase() {
+    private static final ITemplate NULL_TEMPLATE = new TagBase() {
         @Override
         public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
             return null;
@@ -370,14 +371,16 @@ public class TemplateClass {
             }
         }
         templateInstance.__setTemplateClass(this, type, locale);
-        if (!engine().isProdMode()) {
+        RythmEngine engine = engine();
+        if (!engine.isProdMode()) {
             // check parent class change
             Class<?> c = templateInstance.getClass();
             Class<?> pc = c.getSuperclass();
             if (null != pc && !Modifier.isAbstract(pc.getModifiers())) {
-                engine().classes().getByClassName(pc.getName());
+                engine.classes().getByClassName(pc.getName());
             }
         }
+        engine.registerTemplate(templateInstance);
         return templateInstance;
     }
 
@@ -503,7 +506,7 @@ public class TemplateClass {
                     name += ParamTypeInferencer.uuid();
                 }
                 //name = templateResource.getSuggestedClassName();
-                engine.classes().add(this);
+                engine.registerTemplateClass(this);
             }
 
             if (null == javaSource) {
@@ -537,12 +540,12 @@ public class TemplateClass {
                 for (String tcName : includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;
                     tcName = tcName.trim();
-                    String fullName = engine().testTag(tcName, this);
+                    String fullName = engine().testTemplate(tcName, this);
                     if (null == fullName) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;
                     }
-                    TemplateClass tc = engine().getTemplateClassFromTagName(fullName);
+                    TemplateClass tc = engine().getRegisteredTemplateClass(fullName);
                     if (null == tc) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;

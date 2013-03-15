@@ -25,7 +25,6 @@ import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.S;
-import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.Map;
 
@@ -86,7 +85,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
         super.__setRenderArg(name, arg);
     }
 
-    public TextBuilder setBodyContext(__Body body) {
+    @Override
+    public ITag __setBodyContext(__Body body) {
         this.__context = body;
         return this;
     }
