@@ -33,6 +33,7 @@ public class ForEachCodeToken extends BlockCodeToken {
     private String type;
     private String varname;
     private String iterable;
+    private String joinSep;
 //    private int openPos;
 //    private int closePos;
 
@@ -46,9 +47,10 @@ public class ForEachCodeToken extends BlockCodeToken {
      * |     |       |        |
      * type varname  iterable endloop
      */
-    public ForEachCodeToken(String type, String varname, String iterable, IContext context, int lineNo) {
+    public ForEachCodeToken(String type, String varname, String iterable, IContext context, int lineNo, String joinSep) {
         super(null, context);
         line = lineNo;
+        this.joinSep = joinSep;
         if (null == iterable) throw new NullPointerException();
         iterable = iterable.trim();
         iterable = ExpressionParser.processPositionPlaceHolder(iterable);
@@ -143,7 +145,11 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("for(").p("?".equals(type) ? "java.lang.Object" : type).p(" ").p(varname).p(" : ").p(varItr).p(") {");
         pline();
-        p(varId).p("++;");
+        if (null != joinSep) {
+            p("if (").p(varId).p("++ > 0) p(").p(joinSep).p(");");
+        } else {
+            p(varId).p("++;");
+        }
         pline();
         p("boolean ").p(varIsOdd).p(" = ").p(varId).p(" % 2 == 1;");
         pline();

@@ -349,6 +349,25 @@ public class ForParserTest extends TestBase {
         s = r(t, from(p("items", Collections.EMPTY_LIST)));
         eq("");
     }
+    
+    @Test
+    public void testJoin() {
+        t = "@for (int i = 0; i < 5; ++i).join('\n') {@i}";
+        s = r(t);
+        assertEquals("0\n1\n2\n3\n4", s);
+
+        t = "@for(items).join('\n'){@_}";
+        s = r(t, from(p("items", new Integer[]{1,2})));
+        eq("1\n2");
+        
+        t = "@for(1..5).join(){@_}";
+        s = r(t);
+        eq("1,2,3,4");
+        
+        t = "@for(1..5).join(@1){@_}";
+        s = r(t, "|");
+        eq("1|2|3|4");
+    }
 
     public static void main(String[] args) {
         run(ForParserTest.class);

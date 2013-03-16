@@ -63,11 +63,31 @@ public class ForEachParser extends KeywordParserFactory {
                 }
                 step(matched.length());
                 String s = r.stringMatched(2);
+                String sep = r.stringMatched(4);
+                if (!S.empty(sep)) {
+                    sep = sep.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+                    sep = S.stripBrace(sep).trim();
+                    boolean hasQuotation = sep.startsWith("'");
+                    if (hasQuotation) {
+                        sep = S.strip(sep, "'", "'");
+                        sep = "\"" + sep + "\"";
+                    }
+                    if ("".equals(sep)) sep = "\",\"";
+                    else sep = ExpressionParser.processPositionPlaceHolder(sep);
+                }
+                final String separator = sep;
                 if (s.contains(";")) {
                     if (!ctx().getDialect().enableFreeForLoop()) {
                         throw new TemplateParser.NoFreeLoopException(ctx());
                     }
-                    return new BlockCodeToken("for " + s + "{ //line: " + lineNo + "\n\t", ctx()) {
+                    String s1 = "for ";
+                    String s2 = "{ //line: " + lineNo + "\n\t";
+                    if (null != sep) {
+                        String varCursor = ctx.getCodeBuilder().newVarName();
+                        s1 = "int " + varCursor + " = 0;//line: " + lineNo + "\nfor ";
+                        s2 = s2 + "if (" + varCursor + "++ > 0) p(" + separator + "); //line: " + lineNo + "\n\t"; 
+                    }
+                    return new BlockCodeToken(s1 + s + s2, ctx()) {
                         @Override
                         public void openBlock() {
                             ctx().pushBreak(IContext.Break.BREAK);
@@ -115,7 +135,7 @@ public class ForEachParser extends KeywordParserFactory {
                             varname = s1;
                         }
                     }
-                    return new ForEachCodeToken(type, varname, iterable, ctx(), lineNo);
+                    return new ForEachCodeToken(type, varname, iterable, ctx(), lineNo, separator);
                 }
             }
         };
@@ -128,7 +148,7 @@ public class ForEachParser extends KeywordParserFactory {
 
     // match for(int i=0; i<100;++i) {
     protected String patternStr2() {
-        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)";
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))(\\.join((?@())))?([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)";
     }
 
     @Override

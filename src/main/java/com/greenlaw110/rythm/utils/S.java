@@ -499,6 +499,25 @@ public class S {
 
     /**
      * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
+     * an object with Java escaping
+     * <p/>
+     * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
+     * <p/>
+     * <p>After the object get escaped, the output string is safe to put inside a pair of
+     * Java quotation marks</p>
+     *
+     * @param o
+     * @return Java escaped data
+     */
+    public static RawData escapeJava(Object o) {
+        if (null == o) return RawData.NULL;
+        if (o instanceof RawData)
+            return (RawData) o;
+        return new RawData(StringEscapeUtils.escapeJava(o.toString()));
+    }
+
+    /**
+     * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
      * an object with XML escaping
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
@@ -1173,5 +1192,46 @@ public class S {
      */
     public static String random() {
         return random(8);
+    }
+
+    /**
+     * Join items in an {@link java.lang.Iterable iterable} with ","
+     * 
+     * @param itr
+     * @return joined String
+     */
+    @Transformer
+    public static String join(Iterable itr) {
+        return join(itr, ",");
+    }
+    
+    /**
+     * Join an {@link java.lang.Iterable iterable} with separator
+     * 
+     * @param itr
+     * @param sep
+     * @return the String joined
+     */
+    @Transformer
+    public static String join(Iterable itr, String sep) {
+        StringBuilder sb = new StringBuilder();
+        Iterator i = itr.iterator();
+        if (!i.hasNext()) return "";
+        sb.append(i.next());
+        while (i.hasNext()) {
+            sb.append(sep);
+            sb.append(i.next());
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Join an {@link java.lang.Iterable iterable} with a char separator
+     * @param itr
+     * @param sep
+     * @return joined string
+     */
+    public static String join(Iterable itr, char sep) {
+        return join(itr, String.valueOf(sep));
     }
 }

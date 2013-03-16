@@ -25,7 +25,9 @@ import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.utils.S;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @Transformer
 public class TransformerTest extends TestBase {
@@ -47,7 +49,8 @@ public class TransformerTest extends TestBase {
     @Test
     public void testBuiltInTranformers() {
         System.setProperty("feature.type_inference.enabled", "true");
-        String p, s;
+        Rythm.shutdown();
+        String p;
 
         // raw
         p = "<h1>h1</h1>";
@@ -84,6 +87,20 @@ public class TransformerTest extends TestBase {
         Date d = new Date();
         s = Rythm.render("@1.format(\"dd/MM/yyyy\")", d);
         assertEquals(S.format(d, "dd/MM/yyyy"), s);
+        
+    }
+    
+    @Test
+    public void testJoin() {
+        System.setProperty("feature.type_inference.enabled", "true");
+        Rythm.shutdown();
+        List l = Arrays.asList(new Integer[]{1, 2, 3});
+        s = r("@1.join()", l);
+        eq("1,2,3");
+        s = r("@1.join(\";\")", l);
+        eq("1;2;3");
+        s = r("@1.join(':')", l);
+        eq("1:2:3");
     }
 
     @Test
