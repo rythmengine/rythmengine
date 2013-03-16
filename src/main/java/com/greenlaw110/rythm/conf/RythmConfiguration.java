@@ -210,7 +210,14 @@ public class RythmConfiguration {
         if (null == _restrictedClasses) {
             String s = get(SANDBOX_RESTRICTED_CLASS);
             s += ";com.greenlaw110.rythm.Rythm;com.greenlaw110.rythm.RythmEngine;java.io;java.nio;java.security;java.rmi;java.net;java.awt;java.applet";
-            _restrictedClasses = new HashSet<String>(Arrays.asList(s.split(";")));
+            _restrictedClasses = new HashSet<String>();
+            for (String cls : Arrays.asList(s.split(";"))) {
+                cls = cls.trim();
+                if ("".equals(cls)) {
+                    continue;
+                }
+                _restrictedClasses.add(cls);
+            }
         }
         return new HashSet<String>(_restrictedClasses);
     }

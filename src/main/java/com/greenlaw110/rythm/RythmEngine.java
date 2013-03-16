@@ -586,7 +586,9 @@ public class RythmEngine implements IEventDispatcher {
     -------------------------------------------------------------------------------*/
 
     private void setRenderArgs(ITemplate t, Object... args) {
-        if (1 == args.length) {
+        if (null == args) {
+            t.__setRenderArg(0, null);
+        } else if (1 == args.length) {
             Object o0 = args[0];
             if (o0 instanceof Map) {
                 t.__setRenderArgs((Map<String, Object>) args[0]);

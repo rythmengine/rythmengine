@@ -11,4 +11,12 @@ public class Foo {
     public Bar bar() {
         return new Bar();
     }
+    
+    public Bar bar(String b) {
+        return new Bar(b);
+    }    
+    
+    public Bar bar(Bar b) {
+        return new Bar(b.toString());
+    }
 }

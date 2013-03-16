@@ -160,6 +160,20 @@ public class ExpressionTest extends TestBase {
 //        eq("nullbar");
     }
     
+//    @Test
+//    public void testNullSafeExpressionInsideTagParams() {
+//        t = "@args models.Bar bar;@bar?._()";
+//        s = r(t, null);
+//        eq("");
+//
+//        t = "@args models.Foo foo, models.Bar bar;@foo.bar(bar?._())";
+//        s = r(t, from(p("foo", new Foo()), p("bar", new Bar("rab"))));
+//        eq("rab");
+//        
+//        s = r(t, from(p("foo", new Foo()), p("bar", null)));
+//        eq("");
+//    }
+    
     @Test
     public void testEscape() {
         t = "@1";
