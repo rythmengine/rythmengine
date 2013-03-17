@@ -91,14 +91,14 @@ public class ExtendsParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "(^%s%s)\\s*((?@())[\\s\\r\\n;]*)";
+        return "(^\\n?[ \\t\\x0B\\f]*%s%s)\\s*((?@())[\\s\\r\\n;]*)";
     }
 
     protected static Regex innerPattern = new Regex("\\((.*?)\\s*(,\\s*(.*))?\\)");
     protected static Regex argsPattern = new Regex("\\G(,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))");
 
     protected String patternStr0() {
-        return "(%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
+        return "(\\n?[ \\t\\x0B\\f]*%s%s(\\s*\\((.*)\\)|\\s+([_a-zA-Z\\\\\\\\/][a-zA-Z0-9_\\.\\\\\\\\/]+))[;]?)";
     }
 
 }

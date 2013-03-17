@@ -134,7 +134,7 @@ public class ExpressionTest extends TestBase {
     }
 
     @Test
-    public void testElvs() {
+    public void testElvis() {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
         t = "@args String s\n@(s?:\"foo\")";
         s = r(t, from(p("s", null)));
@@ -144,7 +144,7 @@ public class ExpressionTest extends TestBase {
         t = "@(d.nullMe()?:\"boo\")";
         s = r(t, from(p("d", d)));
         eq("boo");
-
+        
         t = "@args com.greenlaw110.rythm.essential.ExpressionTest.Data d\n@(d.nullMe()?:new com.greenlaw110.rythm.essential.ExpressionTest.Data())";
         s = r(t, from(p("d", d)));
         eq("nullbar");

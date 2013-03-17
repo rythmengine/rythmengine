@@ -76,8 +76,9 @@ public class EscapeParserTest extends TestBase {
         t = "@escape()@1@";
         s = r(t, "<h1>h1</h1>");
         eq("&lt;h1&gt;h1&lt;/h1&gt;");
+        
     }
-
+    
     public static void main(String[] args) {
         run(EscapeParserTest.class);
     }

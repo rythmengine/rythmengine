@@ -89,7 +89,7 @@ public class SectionParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         //return "(%s%s[\\s]+([a-zA-Z][a-zA-Z0-9_]+)[\\s\\r\\n\\{]*).*";
-        return "%s%s\\s*((?@()))[\\s]*\\{?\\s*";
+        return "\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))[\\s]*\\{?";
     }
 
 }

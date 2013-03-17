@@ -22,7 +22,6 @@ package com.greenlaw110.rythm.internal.parser.build_in;
 import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Keyword;
-import com.greenlaw110.rythm.internal.dialect.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import com.greenlaw110.rythm.utils.TextBuilder;
@@ -53,14 +52,7 @@ public class NoSIMParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(%s%s(?@())?)\\s+";
-    }
-
-    public static void main(String[] args) {
-        Regex r = new NoSIMParser().reg(Rythm.INSTANCE);
-        if (r.search("@nosim() ad")) {
-            p(r, 3);
-        }
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s(?@())?)\\s+";
     }
 
 }
