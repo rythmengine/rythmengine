@@ -1,10 +1,13 @@
 package com.greenlaw110.rythm.issue;
 
+import models.Foo;
+import models.License;
+
+import org.junit.Test;
+
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.extension.ICodeType;
-import models.Foo;
-import org.junit.Test;
 
 /**
  * Test Github Issues
@@ -49,6 +52,24 @@ public class GHIssueTest extends TestBase {
         t = "@args models.Foo foo;@foo.bar()._x()";
         s = r(t, new Foo());
         eq("");
+    }
+    
+    @Test
+    public void test124() {
+        t = "@args models.License license;@license.getLicense_type()";
+        License license = new License();
+        license.setLicense_type("1");
+		s = r(t, license);
+        eq("1");
+    }
+    
+    @Test
+    public void test125() {
+        t = "@args models.License license;@license.license_type";
+        License license = new License();
+        license.setLicense_type("1");
+		s = r(t, license);
+        eq("1");
     }
     
     public static void main(String[] args) {
