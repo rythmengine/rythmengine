@@ -34,6 +34,13 @@ public class JSONParameterTest extends TestBase {
     }
     
     @Test
+    public void testSimple() {
+        t = "@args String name;hello @name";
+        s = r(t, JSONWrapper.wrap("{\"name\":\"world\"}"));
+        eq("hello world");
+    }
+    
+    @Test
     public void testArray() {
         t = "@args List<com.greenlaw110.rythm.advanced.JSONParameterTest.User> users\n<ul>@for(users){\n@_.name: @_.age\n}</ul>";
         String params = "{users: [{\"name\":\"Tom\", \"age\": 12}, {\"name\":\"Peter\", \"age\": 11}]}";

@@ -116,7 +116,7 @@ public class ParamTypeInferencer {
     public static void registerParams(RythmEngine engine, Object... args) {
         if (!engine.conf().typeInferenceEnabled()) return;
 
-        if (args.length == 0) return;
+        if (null == args || args.length == 0) return;
 
         Map<String, String> tMap = typeMap.get();
         tMap.clear();

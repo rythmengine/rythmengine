@@ -368,6 +368,13 @@ public class ForParserTest extends TestBase {
         s = r(t, "|");
         eq("1|2|3|4");
     }
+    
+//    @Test
+//    public void testNullCollection() {
+//        t = "@args List<String> l;@for(l).join(){@_}";
+//        s = r(t, null);
+//        eq("");
+//    }
 
     public static void main(String[] args) {
         run(ForParserTest.class);

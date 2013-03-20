@@ -823,7 +823,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     Class c0 = typeMap.get(vn + "__0");
                     p = JSON.parseArray(o.toString(), c0);
                 } else {
-                    p = JSON.parseObject(o.toString(), c);
+                    String s = o.toString();
+                    if (String.class.equals(c)) {
+                        s = "\"" + s + "\"";
+                    }
+                    p = JSON.parseObject(s, c);
                 }
                 __setRenderArg(nm, p);
             }
