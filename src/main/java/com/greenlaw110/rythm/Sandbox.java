@@ -20,7 +20,6 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
-import com.greenlaw110.rythm.template.ITemplate;
 
 import java.io.File;
 
@@ -55,11 +54,9 @@ public class Sandbox {
     }
 
     public String render(String template, Object... args) {
-        RythmEngine eng = engine();
         sandboxMode.set(true);
         try {
-            ITemplate t = engine().getTemplate(template, args);
-            return secureExecutor.execute(t);
+            return secureExecutor.execute(template, args);
         } finally {
             sandboxMode.set(false);
         }
@@ -68,8 +65,7 @@ public class Sandbox {
     public String render(File file, Object... args) {
         sandboxMode.set(true);
         try {
-            ITemplate t = engine().getTemplate(file, args);
-            return secureExecutor.execute(t);
+            return secureExecutor.execute(file, args);
         } finally {
             sandboxMode.set(false);
         }

@@ -604,7 +604,21 @@ public enum RythmConfigurationKey {
      * </ul>
      * <code>Default value: <code>""</code></code>
      */
-    SANDBOX_RESTRICTED_CLASS("sandbox.restricted_class", "");
+    SANDBOX_RESTRICTED_CLASS("sandbox.restricted_class", ""),
+
+    /**
+     * "sandbox.allowed_system_properties": Set allowed system properties in string separated by <tt>,</tt>. 
+     * 
+     * By default the following properties are allowed to access by sandbox thread
+     * <ul>
+     * <li><code>user.dir</code></li>
+     * <li><code>line.separator</code></li>
+     * <li>java.vm.name</li>
+     * <li>java.protocol.handler.pkgs</li>
+     * </ul>
+     */
+    SANDBOX_ALLOWED_SYSTEM_PROPERTIES("sandbox.allowed_system_properties", 
+        "user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs");
 
     private String key;
     private Object defVal;

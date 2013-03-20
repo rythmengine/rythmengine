@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.internal.parser.toString;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
@@ -33,7 +32,7 @@ import com.greenlaw110.rythm.utils.TextBuilder;
 public class AppendFieldToken extends CodeToken {
 
     private static String getCode(String fieldName, String expression) {
-        return Rythm.render("__style.append(buffer(), \"@fieldName\", _.@expression, null);", fieldName, expression);
+        return String.format("__style.append(buffer(), \"%s\", _.%s, null);", fieldName, expression);
     }
 
     public AppendFieldToken(String fieldName, String expression, TextBuilder caller) {

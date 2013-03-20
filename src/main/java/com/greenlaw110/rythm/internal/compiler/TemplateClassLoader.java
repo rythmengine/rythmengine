@@ -259,7 +259,7 @@ public class TemplateClassLoader extends ClassLoader {
         }
 
         // Delegate to the classic classloader
-        boolean unlockSM = engine.isDevMode() && null != rsm;
+        boolean unlockSM = /*engine.isDevMode() && */null != rsm;
         try {
             // release sandbox password if running inside sandbox in order to load 
             // application classes when running is dev mode

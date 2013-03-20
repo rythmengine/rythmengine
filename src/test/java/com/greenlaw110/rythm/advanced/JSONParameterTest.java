@@ -38,14 +38,18 @@ public class JSONParameterTest extends TestBase {
         t = "@args String name;hello @name";
         s = r(t, JSONWrapper.wrap("{\"name\":\"world\"}"));
         eq("hello world");
+        
+        String s0 = "{\"name\":\"\\\"world\\\"\"}";
+        s = r(t, JSONWrapper.wrap(s0));
+        eq("hello \"world\"");
     }
     
     @Test
     public void testArray() {
         t = "@args List<com.greenlaw110.rythm.advanced.JSONParameterTest.User> users\n<ul>@for(users){\n@_.name: @_.age\n}</ul>";
-        String params = "{users: [{\"name\":\"Tom\", \"age\": 12}, {\"name\":\"Peter\", \"age\": 11}]}";
+        String params = "{users: [{\"name\":\"\\\"Tom\\\"\", \"age\": 12}, {\"name\":\"Peter\", \"age\": 11}]}";
         s = r(t, JSONWrapper.wrap(params));
-        eq("<ul>\nTom: 12\nPeter: 11\n</ul>");
+        eq("<ul>\n\"Tom\": 12\nPeter: 11\n</ul>");
     }
     
     @Test

@@ -452,7 +452,7 @@ public class CodeBuilder extends TextBuilder {
             if (-1 != pos) extended = me.substring(0, pos) + "/" + extended;
             tc = engine.classes().getByTemplate(extended);
             if (null == tc) {
-                ITemplateResource resource = engine.resourceManager().getFileResource(extended);
+                ITemplateResource resource = engine.resourceManager().getResource(extended);
                 if (resource.isValid()) tc = new TemplateClass(resource, engine);
             }
         }
@@ -464,7 +464,7 @@ public class CodeBuilder extends TextBuilder {
         if (null == tc) {
             tc = engine.classes().getByTemplate(origin);
             if (null == tc) {
-                ITemplateResource resource = engine.resourceManager().getFileResource(origin);
+                ITemplateResource resource = engine.resourceManager().getResource(origin);
                 if (resource.isValid()) tc = new TemplateClass(resource, engine);
             }
         }

@@ -819,15 +819,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 Object p;
                 if (o instanceof List) {
                     Map<String, Class> typeMap = __renderArgTypeMap();
-                    String vn = __renderArgName(0);
-                    Class c0 = typeMap.get(vn + "__0");
+                    //String vn = nm;
+                    Class c0 = typeMap.get(nm + "__0");
                     p = JSON.parseArray(o.toString(), c0);
                 } else {
                     String s = o.toString();
                     if (String.class.equals(c)) {
-                        s = "\"" + s + "\"";
+                        p = s;
+                    } else {
+                        p = JSON.parseObject(s, c);
                     }
-                    p = JSON.parseObject(s, c);
                 }
                 __setRenderArg(nm, p);
             }

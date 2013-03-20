@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.sandbox;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 import com.greenlaw110.rythm.internal.compiler.TemplateClassLoader;
 
@@ -31,11 +32,11 @@ class SandboxThreadFactory extends RythmThreadFactory {
     private SecurityManager sm;
     private String password = null;
 
-    public SandboxThreadFactory(SecurityManager sm) {
+    public SandboxThreadFactory(SecurityManager sm, RythmEngine re) {
         super("rythm-executor");
         if (null == sm) {
             String pass = UUID.randomUUID().toString();
-            sm = new RythmSecurityManager(System.getSecurityManager(), pass);
+            sm = new RythmSecurityManager(System.getSecurityManager(), pass, re);
             password = pass;
         }
         this.sm = sm;

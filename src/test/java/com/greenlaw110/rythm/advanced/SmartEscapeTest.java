@@ -21,9 +21,13 @@ package com.greenlaw110.rythm.advanced;
 
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
-import static com.greenlaw110.rythm.conf.RythmConfigurationKey.*;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.ICodeType;
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.FEATURE_SMART_ESCAPE_ENABLED;
+import static com.greenlaw110.rythm.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 
 /**
  * Test Smart Escape feature
@@ -34,6 +38,7 @@ public class SmartEscapeTest extends TestBase {
     public void setup() {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
         System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
+        System.getProperties().put(RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.HTML);
     }
     
     @Test

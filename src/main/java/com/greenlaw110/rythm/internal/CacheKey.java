@@ -1,6 +1,5 @@
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.template.ITemplate;
 import com.greenlaw110.rythm.utils.I18N;
@@ -24,10 +23,10 @@ public class CacheKey {
         if (null == locale) {
             locale = I18N.locale();
         }
-        return Rythm.substitute("@1-i18nM-@2-@3-@4", key, locale, useFormat, template.__engine());
+        return String.format("%s-i18nM-%s-%s-%s", key, locale, useFormat, template.__engine());
     }
     
     public static String i18nBundle(RythmEngine engine, Locale locale) {
-        return Rythm.substitute("i18nB-@1-@2", locale, engine);
+        return String.format("i18nB-%s-%s", locale, engine);
     }
 }

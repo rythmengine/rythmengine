@@ -61,7 +61,7 @@ public class AutoToString extends ToString {
     }
 
     public static String templateStr(Class<?> c, ToStringOption o, ToStringStyle s) {
-        return com.greenlaw110.rythm.Rythm.render("{class: @c; toStringOption: @o; toStringStyle: @s}", null == c ? "" : c.getName(), o.toString(), s.toString());
+        return String.format("{class: %s; toStringOption: %s; toStringStyle: %s}", null == c ? "" : c.getName(), o.toString(), s.toString());
     }
 
     public static class AutoToStringData {

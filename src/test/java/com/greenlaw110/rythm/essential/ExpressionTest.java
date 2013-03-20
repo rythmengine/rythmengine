@@ -20,6 +20,8 @@
 package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
+import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.ICodeType;
 import org.junit.Test;
 
 import java.util.Date;
@@ -176,6 +178,7 @@ public class ExpressionTest extends TestBase {
     
     @Test
     public void testEscape() {
+        System.getProperties().put(RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.HTML);
         t = "@1";
         s = r(t, "<h1>x</h1>");
         eq("&lt;h1&gt;x&lt;/h1&gt;");

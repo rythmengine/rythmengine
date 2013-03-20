@@ -19,8 +19,6 @@
 */
 package com.greenlaw110.rythm.internal;
 
-import com.greenlaw110.rythm.Rythm;
-
 import java.util.regex.Pattern;
 
 /**
@@ -75,11 +73,11 @@ public interface IJavaExtension {
 
         @Override
         public String extend(String s, String signature) {
-            String ptn = "@raw(){@(1)(@2)}";
+            String ptn = "%s(%s)";
             if (requireTemplate) {
-                ptn = "@raw(){@(1)(this, @2)}";
+                ptn = "%s(this, %s)";
             }
-            return Rythm.substitute(ptn, fullMethodName, s);
+            return String.format(ptn, fullMethodName, s);
         }
 
         @Override
@@ -120,11 +118,11 @@ public interface IJavaExtension {
 
         @Override
         public String extend(String s, String signature) {
-            String ptn = "@raw(){@(1)(@2, @3)}";
+            String ptn = "%s(%s, %s)";
             if (requireTemplate) {
-                ptn = "@raw(){@(1)(this, @2, @3)}";
+                ptn = "%s(this, %s, %s)";
             }
-            return Rythm.substitute(ptn, fullMethodName, s, signature);
+            return String.format(ptn, fullMethodName, s, signature);
         }
 
         @Override

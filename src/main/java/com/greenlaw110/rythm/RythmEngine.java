@@ -909,7 +909,7 @@ public class RythmEngine implements IEventDispatcher {
         if (typeInferenceEnabled) {
             key += ParamTypeInferencer.uuid();
         }
-        TemplateClass tc = classes().getByTemplate(key);
+        TemplateClass tc = classes().getByTemplate(key, false);
         if (null == tc) {
             tc = new TemplateClass(new StringTemplateResource(template), this);
             //classes().add(key, tc);
@@ -1043,7 +1043,7 @@ public class RythmEngine implements IEventDispatcher {
                 public void run() {
                     List<String> toBeRemoved = new ArrayList<String>();
                     for (String template : nonExistsTemplates) {
-                        ITemplateResource rsrc = resourceManager().getFileResource(template);
+                        ITemplateResource rsrc = resourceManager().getResource(template);
                         if (rsrc.isValid()) {
                             toBeRemoved.add(template);
                         }
@@ -1087,7 +1087,7 @@ public class RythmEngine implements IEventDispatcher {
 
         TemplateClass tc = classes().getByTemplate(template);
         if (null == tc) {
-            ITemplateResource rsrc = resourceManager().getFileResource(template);
+            ITemplateResource rsrc = resourceManager().getResource(template);
             if (rsrc.isValid()) {
                 tc = new TemplateClass(rsrc, this);
                 //classes().add(key, tc);
@@ -1517,7 +1517,7 @@ public class RythmEngine implements IEventDispatcher {
             int poolSize = (Integer) conf().get(RythmConfigurationKey.SANDBOX_POOL_SIZE);
             SecurityManager sm = conf().get(RythmConfigurationKey.SANDBOX_SECURITY_MANAGER_IMPL);
             int timeout = (Integer) conf().get(RythmConfigurationKey.SANDBOX_TIMEOUT);
-            _secureExecutor = new SandboxExecutingService(poolSize, sm, timeout);
+            _secureExecutor = new SandboxExecutingService(poolSize, sm, timeout, this);
         }
         return _secureExecutor;
     }

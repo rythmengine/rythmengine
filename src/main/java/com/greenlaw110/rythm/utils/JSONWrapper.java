@@ -92,6 +92,9 @@ public class JSONWrapper {
      * @return JSON wrapper of the string
      */
     public static JSONWrapper wrap(String s) {
+        if (S.empty(s)) {
+            return null;
+        }
         return new JSONWrapper(s);
     }
 }

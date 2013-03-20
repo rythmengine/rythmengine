@@ -19,7 +19,6 @@
 */
 package com.greenlaw110.rythm.template;
 
-import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.IEvent;
 import com.greenlaw110.rythm.logger.ILogger;
@@ -142,6 +141,6 @@ public abstract class TagBase extends TemplateBase implements ITag {
     }
 
     public String __str() {
-        return Rythm.renderStr("@args com.greenlaw110.rythm.template.ITag tag; Tag[tag.__getName()|tag.getClass()]", this);
+        return String.format("Tag[%s|%s]", this.__getName(), this.getClass());
     }
 }

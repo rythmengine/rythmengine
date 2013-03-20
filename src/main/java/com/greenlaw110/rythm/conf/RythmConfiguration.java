@@ -478,6 +478,14 @@ public class RythmConfiguration {
         return _suffix;
     }
     
+    private String _allowedSysProps = null;
+    public String allowedSystemProperties() {
+        if (null == _allowedSysProps) {
+            _allowedSysProps = get(SANDBOX_ALLOWED_SYSTEM_PROPERTIES);
+        }
+        return _allowedSysProps;
+    }
+    
 
     public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 
     

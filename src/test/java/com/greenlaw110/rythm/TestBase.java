@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm;
 
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -59,6 +60,7 @@ public abstract class TestBase extends Assert {
         System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
         System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
         System.setProperty("line.separator", "\n");
+        System.getProperties().put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
         t = null;
         s = null;
     }
