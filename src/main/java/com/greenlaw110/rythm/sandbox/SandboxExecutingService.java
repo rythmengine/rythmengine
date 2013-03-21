@@ -25,6 +25,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.template.ITemplate;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -43,11 +44,12 @@ public class SandboxExecutingService {
         engine = re;
     }
 
-    private Future<Object> exec(final ITemplate tmpl, final String template, final File file, final Object... args) {
+    private Future<Object> exec(final Map<String, Object> userCtx, final ITemplate tmpl, final String template, final File file, final Object... args) {
         return scheduler.submit(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
                 try {
+                    engine.prepare(userCtx);
                     ITemplate t = tmpl;
                     if (null != t) {
                     } else if (null != template) {
@@ -65,11 +67,11 @@ public class SandboxExecutingService {
         });
     }
     
-    public String execute(File template, Object ... args) {
+    public String execute(Map<String, Object> context, File template, Object ... args) {
         if (null == template) throw new NullPointerException();
         Future<Object> f = null;
         try {
-            f = exec(null, null, template, args);
+            f = exec(context, null, null, template, args);
             Object o = f.get(timeout, TimeUnit.MILLISECONDS);
             if (o instanceof RuntimeException) throw (RuntimeException) o;
             if (o instanceof Exchanger) throw new RuntimeException((Exception) o);
@@ -83,11 +85,11 @@ public class SandboxExecutingService {
         }
     }
 
-    public String execute(String template, Object... args) {
+    public String execute(Map<String, Object> context, String template, Object... args) {
         if (null == template) throw new NullPointerException();
         Future<Object> f = null;
         try {
-            f = exec(null, template, null, args);
+            f = exec(context, null, template, null, args);
             Object o = f.get(timeout, TimeUnit.MILLISECONDS);
             if (o instanceof RuntimeException) throw (RuntimeException) o;
             if (o instanceof Exchanger) throw new RuntimeException((Exception) o);
@@ -103,7 +105,7 @@ public class SandboxExecutingService {
 
 
     public Future<Object> executeAsync(final ITemplate t) {
-        final Future<Object> f = exec(t, null, null, null);
+        final Future<Object> f = exec(null, t, null, null, null);
         // make sure it get cancelled if timeout
         scheduler.schedule(new Runnable() {
             @Override

@@ -73,15 +73,17 @@ public abstract class TagBase extends TemplateBase implements ITag {
     }
 
     @Override
-    public void __setRenderArgs(Map<String, Object> args) {
+    public ITemplate __setRenderArgs(Map<String, Object> args) {
         super.__setRenderArgs(args);
         if (args.containsKey("__body")) setBody((__Body) args.get("__body"));
+        return this;
     }
 
     @Override
-    public void __setRenderArg(String name, Object arg) {
+    public ITemplate __setRenderArg(String name, Object arg) {
         if ("__body".equals(name)) setBody((__Body) arg);
         super.__setRenderArg(name, arg);
+        return this;
     }
 
     @Override

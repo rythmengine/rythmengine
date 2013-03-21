@@ -94,20 +94,24 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     private Writer w;
     private OutputStream os;
 
-    public void __setWriter(Writer writer) {
+    @Override
+    public ITemplate __setWriter(Writer writer) {
         if (null == writer) throw new NullPointerException();
         if (null != os) throw new IllegalStateException("Cannot set writer to template when outputstream is presented");
         if (null != this.w)
             throw new IllegalStateException("Cannot set writer to template when an writer is presented");
         this.w = writer;
+        return this;
     }
 
-    public void __setOutputStream(OutputStream os) {
+    @Override
+    public ITemplate __setOutputStream(OutputStream os) {
         if (null == os) throw new NullPointerException();
         if (null != w) throw new IllegalStateException("Cannot set output stream to template when writer is presented");
         if (null != this.os)
             throw new IllegalStateException("Cannot set output stream to template when an outputstream is presented");
         this.os = os;
+        return this;
     }
 
     /**
@@ -437,6 +441,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             tmpl.__caller = (TextBuilder) caller;
             tmpl.__setRenderArgs(((TemplateBase)caller).__renderArgs);
         }
+        tmpl.__setUserContext(engine.renderSettings.userContext());
         return tmpl;
     }
 
@@ -745,6 +750,17 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public TextBuilder build() {
         return this;
     }
+    
+    private Map<String, Object> userCtx;
+    @Override
+    public Map<String, Object> __getUserContext() {
+        return null == userCtx ? Collections.EMPTY_MAP : userCtx;
+    }
+    @Override
+    public ITemplate __setUserContext(Map<String, Object> context) {
+        this.userCtx = context;
+        return this;
+    }
 
     /**
      * Return render arg type in array. Not to be used in user application or template
@@ -772,17 +788,19 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    public void __setRenderArgs(Map<String, Object> args) {
+    public ITemplate __setRenderArgs(Map<String, Object> args) {
         __renderArgs.putAll(args);
+        return this;
     }
 
     @Override
-    public void __setRenderArg(JSONWrapper jsonData) {
+    public ITemplate __setRenderArg(JSONWrapper jsonData) {
         if (jsonData.isArray()) {
             setJSONArray(jsonData.getArray());
         } else {
             setJSONObject(jsonData.getObject());
         }
+        return this;
     }
 
     private void setJSONArray(List<Object> jsonArray) {
@@ -840,22 +858,26 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * Not to be used in user application or template
      *
      * @param params
+     * @return this template instance
      */
-    protected void __setRenderArgs0(ITag.__ParameterList params) {
+    protected TemplateBase __setRenderArgs0(ITag.__ParameterList params) {
         for (int i = 0; i < params.size(); ++i) {
             ITag.__Parameter param = params.get(i);
             if (null != param.name) __setRenderArg(param.name, param.value);
             else __setRenderArg(i, param.value);
         }
+        return this;
     }
 
     @Override
-    public void __setRenderArgs(Object... args) {
+    public ITemplate __setRenderArgs(Object... args) {
+        return this;
     }
 
     @Override
-    public void __setRenderArg(String name, Object arg) {
+    public ITemplate __setRenderArg(String name, Object arg) {
         __renderArgs.put(name, arg);
+        return this;
     }
 
     /**
@@ -863,9 +885,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      *
      * @param name
      * @param arg
+     * @return this template instance
      */
-    protected final void __set(String name, Object arg) {
+    protected final TemplateBase __set(String name, Object arg) {
         __setRenderArg(name, arg);
+        return this;
     }
 
     /**
@@ -983,7 +1007,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     @Override
-    public void __setRenderArg(int position, Object arg) {
+    public ITemplate __setRenderArg(int position, Object arg) {
+        return this;
     }
 
     /**

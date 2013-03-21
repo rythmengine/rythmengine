@@ -59,8 +59,9 @@ public interface ITemplate extends ITag, Cloneable {
      * @throws NullPointerException  if os specified is null
      * @throws IllegalStateException if output stream or {@link #__setWriter(java.io.Writer) writer}
      *                               is already set
+     * @return this template instance
      */
-    void __setOutputStream(OutputStream os);
+    ITemplate __setOutputStream(OutputStream os);
 
     /**
      * Set a character based writer to the template instance
@@ -69,30 +70,50 @@ public interface ITemplate extends ITag, Cloneable {
      * @throws NullPointerException  if os specified is null
      * @throws IllegalStateException if {@link #__setOutputStream(java.io.OutputStream) output stream}
      *                               or writer is already set
+     * @return this template instance
      */
-    void __setWriter(Writer writer);
+    ITemplate __setWriter(Writer writer);
+
+    /**
+     * Set user context to the template instance
+     *   
+     * @param userContext
+     * @return this template instance
+     */
+    ITemplate __setUserContext(Map<String, Object> userContext);
+
+    /**
+     * Return user context previously set to this template instance. 
+     * if there is no user context has been set, then an empty Map is returned.
+     * 
+     * @return the user context
+     */
+    Map<String, Object> __getUserContext();
 
     /**
      * Set renderArgs in name-value pair
      *
      * @param args
+     * @return this template instance
      */
-    void __setRenderArgs(Map<String, Object> args);
+    ITemplate __setRenderArgs(Map<String, Object> args);
 
     /**
      * Set renderArgs in position
      *
      * @param args
+     * @return this template instance
      */
-    void __setRenderArgs(Object... args);
+    ITemplate __setRenderArgs(Object... args);
 
     /**
      * Set a render arg by name
      *
      * @param name
      * @param arg
+     * @return this template instance
      */
-    void __setRenderArg(String name, Object arg);
+    ITemplate __setRenderArg(String name, Object arg);
 
     /**
      * Return a render arg value by name
@@ -108,15 +129,17 @@ public interface ITemplate extends ITag, Cloneable {
      *
      * @param position
      * @param arg
+     * @return this template instance
      */
-    void __setRenderArg(int position, Object arg);
+    ITemplate __setRenderArg(int position, Object arg);
 
     /**
      * Set renderArgs using JSON data
      *
      * @param jsonData
+     * @return this template instance
      */
-    void __setRenderArg(JSONWrapper jsonData);
+    ITemplate __setRenderArg(JSONWrapper jsonData);
 
     /**
      * Render the template and return result as String
@@ -152,13 +175,6 @@ public interface ITemplate extends ITag, Cloneable {
      * @return buffer
      */
     StringBuilder __getBuffer();
-
-    /**
-     * Set the internal buffer
-     *
-     * @param sb
-     */
-    void __setBuffer(StringBuilder sb);
 
     /**
      * Get a copy of this template instance and pass in the engine and caller

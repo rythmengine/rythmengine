@@ -22,6 +22,7 @@ package com.greenlaw110.rythm;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * A wrapper of Rythm engine and make sure the rendering is happen in Sandbox mode
@@ -53,10 +54,17 @@ public class Sandbox {
         return Rythm.engine();
     }
 
+    private Map<String, Object> userContext;
+
+    public Sandbox setUserContext(Map<String, Object> context) {
+        this.userContext = context;
+        return this;
+    }
+
     public String render(String template, Object... args) {
         sandboxMode.set(true);
         try {
-            return secureExecutor.execute(template, args);
+            return secureExecutor.execute(userContext, template, args);
         } finally {
             sandboxMode.set(false);
         }
@@ -65,7 +73,7 @@ public class Sandbox {
     public String render(File file, Object... args) {
         sandboxMode.set(true);
         try {
-            return secureExecutor.execute(file, args);
+            return secureExecutor.execute(userContext,file, args);
         } finally {
             sandboxMode.set(false);
         }

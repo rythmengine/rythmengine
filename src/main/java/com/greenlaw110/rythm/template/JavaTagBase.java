@@ -28,15 +28,17 @@ public abstract class JavaTagBase extends TagBase {
     protected __ParameterList _params;
     protected __Body _body;
 
-    public void __setRenderArgs0(__ParameterList params) {
+    public TemplateBase __setRenderArgs0(__ParameterList params) {
         _params = null == params ? new __ParameterList() : params;
         __renderArgs.putAll(params.asMap());
+        return this;
     }
 
     @Override
-    public void __setRenderArg(String name, Object val) {
+    public ITemplate __setRenderArg(String name, Object val) {
         if ("__body".equals(name)) _body = (__Body) val;
         super.__setRenderArg(name, val);
+        return this;
     }
 
     @Override

@@ -742,6 +742,7 @@ public class CodeBuilder extends TextBuilder {
 //        }
         // common imports
         pn("import java.util.*;");
+        pn("import com.greenlaw110.rythm.template.TemplateBase;");
         if (!sandbox) pn("import java.io.*;");
     }
 
@@ -852,14 +853,15 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArgs method
         pn();
-        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic void __setRenderArgs(java.util.Map<java.lang.String, java.lang.Object> __args) {");
-        p2tn("if (null == __args) throw new NullPointerException();\n\t\tif (__args.isEmpty()) return;");
+        ptn("@SuppressWarnings(\"unchecked\")\n\tpublic TemplateBase __setRenderArgs(java.util.Map<java.lang.String, java.lang.Object> __args) {");
+        p2tn("if (null == __args) throw new NullPointerException();\n\t\tif (__args.isEmpty()) return this;");
         p2tn("super.__setRenderArgs(__args);");
         first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")__args.get(\"").p(argName).pn("\");");
         }
+        p2tn("return this;");
 //        for (String argName : renderArgs.keySet()) {
 //            p2t("System.err.println(\"").p(argName).p("=\" + this.").p(argName).pn(");");
 //        }
@@ -870,7 +872,7 @@ public class CodeBuilder extends TextBuilder {
         if (0 < userDefinedArgNumber) {
             // -- output __setRenderArgs method with args passed in positioned order
             pn();
-            ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArgs(java.lang.Object... __args) {");
+            ptn("@SuppressWarnings(\"unchecked\") public TemplateBase __setRenderArgs(java.lang.Object... __args) {");
             {
                 p2tn("int __p = 0, __l = __args.length;");
                 int i = userDefinedArgNumber;
@@ -881,6 +883,7 @@ public class CodeBuilder extends TextBuilder {
                     if (--i == 0) break;
                 }
             }
+            p2tn("return this;");
             ptn("}");
 
             // -- output __renderArgTypeArray method with args passed in positioned order
@@ -900,7 +903,7 @@ public class CodeBuilder extends TextBuilder {
 
         // -- output __setRenderArg by name
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") @Override public void __setRenderArg(java.lang.String __name, java.lang.Object __arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") @Override public TemplateBase __setRenderArg(java.lang.String __name, java.lang.Object __arg) {");
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
@@ -914,11 +917,11 @@ public class CodeBuilder extends TextBuilder {
                 p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p("=(").p(arg.type).pn(")__arg;");
             }
         }
-        p2t("super.__setRenderArg(__name, __arg);\n\t}\n");
+        p2t("super.__setRenderArg(__name, __arg);\n\t\treturn this;\n\t}\n");
 
         // -- output __setRenderArg by position
         pn();
-        ptn("@SuppressWarnings(\"unchecked\") public void __setRenderArg(int __pos, java.lang.Object __arg) {");
+        ptn("@SuppressWarnings(\"unchecked\") public TemplateBase __setRenderArg(int __pos, java.lang.Object __arg) {");
         p2tn("int __p = 0;");
         if (true) {
             first = true;
@@ -936,6 +939,7 @@ public class CodeBuilder extends TextBuilder {
         }
         // the first argument has a default name "arg"
         p2tn("if(0 == __pos) __setRenderArg(\"arg\", __arg);");
+        p2tn("return this;");
         ptn("}");
     }
 

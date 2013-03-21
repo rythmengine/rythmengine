@@ -311,21 +311,48 @@ public class RythmEngine implements IEventDispatcher {
                 return null; // there are logic in TemplateClass.asTemplate() to further deduct code type from resource 
             }
         };
+        private final ThreadLocal<Map<String, Object>> _usrCtx = new ThreadLocal<Map<String, Object>>();
 
         /**
-         * Init the render time. This method could be called before calling render methods.
-         * The setting will be used to render the template later on
+         * Init the render time by setting {@link com.greenlaw110.rythm.extension.ICodeType code type}. 
+         * This method should called before calling render methods to setup the context of this render 
+         * 
+         * @param codeType
+         * @return the render setting instance
+         */
+        public final RenderSettings init(ICodeType codeType) {
+            if (null != codeType) _codeType.set(codeType);
+            else _codeType.remove();
+            return this;
+        }
+
+        /**
+         * Init the render time by setting {@link java.util.Locale locale}. 
+         * This method should called before calling render methods to setup the context of this render 
          * 
          * @param locale
+         * @return the render setting instance
          */
-        public final RythmEngine init(ICodeType codeType, Locale locale) {
+        public final RenderSettings init(Locale locale) {
             if (null != locale) _locale.set(locale);
-            if (null != codeType) _codeType.set(codeType);
-            return RythmEngine.this;
+            else _locale.remove();
+            return this;
         }
-    
+
         /**
-         * (not API)
+         * Init the render time by setting user context 
+         * This method should called before calling render methods to setup the context of this render 
+         * 
+         * @param usrCtx
+         * @return the render setting instance
+         */
+        public final RenderSettings init(Map<String, Object> usrCtx) {
+            if (null != usrCtx) _usrCtx.set(usrCtx);
+            else _usrCtx.remove();
+            return this;
+        }
+        
+        /**
          * Return ThreadLocal locale.
          * 
          * @return locale setting for this render process
@@ -335,13 +362,21 @@ public class RythmEngine implements IEventDispatcher {
         }
 
         /**
-         * (not API)
          * Return thread local code type
          * 
          * @return {@link com.greenlaw110.rythm.extension.ICodeType code type} setting for this render process
          */
         public final ICodeType codeType() {
             return _codeType.get();
+        }
+
+        /**
+         * Return thread local user context map
+         * 
+         * @return the user context map
+         */
+        public final Map<String, Object> userContext() {
+            return _usrCtx.get();
         }
     
         /**
@@ -355,9 +390,57 @@ public class RythmEngine implements IEventDispatcher {
         }
     
     }
-    
+
+    /**
+     * The RenderSettings instance keep the environment settings for one render operation
+     */
     public final RenderSettings renderSettings = new RenderSettings();
 
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param codeType
+     * @param locale
+     * @param usrCtx
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(ICodeType codeType, Locale locale, Map<String, Object> usrCtx) {
+        renderSettings.init(codeType).init(locale).init(usrCtx);
+        return this;
+    }
+    
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param codeType
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(ICodeType codeType) {
+        renderSettings.init(codeType);
+        return this;
+    }
+
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param locale
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(Locale locale) {
+        renderSettings.init(locale);
+        return this;
+    }
+    
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param userContext
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(Map<String, Object> userContext) {
+        renderSettings.init(userContext);
+        return this;
+    }
 
     /* -----------------------------------------------------------------------------
       Constructors, Configuration and Initializing
@@ -754,29 +837,6 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String render(String template, Object... args) {
-        return render(null, null, template, args);
-    }
-
-    /**
-     * Render template by string parameter and an array of
-     * template args. The string parameter could be either
-     * a path point to the template source file, or the inline
-     * template source content. The render result is returned
-     * as a String. The API allows user to specify the 
-     * {@link com.greenlaw110.rythm.extension.ICodeType code type} and
-     * {@link java.util.Locale locale} before rendering
-     * <p/>
-     * <p>See {@link #getTemplate(java.io.File, Object...)} for note on
-     * render args</p>
-     *
-     * @param codeType
-     * @param locale
-     * @param template
-     * @param args
-     * @return render result
-     */
-    public String render(ICodeType codeType, Locale locale, String template, Object... args) {
-        renderSettings.init(codeType, locale);
         ITemplate t = getTemplate(template, args);
         return t.render();
     }
@@ -1529,6 +1589,16 @@ public class RythmEngine implements IEventDispatcher {
      */
     public Sandbox sandbox() {
         return new Sandbox(this, secureExecutor());
+    }
+
+    /**
+     * Create a {@link Sandbox} instance with user supplied context 
+     * 
+     * @param context
+     * @return an new sandbox instance
+     */
+    public Sandbox sandbox(Map<String, Object> context) {
+        return new Sandbox(this, secureExecutor()).setUserContext(context);
     }
 
     // dispatch rythm events
