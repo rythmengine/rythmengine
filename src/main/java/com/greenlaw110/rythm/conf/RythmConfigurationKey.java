@@ -613,8 +613,8 @@ public enum RythmConfigurationKey {
      * <ul>
      * <li><code>user.dir</code></li>
      * <li><code>line.separator</code></li>
-     * <li>java.vm.name</li>
-     * <li>java.protocol.handler.pkgs</li>
+     * <li><code>java.vm.name</code></li>
+     * <li><code>java.protocol.handler.pkgs</code></li>
      * </ul>
      */
     SANDBOX_ALLOWED_SYSTEM_PROPERTIES("sandbox.allowed_system_properties", 

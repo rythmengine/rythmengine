@@ -85,6 +85,7 @@ public class CodeBuilder extends TextBuilder {
 
         private static String defValTransform(String type, String defVal) {
             if (S.isEmpty(defVal)) return null;
+            if ("String".equalsIgnoreCase(type) && "null".equalsIgnoreCase(defVal)) return "\"\"";
             if ("boolean".equalsIgnoreCase(type)) defVal = defVal.toLowerCase();
             if ("long".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "L";
             if ("float".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "f";
@@ -93,7 +94,9 @@ public class CodeBuilder extends TextBuilder {
         }
 
         private static String defVal(String type) {
-            if (type.equalsIgnoreCase("boolean"))
+            if (type.equalsIgnoreCase("String"))
+                return "\"\"";
+            else if (type.equalsIgnoreCase("boolean"))
                 return "false";
             else if (type.equalsIgnoreCase("int"))
                 return "0";

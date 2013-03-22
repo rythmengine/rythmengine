@@ -50,6 +50,17 @@ public class GHIssueTest extends TestBase {
         s = r(t, new Foo());
         eq("");
     }
+
+    @Test
+    public void test132() {
+        t = "@args String s;@s.length()";
+        s = r(t, null);
+        eq("0");
+        
+        s = r(t);
+        eq("0");
+    }
+
     
     public static void main(String[] args) {
         run(GHIssueTest.class);
