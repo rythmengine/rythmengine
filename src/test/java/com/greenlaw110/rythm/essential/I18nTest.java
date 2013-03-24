@@ -75,6 +75,16 @@ public class I18nTest extends TestBase {
         t = "@args String @1;@1.i18n()";
         s = r(t, "foo.bar");
         eq("foobar");
+
+        Date date = new Date(1364122714992L);
+
+        t = "@args Date today;@today.format()";
+        s = r(t, date);
+        eq("24/03/2013");
+        
+        t = "@args Date today;@today.format()\n@locale(\"zh\", \"CN\"){@today.format()}\n@today.format()";
+        s = r(t, date);
+        eq("24/03/2013\n2013-3-24\n24/03/2013");
     }
     
 

@@ -538,7 +538,7 @@ public enum RythmConfigurationKey {
      * <p>Default value: <code>null</code>. When no security manager is configured, when the sandbox mode is running, an
      * instance of {@link com.greenlaw110.rythm.sandbox.RythmSecurityManager} will be initiated to supervise the
      * execution. Usually you should NOT set this configuration and allow Rythm to run it's <code>SecurityManager</code>
-     * implementation</p>
+     * implementation.</p>
      */
     SANDBOX_SECURITY_MANAGER_IMPL("sandbox.security_manager.impl"),
 
@@ -618,7 +618,15 @@ public enum RythmConfigurationKey {
      * </ul>
      */
     SANDBOX_ALLOWED_SYSTEM_PROPERTIES("sandbox.allowed_system_properties", 
-        "user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs");
+        "user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs"),
+
+    /**
+     * "sandbox.thread_factory.impl": Configure the thread factory to be used by the sandbox executing service.
+     * <p>Note this configuration should be very rare used as it is create to support rythmfiddle implementation.
+     * Should you really need to configure this item, make sure it is configured as an instance of {@link com.greenlaw110.rythm.sandbox.SandboxThreadFactory}</p>
+     * <p>Default value: <code>null</code></p>
+     */
+    SANBOX_THREAD_FACTORY_IMPL("sandbox.thread_factory.impl", null);
 
     private String key;
     private Object defVal;

@@ -38,8 +38,8 @@ public class SandboxExecutingService {
     private long timeout = 1000;
     private RythmEngine engine;
 
-    public SandboxExecutingService(int poolSize, SecurityManager sm, long timeout, RythmEngine re) {
-        scheduler = new ScheduledThreadPoolExecutor(poolSize, new SandboxThreadFactory(sm, re), new ThreadPoolExecutor.AbortPolicy());
+    public SandboxExecutingService(int poolSize, SandboxThreadFactory fact, long timeout, RythmEngine re) {
+        scheduler = new ScheduledThreadPoolExecutor(poolSize, fact, new ThreadPoolExecutor.AbortPolicy());
         this.timeout = timeout;
         engine = re;
     }

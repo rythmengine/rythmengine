@@ -67,11 +67,28 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * <p>Not to be called in user application or template</p>
      *
      * @param templateClass
-     * @param type
      */
-    public void __setTemplateClass(TemplateClass templateClass, ICodeType type, Locale locale) {
+    public void __setTemplateClass(TemplateClass templateClass) {
         this.__templateClass = templateClass;
+    }
+    
+    public void __prepareRender(ICodeType type, Locale locale) {
         __ctx.init(this, type, locale);
+        Class<? extends TemplateBase> c = getClass();
+        Class<?> pc = c.getSuperclass();
+        if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
+            try {
+                TemplateClass ptc = __engine().classes().getByClassName(pc.getName());
+                if (null != ptc) {
+                    __parent = (TemplateBase) ptc.asTemplate();
+                } else {
+                    throw new RuntimeException("Cannot find template class for parent class: " + pc);
+                }
+                //__parent.__setTemplateClass(__engine().classes.getByClassName(pc.getName()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         if (null != __parent) {
             __parent.__ctx.init(__parent, type, locale);
         }
@@ -241,21 +258,6 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     public TemplateBase() {
         super();
-        Class<? extends TemplateBase> c = getClass();
-        Class<?> pc = c.getSuperclass();
-        if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
-            try {
-                TemplateClass ptc = __engine().classes().getByClassName(pc.getName());
-                if (null != ptc) {
-                    __parent = (TemplateBase) ptc.asTemplate();
-                } else {
-                    __parent = (TemplateBase) pc.newInstance();
-                }
-                //__parent.__setTemplateClass(__engine().classes.getByClassName(pc.getName()));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     /**

@@ -85,7 +85,7 @@ public class ForEachParser extends KeywordParserFactory {
                     if (null != sep) {
                         String varCursor = ctx.getCodeBuilder().newVarName();
                         s1 = "int " + varCursor + " = 0;//line: " + lineNo + "\nfor ";
-                        s2 = s2 + "if (" + varCursor + "++ > 0) p(" + separator + "); //line: " + lineNo + "\n\t"; 
+                        s2 = s2 + "if (" + varCursor + "++ > 0) {p(" + separator + ");} //line: " + lineNo + "\n\t"; 
                     }
                     return new BlockCodeToken(s1 + s + s2, ctx()) {
                         @Override

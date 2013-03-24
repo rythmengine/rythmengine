@@ -146,7 +146,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         p("for(").p("?".equals(type) ? "java.lang.Object" : type).p(" ").p(varname).p(" : ").p(varItr).p(") {");
         pline();
         if (null != joinSep) {
-            p("if (").p(varId).p("++ > 0) p(").p(joinSep).p(");");
+            p("if (").p(varId).p("++ > 0) {p(").p(joinSep).p(");}");
         } else {
             p(varId).p("++;");
         }

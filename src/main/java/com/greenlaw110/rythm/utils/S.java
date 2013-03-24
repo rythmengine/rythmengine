@@ -306,7 +306,7 @@ public class S {
      * @param o
      * @return escaped data
      */
-    @Transformer
+    @Transformer(requireTemplate = true)
     public static RawData escape(Object o) {
         return escape(null, o);
     }

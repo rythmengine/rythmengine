@@ -42,6 +42,7 @@ import com.greenlaw110.rythm.resource.StringTemplateResource;
 import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.resource.ToStringTemplateResource;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
+import com.greenlaw110.rythm.sandbox.SandboxThreadFactory;
 import com.greenlaw110.rythm.template.*;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
@@ -706,6 +707,7 @@ public class RythmEngine implements IEventDispatcher {
     //static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
 
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
+        set(this);
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
@@ -1577,7 +1579,9 @@ public class RythmEngine implements IEventDispatcher {
             int poolSize = (Integer) conf().get(RythmConfigurationKey.SANDBOX_POOL_SIZE);
             SecurityManager sm = conf().get(RythmConfigurationKey.SANDBOX_SECURITY_MANAGER_IMPL);
             int timeout = (Integer) conf().get(RythmConfigurationKey.SANDBOX_TIMEOUT);
-            _secureExecutor = new SandboxExecutingService(poolSize, sm, timeout, this);
+            SandboxThreadFactory fact = conf().get(RythmConfigurationKey.SANBOX_THREAD_FACTORY_IMPL);
+            if (null == fact) fact = new SandboxThreadFactory(sm, null, this);
+            _secureExecutor = new SandboxExecutingService(poolSize, fact, timeout, this);
         }
         return _secureExecutor;
     }

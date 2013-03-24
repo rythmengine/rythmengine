@@ -28,16 +28,23 @@ import java.util.UUID;
 /**
  * Create secure template executing thread
  */
-class SandboxThreadFactory extends RythmThreadFactory {
+public class SandboxThreadFactory extends RythmThreadFactory {
     private SecurityManager sm;
     private String password = null;
 
-    public SandboxThreadFactory(SecurityManager sm, RythmEngine re) {
+    /**
+     * Construct a Sandbox thread factory instance.
+     * @param sm security manager, optional
+     * @param re engine, optional
+     */
+    public SandboxThreadFactory(SecurityManager sm, String password, RythmEngine re) {
         super("rythm-executor");
         if (null == sm) {
             String pass = UUID.randomUUID().toString();
             sm = new RythmSecurityManager(System.getSecurityManager(), pass, re);
-            password = pass;
+            this.password = pass;
+        } else {
+            this.password = password;
         }
         this.sm = sm;
     }
@@ -59,12 +66,15 @@ class SandboxThreadFactory extends RythmThreadFactory {
         public void run() {
             SecurityManager osm = System.getSecurityManager();
             SecurityManager nsm = sm;
-            if (osm != nsm) System.setSecurityManager(nsm);
+            boolean needsSetSM = null == osm || !osm.getClass().equals(nsm.getClass()); 
+            if (needsSetSM) {
+                System.setSecurityManager(nsm);
+            }
             TemplateClassLoader.setSandboxPassword(fact.password);
             try {
                 super.run();
             } finally {
-                if (osm != nsm) {
+                if (needsSetSM) {
                     if (nsm instanceof RythmSecurityManager) {
                         RythmSecurityManager rsm = (RythmSecurityManager) nsm;
                         rsm.unlock(fact.password);

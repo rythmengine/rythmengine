@@ -355,7 +355,7 @@ public class TemplateClass {
         }
     };
 
-    private ITemplate templateInstance_(ICodeType type, Locale locale) {
+    private ITemplate templateInstance_() {
         if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
@@ -363,6 +363,7 @@ public class TemplateClass {
                 Class<?> clz = getJavaClass();
                 if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
                 templateInstance = (TemplateBase) clz.newInstance();
+                templateInstance.__setTemplateClass(this);
                 if (Logger.isTraceEnabled()) logger.trace("template instance generated");
             } catch (RythmException e) {
                 throw e;
@@ -370,8 +371,8 @@ public class TemplateClass {
                 throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
-        templateInstance.__setTemplateClass(this, type, locale);
         RythmEngine engine = engine();
+        engine.registerTemplate(templateInstance);
         if (!engine.isProdMode()) {
             // check parent class change
             Class<?> c = templateInstance.getClass();
@@ -380,14 +381,15 @@ public class TemplateClass {
                 engine.classes().getByClassName(pc.getName());
             }
         }
-        engine.registerTemplate(templateInstance);
         return templateInstance;
     }
 
-    public ITemplate asTemplate(ICodeType lang, Locale locale) {
+    public ITemplate asTemplate(ICodeType type, Locale locale) {
         RythmEngine e = engine();
         if (null == name || e.mode().isDev()) refresh();
-        return templateInstance_(lang, locale).__cloneMe(engine(), null);
+        TemplateBase tmpl = (TemplateBase)templateInstance_().__cloneMe(engine(), null);
+        tmpl.__prepareRender(type, locale);
+        return tmpl;
     }
 
     public ITemplate asTemplate() {
@@ -395,8 +397,10 @@ public class TemplateClass {
     }
 
     public ITemplate asTemplate(ITemplate caller) {
-        TemplateBase tb = (TemplateBase) caller;
-        return templateInstance_(tb.__curCodeType(), tb.__curLocale()).__cloneMe(engine(), caller);
+        TemplateBase tb = (TemplateBase)caller;
+        TemplateBase tmpl = (TemplateBase)templateInstance_().__cloneMe(engine(), caller);
+        tmpl.__prepareRender(tb.__curCodeType(), tb.__curLocale());
+        return tmpl;
     }
 
     private boolean refreshing = false;

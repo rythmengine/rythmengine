@@ -32,7 +32,7 @@ import com.stevesoft.pat.Regex;
 import java.util.Locale;
 
 /**
- * Parse @local("zh", "CN) {...}
+ * Parse @locale("zh", "CN) {...}
  */
 public class LocaleParser extends KeywordParserFactory {
 
@@ -67,11 +67,12 @@ public class LocaleParser extends KeywordParserFactory {
                 }
                 step(matched.length());
                 String s = r.stringMatched(1);
-                s = S.stripBraceAndQuotation(s);
+                s = S.stripBrace(s);
                 if (S.isEmpty(s)) {
                     raiseParseException("Error parsing @locale statement. locale parameter expected");
                 }
-                Locale locale = (Locale)ctx.getEngine().eval(String.format("com.greenlaw110.rythm.utils.Eval.locale(%s)", s));
+                String code = s;
+                Locale locale = (Locale)ctx.getEngine().eval(String.format("com.greenlaw110.rythm.utils.Eval.locale(%s)", code));
                 ctx.pushLocale(locale);
                 s = String.format("__ctx.pushLocale(com.greenlaw110.rythm.utils.Eval.locale(%s));", s);
                 

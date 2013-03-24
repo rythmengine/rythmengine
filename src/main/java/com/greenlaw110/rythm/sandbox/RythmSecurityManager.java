@@ -39,8 +39,16 @@ public class RythmSecurityManager extends SecurityManager {
 
     private SecurityManager osm;
     private String code = null;
-    private boolean released = false;
+    private ThreadLocal<Boolean> released = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
     private RythmEngine engine = null;
+    private RythmEngine engine() {
+        return null == engine ? RythmEngine.get() : engine;
+    }
 
     private String hash(String input) {
         try {
@@ -53,16 +61,20 @@ public class RythmSecurityManager extends SecurityManager {
     }
 
     public RythmSecurityManager(SecurityManager sm, String password, RythmEngine re) {
-        if (null == re) throw new NullPointerException();
         osm = sm;
         if (null == password) throw new NullPointerException();
         code = hash(password);
         engine = re;
     }
+    
+    public void setPassword(String password) {
+        if (null != code) throw new IllegalStateException("security code already intiailized");
+        code = hash(password);
+    }
 
     public void unlock(String password) {
         if (code.equals(hash(password))) {
-            released = true;
+            released.set(true);
         } else {
             throw new SecurityException("password not match");
         }
@@ -70,14 +82,14 @@ public class RythmSecurityManager extends SecurityManager {
 
     public void lock(String password) {
         if (code.equals(hash(password))) {
-            released = false;
+            released.set(false);
         } else {
             throw new SecurityException("password not match");
         }
     }
 
     private void checkRythm() {
-        if (!released && isRythmThread()) {
+        if (!released.get() && isRythmThread()) {
             throw new SecurityException("Access to protected resource is restricted in Sandbox mode");
         }
     }
@@ -198,7 +210,12 @@ public class RythmSecurityManager extends SecurityManager {
         if (null != RythmConfigurationKey.valueOfIgnoreCase(key)) {
             return;
         }
-        String s = engine.conf().allowedSystemProperties();
+        RythmEngine e = engine();
+        if (null == e) {
+            // not in Rendering process yet, let's assume it's safe to check system properties
+            return;
+        }
+        String s = e.conf().allowedSystemProperties();
         if (s.indexOf(key) > -1) return; 
         checkRythm();
         if (null != osm) osm.checkPropertyAccess(key);
