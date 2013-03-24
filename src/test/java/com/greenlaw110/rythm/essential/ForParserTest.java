@@ -354,13 +354,25 @@ public class ForParserTest extends TestBase {
     public void testJoin() {
         t = "@for (int i = 0; i < 5; ++i).join('\n') {@i}";
         s = r(t);
-        assertEquals("0\n1\n2\n3\n4", s);
+        eq("0\n1\n2\n3\n4");
+        t = "@for (int i = 0; i < 5; ++i).join(',') {@i}";
+        s = r(t);
+        eq("0,1,2,3,4");
+        t = "@for (int i = 0; i < 5; ++i).join(\",\") {@i}";
+        s = r(t);
+        eq("0,1,2,3,4");
 
         t = "@for(items).join('\n'){@_}";
         s = r(t, from(p("items", new Integer[]{1,2})));
         eq("1\n2");
+        t = "@for(items).join(\"\n\"){@_}";
+        s = r(t, from(p("items", new Integer[]{1,2})));
+        eq("1\n2");
         
         t = "@for(1..5).join(){@_}";
+        s = r(t);
+        eq("1,2,3,4");
+        t = "@for(1..5).join(\",\"){@_}";
         s = r(t);
         eq("1,2,3,4");
         

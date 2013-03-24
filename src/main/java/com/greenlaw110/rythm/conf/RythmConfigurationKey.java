@@ -618,7 +618,7 @@ public enum RythmConfigurationKey {
      * </ul>
      */
     SANDBOX_ALLOWED_SYSTEM_PROPERTIES("sandbox.allowed_system_properties", 
-        "user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs"),
+        "file.encoding,user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs,suppressRawWhenUnchecked"),
 
     /**
      * "sandbox.thread_factory.impl": Configure the thread factory to be used by the sandbox executing service.

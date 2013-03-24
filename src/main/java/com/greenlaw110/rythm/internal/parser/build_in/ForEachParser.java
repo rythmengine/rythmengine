@@ -65,7 +65,7 @@ public class ForEachParser extends KeywordParserFactory {
                 String s = r.stringMatched(2);
                 String sep = r.stringMatched(4);
                 if (!S.empty(sep)) {
-                    sep = sep.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
+                    sep = sep.replaceAll("(\\r?\\n)+", "\\\\n");
                     sep = S.stripBrace(sep).trim();
                     boolean hasQuotation = sep.startsWith("'");
                     if (hasQuotation) {
