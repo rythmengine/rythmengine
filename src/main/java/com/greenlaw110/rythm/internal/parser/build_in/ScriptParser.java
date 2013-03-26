@@ -67,7 +67,8 @@ public class ScriptParser extends RemoveLeadingLineBreakAndSpacesParser {
         for (int i = 0; i < len; ++i) {
             String line = lines[i];
             if (!S.isEmpty(line)) lastLine = line;
-            sb.append(line).append(" //line: ").append(curLine++).append("\n");
+            curLine = curLine + 1;
+            sb.append(line).append(" //line: ").append(curLine).append("\n");
         }
         if (!hasIfStatement && !lastLine.trim().endsWith(";")) sb.append(";");
         String code = sb.toString();

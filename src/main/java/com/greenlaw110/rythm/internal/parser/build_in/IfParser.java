@@ -46,7 +46,8 @@ public class IfParser extends KeywordParserFactory {
                 final String matched = r.stringMatched();
                 int line = ctx.currentLine();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
-                    if (matched.startsWith("\n")) line = line + 1;
+                    String s = matched;
+                    while (s.startsWith("\n")) {line = line + 1;s = s.substring(1);}
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
                     Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
                     if (r0.search(matched)) {
