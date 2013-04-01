@@ -55,15 +55,15 @@ public class TransformerTest extends TestBase {
         // raw
         p = "<h1>h1</h1>";
         s = Rythm.render("@1.raw()", p);
-        assertEquals(p, s);
+        eq(p);
 
         // escape
-        p = "<script>alert(\"xyz,'abc'\" + x);</script>";
-        s = Rythm.render("@1.escape()", p);
-        assertEquals(S.escape(p).toString(), s);
+        s = Rythm.render("<script>alert('@1.escape()' + x);</script>", "xyz,'abc'");
+        eq("<script>alert('xyz,\'abc\'' + x);</script>");
 
         String[] sa = "json,xml,javascript,html,csv,raw".split(",");
         for (String escape : sa) {
+            System.err.println(escape);
             s = Rythm.render(String.format("@1.escape(\"%s\")", escape), p);
             assertEquals(S.escape(p, escape).toString(), s);
         }
@@ -88,6 +88,11 @@ public class TransformerTest extends TestBase {
         s = Rythm.render("@1.format(\"dd/MM/yyyy\")", d);
         assertEquals(S.format(d, "dd/MM/yyyy"), s);
         
+        // format currency
+        s = Rythm.render("@1.formatCurrency()", 100000/100);
+        eq("$1,000.00");
+        s = Rythm.render("@args int x;@s().formatCurrency(x)", 100000/100);
+        eq("$1,000.00");
     }
     
     @Test
@@ -117,7 +122,7 @@ public class TransformerTest extends TestBase {
     @Test
     public void testUserDefinedTransformerWithNamespace() {
         // test register with namespace specified
-        Rythm.engine().registerTransformer("foo", TransformerTest.class);
+        Rythm.engine().registerTransformer("foo", "", TransformerTest.class);
         String t = "@args String s, int i\n" +
                 "double of \"@s\" is \"@s.foo_dbl()\",\n " +
                 "double of [@i] is [@i.foo_dbl().format(\"0000.00\")]";

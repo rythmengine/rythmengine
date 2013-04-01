@@ -279,7 +279,14 @@ public class Token extends TextBuilder {
                 Matcher m = p.matcher(s);
                 if (m.matches()) {
                     matched = true;
-                    String signature = (e instanceof IJavaExtension.VoidParameterExtension) ? null : m.group(1);
+                    String signature = null;
+                    if (!(e instanceof IJavaExtension.VoidParameterExtension)) {
+                        signature = m.group(1);
+                        if (null == signature) {
+                            signature = m.group(2);
+                        }
+                    }
+                    
                     m = e.pattern2().matcher(s);
                     s = m.replaceAll("");
                     allMatched.push(new Pair(e, signature));

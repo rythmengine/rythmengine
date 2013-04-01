@@ -23,7 +23,6 @@ import com.greenlaw110.rythm.internal.IContext;
 import com.greenlaw110.rythm.internal.IParser;
 import com.greenlaw110.rythm.internal.Token;
 import com.greenlaw110.rythm.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
-import com.greenlaw110.rythm.utils.S;
 import com.greenlaw110.rythm.utils.TextBuilder;
 
 import java.util.regex.Matcher;
@@ -31,7 +30,7 @@ import java.util.regex.Pattern;
 
 /**
  * CommentParser deals with the following type comments:
- * 1. inline comment. e.g. @//this is my comment \n
+ * 1. inline comment. e.g. @/ this is my comment \n
  * 2. block comment. e.g. @* this is my multi \nline comments *@
  * User: luog
  * Date: 2/12/11
@@ -59,7 +58,7 @@ public class CommentParser extends CaretParserFactoryBase {
             }
 
             private Pattern inlineComment() {
-                return Pattern.compile(String.format("^(%s//.*?)(\n.*|$)", a()), Pattern.DOTALL);
+                return Pattern.compile(String.format("^(%s/.*?)(\n.*|$)", a()), Pattern.DOTALL);
 //                IContext ctx = ctx();
 //                if (ctx.insideDirectiveComment()) {
 //                    return Pattern.compile(String.format("^(%s//.*?)(%s|\n).*", a(), S.escapeRegex(ctx.peekCodeType().commentEnd())), Pattern.DOTALL);

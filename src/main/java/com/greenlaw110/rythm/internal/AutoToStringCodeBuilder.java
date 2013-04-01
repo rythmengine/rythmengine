@@ -118,9 +118,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             return true;
         }
 
-        if (!Modifier.isPublic(mod)) return true;
-
-        return false;
+        return !Modifier.isPublic(mod);
     }
 
     private boolean shouldSkip(Method m, String fn) {

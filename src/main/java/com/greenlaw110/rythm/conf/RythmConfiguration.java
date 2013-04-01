@@ -299,11 +299,7 @@ public class RythmConfiguration {
             if (!ce) {
                 _cacheEnabled = false;
             } else {
-                if (mode.isDev() && po) {
-                    _cacheEnabled = false;
-                } else {
-                    _cacheEnabled = true;
-                }
+                _cacheEnabled = !(mode.isDev() && po);
             }
         }
         return _cacheEnabled;

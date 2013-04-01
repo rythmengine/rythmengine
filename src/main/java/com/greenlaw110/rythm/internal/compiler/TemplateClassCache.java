@@ -52,11 +52,7 @@ public class TemplateClassCache {
      * is class cache enabled on the {@link #engine} instance
      */
     private boolean enabled() {
-        if ((mode.isDev() || conf.loadPrecompiled() || conf.precompileMode()) && !RythmEngine.insideSandbox()) {
-            return true;
-        } else {
-            return false;
-        }
+        return ((mode.isDev() || conf.loadPrecompiled() || conf.precompileMode()) && !RythmEngine.insideSandbox());
     }
 
     /**

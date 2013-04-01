@@ -118,7 +118,6 @@ public class TemplateParser implements IContext {
                     dm.endParse(this);
                     throw e;
                 }
-                continue;
             } catch (RuntimeException e) {
                 dm.endParse(this);
                 throw e;

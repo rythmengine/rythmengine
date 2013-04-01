@@ -579,7 +579,7 @@ public class S {
      * @param suffix
      * @return the String result
      */
-    public static final String strip(Object o, String prefix, String suffix) {
+    public static String strip(Object o, String prefix, String suffix) {
         if (null == o) return "";
         String s = o.toString();
         s = s.trim();
@@ -594,7 +594,7 @@ public class S {
      * @param o
      * @return the string result
      */
-    public static final String stripBrace(Object o) {
+    public static String stripBrace(Object o) {
         return strip(o, "(", ")");
     }
 
@@ -604,7 +604,7 @@ public class S {
      * @param o
      * @return the String result
      */
-    public static final String stripQuotation(Object o) {
+    public static String stripQuotation(Object o) {
         return strip(strip(o, "\"", "\""), "'", "'");
     }
     
@@ -614,7 +614,7 @@ public class S {
      * @param o
      * @return the string result
      */
-    public static final String stripBraceAndQuotation(Object o) {
+    public static String stripBraceAndQuotation(Object o) {
         if (null == o) return "";
         String s = stripBrace(o);
         s = stripQuotation(s);
@@ -988,6 +988,17 @@ public class S {
     @Transformer(requireTemplate = true)
     public static String formatCurrency(Object data) {
         return formatCurrency(null, data, null, null);
+    }
+    
+    /**
+     * See {@link #formatCurrency(com.greenlaw110.rythm.template.ITemplate, Object)}
+     * 
+     * @param template
+     * @param data
+     * @return the currency string
+     */
+    public static String formatCurrency(ITemplate template, Object data) {
+        return formatCurrency(template, data, null, null);
     }
 
     /**

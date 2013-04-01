@@ -165,9 +165,7 @@ public class TemplateClassLoader extends ClassLoader {
 
             TemplateClassloaderState that = (TemplateClassloaderState) o;
 
-            if (currentStateValue != that.currentStateValue) return false;
-
-            return true;
+            return (currentStateValue == that.currentStateValue);
         }
 
         @Override

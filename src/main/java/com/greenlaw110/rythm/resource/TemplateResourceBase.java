@@ -175,7 +175,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         return getTypeOfPath(engine, s);
     }
 
-    protected static final String path2CN(String path) {
+    protected static String path2CN(String path) {
         int colon = path.indexOf(":");
         if (++colon > 0) {
             path = path.substring(colon); // strip the driver letter from windows path and scheme from the URL

@@ -568,7 +568,7 @@ public class RythmEngine implements IEventDispatcher {
         // register built-in transformers if enabled
         boolean enableBuiltInJavaExtensions = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED);
         if (enableBuiltInJavaExtensions) {
-            registerTransformer("rythm", S.class);
+            registerTransformer("rythm", "(com.greenlaw110.rythm.utils.S|s\\(\\))", S.class);
         }
 
         boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED);
@@ -608,7 +608,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param transformerClasses
      */
     public void registerTransformer(Class<?>... transformerClasses) {
-        registerTransformer(null, transformerClasses);
+        registerTransformer(null, null, transformerClasses);
     }
 
     /**
@@ -618,7 +618,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param transformerClasses
      */
-    public void registerTransformer(String namespace, Class<?>... transformerClasses) {
+    public void registerTransformer(String namespace, String waivePattern, Class<?>... transformerClasses) {
         ExtensionManager jem = extensionManager();
         for (Class<?> extensionClass : transformerClasses) {
             Transformer t = extensionClass.getAnnotation(Transformer.class);
@@ -627,6 +627,11 @@ public class RythmEngine implements IEventDispatcher {
             boolean namespaceIsEmpty = S.empty(namespace);
             if (classAnnotated && namespaceIsEmpty) {
                 nmsp = t.value();
+            }
+            String waive = waivePattern;
+            boolean waiveIsEmpty = S.empty(waive);
+            if (classAnnotated && waiveIsEmpty) {
+                waive = t.waivePattern();
             }
             boolean clsRequireTemplate = null == t ? false : t.requireTemplate();
             for (Method m : extensionClass.getDeclaredMethods()) {
@@ -642,14 +647,22 @@ public class RythmEngine implements IEventDispatcher {
                 String mnmsp = nmsp;
                 if (methodAnnotated && namespaceIsEmpty) {
                     mnmsp = tm.value();
+                    if (S.empty(mnmsp)) mnmsp = nmsp;
                 }
+                
+                String mwaive = waive;
+                if (methodAnnotated && waiveIsEmpty) {
+                    mwaive = tm.waivePattern();
+                    if (S.empty(mwaive)) mwaive = waive;
+                }
+                String cn = extensionClass.getSimpleName();
+                if (S.empty(mwaive)) mwaive = cn;
                 
                 boolean requireTemplate = clsRequireTemplate;
                 if (null != tm && tm.requireTemplate()) {
                     requireTemplate = true;
                 }
 
-                String cn = extensionClass.getSimpleName();
                 String cn0 = extensionClass.getName();
                 String mn = m.getName();
                 String fullName = String.format("%s.%s", cn0, mn);
@@ -657,9 +670,9 @@ public class RythmEngine implements IEventDispatcher {
                     mn = mnmsp + "_" + mn;
                 }
                 if (len == 1) {
-                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(cn, mn, fullName, requireTemplate));
+                    jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(mwaive, mn, fullName, requireTemplate));
                 } else {
-                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(cn, mn, ".+", fullName, requireTemplate));
+                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(mwaive, mn, ".+", fullName, requireTemplate));
                 }
             }
         }
@@ -1672,7 +1685,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @return output mode
      */
-    public final static OutputMode outputMode() {
+    public static OutputMode outputMode() {
         return outputMode.get();
     }
 
@@ -1754,7 +1767,7 @@ public class RythmEngine implements IEventDispatcher {
         if (null != _templates) _templates.clear();
         if (null != _classes) _classes.clear();
         if (null != _nonExistsTags) _nonExistsTags.clear();
-        if (null != _nonTmpls) _nonTmpls.clear();;
+        if (null != _nonTmpls) _nonTmpls.clear();
     }
 
 }

@@ -56,7 +56,7 @@ public class BlockCloseParser extends ParserBase {
                 if (!m.matches()) {
                     return null;
                 }
-            };
+            }
             s = m.group(1);
         }
         // keep ">" or "]" for case like <a id=".." @if (...) class="error" @>

@@ -37,7 +37,7 @@ public class CommentTest extends TestBase {
 
     @Test
     public void testInlineComment() {
-        t = "abc@//adfiauoprquwreqw\nxyz";
+        t = "abc@/adfiauoprquwreqw\nxyz";
         s = r(t);
         assertEquals("abc\nxyz", s);
     }

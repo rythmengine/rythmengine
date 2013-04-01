@@ -73,6 +73,15 @@ public @interface Transformer {
     String value() default "app";
 
     /**
+     * Once specified the pattern will be used to match the token to see if transformer extension
+     * should be waived or not. For example, <tt>@x.escape()</tt> should be treated as <tt>escape</tt> 
+     * transformer while <tt>@s().escape(x)</tt> shouldn't because <tt>s\\(\\)</tt> is a waive pattern
+     * 
+     * @return
+     */
+    String waivePattern() default "";
+
+    /**
      * Require passing {@link com.greenlaw110.rythm.template.ITemplate template} instance as
      * implicit argument (the first parameter)
      * @return true if require passing template instance as the implicit first parameter 
