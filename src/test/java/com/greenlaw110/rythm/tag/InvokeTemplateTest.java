@@ -111,6 +111,12 @@ public class InvokeTemplateTest extends TestBase {
         s = r(t, "rythm");
         eq("alert('rythm')");
     }
+    
+    @Test
+    public void testTagWithCallback() {
+        s = r("testTagWithCallback.html", "abc");
+        eqf("testTagWithCallback.result");
+    }
 
     public static void main(String[] args) {
         run(InvokeTemplateTest.class);
