@@ -61,6 +61,12 @@ public class GHIssueTest extends TestBase {
         eq("0");
     }
 
+    @Test
+    public void test137() {
+        t = "@{String s = \"abc\"}\n@s @assign(foo){bar}@foo";
+        s = r(t);
+        eq("\nabc bar");
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

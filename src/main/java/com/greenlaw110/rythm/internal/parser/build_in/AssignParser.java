@@ -72,9 +72,10 @@ public class AssignParser extends KeywordParserFactory {
             StringBuilder sbNew = new StringBuilder();
             StringBuilder sbOld = __getBuffer();
             __setBuffer(sbNew);
-            p3tline("String s = sbNew.toString();");
+            String varName = ctx.getCodeBuilder().newVarName();
+            p3tline(String.format("String %s = sbNew.toString();", varName));
             p3tline("setSelfOut(sbOld);");
-            p3t(assignTo).p(" = s;");
+            p3t(assignTo).p(String.format(" = %s;", varName));
             pline();
             p2tline("}");
             if (isFinal) {
