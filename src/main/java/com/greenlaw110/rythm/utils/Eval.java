@@ -111,7 +111,7 @@ public class Eval {
     public static boolean eval(Collection c) {
         return !c.isEmpty();
     }
-
+    
     /**
      * Return <code>true</code> if the map is not empty
      * @param m
@@ -171,7 +171,7 @@ public class Eval {
      * General object type evaluation. 
      * <ul>
      * <li>return <code>false</code> if the object instance is <code>null</code></li>
-     * <li>return <code>false</code> if the object instance is an empty {@link Collection}</li>
+     * <li>return <code>false</code> if the object instance is an empty {@link java.util.Collection} or {@link java.util.Map}</li>
      * <li>if object is type of Character, Float, Double then use its primitive value to evaluate</li>
      * <li>if object is any other type of Number, then use it's {@link Number#intValue()} to evaluate</li>
      * </ul>
@@ -184,6 +184,20 @@ public class Eval {
             return false;
         } else if (condition.getClass().isArray()) {
             return ((Object[])condition).length > 0;
+        } else if (condition instanceof String) {
+            return eval((String) condition);
+        } else if (condition instanceof Boolean) {
+            return (Boolean)condition;
+        } else if (condition instanceof Collection) {
+            return eval((Collection) condition);
+        } else if (condition instanceof Map) {
+            return eval((Map) condition);
+        } else if (condition instanceof Double) {
+            return eval((Double) condition);
+        } else if (condition instanceof Float) {
+            return eval((Float) condition);
+        } else if (condition instanceof Number) {
+            return eval((Number) condition);
         }
         return true;
     }
