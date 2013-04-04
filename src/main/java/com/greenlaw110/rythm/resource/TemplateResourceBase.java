@@ -50,6 +50,11 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         this.engine = engine.isSingleton() ? null : engine;
     }
 
+    @Override
+    public void setEngine(RythmEngine engine) {
+        this.engine = engine;
+    }
+
     protected RythmEngine engine() {
         return null == engine ? Rythm.engine() : engine;
     }

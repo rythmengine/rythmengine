@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.resource;
 
+import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.ICodeType;
 
 import java.io.Serializable;
@@ -81,5 +82,11 @@ public interface ITemplateResource extends Serializable {
      * @return code type suggested
      */
     ICodeType codeType();
+
+    /**
+     * Set engine instance to the resource
+     * @param engine
+     */
+    void setEngine(RythmEngine engine);
 
 }

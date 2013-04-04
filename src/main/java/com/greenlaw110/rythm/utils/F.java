@@ -538,6 +538,11 @@ public class F {
             public int size() {
                 return max() - min();
             }
+
+            @Override
+            public boolean include(Integer element) {
+                return (min() <= element) && (element < max());
+            }
         };
     }
 
@@ -553,6 +558,11 @@ public class F {
                 char min = min();
                 char max = max();
                 return (int) max - (int) min;
+            }
+
+            @Override
+            public boolean include(Character element) {
+                return (min() <= element) && (element < max());
             }
         };
     }

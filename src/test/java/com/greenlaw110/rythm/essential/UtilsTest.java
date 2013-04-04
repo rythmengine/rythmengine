@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.essential;
 
 import com.greenlaw110.rythm.TestBase;
+import com.greenlaw110.rythm.utils.S;
 import org.junit.Test;
 
 import java.util.*;
@@ -126,5 +127,14 @@ public class UtilsTest extends TestBase {
         t = "@__log_time__";
         s = r(t);
         // TODO how to test this?
+    }
+    
+    @Test
+    public void captializeWords() {
+        s = S.capitalizeWords("[abc 123 xyz]");
+        eq("[Abc 123 Xyz]");
+        
+        s = S.capitalizeWords("abc@xyz.com");
+        eq("Abc@Xyz.Com");
     }
 }

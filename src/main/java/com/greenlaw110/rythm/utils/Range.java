@@ -56,6 +56,8 @@ public abstract class Range<TYPE extends Comparable<TYPE>> implements Iterable<T
 
     protected abstract TYPE next(TYPE element);
     
+    public abstract boolean include(TYPE element);
+    
     public abstract int size();
 
     @Override

@@ -93,6 +93,22 @@ public class TransformerTest extends TestBase {
         eq("$1,000.00");
         s = Rythm.render("@args int x;@s().formatCurrency(x)", 100000/100);
         eq("$1,000.00");
+        
+        // eq
+        s = Rythm.render("@1.eq(@2)", "a", "b");
+        eq("false");
+        
+        s = Rythm.render("@1.eq(@2)", "a", "a");
+        eq("true");
+
+        s = Rythm.render("@1.eq(@2)", 1, 3);
+        eq("false");
+
+        s = Rythm.render("@1.eq(@2)", 1, 1);
+        eq("true");
+
+        s = Rythm.render("@1.eq(@2)", null, null);
+        eq("true");
     }
     
     @Test

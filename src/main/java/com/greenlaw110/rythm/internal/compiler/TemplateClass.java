@@ -312,6 +312,7 @@ public class TemplateClass {
     public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh) {
         this(engine);
         if (null == resource) throw new NullPointerException();
+        resource.setEngine(engine());
         templateResource = resource;
         if (!noRefresh) refresh();
     }
@@ -319,6 +320,7 @@ public class TemplateClass {
     public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh, IDialect dialect) {
         this(engine);
         if (null == resource) throw new NullPointerException();
+        resource.setEngine(engine());
         templateResource = resource;
         this.dialect = dialect;
         if (!noRefresh) refresh();

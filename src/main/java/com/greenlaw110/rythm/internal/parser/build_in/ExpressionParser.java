@@ -137,12 +137,12 @@ public class ExpressionParser extends CaretParserFactoryBase {
                 if (r1.search(s)) {
                     s = r1.stringMatched();
                     if (s.length() > 0) {
-                        String s0 = s.substring(1);
-                        int pos = s0.indexOf("@");
-                        if (pos > -1) {
-                            s = s.substring(0, pos + 1);
-                            step(s.length());
-                        }
+//                        String s0 = s.substring(1);
+//                        int pos = s0.indexOf("@");
+//                        if (pos > -1) {
+//                            s = s.substring(0, pos + 1);
+//                            step(s.length());
+//                        }
                         //s = r1.stringMatched(1);
                         if (!caret.equals(s.trim())) {
                             step(s.length());

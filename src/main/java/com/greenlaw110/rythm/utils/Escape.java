@@ -25,31 +25,49 @@ import java.util.Arrays;
  * Escape
  */
 public enum Escape {
+    /**
+     * Indicate raw escape scheme, i.e. no other escape scheme should apply
+     */
     RAW,
+    /**
+     * CSV escape scheme
+     */
     CSV {
         @Override
         protected RawData apply_(String s) {
             return com.greenlaw110.rythm.utils.S.escapeCsv(s);
         }
     },
+    /**
+     * HTML escape scheme
+     */
     HTML {
         @Override
         protected RawData apply_(String s) {
             return com.greenlaw110.rythm.utils.S.escapeHtml(s);
         }
     },
+    /**
+     * javascript escape scheme
+     */
     JS {
         @Override
         protected RawData apply_(String s) {
             return com.greenlaw110.rythm.utils.S.escapeJavaScript(s);
         }
     },
+    /**
+     * JSON escape scheme
+     */
     JSON {
         @Override
         protected RawData apply_(String s) {
             return com.greenlaw110.rythm.utils.S.escapeJson(s);
         }
     },
+    /**
+     * XML escape scheme
+     */
     XML {
         @Override
         protected RawData apply_(String s) {
@@ -57,6 +75,11 @@ public enum Escape {
         }
     };
 
+    /**
+     * Apply this escape scheme to the object's string representation
+     * @param o
+     * @return
+     */
     public RawData apply(Object o) {
         if (null == o) return RawData.NULL;
         String s = o.toString();

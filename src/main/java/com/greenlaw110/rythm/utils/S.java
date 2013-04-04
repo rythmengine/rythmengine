@@ -176,6 +176,7 @@ public class S {
      * @param s2
      * @return true if s1 equals s2
      */
+    @Transformer
     public static boolean eq(String s1, String s2) {
         return isEqual(s1, s2, 0);
     }
@@ -297,9 +298,9 @@ public class S {
 
     /**
      * Return a {@link com.greenlaw110.rythm.utils.RawData} type wrapper of
-     * an object with default {@link #escapeXml(Object)} escaping or if the current
-     * render engine exists return the escape specified by the default code type of the 
-     * current render engine
+     * an object without escaping or if the current template exists 
+     * return the escape specified by the current escape scheme of the current
+     * render template
      * <p/>
      * <p>Object is {@link #toString(Object) converted to String} before escaping</p>
      *
@@ -632,7 +633,15 @@ public class S {
         if (null == o) return "";
         return o.toString().replaceAll("[\r\n]+", "\n").replaceAll("[ \\t\\x0B\\f]+", " ");
     }
-
+    
+    private static final Range<Integer> digits = F.R(0x30, 0x3a);
+    private static final Range<Integer> uppers = F.R(0x41, 0x5b); 
+    private static final Range<Integer> lowers = F.R(0x61, 0x7b);
+    
+    public static boolean isDigitsOrAlphabetic(char c) {
+        int i = (int)c;
+        return digits.include(i) || uppers.include(i) || lowers.include(i);
+    }
 
     /**
      * Capitalize the first character of every word of the specified object's
@@ -649,7 +658,7 @@ public class S {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < source.length(); i++) {
             char c = source.charAt(i);
-            if (c != ' ' && prevc == ' ') {
+            if (c != ' ' && !isDigitsOrAlphabetic(prevc)) {
                 sb.append(Character.toUpperCase(c));
             } else {
                 sb.append(c);
