@@ -818,6 +818,7 @@ public class S {
      * @see DecimalFormatSymbols
      */
     public static String format(ITemplate template, Number number, String pattern, Locale locale) {
+        if (null == number) number = 0;
         if (null == locale) {
             locale = I18N.locale(template);
         }
@@ -953,6 +954,7 @@ public class S {
      * @return format result
      */
     public static String format(ITemplate template, Date date, String pattern, Locale locale, String timezone) {
+        if (null == date) date = new Date(0);
         if (null == locale) {
             locale = I18N.locale(template);
         }

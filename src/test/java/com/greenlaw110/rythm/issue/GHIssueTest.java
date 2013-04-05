@@ -87,6 +87,13 @@ public class GHIssueTest extends TestBase {
         eq("\n1,2");
     }
     
+    @Test
+    public void test140() {
+        t = "@args Date d;@d.format(\"yyyy-MM-dd\"):@args Number n;@n.format()";
+        s = r(t, null, null);
+        eq("1970-01-01:0");
+    }
+    
     public static void main(String[] args) {
         run(GHIssueTest.class);
     }
