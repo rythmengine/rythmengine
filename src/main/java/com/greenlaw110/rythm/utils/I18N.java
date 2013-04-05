@@ -38,7 +38,17 @@ import java.util.ResourceBundle;
 public class I18N {
 
     private static final ILogger logger = Logger.get(I18N.class);
-    
+
+    /**
+     * Return a {@link com.greenlaw110.rythm.template.ITemplate template}'s current locale, or
+     * the the {@link com.greenlaw110.rythm.RythmEngine#get() current engine}'s 
+     * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#I18N_LOCALE locale configuration}
+     * or finally the default locale with {@link java.util.Locale#getDefault() java.util.Locale.getDefault()}
+     * call
+     * 
+     * @param template the template being executing
+     * @return a locale instance
+     */
     public static Locale locale(ITemplate template) {
         if (null != template) {
             return template.__curLocale();

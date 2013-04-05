@@ -31,6 +31,7 @@ import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
 import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.SimpleRythm;
+import com.greenlaw110.rythm.internal.parser.BlockCodeToken;
 import com.greenlaw110.rythm.internal.parser.CodeToken;
 import com.greenlaw110.rythm.internal.parser.NotRythmTemplateException;
 import com.greenlaw110.rythm.internal.parser.build_in.BlockToken;
@@ -539,6 +540,21 @@ public class CodeBuilder extends TextBuilder {
         List<TextBuilder> list = this.macros.get(macro);
         if (null == list) throw new NullPointerException();
         return list;
+    }
+    
+    public boolean lastIsBlockToken() {
+        for (int i = builders.size() - 1; i >= 0; --i) {
+            TextBuilder tb = builders.get(i);
+            if (tb instanceof BlockCodeToken) return true;
+            else if (tb instanceof Token.StringToken) {
+                String s = tb.toString();
+                if (S.empty(s)) continue;
+                else return false;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
     
     public boolean removeNextLF = false;

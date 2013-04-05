@@ -6,6 +6,8 @@ import com.greenlaw110.rythm.extension.ICodeType;
 import models.Foo;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /**
  * Test Github Issues
  */
@@ -66,6 +68,23 @@ public class GHIssueTest extends TestBase {
         t = "@{String s = \"abc\"}\n@s @assign(foo){bar}@foo";
         s = r(t);
         eq("\nabc bar");
+    }
+    
+    @Test
+    public void test139() {
+        t = "@args Object @1;@if (@1) \n{true} \nelse\n{false}";
+        s = r(t, true);
+        eq("true");
+        s = r(t, "false");
+        eq("false");
+        
+        t = "@for(int i = 0; i < 1; ++i).join()\n{\n@i\n}";
+        s = r(t);
+        eq("\n0\n");
+        
+        t = "@args List l;@for(l).join()\n{@_}";
+        s = r(t, Arrays.asList("1,2".split(",")));
+        eq("\n1,2");
     }
     
     public static void main(String[] args) {

@@ -40,7 +40,7 @@ public class IfParserTest extends TestBase {
 
     @Test
     public void testIf() {
-        t = "@if(true) {true}";
+        t = "@if(true) \n{true}";
         s = r(t);
         assertEquals("true", s);
         

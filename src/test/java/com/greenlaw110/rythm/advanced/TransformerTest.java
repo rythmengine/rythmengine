@@ -83,10 +83,23 @@ public class TransformerTest extends TestBase {
         s = Rythm.render("@1.camelCase()", p);
         assertEquals("FooBar Zee", s);
 
-        // format
+        // format date
         Date d = new Date();
         s = Rythm.render("@1.format(\"dd/MM/yyyy\")", d);
         assertEquals(S.format(d, "dd/MM/yyyy"), s);
+        s = Rythm.render("@1.format()", d);
+        eq(S.format(d));
+        
+        //format number
+        Number n = 113432.33;
+        s = r("@1.format()", n);
+        eq(S.format(n));
+        System.out.println(s);
+        n = .03;
+        String np = "#,###,###,000.00";
+        s = r("@1.format(@2)", n, np);
+        eq(S.format(n, np));
+        System.out.println(s);
         
         // format currency
         s = Rythm.render("@1.formatCurrency()", 100000/100);

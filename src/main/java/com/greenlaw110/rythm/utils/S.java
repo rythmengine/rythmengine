@@ -754,7 +754,6 @@ public class S {
      * @param data
      * @return raw data of transformed result
      */
-    @Transformer
     public static RawData nl2br(Object data) {
         return new RawData(StringEscapeUtils.escapeHtml4(str(data)).replace("\n", "<br/>"));
     }
@@ -779,6 +778,25 @@ public class S {
     }
 
     /**
+     * Format a number using default pattern, language and locale
+     * @param number
+     * @return the formatted string
+     */
+    public static String format(Number number) {
+        return format(null, number, null, null);
+    }
+
+    /**
+     * Format number with specified template
+     * @param template
+     * @param number
+     * @return the formatted string
+     */
+    public static String format(ITemplate template, Number number) {
+        return format(template, number, null, null);
+    }
+
+    /**
      * Format the number with specified pattern, language and locale
      * @param number
      * @param pattern
@@ -792,7 +810,7 @@ public class S {
     }
     
     /**
-     * Format the number with specified engine, pattern, language and locale
+     * Format the number with specified template, pattern, language and locale
      * @param number
      * @param pattern
      * @param locale

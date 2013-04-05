@@ -266,10 +266,11 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 //                                return tc;
 //                            }
                         } catch (Exception e) {
+                            //e.printStackTrace();
                             return tc;
                         }
                     } catch (Exception e) {
-                        // ignore
+                        //e.printStackTrace();
                     }
                 }
             }
