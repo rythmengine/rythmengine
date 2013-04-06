@@ -94,6 +94,14 @@ public class GHIssueTest extends TestBase {
         eq("1970-01-01:0");
     }
     
+    @Test
+    public void test141() {
+        t = "@args integration.T t;@t";
+        s = r(t);
+        eq("");
+    
+    }
+    
     public static void main(String[] args) {
         run(GHIssueTest.class);
     }
