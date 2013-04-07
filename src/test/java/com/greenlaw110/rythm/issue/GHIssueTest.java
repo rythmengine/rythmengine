@@ -6,7 +6,10 @@ import com.greenlaw110.rythm.extension.ICodeType;
 import models.Foo;
 import org.junit.Test;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Test Github Issues
@@ -99,7 +102,14 @@ public class GHIssueTest extends TestBase {
         t = "@args integration.T t;@t";
         s = r(t);
         eq("");
+    }
     
+    @Test
+    public void test142() {
+        t = "@locale(\"zh_CN\"){@i18n('template', \"planet\", 7, new Date())}";
+        s = r(t);
+        assertContains(s, "我们于");
+        assertContains(s, DateFormat.getDateInstance(DateFormat.LONG, new Locale("zh", "CN")).format(new Date()));
     }
     
     public static void main(String[] args) {

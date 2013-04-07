@@ -218,6 +218,16 @@ public class Eval {
      * @return new Locale constructed from the language
      */
     public static Locale locale(String language) {
+        if (language.contains("_")) {
+            String[] sa = language.split("_");
+            if (sa.length > 2) {
+                return new Locale(sa[0], sa[1], sa[2]);
+            } else if (sa.length > 1) {
+                return new Locale(sa[0], sa[1]);
+            } else {
+                return new Locale(sa[0]);
+            }
+        }
         return new Locale(language);
     }
 
