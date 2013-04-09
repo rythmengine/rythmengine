@@ -52,7 +52,10 @@ public class ArgsParser extends KeywordParserFactory {
                     String type = r.stringMatched(2);
                     checkRestrictedClass(type);
                     String name = r.stringMatched(4);
-                    String defVal = r.stringMatched(6);
+                    String neu = r.stringMatched(6); // check the 'new' keyword
+                    if (null == neu) neu = "";
+                    String defVal = r.stringMatched(7);
+                    defVal = neu + " " + defVal;
                     name = ExpressionParser.processPositionPlaceHolder(name);
                     ral.add(new F.T4(line, type, name, defVal));
                 }
@@ -112,7 +115,10 @@ public class ArgsParser extends KeywordParserFactory {
                     String type = r.stringMatched(2);
                     checkRestrictedClass(type);
                     String name = r.stringMatched(4);
-                    String defVal = r.stringMatched(6);
+                    String neu = r.stringMatched(6); // check the 'new' keyword
+                    if (null == neu) neu = "";
+                    String defVal = r.stringMatched(7);
+                    if (null != defVal) defVal = neu + " " + defVal;
                     name = ExpressionParser.processPositionPlaceHolder(name);
                     //ral.add(new CodeBuilder.RenderArgDeclaration(ctx().currentLine(), name, type, defVal));
                     ctx().getCodeBuilder().addRenderArgs(ctx().currentLine(), type, name, defVal);
@@ -163,7 +169,7 @@ public class ArgsParser extends KeywordParserFactory {
         return ral;
     }
 
-    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([@a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*((?@{})|[0-9]+[fLld]?|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
+    public static final String PATTERN = "\\G[ \\t\\x0B\\f]*,?[ \\t\\x0B\\f]*(([\\sa-zA-Z_][\\w$_\\.]*(?@\\<\\>)?(\\[\\])?)[ \\t\\x0B\\f]+([@a-zA-Z_][\\w$_]*))([ \\t\\x0B\\f]*=[ \\t\\x0B\\f]*(new[ \\t\\x0B\\f]+)?((?@{})|[0-9]+[fLld]?|'[.]'|(?@\"\")|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*))?";
 
     public static final String PATTERN2 = "";
 

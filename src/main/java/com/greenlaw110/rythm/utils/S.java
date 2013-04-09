@@ -1274,4 +1274,95 @@ public class S {
     public static String join(Iterable itr, char sep) {
         return join(itr, String.valueOf(sep));
     }
+    
+    public static String join(Character[] a) {
+        return join(a, ",");
+    }
+    
+    public static String join (Character[] a, String sep) {
+        int len = a.length;
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
+        for (int i = 1; i < len; ++i) {
+            sb.append(sep).append(a[i]);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Character[] a, char sep) {
+        return join(a, String.valueOf(sep));
+    }
+
+    public static String join(Integer[] a) {
+        return join(a, ",");
+    }
+    
+    public static String join (Integer[] a, String sep) {
+        int len = a.length;
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
+        for (int i = 1; i < len; ++i) {
+            sb.append(sep).append(a[i]);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Integer[] a, char sep) {
+        return join(a, String.valueOf(sep));
+    }
+    
+    public static String join(Long[] a) {
+        return join(a, ",");
+    }
+    
+    public static String join (Long[] a, String sep) {
+        int len = a.length;
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
+        for (int i = 1; i < len; ++i) {
+            sb.append(sep).append(a[i]);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Long[] a, char sep) {
+        return join(a, String.valueOf(sep));
+    }
+
+    public static String join(Float[] a) {
+        return join(a, ",");
+    }
+    
+    public static String join (Float[] a, String sep) {
+        int len = a.length;
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
+        for (int i = 1; i < len; ++i) {
+            sb.append(sep).append(a[i]);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Float[] a, char sep) {
+        return join(a, String.valueOf(sep));
+    }
+
+    public static String join(Double[] a) {
+        return join(a, ",");
+    }
+    
+    public static String join (Double[] a, String sep) {
+        int len = a.length;
+        if (len == 0) return "";
+        StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
+        for (int i = 1; i < len; ++i) {
+            sb.append(sep).append(a[i]);
+        }
+        return sb.toString();
+    }
+    
+    public static String join(Double[] a, char sep) {
+        return join(a, String.valueOf(sep));
+    }
+
 }

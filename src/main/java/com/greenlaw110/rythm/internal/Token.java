@@ -37,6 +37,8 @@ public class Token extends TextBuilder {
 
     private Token() {}
     public static Token EMPTY_TOKEN = new Token();
+    // for https://github.com/greenlaw110/Rythm/issues/146
+    public static Token EMPTY_TOKEN2 = new Token(); 
 
     public static class StringToken extends Token {
         public String constId = null;

@@ -50,7 +50,7 @@ public class BraceParser implements IParserFactory {
                     step(1);
                     if (ctx().getCodeBuilder().lastIsBlockToken()) {
                         ctx().getCodeBuilder().removeNextLF = true;
-                        return Token.EMPTY_TOKEN;
+                        return Token.EMPTY_TOKEN2;
                     } else {
                         return new BlockToken.LiteralBlock(ctx());
                     }

@@ -783,6 +783,11 @@ public class CodeBuilder extends TextBuilder {
         return regex.search(type);
     }
     
+    private static boolean isArray(String type) {
+        Regex regex = new Regex(".*(?@[])");
+        return regex.search(type);
+    }
+    
     private void addInferencedRenderArgs() {
         if (renderArgs.isEmpty() && conf.typeInferenceEnabled()) {
             Map<String, String> tMap = ParamTypeInferencer.getTypeMap();
@@ -840,11 +845,12 @@ public class CodeBuilder extends TextBuilder {
         p2tn("java.util.Map<java.lang.String, java.lang.Class> __m = new java.util.HashMap<String, Class>();");
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            boolean isGeneric = isGeneric(arg.type);
+            String argType = arg.type;
+            boolean isGeneric = isGeneric(argType);
             if (isGeneric) {
-                p2t("__m.put(\"").p(argName).p("\", ").p(toNonGeneric(arg.type)).pn(".class);");
+                p2t("__m.put(\"").p(argName).p("\", ").p(toNonGeneric(argType)).pn(".class);");
                 Regex regex = new Regex(".*((?@<>))");
-                regex.search(arg.type);
+                regex.search(argType);
                 String s = regex.stringMatched(1);
                 s = S.strip(s, "<", ">");
                 if (s.contains("<")) {
@@ -860,11 +866,18 @@ public class CodeBuilder extends TextBuilder {
                     }
                 }
             } else {
-                String type = arg.type;
+                String type = argType;
                 if ("?".equals(type)) {
                     type = "Object";
                 }
                 p2t("__m.put(\"").p(argName).p("\", ").p(type).pn(".class);");
+//                int lvl = 0;
+//                if (isArray(type)) {
+//                    int pos = type.lastIndexOf("[");
+//                    type = type.substring(0, pos);
+//                    p2t("__m.put(\"").p(argName).p("__").p(lvl).p("\", ").p(type).pn(".class);");
+//                    //lvl++;
+//                }
             }
         }
         p2tn("return __m;");

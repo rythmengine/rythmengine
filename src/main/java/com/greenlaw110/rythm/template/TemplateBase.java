@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.template;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
@@ -37,6 +38,7 @@ import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.*;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
@@ -812,6 +814,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             Map<String, Class> typeMap = __renderArgTypeMap();
             String vn = __renderArgName(0);
             Class c = typeMap.get(vn + "__0");
+            if (null == c) {
+                // an array type
+                c = typeMap.get(vn);
+            }
             Object p = JSON.parseArray(jsonArray.toString(), c);
             __setRenderArg(vn, p);
         } else {
@@ -841,7 +847,28 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     Map<String, Class> typeMap = __renderArgTypeMap();
                     //String vn = nm;
                     Class c0 = typeMap.get(nm + "__0");
-                    p = JSON.parseArray(o.toString(), c0);
+                    boolean isArray = false;
+                    if (null == c0) {
+                        // an array type
+                        isArray = true;
+                        c0 = typeMap.get(nm);
+                    }
+                    if (isArray) {
+                        JSONArray l = (JSONArray)o;
+                        //try {
+                            Class c1 = c0.getComponentType();
+                            int size = l.size();
+                            Object a = Array.newInstance(c1, size);
+                            for (int i = 0; i < size; ++i) {
+                                Object el = l.get(i);
+                                el = JSON.parseObject(el.toString(), c1);
+                                Array.set(a, i, el);
+                            }
+                        //}
+                        p = a;
+                    } else {
+                        p = JSON.parseArray(o.toString(), c0);
+                    }
                 } else {
                     String s = o.toString();
                     if (String.class.equals(c)) {
