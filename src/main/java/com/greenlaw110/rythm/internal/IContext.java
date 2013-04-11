@@ -48,6 +48,7 @@ public interface IContext {
      * @return true if there are remaining text to be parsed
      */
     boolean hasRemain();
+    
 
     /**
      * @return the first remain character without moving cursor

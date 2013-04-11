@@ -213,9 +213,9 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
             suffixes.add(0, sfx);
         }
         File tagFile;
-        List<String> roots = new ArrayList<String>();
-        File home = engine.conf().templateHome();
-        String root = home.getPath();
+        final List<String> roots = new ArrayList<String>();
+        final File home = engine.conf().templateHome();
+        final String root = home.getPath();
 
         // call tag with import path
         if (null != callerClass.importPaths) {
@@ -240,7 +240,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         }
 
         // add the default root at last
-        roots.add(home.getPath());
+        roots.add(root);
 
         for (String r : roots) {
             tmplName = r + File.separator + tagName0;
@@ -266,7 +266,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 //                                return tc;
 //                            }
                         } catch (Exception e) {
-                            //e.printStackTrace();
+                            e.printStackTrace();
                             return tc;
                         }
                     } catch (Exception e) {

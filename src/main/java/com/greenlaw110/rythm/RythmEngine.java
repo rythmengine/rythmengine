@@ -1282,11 +1282,20 @@ public class RythmEngine implements IEventDispatcher {
             }
         }
         // try relative path
+        // TODO: handle logic error here, caller foo.bar.html, tag: zee
+        // then should try foo.zee.html, if tag is zee.js, then should try foo.zee.js
         String callerName = resourceManager().getFullTagName(callerClass);
         int pos = callerName.lastIndexOf(".");
         if (-1 != pos) {
-            String name0 = callerName.substring(0, pos) + "." + name;
+            String s = callerName.substring(0, pos);
+            String name0 = s + "." + name;
             if (_templates.containsKey(name0)) return name0;
+            pos = s.lastIndexOf(".");
+            if (-1 != pos){
+                s = callerName.substring(0, pos);
+                name0 = s + "." + name;
+                if (_templates.containsKey(name0)) return name0;
+            }
         }
 
         try {

@@ -135,9 +135,9 @@ public class GHIssueTest extends TestBase {
     
     @Test
     public void test145() {
-        t = "@args Date today = new Date();@today.format(\"yyyy\")";
+        t = "@args Date today = new Date(),Boolean b;@today.format(\"yyyy\"):@b";
         s = r(t);
-        eq(S.format(new Date(), "yyyy"));
+        eq(S.format(new Date(), "yyyy") + ":false");
         
         t = "@args String x = \"x\";@x";
         s = r(t);
@@ -149,6 +149,19 @@ public class GHIssueTest extends TestBase {
         t = "@if(true){\n{true}\n}";
         s = r(t);
         eq("{true}");
+        t = "@for(\"a\"){\n{true}\n}";
+        s = r(t);
+        eq("{true}\n");
+        t = "@for(int i = 0; i < 1; ++i){\n{true}\n}";
+        s = r(t);
+        eq("{true}\n");
+    }
+    
+    @Test
+    public void test147() {
+        t = "gh147/index.html";
+        s = r(t);
+        contains("pre-callback-in-tag2");
     }
     
     public static void main(String[] args) {

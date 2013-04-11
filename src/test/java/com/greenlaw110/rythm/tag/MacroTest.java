@@ -28,9 +28,12 @@ import org.junit.Test;
 public class MacroTest extends TestBase {
     @Test
     public void testSimpleExec() {
-        t = "@macro(foo){bar}@exec(foo)";
+//        t = "@macro(foo){bar}@exec(foo)";
+//        s = r(t);
+//        eq("bar");
+        t = "@macro(bar){@if(true){x}}@exec(bar)";
         s = r(t);
-        eq("bar");
+        eq("x");
     }
     
     @Test

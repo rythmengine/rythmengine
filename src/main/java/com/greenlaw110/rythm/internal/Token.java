@@ -113,6 +113,10 @@ public class Token extends TextBuilder {
             }
             return false;
         }
+        
+        public boolean empty() {
+            return S.empty(s);
+        }
     }
 
     protected static final ILogger logger = Logger.get(Token.class);

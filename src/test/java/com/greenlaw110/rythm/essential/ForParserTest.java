@@ -330,7 +330,7 @@ public class ForParserTest extends TestBase {
     public void test3() {
         t = "@args List items\n     @for(Object item: items) {\n@{}}";
         s = r(t, Collections.EMPTY_LIST);
-        eq("\n");
+        eq("");
     }
     
     @Test

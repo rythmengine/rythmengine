@@ -45,15 +45,20 @@ public class IfParser extends KeywordParserFactory {
                 }
                 final String matched = r.stringMatched();
                 int line = ctx.currentLine();
+                boolean leadingLB = !isLastBuilderLiteral();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
-                    String s = matched;
-                    while (s.startsWith("\n")) {line = line + 1;s = s.substring(1);}
+                    if (matched.startsWith("\n")) {
+                        leadingLB = true;
+                        line++;
+                    }
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
-                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
-                    if (r0.search(matched)) {
-                        String blank = r0.stringMatched(1);
-                        if (blank.length() > 0) {
-                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                    if (!matched.startsWith("\n")) {
+                        Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
                         }
                     }
                 } else {
@@ -76,6 +81,7 @@ public class IfParser extends KeywordParserFactory {
                     s = "\nif (!com.greenlaw110.rythm.utils.Eval.eval(" + s + ")) {";
                 }
                 //if (!s.endsWith("{")) s = "\n" + s + " {";
+                processFollowingOpenBraceAndLineBreak(leadingLB);
                 return new IfBlockCodeToken(s, ctx(), line);
             }
         };

@@ -180,6 +180,29 @@ public class CodeBuilder extends TextBuilder {
     // <argName, argClass>
     public Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<TextBuilder> builders = new ArrayList<TextBuilder>();
+    private List<TextBuilder> builders() {
+        if (macroStack.empty()) return builders;
+        String macro = macroStack.peek();
+        List<TextBuilder> bl = macros.get(macro);
+        if (null == bl) {
+            bl = new ArrayList<TextBuilder>();
+            macros.put(macro, bl);
+        }
+        return bl;
+    }
+    public boolean isLastBuilderLiteral() {
+        List<TextBuilder> bl = builders();
+        for (int i = bl.size() - 1; i >= 0; --i) {
+            TextBuilder tb = bl.get(i);
+            if (tb instanceof Token.StringToken) {
+                if (((Token.StringToken)tb).empty()) continue;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
     private TemplateParser parser;
     private TemplateClass templateClass;
 
@@ -543,8 +566,9 @@ public class CodeBuilder extends TextBuilder {
     }
     
     public boolean lastIsBlockToken() {
-        for (int i = builders.size() - 1; i >= 0; --i) {
-            TextBuilder tb = builders.get(i);
+        List<TextBuilder> bs = builders();
+        for (int i = bs.size() - 1; i >= 0; --i) {
+            TextBuilder tb = bs.get(i);
             if (tb instanceof BlockCodeToken) return true;
             else if (tb instanceof Token.StringToken) {
                 String s = tb.toString();
@@ -563,7 +587,7 @@ public class CodeBuilder extends TextBuilder {
             return;
         }
         Token token = (Token)builder;
-        if (removeNextLF) {
+        if (removeNextLF && token != Token.EMPTY_TOKEN2) {
             if (token.removeLeadingLineBreak()) {
                 removeNextLF = false;
             }
@@ -571,17 +595,7 @@ public class CodeBuilder extends TextBuilder {
         if (token.removeNextLineBreak) {
             removeNextLF = true;
         }
-        if (macroStack.empty()) {
-            builders.add(builder);
-        } else {
-            String macro = macroStack.peek();
-            List<TextBuilder> list = macros.get(macro);
-            if (null == list) {
-                list = new ArrayList<TextBuilder>();
-                macros.put(macro, list);
-            }
-            list.add(builder);
-        }
+        builders().add(builder);
     }
     
     /**
@@ -590,8 +604,9 @@ public class CodeBuilder extends TextBuilder {
      */
     public void removeSpaceToLastLineBreak(IContext ctx) {
         boolean shouldRemoveSpace = true;
-        for (int i = builders.size() - 1; i >= 0; --i) {
-            TextBuilder tb = builders.get(i);
+        List<TextBuilder> bl = builders();
+        for (int i = bl.size() - 1; i >= 0; --i) {
+            TextBuilder tb = bl.get(i);
             if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                 continue;
             }
@@ -607,18 +622,18 @@ public class CodeBuilder extends TextBuilder {
             break;
         }
         if (shouldRemoveSpace) {
-            for (int i = builders.size() - 1; i >= 0; --i) {
-                TextBuilder tb = builders.get(i);
+            for (int i = bl.size() - 1; i >= 0; --i) {
+                TextBuilder tb = bl.get(i);
                 if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                     continue;
                 }
                 if (tb.getClass().equals(Token.StringToken.class)) {
                     String s = tb.toString();
                     if (s.matches("[ \\t\\x0B\\f]+")) {
-                        builders.remove(i);
+                        bl.remove(i);
                         continue;
                     } else if (s.matches("(\\n\\r|\\r\\n|[\\r\\n])")) {
-                        builders.remove(i);
+                        bl.remove(i);
                     }
                 }
                 break;
@@ -632,8 +647,9 @@ public class CodeBuilder extends TextBuilder {
      */
     public void removeSpaceTillLastLineBreak(IContext ctx) {
         boolean shouldRemoveSpace = true;
-        for (int i = builders.size() - 1; i >= 0; --i) {
-            TextBuilder tb = builders.get(i);
+        List<TextBuilder> bl = builders();
+        for (int i = bl.size() - 1; i >= 0; --i) {
+            TextBuilder tb = bl.get(i);
             if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                 continue;
             }
@@ -649,15 +665,15 @@ public class CodeBuilder extends TextBuilder {
             break;
         }
         if (shouldRemoveSpace) {
-            for (int i = builders.size() - 1; i >= 0; --i) {
-                TextBuilder tb = builders.get(i);
+            for (int i = bl.size() - 1; i >= 0; --i) {
+                TextBuilder tb = bl.get(i);
                 if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                     continue;
                 }
                 if (tb.getClass().equals(Token.StringToken.class)) {
                     String s = tb.toString();
                     if (s.matches("[ \\t\\x0B\\f]+")) {
-                        builders.remove(i);
+                        bl.remove(i);
                         continue;
                     }
                 }

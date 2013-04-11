@@ -22,10 +22,7 @@ package com.greenlaw110.rythm.internal.parser;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.Sandbox;
-import com.greenlaw110.rythm.internal.CodeBuilder;
-import com.greenlaw110.rythm.internal.IContext;
-import com.greenlaw110.rythm.internal.IDialect;
-import com.greenlaw110.rythm.internal.IParser;
+import com.greenlaw110.rythm.internal.*;
 import com.greenlaw110.rythm.internal.parser.build_in.CaretParserFactoryBase;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
@@ -118,7 +115,48 @@ public abstract class ParserBase implements IParser {
             }
         }
     }
+    
+    protected boolean isLastBuilderLiteral() {
+        IContext ctx = ctx();
+        if (ctx.cursor() == 0) return false;
+        CodeBuilder cb = ctx.getCodeBuilder();
+        return cb.isLastBuilderLiteral();
+    }
 
+    protected void processFollowingOpenBraceAndLineBreak(boolean leadingLB) {
+        IContext ctx = ctx();
+        int cnt = 0; int lbCnt = 0;
+        StringBuilder sb = new StringBuilder();
+        boolean braceOpen = false;
+        while(ctx.hasRemain()) {
+            char c0 = ctx.pop();cnt--;
+            if (c0 == ' ' || c0 == '\t') {
+                if (braceOpen) sb.append(c0);
+                continue;
+            } else if (c0 == '\n') {
+                if (braceOpen) {
+                    if (!leadingLB) sb.append("\n");
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken(sb.toString(), ctx));
+                    break;
+                } else {
+                    lbCnt++;
+                    continue;
+                }
+            } else if (c0 == '{') {
+                if (!braceOpen) {
+                    braceOpen = true;
+                    cnt = 0;
+                    continue;
+                } else {
+                    ctx.step(cnt);
+                    break;
+                }
+            } else {
+                ctx.step(cnt);
+                break;
+            }
+        }
+    }
 
     // -- for testing purpose
     public static void p(int i, Regex r) {

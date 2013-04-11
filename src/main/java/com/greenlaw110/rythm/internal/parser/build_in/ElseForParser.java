@@ -65,6 +65,7 @@ public class ElseForParser extends CaretParserFactoryBase {
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
+                processFollowingOpenBraceAndLineBreak(false);
                 BlockCodeToken tk = new BlockCodeToken(s1, ctx) {
                     @Override
                     public String closeBlock() {

@@ -113,6 +113,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
 //                if (needsToAddLF) {
 //                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
 //                }
+                processFollowingOpenBraceAndLineBreak(false);
                 return new IfParser.IfBlockCodeToken(s1, ctx, line);
             }
 

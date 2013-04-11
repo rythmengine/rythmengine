@@ -42,14 +42,20 @@ public class ForEachParser extends KeywordParserFactory {
                 }
                 int lineNo = ctx.currentLine();
                 final String matched = r.stringMatched();
+                boolean leadingLB = !isLastBuilderLiteral();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
-                    if (matched.startsWith("\n")) lineNo++;
+                    if (matched.startsWith("\n")) {
+                        leadingLB = true;
+                        lineNo++;
+                    }
                     ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
-                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
-                    if (r0.search(matched)) {
-                        String blank = r0.stringMatched(1);
-                        if (blank.length() > 0) {
-                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                    if (!matched.startsWith("\n")) {
+                        Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                        if (r0.search(matched)) {
+                            String blank = r0.stringMatched(1);
+                            if (blank.length() > 0) {
+                                ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                            }
                         }
                     }
                 } else {
@@ -87,6 +93,8 @@ public class ForEachParser extends KeywordParserFactory {
                         s1 = "int " + varCursor + " = 0;//line: " + lineNo + "\nfor ";
                         s2 = s2 + "if (" + varCursor + "++ > 0) {p(" + separator + ");} //line: " + lineNo + "\n\t"; 
                     }
+                    // get rid of the "{" if it is followed
+                    processFollowingOpenBraceAndLineBreak(leadingLB);
                     return new BlockCodeToken(s1 + s + s2, ctx()) {
                         @Override
                         public void openBlock() {
@@ -135,6 +143,7 @@ public class ForEachParser extends KeywordParserFactory {
                             varname = s1;
                         }
                     }
+                    processFollowingOpenBraceAndLineBreak(leadingLB);
                     return new ForEachCodeToken(type, varname, iterable, ctx(), lineNo, separator);
                 }
             }
@@ -148,7 +157,7 @@ public class ForEachParser extends KeywordParserFactory {
 
     // match for(int i=0; i<100;++i) {
     protected String patternStr2() {
-        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))(\\.join((?@())))?([ \\t\\x0B\\f]*\\{?[ \\t\\x0B\\f]*\\n?)";
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))(\\.join((?@())))?([ \\t\\x0B\\f]*\\n?)";
     }
 
     @Override

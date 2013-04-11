@@ -48,12 +48,27 @@ public class BraceParser implements IParserFactory {
                 char c = remain.charAt(0);
                 if ('{' == c) {
                     step(1);
-                    if (ctx().getCodeBuilder().lastIsBlockToken()) {
-                        ctx().getCodeBuilder().removeNextLF = true;
-                        return Token.EMPTY_TOKEN2;
-                    } else {
-                        return new BlockToken.LiteralBlock(ctx());
-                    }
+//                    if (ctx().getCodeBuilder().lastIsBlockToken()) {
+//                        // remove space followed by line break;
+//                        int cnt = 0;
+//                        while (ctx().hasRemain()) {
+//                            char c0 = ctx().pop();
+//                            cnt--;
+//                            if (c0 == ' ' || c0 == '\t') {
+//                                continue;
+//                            } else if (c0 == '\n') {
+//                                return new Token.StringToken("\n", ctx());
+//                            } else {
+//                                ctx().step(cnt);
+//                                break;
+//                            }
+//                        }
+//                        //ctx().getCodeBuilder().removeNextLF = true;
+//                        return Token.EMPTY_TOKEN2;
+//                    } else {
+//                        return new BlockToken.LiteralBlock(ctx());
+//                    }
+                    return new BlockToken.LiteralBlock(ctx());
                 } else {
                     IBlockHandler bh = ctx().currentBlock();
                     boolean isLiteral = null == bh ? false : bh instanceof BlockToken.LiteralBlock;

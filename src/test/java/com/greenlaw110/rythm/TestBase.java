@@ -69,6 +69,10 @@ public abstract class TestBase extends Assert {
         String msg = String.format("should not contains '%s', found: '%s'", notExpected, found);
         assertTrue(msg, !found.contains(notExpected));
     }
+    
+    protected void contains(String expected) {
+        assertContains(s, expected);
+    }
 
     protected void assertContains(String found, String expected) {
         String msg = String.format("should contains '%s', found: '%s'", expected, found);

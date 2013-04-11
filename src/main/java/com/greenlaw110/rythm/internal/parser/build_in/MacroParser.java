@@ -43,8 +43,9 @@ public class MacroParser extends KeywordParserFactory {
         return new ParserBase(ctx) {
             public TextBuilder go() {
                 Regex r = reg(dialect());
-                if (!r.search(remain()))
+                if (!r.search(remain())) {
                     raiseParseException("bad @macro statement. Correct usage: @macro(macro-name){...}");
+                }
                 final String matched = r.stringMatched();
                 step(matched.length());
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {

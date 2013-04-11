@@ -133,8 +133,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     @Override
     protected void __pLayoutContent() {
-        if (null != __body) __body.render(null, buffer());
-        else super.__pLayoutContent();
+        //if (null != __body) __body.render(null, buffer());
+        super.__pLayoutContent();
     }
 
     @Override

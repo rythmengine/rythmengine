@@ -55,7 +55,7 @@ public class ArgsParser extends KeywordParserFactory {
                     String neu = r.stringMatched(6); // check the 'new' keyword
                     if (null == neu) neu = "";
                     String defVal = r.stringMatched(7);
-                    defVal = neu + " " + defVal;
+                    if (null != defVal) defVal = neu + " " + defVal;
                     name = ExpressionParser.processPositionPlaceHolder(name);
                     ral.add(new F.T4(line, type, name, defVal));
                 }
