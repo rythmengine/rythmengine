@@ -521,6 +521,30 @@ public class RythmEngine implements IEventDispatcher {
         init(userConfiguration);
     }
 
+    private Map<String, Object> properties = new HashMap<String, Object>();
+
+    /**
+     * Set user property to the engine. Note The property is not used by the engine program
+     * it's purely a place for user to add any tags or properties to the engine and later
+     * get fetched out and use in the user application
+     * 
+     * @param key
+     * @param val
+     */
+    public void setProperty(String key, Object val) {
+        properties.put(key, val);
+    }
+
+    /**
+     * Get user property by key
+     * @param key
+     * @param <T>
+     * @return the property being cast to type T
+     */
+    public <T> T getProperty(String key) {
+        return (T) properties.get(key);
+    }
+
     private void init() {
         init(null);
     }
@@ -814,26 +838,19 @@ public class RythmEngine implements IEventDispatcher {
             key += ParamTypeInferencer.uuid();
         }
         TemplateClass tc = classes().getByTemplate(key);
+        ITemplate t;
         if (null == tc) {
             tc = new TemplateClass(file, this);
+            t = tc.asTemplate();
+            if (null == t) return null;
+            String fullTagName = resourceManager().getFullTagName(tc);
+            tc.setFullName(fullTagName);
+            _templates.put(fullTagName, t);
             //classes().add(key, tc);
+        } else {
+            t = tc.asTemplate();
         }
-        ITemplate t = tc.asTemplate();
-        if (null == t) return null;
-        String fullTagName = resourceManager().getFullTagName(tc);
-        tc.setFullName(fullTagName);
-        _templates.put(fullTagName, t);
         setRenderArgs(t, args);
-//        try {
-//            __setRenderArgs(t, args);
-//        } catch (ClassCastException ce) {
-//            if (mode.isDev()) {
-//                handleCCE(ce);
-//                return etTemplate(template, args);
-//            }
-//            throw ce;
-//        }
-//        if (mode.isDev()) cceCounter.remove();
         return t;
     }
 
