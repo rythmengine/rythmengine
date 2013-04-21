@@ -626,7 +626,14 @@ public enum RythmConfigurationKey {
      * Should you really need to configure this item, make sure it is configured as an instance of {@link com.greenlaw110.rythm.sandbox.SandboxThreadFactory}</p>
      * <p>Default value: <code>null</code></p>
      */
-    SANBOX_THREAD_FACTORY_IMPL("sandbox.thread_factory.impl", null);
+    SANBOX_THREAD_FACTORY_IMPL("sandbox.thread_factory.impl", null),
+
+    /**
+     * "transformer.udt": User defined transformers, should be a list of class names separated by ",". If configured
+     * then {@link com.greenlaw110.rythm.RythmEngine#registerTransformer(Class[]) RythmEngine.registerTransformer} will
+     * be called to register these user defined transformer classes. Default value: <code>null</code>
+     */
+    TRANSFORMER_UDT("transformer.udt");
 
     private String key;
     private Object defVal;

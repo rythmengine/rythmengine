@@ -43,7 +43,10 @@ import com.greenlaw110.rythm.resource.TemplateResourceManager;
 import com.greenlaw110.rythm.resource.ToStringTemplateResource;
 import com.greenlaw110.rythm.sandbox.SandboxExecutingService;
 import com.greenlaw110.rythm.sandbox.SandboxThreadFactory;
-import com.greenlaw110.rythm.template.*;
+import com.greenlaw110.rythm.template.ITag;
+import com.greenlaw110.rythm.template.ITemplate;
+import com.greenlaw110.rythm.template.JavaTagBase;
+import com.greenlaw110.rythm.template.TemplateBase;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.F;
@@ -55,6 +58,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -612,6 +616,54 @@ public class RythmEngine implements IEventDispatcher {
                 body.render(__getBuffer());
             }
         });
+        
+        Object o = _conf.get(RythmConfigurationKey.TRANSFORMER_UDT);
+        if (null != o) {
+            List<Class> udts = new ArrayList<Class>();
+            if (o.getClass().isArray()) {
+                int len = Array.getLength(o);
+                for (int i = 0; i < len; ++i) {
+                    Object e = Array.get(o, i);
+                    if (e instanceof Class) {
+                        udts.add((Class)e);
+                    } else if (null != e) {
+                        String s = e.toString();
+                        try {
+                            udts.add(Class.forName(s));
+                        } catch (ClassNotFoundException ce) {
+                            logger.warn("User defined transformer class not found: %s", s);
+                        }
+                    }
+                }
+            } else if (o instanceof List) {
+                List l = (List) o;
+                for (Object e : l) {
+                    if (e instanceof Class) {
+                        udts.add((Class)e);
+                    } else if (null != e) {
+                        String s = e.toString();
+                        try {
+                            udts.add(Class.forName(s));
+                        } catch (ClassNotFoundException ce) {
+                            logger.warn("User defined transformer class not found: %s", s);
+                        }
+                    }
+                }
+            } else if (o instanceof Class) {
+                udts.add((Class)o);
+            } else {
+                String s = o.toString();
+                for (String tc: s.split("[, \t]+")){
+                    try {
+                        Class c = Class.forName(tc);
+                        udts.add(c);
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("User defined transformer class not found: %s", tc);
+                    }
+                }
+            }
+            registerTransformer(udts.toArray(new Class[]{}));
+        }
         
         if (isDevMode()) {
             resourceManager().scan(conf().templateHome());

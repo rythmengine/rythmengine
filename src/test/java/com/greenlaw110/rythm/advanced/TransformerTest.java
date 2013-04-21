@@ -25,9 +25,7 @@ import com.greenlaw110.rythm.extension.Transformer;
 import com.greenlaw110.rythm.utils.S;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Transformer
 public class TransformerTest extends TestBase {
@@ -155,6 +153,20 @@ public class TransformerTest extends TestBase {
         String t = "@args String s, int i\n" +
                 "double of \"@s\" is \"@s.foo_dbl()\",\n " +
                 "double of [@i] is [@i.foo_dbl().format(\"0000.00\")]";
+        String s = Rythm.render(t, "Java", 99);
+        assertContains(s, "double of \"Java\" is \"JavaJava\"");
+        assertContains(s, "double of [99] is [0198.00]");
+    }
+    
+    @Test
+    public void testTransformerConf() {
+        Map<String, Object> conf = new HashMap<String, Object>();
+        conf.put("transformer.udt", "com.greenlaw110.rythm.advanced.TransformerTest");
+        Rythm.init(conf);
+        
+        String t = "@args String s, int i\n" +
+                "double of \"@s\" is \"@s.app_dbl()\",\n " +
+                "double of [@i] is [@i.app_dbl().format(\"0000.00\")]";
         String s = Rythm.render(t, "Java", 99);
         assertContains(s, "double of \"Java\" is \"JavaJava\"");
         assertContains(s, "double of [99] is [0198.00]");
