@@ -164,6 +164,13 @@ public class GHIssueTest extends TestBase {
         contains("pre-callback-in-tag2");
     }
     
+    @Test
+    public void test148() {
+        t = "gh148/main.html";
+        s = r(t);
+        eq("2");
+    }
+    
     public static void main(String[] args) {
         run(GHIssueTest.class);
     }
