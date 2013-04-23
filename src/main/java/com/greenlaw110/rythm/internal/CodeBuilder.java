@@ -925,9 +925,9 @@ public class CodeBuilder extends TextBuilder {
                 p2tn("int __p = 0, __l = __args.length;");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
-                    p2t("if (__p < __l) { Object v = __args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
-                            .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                            .p(arg.name).p(" = (").p(arg.type).pn(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                    p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
+                            .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); \n\t\t\t")
+                            .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v);\n\t\t\t __renderArgs.put(\"").p(arg.name.trim()).p("\",v);}\n");
                     if (--i == 0) break;
                 }
             }

@@ -167,8 +167,8 @@ public class GHIssueTest extends TestBase {
     @Test
     public void test148() {
         t = "gh148/main.html";
-        s = r(t);
-        eq("2");
+        s = r(t,"a", "b");
+        eq("2/b");
     }
     
     public static void main(String[] args) {

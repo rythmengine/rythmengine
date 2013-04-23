@@ -444,10 +444,17 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (null != caller) {
             tmpl.__caller = (TextBuilder) caller;
             Map<String, Object> callerRenderArgs = new HashMap<String, Object>(((TemplateBase)caller).__renderArgs);
-            for (String s: tmpl.__renderArgs.keySet()) {
-                callerRenderArgs.remove(s);
+            Map<String, Class> types = tmpl.__renderArgTypeMap();
+            for (String s: callerRenderArgs.keySet()) {
+                if (tmpl.__renderArgs.containsKey(s)) continue;
+                Object o = callerRenderArgs.get(s);
+                if (null == o) continue;
+                Class<?> c = types.get(s);
+                
+                if (null == c || c.isAssignableFrom(o.getClass())) {
+                    tmpl.__setRenderArg(s, o);
+                }
             }
-            tmpl.__setRenderArgs(callerRenderArgs);
         }
         tmpl.__setUserContext(engine.renderSettings.userContext());
         return tmpl;
