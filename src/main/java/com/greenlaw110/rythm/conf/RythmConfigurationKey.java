@@ -781,6 +781,9 @@ public enum RythmConfigurationKey {
         if (isAbsolute) return new File(s);
         try {
             File base = new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
+            if (!base.isDirectory()) {
+                base = new File("");
+            }
             return new File(base, s);
         } catch (Exception e) {
             throw new RuntimeException(e);

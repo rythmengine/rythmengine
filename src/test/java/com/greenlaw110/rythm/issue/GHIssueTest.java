@@ -9,9 +9,7 @@ import models.Foo;
 import org.junit.Test;
 
 import java.text.DateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Test Github Issues
@@ -168,6 +166,12 @@ public class GHIssueTest extends TestBase {
     public void test148() {
         t = "gh148/main.html";
         s = r(t,"a", "b");
+        eq("2/b");
+
+        Map<String, Object> args = new HashMap<String, Object>();
+        args.put("id", "x");
+        args.put("sid", "b");
+        s = r(t, args);
         eq("2/b");
     }
     

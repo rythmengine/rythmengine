@@ -76,7 +76,7 @@ public class Rythm {
     static RythmEngine engine = null;
 
     /**
-     * Initialize default engine instance with specified properties
+     * Initialize default engine instance with specified configuration
      * <p/>
      * <p>Note this method can not be called more than once during a JVM lifecycle.
      * if the default engine instance is created already then
@@ -87,11 +87,36 @@ public class Rythm {
      * <code>Rythm</code> will cause an new <code>RythmEngine</code> initialized as
      * the new default engine</p>
      *
-     * @param conf the configuration properties
+     * @param conf the configurations
      */
     public static void init(Map<String, ?> conf) {
         if (null != engine) throw new IllegalStateException("Rythm is already initialized");
         engine = new RythmEngine(conf);
+        engine.setShutdownListener(new RythmEngine.IShutdownListener() {
+            @Override
+            public void onShutdown() {
+                Rythm.engine = null;
+            }
+        });
+    }
+    
+    /**
+     * Initialize default engine instance with specified configuration file
+     * <p/>
+     * <p>Note this method can not be called more than once during a JVM lifecycle.
+     * if the default engine instance is created already then
+     * an <code>IllegalStateException</code> will be thrown out</p>
+     * <p/>
+     * <p>When the default engine's {@link RythmEngine#shutdown() shutdown} method get called
+     * the default engine instance will be discard. Calling any servicing method of
+     * <code>Rythm</code> will cause an new <code>RythmEngine</code> initialized as
+     * the new default engine</p>
+     *
+     * @param file the configuration file
+     */
+    public static void init(File file) {
+        if (null != engine) throw new IllegalStateException("Rythm is already initialized");
+        engine = new RythmEngine(file);
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
             @Override
             public void onShutdown() {

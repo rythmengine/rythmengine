@@ -123,6 +123,12 @@ public class UtilsTest extends TestBase {
     }
     
     @Test
+    public void testEscape() {
+        String s = null;
+        System.out.println(S.escapeCSV(s));
+    }
+    
+    @Test
     public void logTime() {
         t = "@__log_time__";
         s = r(t);

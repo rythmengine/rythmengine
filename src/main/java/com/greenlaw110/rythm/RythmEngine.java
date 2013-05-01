@@ -61,7 +61,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -472,9 +472,9 @@ public class RythmEngine implements IEventDispatcher {
         return m;
     }
 
-    private void _initConf(Map<String, ?> conf) {
+    private void _initConf(Map<String, ?> conf, File confFile) {
         // load conf from disk
-        Map<String, ?> rawConf = _loadConfFromDisk();
+        Map<String, ?> rawConf = _loadConfFromDisk(confFile);
         rawConf = _processConf(rawConf);
 
         // load conf from System.properties
@@ -500,14 +500,20 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     /**
-     * Create a rythm engine instance with template root specified
+     * Create a rythm engine instance with either template root or configuration file specified
      *
-     * @param templateHome
+     * @param file if is directory then the template root, otherwise then the configuration file
      * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
      */
-    public RythmEngine(File templateHome) {
-        _initConf(null);
-        _conf.setTemplateHome(templateHome);
+    public RythmEngine(File file) {
+        if (file.isDirectory()) {
+            _initConf(null, null);
+            _conf.setTemplateHome(file);
+        } else if (file.isFile() && file.canRead()) {
+            _initConf(null, file);
+        } else {
+            logger.warn("Unknown file: " + file);
+        }
         init();
     }
 
@@ -553,15 +559,29 @@ public class RythmEngine implements IEventDispatcher {
         init(null);
     }
 
-    private Map _loadConfFromDisk() {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (null == cl) cl = Rythm.class.getClassLoader();
-        URL url = cl.getResource("rythm.conf");
-        if (null != url) {
-            Properties p = new Properties();
-            InputStream is = null;
+    private Map _loadConfFromDisk(File conf) {
+        InputStream is = null;
+        if (null == conf) {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            if (null == cl) cl = Rythm.class.getClassLoader();
+            String s;
             try {
-                is = url.openStream();
+                s = URLDecoder.decode(cl.getResource(".").getFile(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+            File base = new File(s);
+            if (!base.isDirectory()) base = new File("");
+            conf = new File(base, "rythm.conf");
+        }
+        try {
+            is = new FileInputStream(conf);
+        } catch (IOException e) {
+            logger.warn(e, "Error opening conf file:" + conf);
+        }
+        if (null != is) {
+            Properties p = new Properties();
+            try {
                 p.load(is);
                 return p;
             } catch (Exception e) {
@@ -578,7 +598,7 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     private void init(Map<String, ?> conf) {
-        _initConf(conf);
+        _initConf(conf, null);
 
         // post configuration initializations 
         _mode = _conf.get(RythmConfigurationKey.ENGINE_MODE);
