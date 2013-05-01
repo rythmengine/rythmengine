@@ -561,7 +561,9 @@ public class RythmEngine implements IEventDispatcher {
 
     private Map _loadConfFromDisk(File conf) {
         InputStream is = null;
+        boolean emptyConf = false;
         if (null == conf) {
+            emptyConf = true;
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (null == cl) cl = Rythm.class.getClassLoader();
             String s;
@@ -577,7 +579,7 @@ public class RythmEngine implements IEventDispatcher {
         try {
             is = new FileInputStream(conf);
         } catch (IOException e) {
-            logger.warn(e, "Error opening conf file:" + conf);
+            if (!emptyConf) logger.warn(e, "Error opening conf file:" + conf);
         }
         if (null != is) {
             Properties p = new Properties();
