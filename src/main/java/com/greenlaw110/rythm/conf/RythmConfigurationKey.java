@@ -31,7 +31,7 @@ import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
-import java.net.URLDecoder;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -780,11 +780,8 @@ public enum RythmConfigurationKey {
         }
         if (isAbsolute) return new File(s);
         try {
-            File base = new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));
-            if (!base.isDirectory()) {
-                base = new File("");
-            }
-            return new File(base, s);
+            URL url = Thread.currentThread().getContextClassLoader().getResource(s);
+            return new File(url.getPath());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

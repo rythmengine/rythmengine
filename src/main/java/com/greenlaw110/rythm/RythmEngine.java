@@ -61,7 +61,6 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -496,7 +495,7 @@ public class RythmEngine implements IEventDispatcher {
      * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
      */
     public RythmEngine() {
-        init();
+        init(null, null);
     }
 
     /**
@@ -506,15 +505,7 @@ public class RythmEngine implements IEventDispatcher {
      * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
      */
     public RythmEngine(File file) {
-        if (file.isDirectory()) {
-            _initConf(null, null);
-            _conf.setTemplateHome(file);
-        } else if (file.isFile() && file.canRead()) {
-            _initConf(null, file);
-        } else {
-            logger.warn("Unknown file: " + file);
-        }
-        init();
+        init(null, file);
     }
 
     public RythmEngine(Properties userConfiguration) {
@@ -528,7 +519,7 @@ public class RythmEngine implements IEventDispatcher {
      * @see com.greenlaw110.rythm.conf.RythmConfigurationKey
      */
     public RythmEngine(Map<String, ?> userConfiguration) {
-        init(userConfiguration);
+        init(userConfiguration, null);
     }
 
     private Map<String, Object> properties = new HashMap<String, Object>();
@@ -555,31 +546,19 @@ public class RythmEngine implements IEventDispatcher {
         return (T) properties.get(key);
     }
 
-    private void init() {
-        init(null);
-    }
-
     private Map _loadConfFromDisk(File conf) {
         InputStream is = null;
         boolean emptyConf = false;
         if (null == conf) {
-            emptyConf = true;
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if (null == cl) cl = Rythm.class.getClassLoader();
-            String s;
+            is = cl.getResourceAsStream("rythm.conf");
+        } else {
             try {
-                s = URLDecoder.decode(cl.getResource(".").getFile(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+                is = new FileInputStream(conf);
+            } catch (IOException e) {
+                if (!emptyConf) logger.warn(e, "Error opening conf file:" + conf);
             }
-            File base = new File(s);
-            if (!base.isDirectory()) base = new File("");
-            conf = new File(base, "rythm.conf");
-        }
-        try {
-            is = new FileInputStream(conf);
-        } catch (IOException e) {
-            if (!emptyConf) logger.warn(e, "Error opening conf file:" + conf);
         }
         if (null != is) {
             Properties p = new Properties();
@@ -599,8 +578,13 @@ public class RythmEngine implements IEventDispatcher {
         return new HashMap();
     }
 
-    private void init(Map<String, ?> conf) {
-        _initConf(conf, null);
+    private void init(Map<String, ?> conf, File file) {
+        if (null == file || file.isDirectory()) {
+            _initConf(conf, null);
+            if (null != file) _conf.setTemplateHome(file);
+        } else if (file.isFile() && file.canRead()) {
+            _initConf(conf, file);
+        }
 
         // post configuration initializations 
         _mode = _conf.get(RythmConfigurationKey.ENGINE_MODE);
