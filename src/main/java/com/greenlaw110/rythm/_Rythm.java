@@ -19,58 +19,17 @@
 */
 package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.toString.ToStringOption;
 import com.greenlaw110.rythm.toString.ToStringStyle;
-import com.greenlaw110.rythm.utils.Escape;
 
 import java.io.File;
 import java.util.Map;
 
 /**
- * Rythm is a service wrapper of the {@link RythmEngine}.
- * <p/>
- * <p>For most cases you can play with <cod>Rythm</cod> instead of an individual
- * <code>RythmEngine</code> instance</p>
- * <p/>
- * <p>Since <code>Rythm</code> is a wrapper class, all services are provided via
- * static methods and delegated to an internal <code>RythmEngine</code> instance,
- * which as I called, the default engine</p>
+ * _Rythm is clone of {@link Rythm} but for internal use of Rythm engine. User application
+ * shall NOT use _Rythm
  */
-public class Rythm {
-
-    /**
-     * The type used to indicate the execution mode
-     * of a {@link RythmEngine}
-     */
-    public static enum Mode {
-        /**
-         * Indicate the engine is run in a development mode
-         */
-        dev,
-        /**
-         * Indicate the engien is run in a product environment
-         */
-        prod;
-
-        /**
-         * Check if the current value is {@link #dev} or not
-         *
-         * @return true if the current value is {@link #dev} or false otherwise
-         */
-        public boolean isDev() {
-            return dev == this;
-        }
-
-        /**
-         * Check if the current value is {@link #prod} or not
-         *
-         * @return true if the current value is {@link #prod} or false otherwise
-         */
-        public boolean isProd() {
-            return prod == this;
-        }
-    }
+public class _Rythm {
 
     // the default engine instance
     static RythmEngine engine = null;
@@ -82,7 +41,7 @@ public class Rythm {
      * if the default engine instance is created already then
      * an <code>IllegalStateException</code> will be thrown out</p>
      * <p/>
-     * <p>When the default engine's {@link RythmEngine#shutdown() shutdown} method get called
+     * <p>When the default engine's {@link com.greenlaw110.rythm.RythmEngine#shutdown() shutdown} method get called
      * the default engine instance will be discard. Calling any servicing method of
      * <code>Rythm</code> will cause an new <code>RythmEngine</code> initialized as
      * the new default engine</p>
@@ -95,7 +54,7 @@ public class Rythm {
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
             @Override
             public void onShutdown() {
-                Rythm.engine = null;
+                _Rythm.engine = null;
             }
         });
     }
@@ -107,7 +66,7 @@ public class Rythm {
      * if the default engine instance is created already then
      * an <code>IllegalStateException</code> will be thrown out</p>
      * <p/>
-     * <p>When the default engine's {@link RythmEngine#shutdown() shutdown} method get called
+     * <p>When the default engine's {@link com.greenlaw110.rythm.RythmEngine#shutdown() shutdown} method get called
      * the default engine instance will be discard. Calling any servicing method of
      * <code>Rythm</code> will cause an new <code>RythmEngine</code> initialized as
      * the new default engine</p>
@@ -120,7 +79,7 @@ public class Rythm {
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
             @Override
             public void onShutdown() {
-                Rythm.engine = null;
+                _Rythm.engine = null;
             }
         });
     }
@@ -143,7 +102,7 @@ public class Rythm {
      * Use an pre-initialized engine as the default engine. Note if there are already default
      * engine initialized then the method will raise a <code>IllegalStateException</code>
      * <p/>
-     * <p>When the default engine's {@link RythmEngine#shutdown() shutdown} method get called
+     * <p>When the default engine's {@link com.greenlaw110.rythm.RythmEngine#shutdown() shutdown} method get called
      * the default engine instance will be discard. Calling any servicing method of
      * <code>Rythm</code> will cause an new <code>RythmEngine</code> initialized as
      * the new default engine</p>
@@ -151,12 +110,12 @@ public class Rythm {
      * @param engine
      */
     public static void init(RythmEngine engine) {
-        if (null != Rythm.engine) throw new IllegalStateException("Rythm is already initialized");
-        Rythm.engine = engine;
+        if (null != _Rythm.engine) throw new IllegalStateException("Rythm is already initialized");
+        _Rythm.engine = engine;
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
             @Override
             public void onShutdown() {
-                Rythm.engine = null;
+                _Rythm.engine = null;
             }
         });
     }
@@ -178,7 +137,7 @@ public class Rythm {
 
     /**
      * @return true if the current thread is in sandbox mode
-     * @see com.greenlaw110.rythm.RythmEngine#insideSandbox()
+     * @see RythmEngine#insideSandbox()
      */
     public static boolean insideSandbox() {
         return RythmEngine.insideSandbox();
@@ -186,14 +145,14 @@ public class Rythm {
 
     /**
      * @return an new sandbox
-     * @see com.greenlaw110.rythm.RythmEngine#sandbox()
+     * @see RythmEngine#sandbox()
      */
     public static Sandbox sandbox() {
         return engine().sandbox();
     }
 
     /**
-     * Check if default engine is running in {@link Mode#prod production} mode
+     * Check if default engine is running in {@link Rythm.Mode#prod production} mode
      *
      * @return true if default engine is in prod mode
      */
@@ -205,7 +164,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#render(String, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#render(String, Object...)
      */
     public static String render(String template, Object... args) {
         return engine().render(template, args);
@@ -215,7 +174,7 @@ public class Rythm {
      * @param file
      * @param args
      * @return render result
-     * @see RythmEngine#render(java.io.File, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#render(java.io.File, Object...)
      */
     public static String render(File file, Object... args) {
         return engine().render(file, args);
@@ -225,7 +184,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#substitute(String, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#substitute(String, Object...)
      */
     public static String substitute(String template, Object... args) {
         return engine().substitute(template, args);
@@ -235,7 +194,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#substitute(java.io.File, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#substitute(java.io.File, Object...)
      */
     public static String substitute(File template, Object... args) {
         return engine().substitute(template, args);
@@ -245,7 +204,7 @@ public class Rythm {
      * @param template
      * @param obj
      * @return render result
-     * @see RythmEngine#toString(String, Object)
+     * @see com.greenlaw110.rythm.RythmEngine#toString(String, Object)
      */
     public static String toString(String template, Object obj) {
         return engine().toString(template, obj);
@@ -254,7 +213,7 @@ public class Rythm {
     /**
      * @param obj
      * @return render result
-     * @see RythmEngine#toString(Object)
+     * @see com.greenlaw110.rythm.RythmEngine#toString(Object)
      */
     public static String toString(Object obj) {
         return engine().toString(obj);
@@ -265,7 +224,7 @@ public class Rythm {
      * @param option
      * @param style
      * @return render result
-     * @see RythmEngine#toString(Object, com.greenlaw110.rythm.toString.ToStringOption, com.greenlaw110.rythm.toString.ToStringStyle)
+     * @see com.greenlaw110.rythm.RythmEngine#toString(Object, com.greenlaw110.rythm.toString.ToStringOption, com.greenlaw110.rythm.toString.ToStringStyle)
      */
     public static String toString(Object obj, ToStringOption option, ToStringStyle style) {
         return engine().toString(obj, option, style);
@@ -276,7 +235,7 @@ public class Rythm {
      * @param option
      * @param style
      * @return render result
-     * @see RythmEngine#commonsToString(Object, com.greenlaw110.rythm.toString.ToStringOption, org.apache.commons.lang3.builder.ToStringStyle)
+     * @see com.greenlaw110.rythm.RythmEngine#commonsToString(Object, com.greenlaw110.rythm.toString.ToStringOption, org.apache.commons.lang3.builder.ToStringStyle)
      */
     public static String commonsToString(Object obj, ToStringOption option, org.apache.commons.lang3.builder.ToStringStyle style) {
         return engine().commonsToString(obj, option, style);
@@ -288,7 +247,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#renderString(String, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#renderString(String, Object...)
      */
     public static String renderStr(String template, Object... args) {
         return engine().renderString(template, args);
@@ -298,7 +257,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#renderString(String, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#renderString(String, Object...)
      */
     public static String renderString(String template, Object... args) {
         return engine().renderString(template, args);
@@ -308,7 +267,7 @@ public class Rythm {
      * @param template
      * @param args
      * @return render result
-     * @see RythmEngine#renderIfTemplateExists(String, Object...)
+     * @see com.greenlaw110.rythm.RythmEngine#renderIfTemplateExists(String, Object...)
      */
     public static String renderIfTemplateExists(String template, Object... args) {
         return engine().renderIfTemplateExists(template, args);
@@ -323,41 +282,12 @@ public class Rythm {
     }
 
     /**
-     * @see com.greenlaw110.rythm.RythmEngine#shutdown()
+     * @see RythmEngine#shutdown()
      */
     public static void shutdown() {
         if (null == engine) return;
         engine.shutdown();
         engine = null;
-    }
-    
-    public static final class RenderTime {
-        private static final ThreadLocal<Escape> escape_ = new ThreadLocal<Escape>();
-        public static void setEscape(Escape e) {
-            escape_.set(e);
-        }
-        public static Escape getEscape() {
-            Escape e = escape_.get();
-            if (null == e) {
-                ICodeType type = getCodeType();
-                e = null == type ? Escape.XML : type.escape();
-            }
-            return e;
-        }
-        
-        private static final ThreadLocal<ICodeType> type_ = new ThreadLocal<ICodeType>();
-        public static void setCodeType(ICodeType type) {
-            type_.set(type);
-        }
-
-        public static ICodeType getCodeType() {
-            return type_.get();
-        }
-        
-        public static void clear() {
-            escape_.remove();
-            type_.remove();
-        }
     }
 
 }

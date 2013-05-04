@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.conf;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm._Rythm;
 import com.greenlaw110.rythm.cache.NoCacheService;
 import com.greenlaw110.rythm.cache.SimpleCacheService;
 import com.greenlaw110.rythm.exception.ConfigurationException;
@@ -27,15 +28,11 @@ import com.greenlaw110.rythm.extension.ICodeType;
 import com.greenlaw110.rythm.extension.IDurationParser;
 import com.greenlaw110.rythm.extension.II18nMessageResolver;
 import com.greenlaw110.rythm.logger.JDKLogger;
-import com.greenlaw110.rythm.resource.ITemplateResourceLoader;
 import com.greenlaw110.rythm.utils.S;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * {@link com.greenlaw110.rythm.RythmEngine} configuration keys. General rules:
@@ -241,13 +238,13 @@ public enum RythmConfigurationKey {
     ENGINE_FILE_WRITE_ENABLED("engine.file_write.enabled", true),
 
     /**
-     * "engine.precompile.mode": Set/unset precompile mode. This option is used by play-rythm plugin (could also
+     * "engine.precompile_mode.enabled": Set/unset precompile mode. This option is used by play-rythm plugin (could also
      * be other plugin) to notify rythm that is is doing a precompile. User application
      * should not use this option
      * <p/>
      * <p>Default value: <code>false</code></p>
      */
-    ENGINE_PRECOMPILE_MODE("engine.precompile.mode") {
+    ENGINE_PRECOMPILE_MODE("engine.precompile_mode.enabled") {
         @Override
         public <T> T getConfiguration(Map<String, ?> configuration) {
             String k = getKey();
@@ -309,100 +306,46 @@ public enum RythmConfigurationKey {
     FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", false),
 
     /**
-     * "home.template": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
+     * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
      * is not configured, therefore the {@link com.greenlaw110.rythm.resource.TemplateResourceManager} will
      * try to load {@link com.greenlaw110.rythm.resource.FileTemplateResource} from this template home dir
      * configured.
      * <p/>
      * <p>Default value: a file created with the following logic</p>
      * <p/>
-     * <pre><code>new File(URLDecoder.decode(Thread.currentThread().getContextClassLoader().getResource(".").getFile(), "UTF-8"));</code></pre>
+     * <pre><code>new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getFile())</code></pre>
      */
-    HOME_TEMPLATE("home.template") {
+    HOME_TEMPLATE("home.template.dir") {
         @Override
-        public <T> T getConfiguration(Map<String, ?> configuration) {
-            ITemplateResourceLoader loader = RESOURCE_LOADER_IMPL.getConfiguration(configuration);
-            if (null != loader) {
-                return null;
-            }
-            File f = getFile(getKey(), configuration);
-            if (null == f) {
-                f = new File(Thread.currentThread().getContextClassLoader().getResource(".").getFile());
-            }
-            if (!f.exists()) {
-                throw new ConfigurationException("template root [%s] does not exists", f.getAbsolutePath());
-            }
-            if (!f.isDirectory()) {
-                throw new ConfigurationException("template root [%s] is not a directory", f.getAbsolutePath());
-            }
-            if (!f.canRead()) {
-                throw new ConfigurationException("template root [%s] is not readable", f.getAbsolutePath());
-            }
-            return (T) f;
+        protected Object getDefVal(Map<String, ?> configuration) {
+            return new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getPath());
         }
     },
 
     /**
-     * "home.tmp": Set the rythm tmp dir. The tmp dir is to where Rythm write compiled template class bytecode
+     * "home.tmp.dir": Set the rythm tmp dir. The tmp dir is to where Rythm write compiled template class bytecode
      * when running in the {@link com.greenlaw110.rythm.Rythm.Mode#dev dev} mode.
      * <p/>
      * <p>Default value: a file created with the following logic</p>
      * <p/>
      * <pre><code>new File(System.__getProperty("java.io.tmpdir"), "__rythm")</code></pre>
      */
-    HOME_TMP("home.tmp") {
+    HOME_TMP("home.tmp.dir") {
         @Override
-        public <T> T getConfiguration(Map<String, ?> configuration) {
-            Rythm.Mode mode = ENGINE_MODE.getConfiguration(configuration);
-            if (mode.isProd()) {
-                return null;
-            }
-            File f = getFile(getKey(), configuration);
-            if (null == f) {
-                f = new File(System.getProperty("java.io.tmpdir"), "__rythm");
-            }
-            if (!f.exists()) {
-                if (!f.mkdirs()) {
-                    throw new ConfigurationException("tmp dir [%s] cannot be created", f.getAbsolutePath());
-                }
-            }
-            if (!f.isDirectory()) {
-                throw new ConfigurationException("tmp dir [%s] is not a directory", f.getAbsolutePath());
-            }
-            if (!f.canRead()) {
-                throw new ConfigurationException("tmp dir [%s] is not readable", f.getAbsolutePath());
-            }
-            if (!f.canWrite()) {
-                throw new ConfigurationException("tmp dir [%s] is not writable", f.getAbsolutePath());
-            }
-            return (T) f;
+        protected Object getDefVal(Map<String, ?> configuration) {
+            return new File(System.getProperty("java.io.tmpdir"), "__rythm");
         }
     },
 
     /**
-     * "home.precompiled": Set the dir root of the precompiled template bytecodes. Default value: <code>null</code>
+     * "home.precompiled.dir": Set the dir root of the precompiled template bytecodes. Default value: <code>null</code>
      *
      * @see #ENGINE_LOAD_PRECOMPILED_ENABLED
      */
-    HOME_PRECOMPILED("home.precompiled") {
+    HOME_PRECOMPILED("home.precompiled.dir") {
         @Override
-        public <T> T getConfiguration(Map<String, ?> configuration) {
-            Rythm.Mode mode = ENGINE_MODE.getConfiguration(configuration);
-            if (mode.isDev()) {
-                return null;
-            }
-            File f = getFile(getKey(), configuration);
-            if (null == f) return null;
-            if (!f.exists()) {
-                throw new ConfigurationException("precompiled dir [%s] does not exists", f.getAbsolutePath());
-            }
-            if (!f.isDirectory()) {
-                throw new ConfigurationException("precompiled dir [%s] is not a directory", f.getAbsolutePath());
-            }
-            if (!f.canRead()) {
-                throw new ConfigurationException("precompiled dir [%s] is not readable", f.getAbsolutePath());
-            }
-            return (T) f;
+        protected Object getDefVal(Map<String, ?> configuration) {
+            return null;
         }
     },
 
@@ -679,95 +622,80 @@ public enum RythmConfigurationKey {
         return key;
     }
 
-    private static Boolean getAsBoolean(String key, Map<String, ?> configuration) {
-        Object o = configuration.get(key);
-        if (null == o) {
-            return false;
+    private static List<String> aliases(String key, String suffix) {
+        List<String> l = new ArrayList<String>();
+        l.add(key);
+        l.add("rythm." + key);
+        if (S.notEmpty(suffix)) {
+            String k0 = key.replace("." + suffix, "");
+            l.add(k0);
+            l.add("rythm." + k0);
         }
-        if (o instanceof Boolean) {
-            return (Boolean) o;
-        } else {
-            return Boolean.valueOf(o.toString());
-        }
+        return l;
     }
+    
+    private Object getValFromAliases(Map<String, ?> configuration, String key, String suffix) {
+        Object v = configuration.get(key);
+        if (null == v) {
+            for (String k0 : aliases(key, suffix)) {
+                v = configuration.get(k0);
+                if (null != v) break;
+            }
+            if (null == v) {
+                // still not found, load default value
+                v = getDefVal(configuration);
+            }
+        }
+        return v;
+    }
+
+    private static boolean toBoolean(Object v) {
+        if (null == v) return false;
+        if (v instanceof Boolean) return (Boolean)v;
+        return Boolean.parseBoolean(v.toString());
+    } 
 
     private Boolean getEnabled(String key, Map<String, ?> configuration) {
-        String k0 = key.replace(".enabled", "");
-        String k1 = k0 + ".disabled";
-        if (configuration.containsKey(k1)) {
-            return (!getAsBoolean(k1, configuration));
+        Object v = getValFromAliases(configuration, key, "enabled");
+        if (null == v) {
+            v = getValFromAliases(configuration, key, "disabled");
+            return !toBoolean(v);
         }
-        if (configuration.containsKey(key)) {
-            return getAsBoolean(key, configuration);
-        }
-        if (configuration.containsKey(k0)) {
-            return getAsBoolean(k0, configuration);
-        }
-        // try key with "rythm." prefix
-        key = "rythm." + key;
-        k0 = key.replace(".enabled", "");
-        k1 = k0 + ".disabled";
-        if (configuration.containsKey(k1)) {
-            return (!getAsBoolean(k1, configuration));
-        }
-        if (configuration.containsKey(key)) {
-            return getAsBoolean(key, configuration);
-        }
-        if (configuration.containsKey(k0)) {
-            return getAsBoolean(k0, configuration);
-        }
-
-        // still not found, use default value
-        Object defVal = getDefVal(configuration);
-        return (null == defVal) ? false : (Boolean) defVal;
+        return toBoolean(v);
     }
-
+    
     private <T> T getImpl(String key, Map<String, ?> configuration) {
-        Object v = configuration.get(key);
-        if (null == v) {
-            String k0 = key.replace(".impl", "");
-            v = configuration.get(k0);
-            if (null == v) {
-                // try key with "rythm." prefix
-                key = "rythm." + key;
-                v = configuration.get(key);
-                if (null == v) {
-                    k0 = key.replace(".impl", "");
-                    v = configuration.get(k0);
-                    if (null == v) {
-                        // still not found, load default value
-                        v = getDefVal(configuration);
-                        if (null == v) {
-                            // really don't have it, return null
-                            return null;
-                        }
-                    }
-                }
+        Object v = getValFromAliases(configuration, key, "impl");
+        if (null == v) return null;
+        if (v instanceof Class) {
+            try {
+                return (T) ((Class) v).newInstance();
+            } catch (Exception e) {
+                throw new ConfigurationException(e, "Error getting implementation configuration: %s", key);
             }
         }
-        if (v instanceof String) {
-            String clsName = (String) v;
+        if (!(v instanceof String)) return (T)v;
+        String clsName = (String)v;
+        try {
+            return (T) Class.forName(clsName).newInstance();
+        } catch (Exception e) {
+            // try to evaluate the string
             try {
-                return (T) Class.forName(clsName).newInstance();
-            } catch (Exception e) {
+                Object o = _Rythm.eval(clsName);
+                if (o instanceof Class) {
+                    return (T) ((Class) o).newInstance();
+                } else {
+                    return (T) o;
+                }
+            } catch (Exception e1) {
                 throw new ConfigurationException(e, "Error getting implementation configuration: %s", key);
             }
-        } else if (v instanceof Class) {
-            try {
-                return (T) ((Class)v).newInstance();
-            } catch (Exception e) {
-                throw new ConfigurationException(e, "Error getting implementation configuration: %s", key);
-            }
-        } else {
-            return (T) v;
         }
     }
 
-    private static File getFile(String key, Map<String, ?> configuration) {
-        Object v = configuration.get(key);
-        if (null == v) {
-            return null;
-        }
+    private File getFile(String key, Map<String, ?> configuration) {
+        Object v = getValFromAliases(configuration, key, "dir");
+        if (null == v) return null;
         if (v instanceof File) {
             return (File) v;
         }
@@ -783,7 +711,7 @@ public enum RythmConfigurationKey {
             URL url = Thread.currentThread().getContextClassLoader().getResource(s);
             return new File(url.getPath());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ConfigurationException(e, "Error reading file configuration %s", key);
         }
     }
 
@@ -803,16 +731,10 @@ public enum RythmConfigurationKey {
         if (key.endsWith(".impl")) {
             return getImpl(key, configuration);
         }
-        Object o = configuration.get(key);
-        if (null == o) {
-            // try key with "rythm." prefix
-            o = configuration.get("rythm." + key);
+        if (key.endsWith(".dir")) {
+            return (T) getFile(key, configuration);
         }
-        if (null == o) {
-            return (T) getDefVal(configuration);
-        } else {
-            return (T) o;
-        }
+        return (T) getValFromAliases(configuration, key, null);
     }
 
     /**
