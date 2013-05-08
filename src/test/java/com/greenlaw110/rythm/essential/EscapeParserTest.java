@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.essential;
 
+import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.TestBase;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.extension.ICodeType;
@@ -58,8 +59,8 @@ public class EscapeParserTest extends TestBase {
         eq("<h1>abc<\\/h1>");
 
         t = "@escape(\"javascript\"){@p}";
-        s = r(t, "\"foo\"");
-        eq("\\\"foo\\\"");
+        s = r(t, "\"foo\" at \\ xb");
+        eq("\\\"foo\\\" at \\\\ xb");
 
         t = "@escape(\"csv\"){@p}";
         s = r(t, "Someone's good, bad and ...");
@@ -89,6 +90,9 @@ public class EscapeParserTest extends TestBase {
     }
     
     public static void main(String[] args) {
-        run(EscapeParserTest.class);
+        //run(EscapeParserTest.class);
+        
+        String s = "abc \\ dfd 'xx' and \"yyy\" \\ dd";
+        System.out.println(Rythm.render("@args String s\n{\"abc\": \"@s.escapeJSON()\"}", s));
     }
 }

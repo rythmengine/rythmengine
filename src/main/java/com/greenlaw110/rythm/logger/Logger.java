@@ -20,6 +20,7 @@
 package com.greenlaw110.rythm.logger;
 
 import com.greenlaw110.rythm.Rythm;
+import com.greenlaw110.rythm.extension.ILoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;

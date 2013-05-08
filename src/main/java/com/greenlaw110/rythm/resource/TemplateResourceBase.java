@@ -155,7 +155,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
             int pos = s.lastIndexOf(suffix);
             if (pos > -1) s = s.substring(0, pos);
         }
-        ICodeType codeType = ICodeType.DefImpl.RAW;
+        ICodeType codeType = engine.conf().defaultCodeType();
         if (s.endsWith(".html") || s.endsWith(".htm")) {
             codeType = ICodeType.DefImpl.HTML;
         } else if (s.endsWith(".js")) {

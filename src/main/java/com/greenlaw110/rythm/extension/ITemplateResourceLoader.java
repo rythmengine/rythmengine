@@ -17,10 +17,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package com.greenlaw110.rythm.resource;
+package com.greenlaw110.rythm.extension;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;
+import com.greenlaw110.rythm.resource.ITemplateResource;
+import com.greenlaw110.rythm.resource.TemplateResourceManager;
 
 
 /**
@@ -61,8 +63,8 @@ public interface ITemplateResourceLoader {
     /**
      * Scan the folder and try to load all template files under the folder.
      * Once a resource is located, it should be passed to the 
-     * {@link TemplateResourceManager resource manager} by 
-     * {@link TemplateResourceManager#resourceLoaded(ITemplateResource)} call
+     * {@link com.greenlaw110.rythm.resource.TemplateResourceManager resource manager} by 
+     * {@link com.greenlaw110.rythm.resource.TemplateResourceManager#resourceLoaded(ITemplateResource)} call
      * 
      * @param root the root folder
      */

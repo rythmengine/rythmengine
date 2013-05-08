@@ -33,7 +33,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * Parse @cacheFor("1m")
+ * Parse @cache("1m")
  */
 public class CacheParser extends KeywordParserFactory {
 

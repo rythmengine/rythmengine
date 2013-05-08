@@ -17,7 +17,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package com.greenlaw110.rythm.logger;
+package com.greenlaw110.rythm.extension;
+
+import com.greenlaw110.rythm.logger.ILogger;
 
 /**
  * Created by IntelliJ IDEA.

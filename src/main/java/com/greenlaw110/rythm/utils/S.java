@@ -443,7 +443,7 @@ public class S {
         if (o instanceof RawData)
             return (RawData) o;
         String s0 = o.toString();
-        s0 = s0.replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
+        s0 = s0.replace("\\", "\\\\").replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
         return new RawData(s0);
     }
 

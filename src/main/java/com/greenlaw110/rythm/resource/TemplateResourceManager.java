@@ -21,6 +21,7 @@ package com.greenlaw110.rythm.resource;
 
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
+import com.greenlaw110.rythm.extension.ITemplateResourceLoader;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 import com.greenlaw110.rythm.internal.compiler.ParamTypeInferencer;
 import com.greenlaw110.rythm.internal.compiler.TemplateClass;

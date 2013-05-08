@@ -19,6 +19,8 @@
 */
 package com.greenlaw110.rythm.logger;
 
+import com.greenlaw110.rythm.extension.ILoggerFactory;
+
 import java.util.logging.Level;
 
 /**

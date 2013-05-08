@@ -23,7 +23,7 @@ import com.greenlaw110.rythm.utils.Time;
 
 /**
  * A user application could implement this interface to provide
- * customized time string parsing utility to {@link com.greenlaw110.rythm.cache.ICacheService rythm cache service}.
+ * customized time string parsing utility to {@link ICacheService rythm cache service}.
  * and then configure the Rythm to use customized implementation via
  * {@link com.greenlaw110.rythm.conf.RythmConfigurationKey#CACHE_DURATION_PARSER_IMPL "cache.duration_parser.impl"}
  * configuration.

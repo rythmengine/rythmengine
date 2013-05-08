@@ -25,6 +25,7 @@ import com.greenlaw110.rythm.toString.ToStringStyle;
 import com.greenlaw110.rythm.utils.Escape;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -199,6 +200,48 @@ public class Rythm {
      */
     public boolean isProdMode() {
         return engine().isProdMode();
+    }
+
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param codeType
+     * @param locale
+     * @param usrCtx
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(ICodeType codeType, Locale locale, Map<String, Object> usrCtx) {
+        return engine().prepare(codeType, locale, usrCtx);
+    }
+    
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param codeType
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(ICodeType codeType) {
+        return engine().prepare(codeType);
+    }
+
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param locale
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(Locale locale) {
+        return engine().prepare(locale);
+    }
+    
+    /**
+     * Prepare the render operation environment settings
+     * 
+     * @param userContext
+     * @return the engine instance itself
+     */
+    public final RythmEngine prepare(Map<String, Object> userContext) {
+        return engine().prepare(userContext);
     }
 
     /**

@@ -19,10 +19,12 @@
 */
 package com.greenlaw110.rythm.cache;
 
+import com.greenlaw110.rythm.extension.ICacheService;
+
 import java.io.Serializable;
 
 /**
- * A do-nothing implementation of {@link ICacheService}
+ * A do-nothing implementation of {@link com.greenlaw110.rythm.extension.ICacheService}
  */
 public class NoCacheService implements ICacheService {
 

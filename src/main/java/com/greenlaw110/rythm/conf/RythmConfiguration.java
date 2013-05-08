@@ -22,6 +22,8 @@ package com.greenlaw110.rythm.conf;
 import com.greenlaw110.rythm.Rythm;
 import com.greenlaw110.rythm.RythmEngine;
 import com.greenlaw110.rythm.extension.*;
+import com.greenlaw110.rythm.logger.ILogger;
+import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.utils.RawData;
 
 import java.io.File;
@@ -112,13 +114,13 @@ public class RythmConfiguration {
     private IByteCodeHelper _byteCodeHelper = null;
 
     /**
-     * Return {@link RythmConfigurationKey#ENGINE_CLASS_LOADER_BYTECODE_HELPER_IMPL} without lookup
+     * Return {@link RythmConfigurationKey#ENGINE_CLASS_LOADER_BYTE_CODE_HELPER_IMPL} without lookup
      *
      * @return the byte code helper
      */
     public IByteCodeHelper byteCodeHelper() {
         if (null == _byteCodeHelper) {
-            _byteCodeHelper = get(ENGINE_CLASS_LOADER_BYTECODE_HELPER_IMPL);
+            _byteCodeHelper = get(ENGINE_CLASS_LOADER_BYTE_CODE_HELPER_IMPL);
         }
         return _byteCodeHelper;
     }
@@ -495,6 +497,15 @@ public class RythmConfiguration {
     public static RythmConfiguration get() {
         RythmEngine engine = RythmEngine.get();
         return null != engine ? engine.conf() : EMPTY_CONF;
+    }
+
+    private static ILogger logger = Logger.get(RythmConfiguration.class);
+    public void debug() {
+        logger.info("start to dump rythm configuration >>>");
+        for (RythmConfigurationKey k : RythmConfigurationKey.values()) {
+            logger.info("%s: %s", k, get(k));
+        }
+        logger.info("end dumping rythm configuration <<<");
     }
 
 }

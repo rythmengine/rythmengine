@@ -19,7 +19,7 @@
 */
 package com.greenlaw110.rythm;
 
-import com.greenlaw110.rythm.cache.ICacheService;
+import com.greenlaw110.rythm.extension.ICacheService;
 import com.greenlaw110.rythm.conf.RythmConfiguration;
 import com.greenlaw110.rythm.conf.RythmConfigurationKey;
 import com.greenlaw110.rythm.exception.RythmException;
@@ -34,7 +34,7 @@ import com.greenlaw110.rythm.internal.dialect.BasicRythm;
 import com.greenlaw110.rythm.internal.dialect.DialectManager;
 import com.greenlaw110.rythm.internal.dialect.ToString;
 import com.greenlaw110.rythm.logger.ILogger;
-import com.greenlaw110.rythm.logger.ILoggerFactory;
+import com.greenlaw110.rythm.extension.ILoggerFactory;
 import com.greenlaw110.rythm.logger.Logger;
 import com.greenlaw110.rythm.logger.NullLogger;
 import com.greenlaw110.rythm.resource.ITemplateResource;
@@ -390,6 +390,7 @@ public class RythmEngine implements IEventDispatcher {
         public final RythmEngine clear() {
             _locale.remove();
             _codeType.remove();
+            _usrCtx.remove();
             return RythmEngine.this;
         }
     
@@ -487,6 +488,11 @@ public class RythmEngine implements IEventDispatcher {
 
         // initialize the configuration with all loaded data 
         this._conf = new RythmConfiguration(rawConf);
+        
+        // check if it needs to debug the conf information
+        if (rawConf.containsKey("rythm.debug_conf") && Boolean.parseBoolean(rawConf.get("rythm.debug_conf").toString())) {
+            this._conf.debug();
+        }
     }
 
     /**

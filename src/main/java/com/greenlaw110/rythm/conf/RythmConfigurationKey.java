@@ -66,7 +66,7 @@ public enum RythmConfigurationKey {
     BUILT_IN_TRANSFORMER_ENABLED("built_in.transformer.enabled", true),
 
     /**
-     * "cache.enabled": Enable disable {@link com.greenlaw110.rythm.cache.ICacheService cache service}. When this
+     * "cache.enabled": Enable disable {@link com.greenlaw110.rythm.extension.ICacheService cache service}. When this
      * setting is turned off, the {@link #CACHE_SERVICE_IMPL} will be set to
      * {@link com.greenlaw110.rythm.cache.NoCacheService} without regarding to it's configuration
      * <p/>
@@ -77,7 +77,7 @@ public enum RythmConfigurationKey {
     CACHE_ENABLED("cache.enabled", false),
 
     /**
-     * "cache.service.impl": Set {@link com.greenlaw110.rythm.cache.ICacheService cache service} implementation
+     * "cache.service.impl": Set {@link com.greenlaw110.rythm.extension.ICacheService cache service} implementation
      * <p/>
      * <p>Default value: {@link com.greenlaw110.rythm.cache.SimpleCacheService}</p>
      * <p/>
@@ -136,20 +136,19 @@ public enum RythmConfigurationKey {
     /**
      * "default.code_type.impl": Set default {@link com.greenlaw110.rythm.extension.ICodeType code type}
      * <p/>
-     * <p>Default value: {@link com.greenlaw110.rythm.extension.ICodeType.DefImpl#HTML}</p>
+     * <p>Default value: {@link com.greenlaw110.rythm.extension.ICodeType.DefImpl#RAW raw}</p>
      * <p/>
      * TODO: what if {@link #BUILT_IN_CODE_TYPE_ENABLED} is false
      */
     DEFAULT_CODE_TYPE_IMPL("default.code_type.impl", ICodeType.DefImpl.RAW),
 
     /**
-     * "default.cache_ttl": Set default {@link com.greenlaw110.rythm.cache.ICacheService cache} ttl
+     * "default.cache_ttl": Set default {@link com.greenlaw110.rythm.extension.ICacheService cache} ttl
      * in second
      * <p/>
      * <p>Default value: 60 * 60(1hr</p>
      */
     DEFAULT_CACHE_TTL("default.cache_ttl") {
-        @Override
         public <T> T getConfiguration(Map<String, ?> configuration) {
             String k = getKey();
             Object v = configuration.get(k);
@@ -213,11 +212,11 @@ public enum RythmConfigurationKey {
     },
 
     /**
-     * "engine.class_loader.bytecode_helper.impl": Set the {@link com.greenlaw110.rythm.extension.IByteCodeHelper bytecode helper}
+     * "engine.class_loader.byte_code_helper.impl": Set the {@link com.greenlaw110.rythm.extension.IByteCodeHelper bytecode helper}
      * implementation
      * <p>Default value: <code>null</code></p>
      */
-    ENGINE_CLASS_LOADER_BYTECODE_HELPER_IMPL("engine.class_loader.bytecode_helper.impl"),
+    ENGINE_CLASS_LOADER_BYTE_CODE_HELPER_IMPL("engine.class_loader.byte_code_helper.impl"),
 
     /**
      * "engine.load_precompiled.enabled": Set the flag so that Rythm will load precompiled template class directly from
@@ -318,7 +317,9 @@ public enum RythmConfigurationKey {
     HOME_TEMPLATE("home.template.dir") {
         @Override
         protected Object getDefVal(Map<String, ?> configuration) {
-            return new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getPath());
+            URL url = Thread.currentThread().getContextClassLoader().getResource("rythm");
+            if (null != url) return new File(url.getPath());
+            return new File("rythm");
         }
     },
 
@@ -405,7 +406,7 @@ public enum RythmConfigurationKey {
     LOG_ENABLED("log.enabled", true),
 
     /**
-     * "log.factory.impl": Configure the {@link com.greenlaw110.rythm.logger.ILoggerFactory logger factory} implementation.
+     * "log.factory.impl": Configure the {@link com.greenlaw110.rythm.extension.ILoggerFactory logger factory} implementation.
      * When this configuration is not set, then a {@link com.greenlaw110.rythm.logger.JDKLogger.Factory} instance
      * is used to create the logger
      * <p/>
@@ -450,7 +451,7 @@ public enum RythmConfigurationKey {
     RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
 
     /**
-     * "resource.loader.impl": The {@link com.greenlaw110.rythm.resource.ITemplateResourceLoader resource loader}
+     * "resource.loader.impl": The {@link com.greenlaw110.rythm.extension.ITemplateResourceLoader resource loader}
      * implementation
      * <p>Default value: <code>null</code>. But if this is not configured, try templates will be loaded as
      * {@link com.greenlaw110.rythm.resource.FileTemplateResource file template resource} first and if
@@ -624,12 +625,12 @@ public enum RythmConfigurationKey {
 
     private static List<String> aliases(String key, String suffix) {
         List<String> l = new ArrayList<String>();
-        l.add(key);
         l.add("rythm." + key);
+        l.add(key);
         if (S.notEmpty(suffix)) {
             String k0 = key.replace("." + suffix, "");
-            l.add(k0);
             l.add("rythm." + k0);
+            l.add(k0);
         }
         return l;
     }

@@ -19,6 +19,7 @@
 */
 package com.greenlaw110.rythm.cache;
 
+import com.greenlaw110.rythm.extension.ICacheService;
 import com.greenlaw110.rythm.internal.RythmThreadFactory;
 import com.greenlaw110.rythm.logger.ILogger;
 import com.greenlaw110.rythm.logger.Logger;
