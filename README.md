@@ -1,3 +1,5 @@
+**Notice** proposed by community, I decided to change the package name from `com.greenlaw110.rythm` to `org.rythmengine`
+
 Rythm
 =====
 
