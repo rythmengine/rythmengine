@@ -428,7 +428,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
         tmpl.__engine = engine;
         tmpl.__templateClass = __templateClass;
-        tmpl.__ctx = new __Context(__ctx);
+        tmpl.__ctx = new __Context(__ctx, tmpl);
         //if (null != buffer) tmpl.__buffer = buffer;
         if (null != __buffer) tmpl.__buffer = new StringBuilder();
         tmpl.__renderArgs = new HashMap<String, Object>(__renderArgs.size());

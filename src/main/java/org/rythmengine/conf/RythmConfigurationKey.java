@@ -465,6 +465,9 @@ public enum RythmConfigurationKey {
     /**
      * "resource.name.suffix": does resource name has special rythm suffix attached? 
      * E.g. <tt>.rythm</tt> or <tt>.rtl</tt> etc. Default is empty string 
+     * 
+     * <p>Note, do not use regular file extensions for this setting, like ".html", ".js" etc
+     * as they can be used to identify the code type of the template</p>
      */
     RESOURCE_NAME_SUFFIX("resource.name.suffix", "") {
         @Override

@@ -21,6 +21,7 @@ package org.rythmengine.template;
 
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.utils.Escape;
@@ -234,7 +235,14 @@ public interface ITemplate extends ITag, Cloneable {
         private Stack<Locale> localeStack = new Stack<Locale>();
 
         private TemplateBase tmpl;
+        
+        private RythmConfiguration conf;
 
+        private void setTemplate(TemplateBase tmpl) {
+            this.tmpl = tmpl;
+            conf = tmpl.__engine().conf();
+        }
+        
         /**
          * init the context with template and base code type
          *
@@ -253,12 +261,12 @@ public interface ITemplate extends ITag, Cloneable {
             }
             codeTypeStack.push(type);
             localeStack.push(locale);
-            tmpl = templateBase;
+            setTemplate(templateBase);
         }
 
         public ICodeType currentCodeType() {
             if (codeTypeStack.isEmpty()) {
-                return null;
+                return conf.defaultCodeType();
             } else {
                 return codeTypeStack.peek();
             }
@@ -281,7 +289,7 @@ public interface ITemplate extends ITag, Cloneable {
         
         public Locale currentLocale() {
             if (localeStack.isEmpty()) {
-                return tmpl.__engine().conf().locale();
+                return conf.locale();
             } else {
                 return localeStack.peek();
             }
@@ -318,14 +326,14 @@ public interface ITemplate extends ITag, Cloneable {
             localeStack = new Stack<Locale>();
         }
 
-        public __Context(__Context clone) {
+        public __Context(__Context clone, TemplateBase tmpl) {
             codeTypeStack = new Stack<ICodeType>();
             escapeStack = new Stack<Escape>();
             localeStack = new Stack<Locale>();
             codeTypeStack.addAll(clone.codeTypeStack);
             escapeStack.addAll(clone.escapeStack);
             localeStack.addAll(clone.localeStack);
-            tmpl = clone.tmpl;
+            setTemplate(tmpl);
         }
     }
 
