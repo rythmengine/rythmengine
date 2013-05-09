@@ -18,8 +18,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.greenlaw110.rythm</groupId>
-    <artifactId>rythm-engine</artifactId>
+    <groupId>org.rythmengine</groupId>
+    <artifactId>engine</artifactId>
     <packaging>jar</packaging>
     <version>1.0-b8-SNAPSHOT</version>
 
@@ -205,7 +205,7 @@
                         <version>2.9</version>
                         <configuration>
                             <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
-                            <excludePackageNames>com.greenlaw110.rythm.internal.*</excludePackageNames>
+                            <excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
                             <quiet />
                         </configuration>
                         <executions>
