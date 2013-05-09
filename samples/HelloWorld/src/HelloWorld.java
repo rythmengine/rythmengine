@@ -1,4 +1,4 @@
-import com.greenlaw110.rythm.Rythm;
+import org.rythmengine.Rythm;
 
 /**
  * A Hello world sample

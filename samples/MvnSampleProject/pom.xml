@@ -21,7 +21,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.greenlaw110.rythm.sample</groupId>
+    <groupId>org.rythmengine.sample</groupId>
     <artifactId>helloworld</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
@@ -111,7 +111,7 @@
               <artifactId>exec-maven-plugin</artifactId>
               <version>1.2.1</version>
               <configuration>
-                <mainClass>com.greenlaw110.rythm.sample.HelloWorld</mainClass>
+                <mainClass>org.rythmengine.sample.HelloWorld</mainClass>
               </configuration>
             </plugin>
         </plugins>
@@ -119,7 +119,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.greenlaw110.rythm</groupId>
+            <groupId>org.rythmengine</groupId>
             <artifactId>rythm-engine</artifactId>
             <version>1.0-b7-SNAPSHOT</version>
         </dependency>
