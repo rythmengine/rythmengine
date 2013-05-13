@@ -19,6 +19,7 @@
 */
 package org.rythmengine.utils;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.extension.II18nMessageResolver;
@@ -27,9 +28,9 @@ import org.rythmengine.internal.CacheKey;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.ITemplate;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.text.*;
 import java.util.*;
@@ -737,7 +738,61 @@ public class S {
         }
         return result.toString();
     }
+
+    /**
+     * Bridge String.split() method to Object
+     * @param o
+     * @param sep
+     * @return string array separated by sep
+     */
+    @Transformer
+    public static String[] divide(Object o, String sep) {
+        return str(o).split(sep);
+    }
+
+    /**
+     * Bridge String.toUpperCase() method to Object
+     * @param o
+     * @return the lower case of string presentation of o
+     */
+    @Transformer
+    public static String lowerCase(Object o) {
+        return str(o).toLowerCase();
+    }
     
+    /**
+     * Bridge String.toUpperCase() method to Object
+     * @param o
+     * @return the upper case of string presentation of o
+     */
+    @Transformer
+    public static String upperCase(Object o) {
+        return str(o).toUpperCase();
+    }
+
+    /**
+     * get length of specified object
+     * 
+     * <ul>
+     * <li>If o is a Collection or Map, then return size of it</li>
+     * <li>If o is an array, then return length of it</li>
+     * <li>Otherwise return length() of String representation of the object</li>
+     * </ul>
+     * @param o
+     * @return length
+     */
+    @Transformer
+    public static int len(Object o) {
+        if (o instanceof Collection) {
+            return ((Collection)o).size();
+        } else if (o instanceof Map) {
+            return ((Map)o).size();
+        } else if (o.getClass().isArray()) {
+            return Array.getLength(o);
+        } else {
+            return str(o).length();
+        }
+    }
 
     /**
      * Change line break in the data string into <tt><br/></tt>

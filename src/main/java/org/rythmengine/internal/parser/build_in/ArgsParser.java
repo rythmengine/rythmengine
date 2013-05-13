@@ -46,7 +46,7 @@ public class ArgsParser extends KeywordParserFactory {
             public TextBuilder go2(String s) {
                 Regex r = reg(dialect());
                 final List<F.T4<Integer, String, String, String>> ral = new ArrayList();
-                s = s.replaceAll("[\\n\\r]+", ",");
+                s = s.replaceAll("[\\n\\r]+", ",").replaceAll("[,]+", ",");
                 int line = ctx.currentLine();
                 while (r.search(s)) {
                     String type = r.stringMatched(2);

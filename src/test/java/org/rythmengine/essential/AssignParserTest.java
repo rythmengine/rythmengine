@@ -19,10 +19,8 @@
 */
 package org.rythmengine.essential;
 
-import org.rythmengine.TestBase;
 import org.junit.Test;
-
-import java.util.Collections;
+import org.rythmengine.TestBase;
 
 /**
  * Test @assign parser

@@ -291,6 +291,10 @@ public class RythmEngine implements IEventDispatcher {
 
     private final DialectManager _dialectManager = new DialectManager();
 
+    /**
+     * Not an API
+     * @return {@link DialectManager} instance
+     */
     public DialectManager dialectManager() {
         return _dialectManager;
     }
@@ -488,6 +492,10 @@ public class RythmEngine implements IEventDispatcher {
 
         // initialize the configuration with all loaded data 
         this._conf = new RythmConfiguration(rawConf);
+        
+        // initialize logger factory
+        ILoggerFactory logFact = this._conf.get(RythmConfigurationKey.LOG_FACTORY_IMPL);
+        Logger.registerLoggerFactory(logFact);
         
         // check if it needs to debug the conf information
         if (rawConf.containsKey("rythm.debug_conf") && Boolean.parseBoolean(rawConf.get("rythm.debug_conf").toString())) {
@@ -1771,7 +1779,7 @@ public class RythmEngine implements IEventDispatcher {
     };
 
     /**
-     * Return current {@link OutputMode}. Not to be used in user application
+     * Not an API.
      *
      * @return output mode
      */

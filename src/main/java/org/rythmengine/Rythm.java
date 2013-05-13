@@ -194,6 +194,15 @@ public class Rythm {
     }
 
     /**
+     * @param userContext
+     * @return an new sandbox with user context specified
+     * @see org.rythmengine.RythmEngine#sandbox(java.util.Map) 
+     */
+    public static Sandbox sandbox(Map<String, Object> userContext) {
+        return engine().sandbox(userContext);
+    }
+
+    /**
      * Check if default engine is running in {@link Mode#prod production} mode
      *
      * @return true if default engine is in prod mode
