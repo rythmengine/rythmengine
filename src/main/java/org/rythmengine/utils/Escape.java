@@ -19,6 +19,8 @@
 */
 package org.rythmengine.utils;
 
+import org.rythmengine.RythmEngine;
+
 import java.util.Arrays;
 
 /**
@@ -103,5 +105,15 @@ public enum Escape {
             sa_ = sa;
         }
         return sa_.clone();
+    }
+    
+    public static Escape valueOfIngoreCase(Object o) {
+        String escape = S.str(o);
+        if (S.empty(escape)) {
+            return RythmEngine.get().conf().defaultCodeType().escape();
+        }
+        escape = escape.toUpperCase();
+        if (escape.equals("JAVASCRIPT")) escape = "JS";
+        return valueOf(escape);
     }
 }

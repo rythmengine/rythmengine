@@ -19,18 +19,14 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
-import org.rythmengine.utils.Escape;
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.ParserBase;
-import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
-
-import java.util.Arrays;
 
 /**
  * Parse @escape("JS") {...}
@@ -68,6 +64,7 @@ public class EscapeParser extends KeywordParserFactory {
                 }
                 step(matched.length());
                 String s = r.stringMatched(1);
+                /*
                 s = S.stripBraceAndQuotation(s);
                 if (S.isEmpty(s)) s = "HTML";
                 else if ("JavaScript".equalsIgnoreCase(s)) s = "JS";
@@ -75,7 +72,8 @@ public class EscapeParser extends KeywordParserFactory {
                 if (Arrays.binarySearch(Escape.stringValues(), s) < 0) {
                     raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(Escape.stringValues()), s);
                 }
-                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.%s);", s);
+                */
+                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.valueOfIngoreCase(%s));", s);
                 return new BlockCodeToken(s, ctx()) {
                     @Override
                     public void openBlock() {
