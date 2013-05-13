@@ -20,6 +20,7 @@
 package org.rythmengine.utils;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.template.ITemplate;
 
 import java.util.Arrays;
 
@@ -111,6 +112,25 @@ public enum Escape {
         String escape = S.str(o);
         if (S.empty(escape)) {
             return RythmEngine.get().conf().defaultCodeType().escape();
+        }
+        escape = escape.toUpperCase();
+        if (escape.equals("JAVASCRIPT")) escape = "JS";
+        return valueOf(escape);
+    }
+
+    public static Escape valueOfIngoreCase(ITemplate template, Object o) {
+        String escape = S.str(o);
+        if (S.empty(escape)) {
+            if (null != template) {
+                return template.__curEscape();
+            } else {
+                RythmEngine engine = RythmEngine.get();
+                if (null == engine) {
+                    return Escape.RAW;
+                } else {
+                    return RythmEngine.get().conf().defaultCodeType().escape();
+                }
+            }
         }
         escape = escape.toUpperCase();
         if (escape.equals("JAVASCRIPT")) escape = "JS";

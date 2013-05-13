@@ -26,6 +26,7 @@ import org.rythmengine.internal.Keyword;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.ParserBase;
+import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 
 /**
@@ -64,6 +65,10 @@ public class EscapeParser extends KeywordParserFactory {
                 }
                 step(matched.length());
                 String s = r.stringMatched(1);
+                s = S.stripBrace(s);
+                if (S.empty(s)) {
+                    s = "\"\"";
+                }
                 /*
                 s = S.stripBraceAndQuotation(s);
                 if (S.isEmpty(s)) s = "HTML";
@@ -73,7 +78,7 @@ public class EscapeParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(Escape.stringValues()), s);
                 }
                 */
-                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.valueOfIngoreCase(%s));", s);
+                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.valueOfIngoreCase(this, %s));", s);
                 return new BlockCodeToken(s, ctx()) {
                     @Override
                     public void openBlock() {

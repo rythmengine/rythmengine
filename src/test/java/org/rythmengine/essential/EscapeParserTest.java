@@ -19,11 +19,10 @@
 */
 package org.rythmengine.essential;
 
-import org.rythmengine.Rythm;
+import org.junit.Test;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
-import org.junit.Test;
 
 /**
  * Test escape
@@ -35,6 +34,14 @@ public class EscapeParserTest extends TestBase {
      */
     @Test
     public void testDefault() {
+        t = "@escape(){@p}";
+        s = r(t, "<h1>abc</h1>");
+        eq("<h1>abc</h1>");
+    }
+    
+    @Test
+    public void testDefaultHtml() {
+        System.getProperties().put(RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.HTML);
         t = "@escape(){@p}";
         s = r(t, "<h1>abc</h1>");
         eq("&lt;h1&gt;abc&lt;/h1&gt;");
@@ -82,7 +89,7 @@ public class EscapeParserTest extends TestBase {
     public void testShortNotation() {
         t = "@escape()@1@";
         s = r(t, "<h1>h1</h1>");
-        eq("&lt;h1&gt;h1&lt;/h1&gt;");
+        eq("<h1>h1</h1>");
     }
     
     @Test
@@ -94,9 +101,9 @@ public class EscapeParserTest extends TestBase {
     }
     
     public static void main(String[] args) {
-        //run(EscapeParserTest.class);
+        run(EscapeParserTest.class);
         
-        String s = "abc \\ dfd 'xx' and \"yyy\" \\ dd";
-        System.out.println(Rythm.render("@args String s\n{\"abc\": \"@s.escapeJSON()\"}", s));
+//        String s = "abc \\ dfd 'xx' and \"yyy\" \\ dd";
+//        System.out.println(Rythm.render("@args String s\n{\"abc\": \"@s.escapeJSON()\"}", s));
     }
 }
