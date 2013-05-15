@@ -389,7 +389,7 @@ public class RythmEngine implements IEventDispatcher {
     
         /**
          * Clear the render time after render process done
-         * @return
+         * @return this engine instance
          */
         public final RythmEngine clear() {
             _locale.remove();

@@ -326,7 +326,12 @@ public class S {
         if (null != template) {
             escape = template.__curEscape();
         } else {
-            escape = Escape.RAW;
+            RythmEngine engine = RythmEngine.get();
+            if (null != engine) {
+                escape = engine.conf().defaultCodeType().escape();
+            } else {
+                escape = Escape.RAW;
+            }
         }
         return escape.apply(o);
     }
@@ -384,8 +389,9 @@ public class S {
     @Transformer
     public static RawData escapeHTML(Object o) {
         if (null == o) return RawData.NULL;
-        if (o instanceof RawData)
+        if (o instanceof RawData) {
             return (RawData) o;
+        }
         return new RawData(StringEscapeUtils.escapeHtml4(o.toString()));
     }
 
@@ -411,9 +417,12 @@ public class S {
     @Transformer
     public static RawData escapeCSV(Object o) {
         if (null == o) return RawData.NULL;
-        if (o instanceof RawData)
+        if (o instanceof RawData) {
             return (RawData) o;
-        return new RawData(StringEscapeUtils.escapeCsv(o.toString()));
+        }
+        //return new RawData(StringEscapeUtils.escapeCsv(o.toString()));
+        // fix https://github.com/greenlaw110/Rythm/issues/155
+        return Escape.CSV.apply_(o.toString());
     }
 
     /**

@@ -275,7 +275,7 @@ public class _Rythm {
 
     /**
      * @param s
-     * @return
+     * @return evaluation result
      */
     public static Object eval(String s) {
         return engine().eval(s);

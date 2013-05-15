@@ -77,7 +77,7 @@ public @interface Transformer {
      * should be waived or not. For example, <tt>@x.escape()</tt> should be treated as <tt>escape</tt> 
      * transformer while <tt>@s().escape(x)</tt> shouldn't because <tt>s\\(\\)</tt> is a waive pattern
      * 
-     * @return
+     * @return the waive pattern 
      */
     String waivePattern() default "";
 

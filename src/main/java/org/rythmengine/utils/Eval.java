@@ -19,6 +19,7 @@
 */
 package org.rythmengine.utils;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -109,7 +110,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Collection c) {
-        return !c.isEmpty();
+        return null != c && !c.isEmpty();
     }
     
     /**
@@ -118,7 +119,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Map m) {
-        return !m.isEmpty();
+        return null != m && !m.isEmpty();
     }
 
     /**
@@ -127,7 +128,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Boolean b) {
-        return b;
+        return null != b && b;
     }
 
     /**
@@ -136,7 +137,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Character c) {
-        return eval(c.charValue());
+        return null != c && eval(c.charValue());
     }
 
     /**
@@ -145,7 +146,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Float f) {
-        return eval(f.floatValue());
+        return null != f && eval(f.floatValue());
     }
 
     /**
@@ -154,7 +155,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Double d) {
-        return eval(d.doubleValue());
+        return null != d && eval(d.doubleValue());
     }
 
     /**
@@ -164,7 +165,7 @@ public class Eval {
      * @return boolean result
      */
     public static boolean eval(Number n) {
-        return eval(n.intValue());
+        return null == n ? false : eval(n.intValue());
     }
 
     /**
@@ -182,12 +183,10 @@ public class Eval {
     public static boolean eval(Object condition) {
         if (condition == null) {
             return false;
-        } else if (condition.getClass().isArray()) {
-            return ((Object[])condition).length > 0;
         } else if (condition instanceof String) {
             return eval((String) condition);
         } else if (condition instanceof Boolean) {
-            return (Boolean)condition;
+            return (Boolean) condition;
         } else if (condition instanceof Collection) {
             return eval((Collection) condition);
         } else if (condition instanceof Map) {
@@ -196,6 +195,10 @@ public class Eval {
             return eval((Double) condition);
         } else if (condition instanceof Float) {
             return eval((Float) condition);
+        } else if (condition instanceof Long) {
+            return eval((Long) condition);
+        } else if (condition.getClass().isArray()) {
+            return Array.getLength(condition) > 0;
         } else if (condition instanceof Number) {
             return eval((Number) condition);
         }

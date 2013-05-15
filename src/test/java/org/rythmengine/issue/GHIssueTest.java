@@ -1,12 +1,13 @@
 package org.rythmengine.issue;
 
+import models.Foo;
+import org.junit.Test;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
-import models.Foo;
-import org.junit.Test;
 
 import java.text.DateFormat;
 import java.util.*;
@@ -116,7 +117,7 @@ public class GHIssueTest extends TestBase {
     public void test143() {
         s = S.join(new Integer[]{1,2,3}, "::");
         eq("1::2::3");
-        s = S.join(new Double[]{1.0,2.0,3.0}, ":");
+        s = S.join(new Double[]{1.0, 2.0, 3.0}, ":");
         eq("1.0:2.0:3.0");
     }
     
@@ -173,6 +174,43 @@ public class GHIssueTest extends TestBase {
         args.put("sid", "b");
         s = r(t, args);
         eq("2/b");
+    }
+    
+    @Test
+    public void test155() {
+        String x = "\uD83D\uDE30";
+        assertEquals(x, S.escapeCSV(x).toString());
+        assertEquals(x, Escape.CSV.apply(x).toString());
+        System.getProperties().setProperty(RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL.getKey(), "org.rythmengine.extension.ICodeType.DefImpl.CSV");
+        t = "@s";
+        s = r(t, x);
+        eq(x);
+    }
+    
+    private void yes(Object p) {
+        assertEquals("yes", r(t, p, null));
+    }
+    
+    private void no(Object p) {
+        assertEquals("no", r(t, p, null));
+    }
+    
+    @Test
+    public void test157() {
+        t = "@args List o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Integer o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Long o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Character o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Float o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Double o;@if(o){yes}else{no}";
+        no(null);
+        t = "@args Boolean o;@if(o){yes}else{no}";
+        no(null);
     }
     
     public static void main(String[] args) {

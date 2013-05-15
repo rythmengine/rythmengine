@@ -19,6 +19,8 @@
 */
 package org.rythmengine.utils;
 
+import org.apache.commons.lang3.CharUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.template.ITemplate;
 
@@ -38,13 +40,17 @@ public enum Escape {
     CSV {
         @Override
         protected RawData apply_(String s) {
-            return org.rythmengine.utils.S.escapeCsv(s);
+            // fix https://github.com/greenlaw110/Rythm/issues/155
+            //return org.rythmengine.utils.S.escapeCsv(s);
+            return new RawData(CSVEscape.escape(s));
         }
     },
     /**
      * HTML escape scheme
      */
-    HTML {
+    HTML
+
+    {
         @Override
         protected RawData apply_(String s) {
             return org.rythmengine.utils.S.escapeHtml(s);
@@ -62,7 +68,9 @@ public enum Escape {
     /**
      * JSON escape scheme
      */
-    JSON {
+    JSON
+
+    {
         @Override
         protected RawData apply_(String s) {
             return org.rythmengine.utils.S.escapeJson(s);
@@ -81,10 +89,11 @@ public enum Escape {
     /**
      * Apply this escape scheme to the object's string representation
      * @param o
-     * @return
+     * @return the raw data been processed out from the object
      */
     public RawData apply(Object o) {
         if (null == o) return RawData.NULL;
+        if (o instanceof RawData) return (RawData)o;
         String s = o.toString();
         return apply_(s);
     }
@@ -135,5 +144,23 @@ public enum Escape {
         escape = escape.toUpperCase();
         if (escape.equals("JAVASCRIPT")) escape = "JS";
         return valueOf(escape);
+    }
+
+    private static class CSVEscape {
+        private static final char CSV_DELIMITER = ',';
+        private static final char CSV_QUOTE = '"';
+        private static final String CSV_QUOTE_STR = String.valueOf(CSV_QUOTE);
+        private static final char[] CSV_SEARCH_CHARS = 
+            new char[] {CSV_DELIMITER, CSV_QUOTE, CharUtils.CR, CharUtils.LF};
+
+        private static String escape(String s) {
+            if (StringUtils.containsNone(s, CSV_SEARCH_CHARS)) {
+                return s;
+            }
+            StringBuilder sb = new StringBuilder(CSV_QUOTE_STR);
+            sb.append(StringUtils.replace(s, CSV_QUOTE_STR, CSV_QUOTE_STR + CSV_QUOTE_STR));
+            return sb.append(CSV_QUOTE_STR).toString();
+            //return StringEscapeUtils.escapeCsv(s);
+        }
     }
 }

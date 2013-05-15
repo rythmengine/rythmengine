@@ -70,8 +70,8 @@ public class EscapeParserTest extends TestBase {
         eq("\\\"foo\\\" at \\\\ xb");
 
         t = "@escape(\"csv\"){@p}";
-        s = r(t, "Someone's good, bad and ...");
-        eq("\"Someone's good, bad and ...\"");
+        s = r(t, "Someone's, good bad and ...");
+        eq("\"Someone's, good bad and ...\"");
         
         t = "@args String p;@{String scheme = \"csv\";}\n@escape(scheme){@p}";
         s = r(t, "Someone's good, \"bad\" and ...");
