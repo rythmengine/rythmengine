@@ -127,6 +127,15 @@ public class Eval {
      * @param b
      * @return boolean result
      */
+    public static boolean eval(Byte b) {
+        return null != b && eval(b.byteValue());
+    }
+
+    /**
+     * @see #eval(boolean) 
+     * @param b
+     * @return boolean result
+     */
     public static boolean eval(Boolean b) {
         return null != b && b;
     }
