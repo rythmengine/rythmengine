@@ -21,8 +21,10 @@ package org.rythmengine.template;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.exception.FastRuntimeException;
 import org.rythmengine.exception.RythmException;
@@ -73,7 +75,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public void __setTemplateClass(TemplateClass templateClass) {
         this.__templateClass = templateClass;
     }
-    
+
     public void __prepareRender(ICodeType type, Locale locale) {
         __ctx.init(this, type, locale);
         Class<? extends TemplateBase> c = getClass();
@@ -443,14 +445,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.os = null;
         if (null != caller) {
             tmpl.__caller = (TextBuilder) caller;
-            Map<String, Object> callerRenderArgs = new HashMap<String, Object>(((TemplateBase)caller).__renderArgs);
+            Map<String, Object> callerRenderArgs = new HashMap<String, Object>(((TemplateBase) caller).__renderArgs);
             Map<String, Class> types = tmpl.__renderArgTypeMap();
-            for (String s: callerRenderArgs.keySet()) {
+            for (String s : callerRenderArgs.keySet()) {
                 if (tmpl.__renderArgs.containsKey(s)) continue;
                 Object o = callerRenderArgs.get(s);
                 if (null == o) continue;
                 Class<?> c = types.get(s);
-                
+
                 if (null == c || c.isAssignableFrom(o.getClass())) {
                     tmpl.__setRenderArg(s, o);
                 }
@@ -536,6 +538,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * Trigger render events.
      * <p>Not an API for user application</p>
+     *
      * @param event
      * @param engine
      */
@@ -563,30 +566,29 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 __logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 l = System.currentTimeMillis();
             }
-            String s = __internalRender();
-            __triggerRenderEvent(RythmEvents.RENDERED, engine);
-            if (__logTime()) {
-                __logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
+            try {
+                String s = __internalRender();
+                return s;
+            } finally {
+                __triggerRenderEvent(RythmEvents.RENDERED, engine);
+                if (__logTime()) {
+                    __logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
+                }
             }
-            return s;
         } catch (ClassReloadException e) {
             if (__logger.isDebugEnabled()) {
                 __logger.debug("Cannot hotswap class, try to restart engine...");
             }
             engine.restart(e);
             return render();
-        } 
-//        catch (ClassCastException e) {
-//            if (__logger.isDebugEnabled()) {
-//                __logger.debug("ClassCastException found, force refresh template and try again...");
-//            }
-//            engine.restart(e);
-//            TemplateClass tc = engine.classes().getByClassName(getClass().getName());
-//            tc.refresh(true);
-//            ITemplate t = tc.asTemplate(__ctx.currentCodeType());
-//            t.__setRenderArgs(__renderArgs);
-//            return t.render();
-//        }
+        }
+    }
+
+    private String secureCode = null;
+    @Override
+    public String safeRender(String secureCode) {
+        this.secureCode = secureCode;
+        return render();
     }
 
     private Writer w_ = null;
@@ -635,37 +637,37 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         w_ = w;
     }
 
-    private static final ThreadLocal<Boolean> cce_ = new ThreadLocal<Boolean>(){
+    private static final ThreadLocal<Boolean> cce_ = new ThreadLocal<Boolean>() {
         @Override
         protected Boolean initialValue() {
             return false;
         }
     };
+
     /**
      * Not to be used in user application or template
      */
     protected void __internalBuild() {
         w_ = null; // reset output destination
-        RythmEngine engine = __engine();
-        //if (!(engine.recordTemplateSourceOnError || engine.recordJavaSourceOnError)) {
-        if (false) {
-            __internalInit();
-            build();
-        } else {
-//            try {
-                try {
-                    long l = 0l;
-                    if (__logTime()) {
-                        l = System.currentTimeMillis();
-                    }
-                    __internalInit();
-                    build();
-                    if (__logTime()) {
-                        __logger.debug("<<<<<<<<<<<< [%s] build: %sms", getClass().getName(), System.currentTimeMillis() - l);
-                    }
-                } catch (RythmException e) {
-                    throw e;
-                } catch (Throwable e) {
+        try {
+            long l = 0l;
+            if (__logTime()) {
+                l = System.currentTimeMillis();
+            }
+            final String code = secureCode;
+            Sandbox.enterRestrictedZone(code);
+            try {
+                __internalInit();
+                build();
+            } finally {
+                Sandbox.leaveCurZone(code);
+            }
+            if (__logTime()) {
+                __logger.debug("<<<<<<<<<<<< [%s] build: %sms", getClass().getName(), System.currentTimeMillis() - l);
+            }
+        } catch (RythmException e) {
+            throw e;
+        } catch (Throwable e) {
 //                    if (engine.isDevMode() && e instanceof ClassCastException) {
 //                        // give one time retry for CCE
 //                        boolean cce = cce_.get();
@@ -676,57 +678,44 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 //                            cce_.set(false);
 //                        }
 //                    }
-                    StackTraceElement[] stackTrace = e.getStackTrace();
-                    String msg = null;
-                    for (StackTraceElement se : stackTrace) {
-                        String cName = se.getClassName();
-                        if (cName.contains(TemplateClass.CN_SUFFIX)) {
-                            // is it the embedded class?
-                            if (cName.indexOf("$") != -1) {
-                                cName = cName.substring(0, cName.lastIndexOf("$"));
-                            }
-                            TemplateClass tc = __engine.classes().getByClassName(cName);
-                            if (null == tc) {
-                                continue;
-                            }
-                            if (null == msg) {
-                                msg = e.getMessage();
-                                if (S.isEmpty(msg)) {
-                                    msg = "Rythm runtime exception caused by " + e.getClass().getName();
-                                }
-                            }
-                            RythmException re = new RythmException(__engine, e, tc, se.getLineNumber(), -1, msg);
-                            int lineNo = re.templateLineNumber;
-                            String key = tc.getKey().toString();
-                            int i = key.indexOf('\n');
-                            if (i == -1) i = key.indexOf('\r');
-                            if (i > -1) {
-                                key = key.substring(0, i - 1) + "...";
-                            }
-                            if (key.length() > 80) key = key.substring(0, 80) + "...";
-                            if (lineNo != -1) {
-                                StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                                newStack[0] = new StackTraceElement(tc.name(), "", key, lineNo);
-                                System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
-                                re.setStackTrace(newStack);
-                            }
-                            throw re;
+            StackTraceElement[] stackTrace = e.getStackTrace();
+            String msg = null;
+            for (StackTraceElement se : stackTrace) {
+                String cName = se.getClassName();
+                if (cName.contains(TemplateClass.CN_SUFFIX)) {
+                    // is it the embedded class?
+                    if (cName.indexOf("$") != -1) {
+                        cName = cName.substring(0, cName.lastIndexOf("$"));
+                    }
+                    TemplateClass tc = __engine.classes().getByClassName(cName);
+                    if (null == tc) {
+                        continue;
+                    }
+                    if (null == msg) {
+                        msg = e.getMessage();
+                        if (S.isEmpty(msg)) {
+                            msg = "Rythm runtime exception caused by " + e.getClass().getName();
                         }
                     }
-                    throw (e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e));
+                    RythmException re = new RythmException(__engine, e, tc, se.getLineNumber(), -1, msg);
+                    int lineNo = re.templateLineNumber;
+                    String key = tc.getKey().toString();
+                    int i = key.indexOf('\n');
+                    if (i == -1) i = key.indexOf('\r');
+                    if (i > -1) {
+                        key = key.substring(0, i - 1) + "...";
+                    }
+                    if (key.length() > 80) key = key.substring(0, 80) + "...";
+                    if (lineNo != -1) {
+                        StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
+                        newStack[0] = new StackTraceElement(tc.name(), "", key, lineNo);
+                        System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
+                        re.setStackTrace(newStack);
+                    }
+                    throw re;
                 }
-//            }
-//            } catch (RuntimeException e) {
-//                // try to restart engine
-//                if (!Rythm.insideSandbox()) {
-//                    try {
-//                        __engine.restart(e);
-//                    } catch (RuntimeException e0) {
-//                        // ignore it because we already thrown it out
-//                    }
-//                }
-//                throw e;
-//            }
+            }
+            throw (e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e));
         }
         if (null != w_) {
             try {
@@ -765,12 +754,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public TextBuilder build() {
         return this;
     }
-    
+
     private Map<String, Object> userCtx;
+
     @Override
     public Map<String, Object> __getUserContext() {
         return null == userCtx ? Collections.EMPTY_MAP : userCtx;
     }
+
     @Override
     public ITemplate __setUserContext(Map<String, Object> context) {
         this.userCtx = context;
@@ -786,6 +777,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     /**
      * Return render arg name by position
+     *
      * @param i
      * @return render argument name by position
      */
@@ -865,16 +857,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                         c0 = typeMap.get(nm);
                     }
                     if (isArray) {
-                        JSONArray l = (JSONArray)o;
+                        JSONArray l = (JSONArray) o;
                         //try {
-                            Class c1 = c0.getComponentType();
-                            int size = l.size();
-                            Object a = Array.newInstance(c1, size);
-                            for (int i = 0; i < size; ++i) {
-                                Object el = l.get(i);
-                                el = JSON.parseObject(el.toString(), c1);
-                                Array.set(a, i, el);
-                            }
+                        Class c1 = c0.getComponentType();
+                        int size = l.size();
+                        Object a = Array.newInstance(c1, size);
+                        for (int i = 0; i < size; ++i) {
+                            Object el = l.get(i);
+                            el = JSON.parseObject(el.toString(), c1);
+                            Array.set(a, i, el);
+                        }
                         //}
                         p = a;
                     } else {
@@ -1059,11 +1051,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public ICodeType __curCodeType() {
         return __ctx.currentCodeType();
     }
-    
+
     public Locale __curLocale() {
         return __ctx.currentLocale();
     }
-    
+
     public Escape __curEscape() {
         return __ctx.currentEscape();
     }
@@ -1079,7 +1071,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     private boolean appendToOutputStream() {
         return (null == __parent && null != os);
     }
-    
+
     @Override
     protected void __append(StrBuf wrapper) {
         if (appendToBuffer()) {
@@ -1109,6 +1101,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (appendToBuffer()) super.__append(oStr);
 
         StrBuf wrapper = new StrBuf(oStr);
+        ToStringBuilder tsb = new ToStringBuilder(o);
         if (appendToOutputStream()) {
             try {
                 os.write(wrapper.toBinary());
@@ -1300,9 +1293,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected boolean __logTime = false;
-    
+
     private II18nMessageResolver i18n = null;
-    protected String __i18n(String key, Object ... args) {
+
+    protected String __i18n(String key, Object... args) {
         if (i18n == null) {
             i18n = __engine().conf().i18nMessageResolver();
         }

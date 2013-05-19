@@ -19,14 +19,11 @@
 */
 package org.rythmengine;
 
-import org.rythmengine.extension.ICacheService;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.exception.TagLoadException;
-import org.rythmengine.extension.ICodeType;
-import org.rythmengine.extension.IDurationParser;
-import org.rythmengine.extension.Transformer;
+import org.rythmengine.extension.*;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.compiler.*;
 import org.rythmengine.internal.dialect.AutoToString;
@@ -34,13 +31,13 @@ import org.rythmengine.internal.dialect.BasicRythm;
 import org.rythmengine.internal.dialect.DialectManager;
 import org.rythmengine.internal.dialect.ToString;
 import org.rythmengine.logger.ILogger;
-import org.rythmengine.extension.ILoggerFactory;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.logger.NullLogger;
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.StringTemplateResource;
 import org.rythmengine.resource.TemplateResourceManager;
 import org.rythmengine.resource.ToStringTemplateResource;
+import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.sandbox.SandboxExecutingService;
 import org.rythmengine.sandbox.SandboxThreadFactory;
 import org.rythmengine.template.ITag;
@@ -68,11 +65,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * <p>Not Thread Safe</p>
- * 
+ * <p/>
  * <p>A Rythm Template Engine is the entry to the Rythm templating system. It provides a set of
  * APIs to render template. Each JVM allows multiple <code>RythmEngine</code> instance, with each
- * one represent a set of configurations.</p> 
- * 
+ * one represent a set of configurations.</p>
+ * <p/>
  * <p>The {@link Rythm} facade contains a default <code>RythmEngine</code> instance to make it
  * easy to use for most cases</p>
  */
@@ -86,6 +83,7 @@ public class RythmEngine implements IEventDispatcher {
      * <p/>
      */
     private static final String version;
+
     static {
         version = IO.readContentAsString(RythmEngine.class.getClassLoader().getResourceAsStream("rythm-engine-version"));
     }
@@ -184,10 +182,10 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     private String _id = null;
-    
+
     /**
      * Return the instance {@link org.rythmengine.conf.RythmConfigurationKey#ENGINE_ID}
-     * 
+     *
      * @return the id
      */
     public String id() {
@@ -293,6 +291,7 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Not an API
+     *
      * @return {@link DialectManager} instance
      */
     public DialectManager dialectManager() {
@@ -322,9 +321,9 @@ public class RythmEngine implements IEventDispatcher {
         private final ThreadLocal<Map<String, Object>> _usrCtx = new ThreadLocal<Map<String, Object>>();
 
         /**
-         * Init the render time by setting {@link org.rythmengine.extension.ICodeType code type}. 
-         * This method should called before calling render methods to setup the context of this render 
-         * 
+         * Init the render time by setting {@link org.rythmengine.extension.ICodeType code type}.
+         * This method should called before calling render methods to setup the context of this render
+         *
          * @param codeType
          * @return the render setting instance
          */
@@ -335,9 +334,9 @@ public class RythmEngine implements IEventDispatcher {
         }
 
         /**
-         * Init the render time by setting {@link java.util.Locale locale}. 
-         * This method should called before calling render methods to setup the context of this render 
-         * 
+         * Init the render time by setting {@link java.util.Locale locale}.
+         * This method should called before calling render methods to setup the context of this render
+         *
          * @param locale
          * @return the render setting instance
          */
@@ -348,9 +347,9 @@ public class RythmEngine implements IEventDispatcher {
         }
 
         /**
-         * Init the render time by setting user context 
-         * This method should called before calling render methods to setup the context of this render 
-         * 
+         * Init the render time by setting user context
+         * This method should called before calling render methods to setup the context of this render
+         *
          * @param usrCtx
          * @return the render setting instance
          */
@@ -359,10 +358,10 @@ public class RythmEngine implements IEventDispatcher {
             else _usrCtx.remove();
             return this;
         }
-        
+
         /**
          * Return ThreadLocal locale.
-         * 
+         *
          * @return locale setting for this render process
          */
         public final Locale locale() {
@@ -371,7 +370,7 @@ public class RythmEngine implements IEventDispatcher {
 
         /**
          * Return thread local code type
-         * 
+         *
          * @return {@link org.rythmengine.extension.ICodeType code type} setting for this render process
          */
         public final ICodeType codeType() {
@@ -380,15 +379,16 @@ public class RythmEngine implements IEventDispatcher {
 
         /**
          * Return thread local user context map
-         * 
+         *
          * @return the user context map
          */
         public final Map<String, Object> userContext() {
             return _usrCtx.get();
         }
-    
+
         /**
          * Clear the render time after render process done
+         *
          * @return this engine instance
          */
         public final RythmEngine clear() {
@@ -397,17 +397,19 @@ public class RythmEngine implements IEventDispatcher {
             _usrCtx.remove();
             return RythmEngine.this;
         }
-    
+
     }
 
     /**
      * The RenderSettings instance keep the environment settings for one render operation
      */
     public final RenderSettings renderSettings = new RenderSettings();
+    
+    private String secureCode = null;
 
     /**
      * Prepare the render operation environment settings
-     * 
+     *
      * @param codeType
      * @param locale
      * @param usrCtx
@@ -417,10 +419,10 @@ public class RythmEngine implements IEventDispatcher {
         renderSettings.init(codeType).init(locale).init(usrCtx);
         return this;
     }
-    
+
     /**
      * Prepare the render operation environment settings
-     * 
+     *
      * @param codeType
      * @return the engine instance itself
      */
@@ -431,7 +433,7 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Prepare the render operation environment settings
-     * 
+     *
      * @param locale
      * @return the engine instance itself
      */
@@ -439,10 +441,10 @@ public class RythmEngine implements IEventDispatcher {
         renderSettings.init(locale);
         return this;
     }
-    
+
     /**
      * Prepare the render operation environment settings
-     * 
+     *
      * @param userContext
      * @return the engine instance itself
      */
@@ -456,7 +458,7 @@ public class RythmEngine implements IEventDispatcher {
     -------------------------------------------------------------------------------*/
 
     private void _initLogger(Map<String, ?> conf) {
-        boolean logEnabled = (Boolean)RythmConfigurationKey.LOG_ENABLED.getConfiguration(conf);
+        boolean logEnabled = (Boolean) RythmConfigurationKey.LOG_ENABLED.getConfiguration(conf);
         if (logEnabled) {
             ILoggerFactory factory = RythmConfigurationKey.LOG_FACTORY_IMPL.getConfiguration(conf);
             Logger.registerLoggerFactory(factory);
@@ -464,7 +466,7 @@ public class RythmEngine implements IEventDispatcher {
             Logger.registerLoggerFactory(new NullLogger.Factory());
         }
     }
-    
+
     // trim "rythm." from conf keys
     private Map<String, Object> _processConf(Map<String, ?> conf) {
         Map<String, Object> m = new HashMap<String, Object>(conf.size());
@@ -486,17 +488,17 @@ public class RythmEngine implements IEventDispatcher {
         rawConf.putAll((Map) sysProps);
 
         // load conf from user supplied configuration
-        if (null != conf) rawConf.putAll((Map)_processConf(conf));
-        
+        if (null != conf) rawConf.putAll((Map) _processConf(conf));
+
         _initLogger(rawConf);
 
         // initialize the configuration with all loaded data 
         this._conf = new RythmConfiguration(rawConf);
-        
+
         // initialize logger factory
         ILoggerFactory logFact = this._conf.get(RythmConfigurationKey.LOG_FACTORY_IMPL);
         Logger.registerLoggerFactory(logFact);
-        
+
         // check if it needs to debug the conf information
         if (rawConf.containsKey("rythm.debug_conf") && Boolean.parseBoolean(rawConf.get("rythm.debug_conf").toString())) {
             this._conf.debug();
@@ -542,7 +544,7 @@ public class RythmEngine implements IEventDispatcher {
      * Set user property to the engine. Note The property is not used by the engine program
      * it's purely a place for user to add any tags or properties to the engine and later
      * get fetched out and use in the user application
-     * 
+     *
      * @param key
      * @param val
      */
@@ -552,6 +554,7 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Get user property by key
+     *
      * @param key
      * @param <T>
      * @return the property being cast to type T
@@ -636,7 +639,7 @@ public class RythmEngine implements IEventDispatcher {
                 body.render(__getBuffer());
             }
         });
-        
+
         Object o = _conf.get(RythmConfigurationKey.TRANSFORMER_UDT);
         if (null != o) {
             List<Class> udts = new ArrayList<Class>();
@@ -645,7 +648,7 @@ public class RythmEngine implements IEventDispatcher {
                 for (int i = 0; i < len; ++i) {
                     Object e = Array.get(o, i);
                     if (e instanceof Class) {
-                        udts.add((Class)e);
+                        udts.add((Class) e);
                     } else if (null != e) {
                         String s = e.toString();
                         try {
@@ -659,7 +662,7 @@ public class RythmEngine implements IEventDispatcher {
                 List l = (List) o;
                 for (Object e : l) {
                     if (e instanceof Class) {
-                        udts.add((Class)e);
+                        udts.add((Class) e);
                     } else if (null != e) {
                         String s = e.toString();
                         try {
@@ -670,10 +673,10 @@ public class RythmEngine implements IEventDispatcher {
                     }
                 }
             } else if (o instanceof Class) {
-                udts.add((Class)o);
+                udts.add((Class) o);
             } else {
                 String s = o.toString();
-                for (String tc: s.split("[, \t]+")){
+                for (String tc : s.split("[, \t]+")) {
                     try {
                         Class c = Class.forName(tc);
                         udts.add(c);
@@ -684,7 +687,7 @@ public class RythmEngine implements IEventDispatcher {
             }
             registerTransformer(udts.toArray(new Class[]{}));
         }
-        
+
         if (isDevMode()) {
             resourceManager().scan(conf().templateHome());
         }
@@ -739,13 +742,13 @@ public class RythmEngine implements IEventDispatcher {
                 Transformer tm = m.getAnnotation(Transformer.class);
                 boolean methodAnnotated = null != tm;
                 if (!methodAnnotated && !classAnnotated) continue;
-                
+
                 String mnmsp = nmsp;
                 if (methodAnnotated && namespaceIsEmpty) {
                     mnmsp = tm.value();
                     if (S.empty(mnmsp)) mnmsp = nmsp;
                 }
-                
+
                 String mwaive = waive;
                 if (methodAnnotated && waiveIsEmpty) {
                     mwaive = tm.waivePattern();
@@ -753,7 +756,7 @@ public class RythmEngine implements IEventDispatcher {
                 }
                 String cn = extensionClass.getSimpleName();
                 if (S.empty(mwaive)) mwaive = cn;
-                
+
                 boolean requireTemplate = clsRequireTemplate;
                 if (null != tm && tm.requireTemplate()) {
                     requireTemplate = true;
@@ -821,7 +824,7 @@ public class RythmEngine implements IEventDispatcher {
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
         }
-        
+
         String key = template;
         if (typeInferenceEnabled) {
             key += ParamTypeInferencer.uuid();
@@ -888,7 +891,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Get an new template instance by template source {@link java.io.File file}
      * and an array of arguments.
-     *
+     * <p/>
      * <p>When the args array contains only one element and is of {@link java.util.Map} type
      * the the render args are passed to template
      * {@link ITemplate#__setRenderArgs(java.util.Map) by name},
@@ -1068,7 +1071,7 @@ public class RythmEngine implements IEventDispatcher {
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
         }
-        
+
         String key = template;
         if (typeInferenceEnabled) {
             key += ParamTypeInferencer.uuid();
@@ -1275,7 +1278,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Evaluate a script and return executing result. Note the API is not mature yet
      * don't use it in your application
-     * 
+     *
      * @param script
      * @return the result
      */
@@ -1337,7 +1340,7 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Register a template class and return self
-     * 
+     *
      * @param tc
      * @return this engine instance
      */
@@ -1380,7 +1383,7 @@ public class RythmEngine implements IEventDispatcher {
             String name0 = s + "." + name;
             if (_templates.containsKey(name0)) return name0;
             pos = s.lastIndexOf(".");
-            if (-1 != pos){
+            if (-1 != pos) {
                 s = callerName.substring(0, pos);
                 name0 = s + "." + name;
                 if (_templates.containsKey(name0)) return name0;
@@ -1478,101 +1481,107 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void invokeTemplate(int line, String name, ITemplate caller, ITag.__ParameterList params, ITag.__Body body, ITag.__Body context, boolean ignoreNonExistsTag) {
         if (_nonExistsTags.contains(name)) return;
-        // try tag registry first
-        ITemplate t = _templates.get(name);
-        TemplateClass tc = caller.__getTemplateClass(true);
-        if (null == t) {
-            // is calling self
-            if (S.isEqual(name, caller.__getName())) t = caller;
-        }
 
-        if (null == t) {
-            // try imported path
-            if (null != tc.importPaths) {
-                for (String s : tc.importPaths) {
-                    String name0 = s + "." + name;
-                    t = _templates.get(name0);
-                    if (null != t) break;
-                }
+        RythmEvents.ENTER_INVOKE_TEMPLATE.trigger(this, (TemplateBase) caller);
+        try {
+            // try tag registry first
+            ITemplate t = _templates.get(name);
+            TemplateClass tc = caller.__getTemplateClass(true);
+            if (null == t) {
+                // is calling self
+                if (S.isEqual(name, caller.__getName())) t = caller;
             }
 
-            // try relative path
             if (null == t) {
-                String callerName = resourceManager().getFullTagName(tc);
-                int pos = callerName.lastIndexOf(".");
-                if (-1 != pos) {
-                    String name0 = callerName.substring(0, pos) + "." + name;
-                    t = _templates.get(name0);
-                }
-            }
-
-            // try load the tag from resource
-            if (null == t) {
-                tc = resourceManager().tryLoadTemplate(name, tc);
-                if (null != tc) t = _templates.get(tc.getFullName());
-                if (null == t) {
-                    if (ignoreNonExistsTag) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("cannot find tag: " + name);
-                        }
-                        _nonExistsTags.add(name);
-                        if (mode().isDev() && nonExistsTemplatesChecker == null) {
-                            nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
-                        }
-                        return;
-                    } else {
-                        throw new NullPointerException("cannot find tag: " + name);
+                // try imported path
+                if (null != tc.importPaths) {
+                    for (String s : tc.importPaths) {
+                        String name0 = s + "." + name;
+                        t = _templates.get(name0);
+                        if (null != t) break;
                     }
                 }
-                t = t.__cloneMe(this, caller);
-            }
-        }
 
-        if (!(t instanceof JavaTagBase)) {
-            // try refresh the tag loaded from template file under tag root
-            // note Java source tags are not reloaded here
-            String cn = t.getClass().getName();
-            TemplateClass tc0 = classes().getByClassName(cn);
-            if (null == tc0) {
-                System.out.println(t.getClass());
-                System.out.println(name);
-                System.out.println(cn);
-                System.out.println(caller.getClass());
-            }
-            t = tc0.asTemplate(caller);
-        } else {
-            t = t.__cloneMe(this, caller);
-        }
+                // try relative path
+                if (null == t) {
+                    String callerName = resourceManager().getFullTagName(tc);
+                    int pos = callerName.lastIndexOf(".");
+                    if (-1 != pos) {
+                        String name0 = callerName.substring(0, pos) + "." + name;
+                        t = _templates.get(name0);
+                    }
+                }
 
-        if (null != params) {
-            if (t instanceof JavaTagBase) {
-                ((JavaTagBase) t).__setRenderArgs0(params);
-            } else {
-                for (int i = 0; i < params.size(); ++i) {
-                    ITag.__Parameter param = params.get(i);
-                    if (null != param.name) t.__setRenderArg(param.name, param.value);
-                    else t.__setRenderArg(i, param.value);
+                // try load the tag from resource
+                if (null == t) {
+                    tc = resourceManager().tryLoadTemplate(name, tc);
+                    if (null != tc) t = _templates.get(tc.getFullName());
+                    if (null == t) {
+                        if (ignoreNonExistsTag) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("cannot find tag: " + name);
+                            }
+                            _nonExistsTags.add(name);
+                            if (mode().isDev() && nonExistsTemplatesChecker == null) {
+                                nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+                            }
+                            return;
+                        } else {
+                            throw new NullPointerException("cannot find tag: " + name);
+                        }
+                    }
+                    t = t.__cloneMe(this, caller);
                 }
             }
-        }
-        if (null == body && null != params) {
-            body = (ITag.__Body)params.getByName("__body");
-            if (null == body) {
-                body = (ITag.__Body)params.getByName("_body");
+
+            if (!(t instanceof JavaTagBase)) {
+                // try refresh the tag loaded from template file under tag root
+                // note Java source tags are not reloaded here
+                String cn = t.getClass().getName();
+                TemplateClass tc0 = classes().getByClassName(cn);
+                if (null == tc0) {
+                    System.out.println(t.getClass());
+                    System.out.println(name);
+                    System.out.println(cn);
+                    System.out.println(caller.getClass());
+                }
+                t = tc0.asTemplate(caller);
+            } else {
+                t = t.__cloneMe(this, caller);
             }
-        }
-        if (null != body) {
-            t.__setRenderArg("__body", body);
-            t.__setRenderArg("_body", body); // for compatiblity
-        }
-        RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, t));
-        try {
-            if (null != context) {
-                t.__setBodyContext(context);
+
+            if (null != params) {
+                if (t instanceof JavaTagBase) {
+                    ((JavaTagBase) t).__setRenderArgs0(params);
+                } else {
+                    for (int i = 0; i < params.size(); ++i) {
+                        ITag.__Parameter param = params.get(i);
+                        if (null != param.name) t.__setRenderArg(param.name, param.value);
+                        else t.__setRenderArg(i, param.value);
+                    }
+                }
             }
-            t.__call(line);
+            if (null == body && null != params) {
+                body = (ITag.__Body) params.getByName("__body");
+                if (null == body) {
+                    body = (ITag.__Body) params.getByName("_body");
+                }
+            }
+            if (null != body) {
+                t.__setRenderArg("__body", body);
+                t.__setRenderArg("_body", body); // for compatiblity
+            }
+            RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, t));
+            try {
+                if (null != context) {
+                    t.__setBodyContext(context);
+                }
+                t.__call(line);
+            } finally {
+                RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase) caller, t));
+            }
         } finally {
-            RythmEvents.TAG_INVOKED.trigger(this, F.T2((TemplateBase) caller, t));
+            RythmEvents.EXIT_INVOKE_TEMPLATE.trigger(this, (TemplateBase) caller);
         }
     }
 
@@ -1685,41 +1694,50 @@ public class RythmEngine implements IEventDispatcher {
 
     private SandboxExecutingService _secureExecutor = null;
 
-    private SandboxExecutingService secureExecutor() {
-        if (null == _secureExecutor) {
-            int poolSize = (Integer) conf().get(RythmConfigurationKey.SANDBOX_POOL_SIZE);
-            SecurityManager sm = conf().get(RythmConfigurationKey.SANDBOX_SECURITY_MANAGER_IMPL);
-            int timeout = (Integer) conf().get(RythmConfigurationKey.SANDBOX_TIMEOUT);
-            SandboxThreadFactory fact = conf().get(RythmConfigurationKey.SANBOX_THREAD_FACTORY_IMPL);
-            if (null == fact) fact = new SandboxThreadFactory(sm, null, this);
-            _secureExecutor = new SandboxExecutingService(poolSize, fact, timeout, this);
-        }
-        return _secureExecutor;
-    }
-
     /**
      * Create a {@link Sandbox} instance to render the template
      *
      * @return an new sandbox instance
      */
-    public Sandbox sandbox() {
-        return new Sandbox(this, secureExecutor());
+    public synchronized Sandbox sandbox() {
+        if (null != _secureExecutor) {
+            return new Sandbox(this, _secureExecutor);
+        }
+        int poolSize = (Integer) conf().get(RythmConfigurationKey.SANDBOX_POOL_SIZE);
+        SecurityManager csm = conf().get(RythmConfigurationKey.SANDBOX_SECURITY_MANAGER_IMPL);
+        int timeout = (Integer) conf().get(RythmConfigurationKey.SANDBOX_TIMEOUT);
+        SandboxThreadFactory fact = conf().get(RythmConfigurationKey.SANBOX_THREAD_FACTORY_IMPL);
+
+        SecurityManager ssm = System.getSecurityManager();
+        RythmSecurityManager rsm;
+        String code;
+        if (null == ssm || !(ssm instanceof RythmSecurityManager)) {
+            code = conf().get(RythmConfigurationKey.SANDBOX_SECURE_CODE);
+            rsm = new RythmSecurityManager(csm, code, this);
+        } else {
+            rsm = ((RythmSecurityManager)ssm);
+            code = rsm.getCode();
+        }
+        _secureExecutor = new SandboxExecutingService(poolSize, fact, timeout, this, code);
+        Sandbox sandbox = new Sandbox(this, _secureExecutor);
+        if (ssm != rsm) System.setSecurityManager(rsm);
+        return sandbox;
     }
 
     /**
-     * Create a {@link Sandbox} instance with user supplied context 
-     * 
+     * Create a {@link Sandbox} instance with user supplied context
+     *
      * @param context
      * @return an new sandbox instance
      */
     public Sandbox sandbox(Map<String, Object> context) {
-        return new Sandbox(this, secureExecutor()).setUserContext(context);
+        return sandbox().setUserContext(context);
     }
 
     // dispatch rythm events
     private IEventDispatcher eventDispatcher = null;
 
-    private IEventDispatcher eventDispatcher() {
+    public IEventDispatcher eventDispatcher() {
         if (null == eventDispatcher) {
             eventDispatcher = new EventBus(this);
         }

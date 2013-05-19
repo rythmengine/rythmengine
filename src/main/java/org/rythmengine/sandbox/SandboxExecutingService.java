@@ -37,11 +37,13 @@ public class SandboxExecutingService {
     private ScheduledExecutorService scheduler = null;
     private long timeout = 1000;
     private RythmEngine engine;
+    private String code = null;
 
-    public SandboxExecutingService(int poolSize, SandboxThreadFactory fact, long timeout, RythmEngine re) {
+    public SandboxExecutingService(int poolSize, SandboxThreadFactory fact, long timeout, RythmEngine re, String code) {
         scheduler = new ScheduledThreadPoolExecutor(poolSize, fact, new ThreadPoolExecutor.AbortPolicy());
         this.timeout = timeout;
         engine = re;
+        this.code = code;
     }
 
     private Future<Object> exec(final Map<String, Object> userCtx, final ITemplate tmpl, final String template, final File file, final Object... args) {
@@ -59,15 +61,15 @@ public class SandboxExecutingService {
                     } else {
                         throw new NullPointerException();
                     }
-                    return t.render();
+                    return t.safeRender(code);
                 } catch (Exception e) {
                     return e;
                 }
             }
         });
     }
-    
-    public String execute(Map<String, Object> context, File template, Object ... args) {
+
+    public String execute(Map<String, Object> context, File template, Object... args) {
         if (null == template) throw new NullPointerException();
         Future<Object> f = null;
         try {
@@ -97,6 +99,9 @@ public class SandboxExecutingService {
         } catch (RuntimeException e) {
             f.cancel(true);
             throw e;
+        } catch (TimeoutException e) {
+            f.cancel(true);
+            throw new SecurityException(e);
         } catch (Exception e) {
             f.cancel(true);
             throw new RuntimeException(e);
@@ -117,7 +122,6 @@ public class SandboxExecutingService {
     }
 
     public void shutdown() {
-        SandboxThreadFactory.shutdown();
         scheduler.shutdownNow();
     }
 

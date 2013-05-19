@@ -28,6 +28,7 @@ import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.IDurationParser;
 import org.rythmengine.extension.II18nMessageResolver;
 import org.rythmengine.logger.JDKLogger;
+import org.rythmengine.sandbox.SandboxThreadFactory;
 import org.rythmengine.utils.S;
 
 import java.io.File;
@@ -493,7 +494,7 @@ public enum RythmConfigurationKey {
      * "sandbox.timeout": Set the timeout of a {@link org.rythmengine.Sandbox sandbox} execution in milliseconds.
      * If the execution failed to return after timeout, then Rythm will interrupt the execution thread and force it
      * to return. This setting prevent infinite loop in untrusted template.
-     * <p>Default value: 1000</p>
+     * <p>Default value: 2000</p>
      */
     SANDBOX_TIMEOUT("sandbox.timeout") {
         @Override
@@ -558,22 +559,45 @@ public enum RythmConfigurationKey {
      * 
      * By default the following properties are allowed to access by sandbox thread
      * <ul>
-     * <li><code>user.dir</code></li>
+     * <li><code>file.encoding</code></li>
+     * <li><code>file.separator</code></li>
      * <li><code>line.separator</code></li>
-     * <li><code>java.vm.name</code></li>
+     * <li><code>java.home</code></li>
      * <li><code>java.protocol.handler.pkgs</code></li>
+     * <li><code>java.vm.name</code></li>
+     * <li><code>path.separator</code></li>
+     * <li><code>sun.timezone.ids.oldmapping</code></li>
+     * <li><code>suppressRawWhenUnchecked</code></li>
+     * <li><code>user.country</code></li>
+     * <li><code>user.dir</code></li>
+     * <li><code>user.language</code></li>
+     * <li><code>user.region</code></li>
+     * <li><code>user.timezone</code></li>
      * </ul>
      */
     SANDBOX_ALLOWED_SYSTEM_PROPERTIES("sandbox.allowed_system_properties", 
-        "java.io.tmpdir,file.encoding,user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs,suppressRawWhenUnchecked"),
+        "java.io.tmpdir,file.encoding,user.dir,line.separator,java.vm.name,java.protocol.handler.pkgs,suppressRawWhenUnchecked,user.language,user.region,user.timezone,user.country,java.home,sun.timezone.ids.oldmapping,file.separator,path.separator"),
 
     /**
      * "sandbox.thread_factory.impl": Configure the thread factory to be used by the sandbox executing service.
-     * <p>Note this configuration should be very rare used as it is create to support rythmfiddle implementation.
-     * Should you really need to configure this item, make sure it is configured as an instance of {@link org.rythmengine.sandbox.SandboxThreadFactory}</p>
-     * <p>Default value: <code>null</code></p>
+     * <p>Default value: {@link org.rythmengine.sandbox.SandboxThreadFactory}</p>
      */
-    SANBOX_THREAD_FACTORY_IMPL("sandbox.thread_factory.impl", null),
+    SANBOX_THREAD_FACTORY_IMPL("sandbox.thread_factory.impl", new SandboxThreadFactory()),
+
+    /**
+     * "sandbox.tmp_dir.io.enabled": enable or disable tmp dir IO in sandbox mode
+     * When tmp_dir io is enabled, template running in sandbox mode can read/write files
+     * in "java.io.tmpdir"
+     * <p>Default value: <code>true</code></p>
+     */
+    SANDBOX_TEMP_IO_ENABLED("sandbox.tmp_dir.io.enabled", true),
+
+    /**
+     * "sandbox.secure_mode": used in sandbox security manager to turn on/off
+     * secure zone
+     * <p>Default value: <code>UUID.randomUUID().toString()</code></p>
+     */
+    SANDBOX_SECURE_CODE("sandbox.secure_code", UUID.randomUUID().toString()),
 
     /**
      * "transformer.udt": User defined transformers, should be a list of class names separated by ",". If configured

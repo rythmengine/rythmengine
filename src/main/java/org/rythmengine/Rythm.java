@@ -39,6 +39,8 @@ import java.util.Map;
  * which as I called, the default engine</p>
  */
 public class Rythm {
+    
+    public static boolean debug = false;
 
     /**
      * The type used to indicate the execution mode

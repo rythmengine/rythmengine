@@ -227,48 +227,48 @@ public class TemplateClassLoader extends ClassLoader {
         SecurityManager sm;
         RythmSecurityManager rsm = null;
         String pass = null;
-        if (Rythm.insideSandbox()) {
-            if (conf.restrictedClasses().contains(name)) {
-                throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
-            }
-            sm = System.getSecurityManager();
-            if (null != sm && sm instanceof RythmSecurityManager) {
-                rsm = (RythmSecurityManager) sm;
-                pass = sandboxPassword.get();
-            }
-        }
-
-        TemplateClass tc = engine.classes().clsNameIdx.get(name);
-        if (null == tc) {
-            // it's not a template class, let's try to find already loaded one
-            Class<?> c = findLoadedClass(name);
-            if (c != null) {
-                return c;
-            }
-        }
-
-        // First check if it's an application Class
-        Class<?> TemplateClass = loadTemplateClass(name);
-        if (TemplateClass != null) {
-            if (resolve) {
-                resolveClass(TemplateClass);
-            }
-            return TemplateClass;
-        }
-
-        // Delegate to the classic classloader
-        boolean unlockSM = /*engine.isDevMode() && */null != rsm;
         try {
+            if (Rythm.insideSandbox()) {
+                if (conf.restrictedClasses().contains(name)) {
+                    throw new ClassNotFoundException("Access to class " + name + " is restricted in sandbox mode");
+                }
+//            sm = System.getSecurityManager();
+//            if (null != sm && sm instanceof RythmSecurityManager) {
+//                rsm = (RythmSecurityManager) sm;
+//                pass = sandboxPassword.get();
+//            }
+            }
+
+            TemplateClass tc = engine.classes().clsNameIdx.get(name);
+            if (null == tc) {
+                // it's not a template class, let's try to find already loaded one
+                Class<?> c = findLoadedClass(name);
+                if (c != null) {
+                    return c;
+                }
+            }
+
+            // First check if it's an application Class
+            Class<?> TemplateClass = loadTemplateClass(name);
+            if (TemplateClass != null) {
+                if (resolve) {
+                    resolveClass(TemplateClass);
+                }
+                return TemplateClass;
+            }
+
+            // Delegate to the classic classloader
+            //boolean unlockSM = /*engine.isDevMode() && */null != rsm;
             // release sandbox password if running inside sandbox in order to load 
             // application classes when running is dev mode
-            if (unlockSM) {
-                rsm.unlock(pass);
-            }
+//            if (unlockSM) {
+//                rsm.unlock(pass);
+//            }
             return super.loadClass(name, resolve);
         } finally {
-            if (unlockSM) {
-                rsm.lock(pass);
-            }
+//            if (unlockSM) {
+//                rsm.lock(pass);
+//            }
         }
     }
 
@@ -379,14 +379,16 @@ public class TemplateClassLoader extends ClassLoader {
             loadTemplateClass(className);
         }
     }
-    
+
     private Set<String> notFoundTypes = null;
+
     private boolean typeNotFound(String name) {
         if (null == notFoundTypes) {
             notFoundTypes = engine.classes().compiler.notFoundTypes;
         }
         return notFoundTypes.contains(name);
     }
+
     private void setTypeNotFound(String name) {
         if (null == notFoundTypes) {
             notFoundTypes = engine.classes().compiler.notFoundTypes;

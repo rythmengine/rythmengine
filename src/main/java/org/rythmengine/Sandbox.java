@@ -19,15 +19,21 @@
 */
 package org.rythmengine;
 
+import org.rythmengine.logger.ILogger;
+import org.rythmengine.logger.Logger;
+import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.sandbox.SandboxExecutingService;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * A wrapper of Rythm engine and make sure the rendering is happen in Sandbox mode
  */
 public class Sandbox {
+
+    private static final ILogger logger = Logger.get(Sandbox.class);
 
     private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
         @Override
@@ -39,14 +45,32 @@ public class Sandbox {
     static boolean sandboxMode() {
         return sandboxMode.get();
     }
-
-
+    
     RythmEngine engine;
     SandboxExecutingService secureExecutor = null;
+    
+    private static boolean sandboxLive = false;
+
+    /**
+     * Turn off sandbox mode. Used by Rythm unit testing program
+     * @param code
+     */
+    public static void turnOffSandbox(String code) {
+        if (!sandboxLive) return;
+        rsm().forbiddenIfCodeNotMatch(code);
+        sandboxLive = false;
+        System.setSecurityManager(null);
+    }
 
     public Sandbox(RythmEngine engine, SandboxExecutingService executor) {
         this.engine = engine;
         this.secureExecutor = executor;
+        sandboxLive = true;
+        restrictedZone.set(new Stack<Boolean>());
+    }
+    
+    private static RythmSecurityManager rsm() {
+        return (RythmSecurityManager)System.getSecurityManager();
     }
 
     private RythmEngine engine() {
@@ -84,6 +108,42 @@ public class Sandbox {
             if (code.contains(s)) return s;
         }
         return null;
+    }
+    
+    private final static ThreadLocal<Stack<Boolean>> restrictedZone = new ThreadLocal<Stack<Boolean>>(){
+        @Override
+        protected Stack<Boolean> initialValue() {
+            return new Stack<Boolean>();
+        }
+    };
+    
+    public final static void enterRestrictedZone(String code) {
+        if (!sandboxLive) return;
+        rsm().forbiddenIfCodeNotMatch(code);
+        restrictedZone.get().push(true);
+    }
+
+    public final static void enterSafeZone(String code) {
+        if (!sandboxLive) return;
+        rsm().forbiddenIfCodeNotMatch(code);
+        restrictedZone.get().push(false);
+    }
+    
+    public final static void leaveCurZone(String code) {
+        if (!sandboxLive) return;
+        rsm().forbiddenIfCodeNotMatch(code);
+        Stack<Boolean> stack = restrictedZone.get();
+        if (stack.isEmpty()) {
+            throw new IllegalStateException("EMPTY ZONE");
+        }
+        stack.pop();
+    }
+    
+    public final static boolean isRestricted() {
+        if (!sandboxLive) return false;
+        Stack<Boolean> stack = restrictedZone.get();
+        if (stack.isEmpty()) return false;
+        return stack.peek();
     }
 
 }

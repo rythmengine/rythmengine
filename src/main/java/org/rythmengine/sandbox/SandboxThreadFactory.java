@@ -19,85 +19,18 @@
 */
 package org.rythmengine.sandbox;
 
-import org.rythmengine.RythmEngine;
 import org.rythmengine.internal.RythmThreadFactory;
-import org.rythmengine.internal.compiler.TemplateClassLoader;
-
-import java.util.UUID;
 
 /**
  * Create secure template executing thread
  */
 public class SandboxThreadFactory extends RythmThreadFactory {
-    private SecurityManager sm;
-    private String password = null;
 
     /**
      * Construct a Sandbox thread factory instance.
-     * @param sm security manager, optional
-     * @param re engine, optional
      */
-    public SandboxThreadFactory(SecurityManager sm, String password, RythmEngine re) {
-        super("rythm-executor");
-        if (null == sm) {
-            String pass = UUID.randomUUID().toString();
-            sm = new RythmSecurityManager(System.getSecurityManager(), pass, re);
-            this.password = pass;
-        } else {
-            this.password = password;
-        }
-        this.sm = sm;
-    }
-
-    //static ConcurrentMap<String, SandboxThread> runners = new ConcurrentHashMap<String, SandboxThread>();
-
-    static class SandboxThread extends Thread {
-        private SecurityManager sm;
-        private SandboxThreadFactory fact;
-
-        public SandboxThread(SandboxThreadFactory fact, SecurityManager sm, ThreadGroup group, Runnable target, String name, long stackSize) {
-            super(group, target, name, stackSize);
-            this.sm = sm;
-            this.fact = fact;
-            //runners.put(name, this);
-        }
-
-        @Override
-        public void run() {
-            SecurityManager osm = System.getSecurityManager();
-            SecurityManager nsm = sm;
-            boolean needsSetSM = null == osm || !osm.getClass().equals(nsm.getClass()); 
-            if (needsSetSM) {
-                System.setSecurityManager(nsm);
-            }
-            TemplateClassLoader.setSandboxPassword(fact.password);
-            try {
-                super.run();
-            } finally {
-                if (needsSetSM) {
-                    if (nsm instanceof RythmSecurityManager) {
-                        RythmSecurityManager rsm = (RythmSecurityManager) nsm;
-                        rsm.unlock(fact.password);
-                        System.setSecurityManager(osm);
-                        rsm.lock(fact.password);
-                    } else {
-                        System.setSecurityManager(osm);
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    protected Thread newThread0(ThreadGroup g, Runnable r, String name, long stackSize) {
-        return new SandboxThread(this, sm, g, r, name, stackSize);
-    }
-
-    static void shutdown() {
-//        for (Thread t: runners.values()) {
-//            t.stop();
-//        }
-//        runners.clear();
+    public SandboxThreadFactory() {
+        super("rythm-sandbox-executor");
     }
 
 }

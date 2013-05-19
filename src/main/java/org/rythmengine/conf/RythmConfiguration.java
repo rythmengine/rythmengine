@@ -484,6 +484,14 @@ public class RythmConfiguration {
         return _allowedSysProps;
     }
     
+    private Boolean _sandboxTmpIO = null;
+    public boolean sandboxTmpIO() {
+        if (null == _sandboxTmpIO) {
+            _sandboxTmpIO = get(SANDBOX_TEMP_IO_ENABLED);
+        }
+        return _sandboxTmpIO;
+    }
+    
 
     public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 
     

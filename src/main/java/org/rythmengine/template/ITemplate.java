@@ -148,6 +148,14 @@ public interface ITemplate extends ITag, Cloneable {
      * @return render result
      */
     String render();
+    
+    /**
+     * Called by Sandbox service to render the template and return result as String
+     *
+     * @param secureCode the secure code of the sandbox service
+     * @return render result
+     */
+    String safeRender(String secureCode);
 
     /**
      * Render the template and put the result into outputstream

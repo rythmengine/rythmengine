@@ -19,6 +19,7 @@
 */
 package org.rythmengine;
 
+import org.junit.internal.RealSystem;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
@@ -105,7 +106,7 @@ public abstract class TestBase extends Assert {
     }
     
     protected static void run(Class<? extends TestBase> cls) {
-        JUnitCore.main(cls.getName());
+        new JUnitCore().runMain(new RealSystem(), cls.getName());
     }
     
 }

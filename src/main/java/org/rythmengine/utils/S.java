@@ -169,6 +169,18 @@ public class S {
     public static boolean isEqual(String s1, String s2) {
         return isEqual(s1, s2, 0);
     }
+    
+    /**
+     * Check if two String is not equal. This comparison is {@link #IGNORECASE case sensitive}
+     * and {@link #IGNORESPACE space sensitive}
+     *
+     * @param s1
+     * @param s2
+     * @return true if the two specified Strings are not equal to each other
+     */
+    public static boolean isNotEqual(String s1, String s2) {
+        return !isEqual(s1, s2, 0);
+    }
 
     /**
      * Alias of {@link #isEqual(String, String)}
@@ -180,6 +192,18 @@ public class S {
     @Transformer
     public static boolean eq(String s1, String s2) {
         return isEqual(s1, s2, 0);
+    }
+    
+    /**
+     * Alias of {@link #isNotEqual(String, String)}
+     *
+     * @param s1
+     * @param s2
+     * @return true if s1 not equals s2
+     */
+    @Transformer
+    public static boolean ne(String s1, String s2) {
+        return !isEqual(s1, s2, 0);
     }
 
     /**
@@ -194,6 +218,17 @@ public class S {
     }
 
     /**
+     * Check if two Object is not equal after converted into String
+     *
+     * @param o1
+     * @param o2
+     * @return true if the specified two object instance are not equal after converting to String
+     */
+    public static boolean isNotEqual(Object o1, Object o2) {
+        return !isEqual(str(o1), str(o2));
+    }
+
+    /**
      * Alias of {@link #isEqual(Object, Object)}
      *
      * @param o1
@@ -201,6 +236,17 @@ public class S {
      * @return true if o1's str equals o2's str
      */
     public static boolean eq(Object o1, Object o2) {
+        return isEqual(str(o1), str(o2), 0);
+    }
+
+    /**
+     * Alias of {@link #isNotEqual(Object, Object)}
+     *
+     * @param o1
+     * @param o2
+     * @return true if o1's str not equals o2's str
+     */
+    public static boolean ne(Object o1, Object o2) {
         return isEqual(str(o1), str(o2), 0);
     }
 
@@ -214,6 +260,18 @@ public class S {
      */
     public static boolean eq(String s1, String s2, int modifier) {
         return isEqual(s1, s2, modifier);
+    }
+
+    /**
+     * Alias of {@link #isNotEqual(String, String, int)}
+     *
+     * @param s1
+     * @param s2
+     * @param modifier
+     * @return true if o1's str not equals o2's str
+     */
+    public static boolean ne(String s1, String s2, int modifier) {
+        return !isEqual(s1, s2, modifier);
     }
 
     /**
@@ -250,6 +308,18 @@ public class S {
         } else {
             return s1.equals(s2);
         }
+    }
+
+    /**
+     * The counter function of {@link #isEqual(String, String, int)}
+     * 
+     * @param s1
+     * @param s2
+     * @param modifier
+     * @return true if s1 not equals s2
+     */
+    public static boolean isNotEqual(String s1, String s2, int modifier) {
+        return !isEqual(s1, s2, modifier);
     }
 
     /**

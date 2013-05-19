@@ -26,23 +26,107 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.IRenderExceptionHandler;
 import org.rythmengine.extension.IRythmListener;
 import org.rythmengine.extension.ISourceCodeEnhancer;
+import org.rythmengine.logger.ILogger;
+import org.rythmengine.logger.Logger;
 import org.rythmengine.template.ITag;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.template.TemplateBase;
 import org.rythmengine.utils.F;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Dispatch {@link IEvent events}
  */
 public class EventBus implements IEventDispatcher {
+    protected static final ILogger logger = Logger.get(EventBus.class);
     private final RythmEngine engine;
     private final ISourceCodeEnhancer sourceCodeEnhancer;
     //private final IByteCodeEnhancer byteCodeEnhancer;
     private final IRenderExceptionHandler exceptionHandler;
-    private final IRythmListener renderListener;
+
+    private static class RythmListenerDispatcher implements IRythmListener {
+        private List<IRythmListener> listeners = new ArrayList<IRythmListener>();
+
+        @Override
+        public void onRender(ITemplate template) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.onRender(template);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing onRender method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+
+        @Override
+        public void rendered(ITemplate template) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.rendered(template);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing rendered method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+
+        @Override
+        public void enterInvokeTemplate(TemplateBase caller) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.enterInvokeTemplate(caller);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing enterInvokeTemplate method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+
+        @Override
+        public void exitInvokeTemplate(TemplateBase caller) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.exitInvokeTemplate(caller);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing exitInvokeTemplate method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+
+        @Override
+        public void onInvoke(ITag tag) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.onInvoke(tag);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing onInvoke method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+
+        @Override
+        public void invoked(ITag tag) {
+            for (IRythmListener l : listeners) {
+                try {
+                    l.invoked(tag);
+                } catch (RuntimeException e) {
+                    logger.warn(e, "Error executing invoked method on rythm listener: " + l.getClass());
+                }
+            }
+        }
+    }
+
+    private final RythmListenerDispatcher renderListener = new RythmListenerDispatcher();
+
+    public final void registerRenderListener(IRythmListener l) {
+        renderListener.listeners.add(l);
+    }
+
+    public final void unregisterRenderListener(IRythmListener l) {
+        renderListener.listeners.remove(l);
+    }
 
     public EventBus(RythmEngine engine) {
         this.engine = engine;
@@ -50,7 +134,10 @@ public class EventBus implements IEventDispatcher {
         sourceCodeEnhancer = conf.get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
         //byteCodeEnhancer = conf.get(RythmConfigurationKey.CODEGEN_BYTE_CODE_ENHANCER);
         exceptionHandler = conf.get(RythmConfigurationKey.RENDER_EXCEPTION_HANDLER);
-        renderListener = conf.get(RythmConfigurationKey.RENDER_LISTENER);
+        IRythmListener l = conf.get(RythmConfigurationKey.RENDER_LISTENER);
+        if (null != l) {
+            registerRenderListener(l);
+        }
         registerHandlers();
     }
 
@@ -128,11 +215,7 @@ public class EventBus implements IEventDispatcher {
                 if (null != ce) {
                     ce.setRenderArgs(template);
                 }
-                IRythmListener l = renderListener;
-                if (null == l) {
-                    return null;
-                }
-                l.onRender(template);
+                renderListener.onRender(template);
                 return null;
             }
         });
@@ -141,40 +224,42 @@ public class EventBus implements IEventDispatcher {
             public Void handleEvent(RythmEngine engine, ITemplate template) {
                 engine.renderSettings.clear();
                 Rythm.RenderTime.clear();
-                IRythmListener l = renderListener;
-                if (null != l) {
-                    l.rendered(template);
-                }
+                renderListener.rendered(template);
                 return null;
             }
         });
         m.put(RythmEvents.ON_TAG_INVOCATION, new IEventHandler<Void, F.T2<ITemplate, ITag>>() {
             @Override
             public Void handleEvent(RythmEngine engine, F.T2<ITemplate, ITag> param) {
-                IRythmListener l = renderListener;
-                if (null == l) {
-                    return null;
-                }
-                ITag tag = param._2;
-                l.onInvoke(tag);
+                renderListener.onInvoke(param._2);
                 return null;
             }
         });
         m.put(RythmEvents.TAG_INVOKED, new IEventHandler<Void, F.T2<TemplateBase, ITag>>() {
             @Override
             public Void handleEvent(RythmEngine engine, F.T2<TemplateBase, ITag> param) {
-                IRythmListener l = renderListener;
-                if (null == l) {
-                    return null;
-                }
-                ITag tag = param._2;
-                l.invoked(tag);
+                renderListener.invoked(param._2);
+                return null;
+            }
+        });
+        m.put(RythmEvents.ENTER_INVOKE_TEMPLATE, new IEventHandler<Void, TemplateBase>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, TemplateBase caller) {
+                renderListener.enterInvokeTemplate(caller);
+                return null;
+            }
+        });
+        m.put(RythmEvents.EXIT_INVOKE_TEMPLATE, new IEventHandler<Void, TemplateBase>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, TemplateBase caller) {
+                renderListener.exitInvokeTemplate(caller);
                 return null;
             }
         });
         m.put(RythmEvents.ON_RENDER_EXCEPTION, new IEventHandler<Boolean, F.T2<TemplateBase, Exception>>() {
             @Override
             public Boolean handleEvent(RythmEngine engine, F.T2<TemplateBase, Exception> param) {
+                if (null == exceptionHandler) return false;
                 return exceptionHandler.handleTemplateExecutionException(param._2, param._1);
             }
         });

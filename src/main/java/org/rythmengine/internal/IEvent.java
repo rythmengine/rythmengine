@@ -24,4 +24,5 @@ package org.rythmengine.internal;
  */
 public interface IEvent<RETURN, PARAM> {
     RETURN trigger(IEventDispatcher eventBus, PARAM eventParams);
+    boolean isSafe();
 }
