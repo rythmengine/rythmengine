@@ -118,19 +118,19 @@ public class Sandbox {
     };
     
     public final static void enterRestrictedZone(String code) {
-        if (!sandboxLive) return;
+        if (!sandboxLive || !sandboxMode()) return;
         rsm().forbiddenIfCodeNotMatch(code);
         restrictedZone.get().push(true);
     }
 
     public final static void enterSafeZone(String code) {
-        if (!sandboxLive) return;
+        if (!sandboxLive || !sandboxMode()) return;
         rsm().forbiddenIfCodeNotMatch(code);
         restrictedZone.get().push(false);
     }
     
     public final static void leaveCurZone(String code) {
-        if (!sandboxLive) return;
+        if (!sandboxLive || !sandboxMode()) return;
         rsm().forbiddenIfCodeNotMatch(code);
         Stack<Boolean> stack = restrictedZone.get();
         if (stack.isEmpty()) {
@@ -140,7 +140,7 @@ public class Sandbox {
     }
     
     public final static boolean isRestricted() {
-        if (!sandboxLive) return false;
+        if (!sandboxLive || !sandboxMode()) return false;
         Stack<Boolean> stack = restrictedZone.get();
         if (stack.isEmpty()) return false;
         return stack.peek();

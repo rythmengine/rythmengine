@@ -125,7 +125,7 @@ public class RythmConfiguration {
         return _byteCodeHelper;
     }
 
-    private Boolean _play = false;
+    private Boolean _play = null;
 
     /**
      * Return {@link RythmConfigurationKey#ENGINE_PLAYFRAMEWORK} without lookup

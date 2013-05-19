@@ -39,9 +39,8 @@ public class RythmSecurityManager extends SecurityManager {
     private SecurityManager osm;
     private SecurityManager csm; // customized security manager
     private String code = null;
-    private RythmEngine engine = null;
-    private RythmEngine engine() {
-        return null == engine ? RythmEngine.get() : engine;
+    private static RythmEngine engine() {
+        return RythmEngine.get();
     }
     
     public String getCode() {
@@ -59,7 +58,6 @@ public class RythmSecurityManager extends SecurityManager {
         csm = customSecurityManager;
         if (null == password) throw new NullPointerException();
         code = password;
-        engine = re;
     }
     
     private static void forbidden() {
@@ -146,7 +144,19 @@ public class RythmSecurityManager extends SecurityManager {
             if (uxPath.startsWith(BASE_RYTHM) || uxPath.startsWith(BASE_JDK)) {
                 return true;
             }
-            return allowTmpDirIO(path);
+            if (allowTmpDirIO(path)) {
+                return true;
+            };
+            if (engine().conf().playFramework()) {
+                StackTraceElement[] st = new Throwable().getStackTrace();
+                if (st.length > 6) {
+                    StackTraceElement ste = st[5];
+                    if (S.eq(ste.getClassName(), "play.classloading.ApplicationClasses")) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     };
     
