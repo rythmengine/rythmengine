@@ -586,7 +586,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     @Override
     public ITemplate __setSecureCode(String secureCode) {
+        if (null == secureCode) return this;
         this.secureCode = secureCode;
+        if (null != __parent) {
+            __parent.__setSecureCode(secureCode);
+        }
         return this;
     }
 
