@@ -37,7 +37,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class TemplateClassManager {
-    protected final ILogger logger = Logger.get(TemplateClassManager.class);
+    protected final static ILogger logger = Logger.get(TemplateClassManager.class);
 
     //private static final ILogger logger = Logger.get(TemplateClassCache.class);
 
@@ -107,16 +107,16 @@ public class TemplateClassManager {
     }
 
     private void checkUpdate(TemplateClass tc) {
-        if (null == tc) return;
-        if (null != tc && engine.isDevMode()) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("checkUpdate for template: %s", tc.getKey());
-            }
-            try {
-                engine.classLoader().detectChange(tc);
-            } catch (ClassReloadException e) {
-                engine.restart(e);
-            }
+        if (null == tc || engine.isProdMode()) {
+            return;
+        }
+        if (logger.isTraceEnabled()) {
+            logger.trace("checkUpdate for template: %s", tc.getKey());
+        }
+        try {
+            engine.classLoader().detectChange(tc);
+        } catch (ClassReloadException e) {
+            engine.restart(e);
         }
     }
 

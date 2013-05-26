@@ -145,7 +145,10 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                 String param = S.stripBrace(r.stringMatched(3));
                 if ("cache".equals(extension)) {
                     parseCache(param);
-                } else if ("escape".equals(extension)) {
+                } else if (extension.startsWith("escape")) {
+                    if (S.empty(param)) {
+                        param = extension.replace("escape", "");
+                    }
                     parseEscape(param);
                 } else if ("raw".equals(extension)) {
                     escape = Escape.RAW;
@@ -157,7 +160,8 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
                     parseAssign(param);
                     ctx.getCodeBuilder().removeNextLF = true;
                 } else {
-                    raiseParseException(ctx, "Unknown tag invocation extension: %s. Currently supported extension: cache, escape, raw, callback, ignoreNonExistsTag", extension);
+                    //TODO enable transformer apply to tag invocation result
+                    raiseParseException(ctx, "Unknown template invocation extension: %s. Currently supported extension: cache, escape, raw, callback, ignoreNonExistsTag", extension);
                 }
             }
         }

@@ -21,7 +21,6 @@ package org.rythmengine.template;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.Sandbox;
@@ -76,15 +75,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         this.__templateClass = templateClass;
     }
 
-    public void __prepareRender(ICodeType type, Locale locale) {
-        __ctx.init(this, type, locale);
+    public void __prepareRender(ICodeType type, Locale locale, RythmEngine engine) {
+        TemplateClass tc = __templateClass;
+        __ctx.init(this, type, locale, tc, engine);
         Class<? extends TemplateBase> c = getClass();
         Class<?> pc = c.getSuperclass();
         if (TemplateBase.class.isAssignableFrom(pc) && !Modifier.isAbstract(pc.getModifiers())) {
             try {
-                TemplateClass ptc = __engine().classes().getByClassName(pc.getName());
+                TemplateClass ptc = engine.classes().getByClassName(pc.getName());
                 if (null != ptc) {
-                    __parent = (TemplateBase) ptc.asTemplate();
+                    __parent = (TemplateBase) ptc.asTemplate(engine);
                 } else {
                     throw new RuntimeException("Cannot find template class for parent class: " + pc);
                 }
@@ -94,7 +94,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
         }
         if (null != __parent) {
-            __parent.__ctx.init(__parent, type, locale);
+            __parent.__ctx.init(__parent, type, locale, tc, engine);
         }
     }
 
@@ -429,20 +429,20 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             tmpl.__parent = (TemplateBase) tmpl.__parent.__cloneMe(engine, caller);
         }
         tmpl.__engine = engine;
-        tmpl.__templateClass = __templateClass;
-        tmpl.__ctx = new __Context(__ctx, tmpl);
+        //tmpl.__templateClass = __templateClass;
+        tmpl.__ctx = new __Context();
         //if (null != buffer) tmpl.__buffer = buffer;
         if (null != __buffer) tmpl.__buffer = new StringBuilder();
         tmpl.__renderArgs = new HashMap<String, Object>(__renderArgs.size());
-        tmpl.layoutContent = "";
+        //tmpl.layoutContent = "";
         tmpl.layoutSections = new HashMap<String, String>();
         tmpl.renderProperties = new HashMap<String, Object>();
-        tmpl.section = null;
-        tmpl.tmpCaller = null;
-        tmpl.tmpOut = null;
-        tmpl.__logTime = __logTime;
-        tmpl.w = null;
-        tmpl.os = null;
+        //tmpl.section = null;
+        //tmpl.tmpCaller = null;
+        //tmpl.tmpOut = null;
+        //tmpl.__logTime = __logTime;
+        //tmpl.w = null;
+        //tmpl.os = null;
         if (null != caller) {
             tmpl.__caller = (TextBuilder) caller;
             Map<String, Object> callerRenderArgs = new HashMap<String, Object>(((TemplateBase) caller).__renderArgs);
@@ -493,7 +493,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     private boolean __logTime() {
-        return __logger.isDebugEnabled() && (__logTime || __engine.conf().logRenderTime());
+        return false;
     }
 
     /**
@@ -556,13 +556,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         RythmEngine.set(engine);
         try {
             long l = 0l;
-            if (__logTime()) {
+            boolean logTime = __logTime();
+            if (logTime) {
                 l = System.currentTimeMillis();
             }
 
             __triggerRenderEvent(RythmEvents.ON_RENDER, engine);
             __setup();
-            if (__logTime()) {
+            if (logTime) {
                 __logger.debug("< preprocess [%s]: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 l = System.currentTimeMillis();
             }
@@ -571,24 +572,22 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 return s;
             } finally {
                 __triggerRenderEvent(RythmEvents.RENDERED, engine);
-                if (__logTime()) {
+                if (logTime) {
                     __logger.debug("<<<<<<<<<<<< [%s] total render: %sms", getClass().getName(), System.currentTimeMillis() - l);
                 }
             }
         } catch (ClassReloadException e) {
-            if (__logger.isDebugEnabled()) {
-                __logger.debug("Cannot hotswap class, try to restart engine...");
-            }
             engine.restart(e);
             return render();
         }
     }
 
     private String secureCode = null;
+
     @Override
-    public String safeRender(String secureCode) {
+    public ITemplate __setSecureCode(String secureCode) {
         this.secureCode = secureCode;
-        return render();
+        return this;
     }
 
     private Writer w_ = null;
@@ -1046,7 +1045,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /**
      * The render context
      */
-    protected __Context __ctx = new __Context();
+    protected __Context __ctx = null;//new __Context();
 
     public ICodeType __curCodeType() {
         return __ctx.currentCodeType();
@@ -1076,8 +1075,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected void __append(StrBuf wrapper) {
         if (appendToBuffer()) {
             super.__append(wrapper);
-            return;
         }
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             try {
@@ -1085,8 +1084,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(wrapper.toString());
             } catch (IOException e) {
@@ -1099,17 +1097,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected void __append(Object o) {
         String oStr = o.toString();
         if (appendToBuffer()) super.__append(oStr);
+        if (null == os && null == w) return;
 
         StrBuf wrapper = new StrBuf(oStr);
-        ToStringBuilder tsb = new ToStringBuilder(o);
         if (appendToOutputStream()) {
             try {
                 os.write(wrapper.toBinary());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(wrapper.toString());
             } catch (IOException e) {
@@ -1121,6 +1118,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(char c) {
         if (appendToBuffer()) super.__append(c);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             try {
@@ -1128,8 +1126,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(c);
             } catch (IOException e) {
@@ -1141,6 +1138,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(int i) {
         if (appendToBuffer()) super.__append(i);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(i));
@@ -1149,8 +1147,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(String.valueOf(i));
             } catch (IOException e) {
@@ -1162,6 +1159,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(long l) {
         if (appendToBuffer()) super.__append(l);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(l));
@@ -1170,8 +1168,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(String.valueOf(l));
             } catch (IOException e) {
@@ -1183,6 +1180,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(float f) {
         if (appendToBuffer()) super.__append(f);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(f));
@@ -1191,8 +1189,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(String.valueOf(f));
             } catch (IOException e) {
@@ -1204,6 +1201,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(double d) {
         if (appendToBuffer()) super.__append(d);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(d));
@@ -1212,8 +1210,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(String.valueOf(d));
             } catch (IOException e) {
@@ -1225,6 +1222,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     protected void __append(boolean b) {
         if (appendToBuffer()) super.__append(b);
+        if (null == os && null == w) return;
 
         if (appendToOutputStream()) {
             StrBuf wrapper = new StrBuf(String.valueOf(b));
@@ -1233,8 +1231,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-        if (appendToWriter()) {
+        } else if (appendToWriter()) {
             try {
                 w.write(String.valueOf(b));
             } catch (IOException e) {
@@ -1565,7 +1562,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
             iterator = tc.iterator();
         }
-
+        
         public int size() {
             return _size;
         }

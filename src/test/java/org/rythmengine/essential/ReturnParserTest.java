@@ -35,6 +35,17 @@ public class ReturnParserTest extends TestBase {
     }
     
     @Test
+    public void testIf() {
+        t = "xyz@return(1 < 2) abc";
+        s = r(t);
+        eq("xyz");
+        
+        t = "xyz @return(1 > 2) abc";
+        s = r(t);
+        eq("xyz abc");
+    }
+    
+    @Test
     public void testLineBreaks() {
         t = "xyz\n@return()\nabc";
         s = r(t);

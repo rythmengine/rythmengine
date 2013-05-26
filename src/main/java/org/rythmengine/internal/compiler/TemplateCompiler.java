@@ -46,7 +46,7 @@ import java.util.*;
  */
 public class TemplateCompiler {
 
-    private ILogger logger = Logger.get(TemplateCompiler.class);
+    private final static ILogger logger = Logger.get(TemplateCompiler.class);
 
     private RythmEngine engine() {
         return classCache.engine;

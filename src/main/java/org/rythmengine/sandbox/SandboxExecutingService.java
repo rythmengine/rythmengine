@@ -61,7 +61,7 @@ public class SandboxExecutingService {
                     } else {
                         throw new NullPointerException();
                     }
-                    return t.safeRender(code);
+                    return t.__setSecureCode(code).render();
                 } catch (Exception e) {
                     return e;
                 }

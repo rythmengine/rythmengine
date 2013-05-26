@@ -30,7 +30,7 @@ import org.rythmengine.utils.S;
 import java.util.Stack;
 
 public class DialectManager {
-    protected ILogger logger = Logger.get(DialectManager.class);
+    protected final static ILogger logger = Logger.get(DialectManager.class);
     final static IDialect[] defDialects = {
             BasicRythm.INSTANCE,
             SimpleRythm.INSTANCE,

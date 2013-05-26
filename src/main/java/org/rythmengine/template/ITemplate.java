@@ -150,14 +150,6 @@ public interface ITemplate extends ITag, Cloneable {
     String render();
     
     /**
-     * Called by Sandbox service to render the template and return result as String
-     *
-     * @param secureCode the secure code of the sandbox service
-     * @return render result
-     */
-    String safeRender(String secureCode);
-
-    /**
      * Render the template and put the result into outputstream
      *
      * @param os
@@ -184,6 +176,16 @@ public interface ITemplate extends ITag, Cloneable {
      * @return buffer
      */
     StringBuilder __getBuffer();
+
+    /**
+     * Set secure code (for sandbox purpse)
+     * 
+     * @param secureCode
+     * @return this template
+     */
+    ITemplate __setSecureCode(String secureCode);
+
+    
 
     /**
      * Get a copy of this template instance and pass in the engine and caller
@@ -246,9 +248,9 @@ public interface ITemplate extends ITag, Cloneable {
         
         private RythmConfiguration conf;
 
-        private void setTemplate(TemplateBase tmpl) {
+        private void setTemplate(TemplateBase tmpl, RythmConfiguration conf) {
             this.tmpl = tmpl;
-            conf = tmpl.__engine().conf();
+            this.conf = conf;
         }
         
         /**
@@ -258,18 +260,17 @@ public interface ITemplate extends ITag, Cloneable {
          * @param type
          * @param locale
          */
-        public void init(TemplateBase templateBase, ICodeType type, Locale locale) {
-            RythmEngine engine = templateBase.__engine();
+        public void init(TemplateBase templateBase, ICodeType type, Locale locale, TemplateClass tc,  RythmEngine engine) {
             if (null == type) {
                 type = engine.renderSettings.codeType();
-                if (null == type) type = templateBase.__getTemplateClass(false).codeType;
+                if (null == type) type = tc.codeType;
             }
             if (null == locale) {
                 locale = engine.renderSettings.locale();
             }
             codeTypeStack.push(type);
             localeStack.push(locale);
-            setTemplate(templateBase);
+            setTemplate(templateBase, engine.conf());
         }
 
         public ICodeType currentCodeType() {
@@ -332,16 +333,10 @@ public interface ITemplate extends ITag, Cloneable {
             codeTypeStack = new Stack<ICodeType>();
             escapeStack = new Stack<Escape>();
             localeStack = new Stack<Locale>();
-        }
-
-        public __Context(__Context clone, TemplateBase tmpl) {
-            codeTypeStack = new Stack<ICodeType>();
-            escapeStack = new Stack<Escape>();
-            localeStack = new Stack<Locale>();
-            codeTypeStack.addAll(clone.codeTypeStack);
-            escapeStack.addAll(clone.escapeStack);
-            localeStack.addAll(clone.localeStack);
-            setTemplate(tmpl);
+//            codeTypeStack.addAll(clone.codeTypeStack);
+//            escapeStack.addAll(clone.escapeStack);
+//            localeStack.addAll(clone.localeStack);
+//            setTemplate(tmpl, conf);
         }
     }
 

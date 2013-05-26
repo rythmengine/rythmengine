@@ -21,8 +21,6 @@ package org.rythmengine.template;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.internal.IEvent;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.util.Map;
@@ -31,7 +29,6 @@ import java.util.Map;
  * Define a tag
  */
 public abstract class TagBase extends TemplateBase implements ITag {
-    protected ILogger logger = Logger.get(TagBase.class);
 
     protected __Body __body;
     
@@ -65,9 +62,8 @@ public abstract class TagBase extends TemplateBase implements ITag {
 
     @Override
     public ITemplate __cloneMe(RythmEngine engine, ITemplate caller) {
-        Map<String, String> m = null;
         TagBase newTag = (TagBase) super.__cloneMe(engine, caller);
-        newTag.setBody(null);
+        //newTag.setBody(null);
         //newTag.__buffer = new StringBuilder();
         return newTag;
     }

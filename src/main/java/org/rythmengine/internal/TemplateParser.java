@@ -35,7 +35,7 @@ import java.util.Locale;
 import java.util.Stack;
 
 public class TemplateParser implements IContext {
-    private final ILogger logger = Logger.get(TemplateParser.class);
+    private final static ILogger logger = Logger.get(TemplateParser.class);
     private final CodeBuilder cb;
     private final RythmEngine engine;
     private final RythmConfiguration conf;

@@ -31,7 +31,7 @@ import com.stevesoft.pat.Regex;
 
 public abstract class CaretParserFactoryBase implements ICaretParserFactory {
 
-    protected ILogger logger = Logger.get(IParserFactory.class);
+    protected final static ILogger logger = Logger.get(IParserFactory.class);
 
     public String getCaret(IDialect dialect) {
         return dialect.a();

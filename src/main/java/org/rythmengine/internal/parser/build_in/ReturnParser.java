@@ -19,14 +19,14 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
 import org.rythmengine.internal.Token;
-import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
+import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * Parse @return() statement. Which break the current template execution and return to caller
@@ -65,14 +65,21 @@ public class ReturnParser extends KeywordParserFactory {
                     }
                 }
                 step(matched.length());
-                return new CodeToken("if (true) {return this;}", ctx());
+                String condition = r.stringMatched(2);
+                if (null != condition) {
+                    condition = S.stripBrace(condition);
+                }
+                if (S.empty(condition)) {
+                    condition = "true";
+                }
+                return new IfThenToken(condition, "return this", ctx());
             }
         };
     }
 
     @Override
     protected String patternStr() {
-        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))?[\\s;]*)";
     }
 
 }

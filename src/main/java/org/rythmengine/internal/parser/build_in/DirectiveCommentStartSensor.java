@@ -23,8 +23,6 @@ import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 
@@ -41,7 +39,6 @@ import java.util.regex.Pattern;
  * &lt;!-- should be stripped out</p>
  */
 public class DirectiveCommentStartSensor extends RemoveLeadingLineBreakAndSpacesParser {
-    ILogger logger = Logger.get(DirectiveCommentStartSensor.class);
 
     public DirectiveCommentStartSensor(IContext context) {
         super(context);

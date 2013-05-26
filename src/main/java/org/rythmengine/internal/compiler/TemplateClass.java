@@ -178,7 +178,13 @@ public class TemplateClass {
     }
 
     public String getFullName() {
-        if (null == fullName) return tagName();
+        return fullName;
+    }
+    
+    public String getFullName(boolean resolve) {
+        if (null == fullName) {
+            fullName = engine().resourceManager().getFullTagName(this);
+        }
         return fullName;
     }
 
@@ -357,25 +363,24 @@ public class TemplateClass {
         }
     };
 
-    private ITemplate templateInstance_() {
+    private ITemplate templateInstance_(RythmEngine engine) {
         if (!isValid) return NULL_TEMPLATE;
         if (null == templateInstance) {
             try {
-                if (Logger.isTraceEnabled()) logger.trace("About to new template instance");
                 Class<?> clz = getJavaClass();
-                if (Logger.isTraceEnabled()) logger.trace("template java class loaded");
-                templateInstance = (TemplateBase) clz.newInstance();
-                templateInstance.__setTemplateClass(this);
-                if (Logger.isTraceEnabled()) logger.trace("template instance generated");
+                TemplateBase tmpl = (TemplateBase) clz.newInstance();
+                tmpl.__setTemplateClass(this);
+                engine.registerTemplate(tmpl);
+                //engine.registerTemplate(getFullName(true), tmpl);
+                templateInstance = tmpl;
             } catch (RythmException e) {
                 throw e;
             } catch (Exception e) {
                 throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
-        RythmEngine engine = engine();
-        engine.registerTemplate(templateInstance);
         if (!engine.isProdMode()) {
+            engine.registerTemplate(templateInstance);
             // check parent class change
             Class<?> c = templateInstance.getClass();
             Class<?> pc = c.getSuperclass();
@@ -386,22 +391,21 @@ public class TemplateClass {
         return templateInstance;
     }
 
-    public ITemplate asTemplate(ICodeType type, Locale locale) {
-        RythmEngine e = engine();
-        if (null == name || e.mode().isDev()) refresh();
-        TemplateBase tmpl = (TemplateBase)templateInstance_().__cloneMe(engine(), null);
-        tmpl.__prepareRender(type, locale);
+    public ITemplate asTemplate(ICodeType type, Locale locale, RythmEngine engine) {
+        if (null == name || engine.isDevMode()) refresh();
+        TemplateBase tmpl = (TemplateBase)templateInstance_(engine).__cloneMe(engine(), null);
+        tmpl.__prepareRender(type, locale, engine);
         return tmpl;
     }
 
-    public ITemplate asTemplate() {
-        return asTemplate(null, null);
+    public ITemplate asTemplate(RythmEngine engine) {
+        return asTemplate(null, null, engine);
     }
 
-    public ITemplate asTemplate(ITemplate caller) {
+    public ITemplate asTemplate(ITemplate caller, RythmEngine engine) {
         TemplateBase tb = (TemplateBase)caller;
-        TemplateBase tmpl = (TemplateBase)templateInstance_().__cloneMe(engine(), caller);
-        tmpl.__prepareRender(tb.__curCodeType(), tb.__curLocale());
+        TemplateBase tmpl = (TemplateBase)templateInstance_(engine).__cloneMe(engine, caller);
+        tmpl.__prepareRender(tb.__curCodeType(), tb.__curLocale(), engine);
         return tmpl;
     }
 

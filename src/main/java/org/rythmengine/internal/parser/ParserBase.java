@@ -41,7 +41,7 @@ public abstract class ParserBase implements IParser {
         }
     };
 
-    protected ILogger logger = Logger.get(IParser.class);
+    protected final static ILogger logger = Logger.get(IParser.class);
 
     public static Pattern pattern(String regex, Object... args) {
         if (0 < args.length) regex = String.format(regex, args);

@@ -23,8 +23,6 @@ import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.TextBuilder;
 
 import java.util.HashMap;
@@ -42,8 +40,7 @@ import java.util.regex.Pattern;
  * should be put in place</p>
  */
 public class CodeTypeBlockStartSensor extends ParserBase {
-    ILogger logger = Logger.get(CodeTypeBlockStartSensor.class);
-
+    
     public CodeTypeBlockStartSensor(IContext context) {
         super(context);
     }

@@ -195,7 +195,7 @@ public interface ITag {
         /**
          * the body logger
          */
-        protected ILogger __bodyLogger = Logger.get(__Body.class);
+        protected final static ILogger __bodyLogger = Logger.get(__Body.class);
 
         /**
          * The context template
@@ -292,4 +292,5 @@ public interface ITag {
      * @param line the number of the caller template line which invoke this tag
      */
     void __call(int line);
+
 }

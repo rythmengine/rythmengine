@@ -103,12 +103,13 @@ public class TemplateResourceManager {
         if (typeInference) {
             key += ParamTypeInferencer.uuid();
         }
+        RythmEngine engine = this.engine;
         TemplateClass tc = engine.classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(resource, engine);
             //engine.classes().add(key, tc);
         }
-        tc.asTemplate();
+        tc.asTemplate(engine);
 //        if (null == t) return;
 //        String fullTagName = engine.resourceManager().getFullTagName(tc);
 //        tc.setFullName(fullTagName);

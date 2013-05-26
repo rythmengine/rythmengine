@@ -22,6 +22,8 @@ package org.rythmengine.resource;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.logger.ILogger;
+import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.util.UUID;
@@ -34,6 +36,8 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class TemplateResourceBase implements ITemplateResource {
+
+    protected final static ILogger logger = Logger.get(TemplateResourceBase.class);
 
     /**
      * When this field is set to null, it assumes using Rythm's singleton mode

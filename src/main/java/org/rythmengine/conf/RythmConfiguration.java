@@ -19,7 +19,6 @@
 */
 package org.rythmengine.conf;
 
-import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.*;
 import org.rythmengine.logger.ILogger;
@@ -38,6 +37,7 @@ import static org.rythmengine.conf.RythmConfigurationKey.*;
 public class RythmConfiguration {
     private Map<String, Object> raw;
     private Map<RythmConfigurationKey, Object> data;
+    private RythmEngine engine;
 
     /**
      * Construct a <code>RythmConfiguration</code> with a map. The map is copied to
@@ -45,9 +45,10 @@ public class RythmConfiguration {
      *
      * @param configuration
      */
-    public RythmConfiguration(Map<String, ?> configuration) {
+    public RythmConfiguration(Map<String, ?> configuration, RythmEngine engine) {
         raw = new HashMap<String, Object>(configuration);
         data = new HashMap<RythmConfigurationKey, Object>(configuration.size());
+        this.engine = engine;
     }
 
     /**
@@ -294,14 +295,18 @@ public class RythmConfiguration {
      * @return true if cache enabled
      */
     public boolean cacheEnabled() {
+        if (this == EMPTY_CONF) return false;
         if (null == _cacheEnabled) {
-            boolean ce = (Boolean) get(CACHE_ENABLED);
-            Rythm.Mode mode = get(ENGINE_MODE);
-            boolean po = (Boolean) get(CACHE_PROD_ONLY_ENABLED);
+            Boolean ce = get(CACHE_ENABLED);
             if (!ce) {
                 _cacheEnabled = false;
             } else {
-                _cacheEnabled = !(mode.isDev() && po);
+                if (engine.isProdMode()) {
+                    _cacheEnabled = true;
+                } else {
+                    Boolean po = get(CACHE_PROD_ONLY_ENABLED);
+                    _cacheEnabled = !po;
+                }
             }
         }
         return _cacheEnabled;
@@ -425,6 +430,14 @@ public class RythmConfiguration {
         }
         return _byteCodeEnhancer;
     }
+    
+    private ISourceCodeEnhancer _srcEnhancer = null;
+    public ISourceCodeEnhancer sourceEnhancer() {
+        if (null == _srcEnhancer) {
+            _srcEnhancer = get(CODEGEN_SOURCE_CODE_ENHANCER);
+        }
+        return _srcEnhancer;
+    }
 
     private Locale _locale = null;
 
@@ -493,7 +506,7 @@ public class RythmConfiguration {
     }
     
 
-    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP); 
+    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP, null); 
     
     /**
      * Return <tt>RythmConfiguration</tt> instance of current RythmEngine, or 
@@ -507,7 +520,7 @@ public class RythmConfiguration {
         return null != engine ? engine.conf() : EMPTY_CONF;
     }
 
-    private static ILogger logger = Logger.get(RythmConfiguration.class);
+    private final static ILogger logger = Logger.get(RythmConfiguration.class);
     public void debug() {
         logger.info("start to dump rythm configuration >>>");
         for (RythmConfigurationKey k : RythmConfigurationKey.values()) {

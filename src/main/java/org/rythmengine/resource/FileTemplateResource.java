@@ -23,8 +23,6 @@ import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.IO;
 import org.rythmengine.utils.S;
 
@@ -42,7 +40,6 @@ import java.util.List;
  */
 public class FileTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
-    private ILogger logger = Logger.get(FileTemplateResource.class);
     private File file;
     private String key;
     private String tagName;
@@ -256,7 +253,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                             tc = new TemplateClass(tr, engine);
                         }
                         try {
-                            tc.asTemplate(); // register the template
+                            tc.asTemplate(engine); // register the template
                             return tc;
 //                            ITemplate t = tc.asTemplate();
 //                            if (null != t) {

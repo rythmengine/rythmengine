@@ -211,7 +211,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.ON_RENDER, new IEventHandler<Void, ITemplate>() {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
-                ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
+                ISourceCodeEnhancer ce = engine.conf().sourceEnhancer();
                 if (null != ce) {
                     ce.setRenderArgs(template);
                 }

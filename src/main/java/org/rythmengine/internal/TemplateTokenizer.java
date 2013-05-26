@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class TemplateTokenizer implements Iterable<TextBuilder> {
-    ILogger logger = Logger.get(TemplateTokenizer.class);
+    private final static ILogger logger = Logger.get(TemplateTokenizer.class);
     private IContext ctx;
     private List<IParser> parsers = new ArrayList<IParser>();
     private int lastCursor = 0;

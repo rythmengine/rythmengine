@@ -52,7 +52,7 @@ import java.util.*;
 
 public class CodeBuilder extends TextBuilder {
 
-    protected ILogger logger = Logger.get(CodeBuilder.class);
+    protected final static ILogger logger = Logger.get(CodeBuilder.class);
 
     private int renderArgCounter = 0;
 

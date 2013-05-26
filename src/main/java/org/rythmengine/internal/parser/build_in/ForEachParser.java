@@ -19,17 +19,14 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
-import org.rythmengine.logger.ILogger;
-import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 public class ForEachParser extends KeywordParserFactory {
-    private static final ILogger logger = Logger.get(ForEachParser.class);
 
     public IParser create(final IContext ctx) {
 

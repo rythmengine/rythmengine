@@ -24,12 +24,13 @@ import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
+import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 public class BreakParser extends KeywordParserFactory {
 
-    private static final String R = "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*(\\(\\s*\\))?[\\s;]*)";
+    private static final String R = "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))?[\\s;]*)";
 
     public BreakParser() {
     }
@@ -46,10 +47,18 @@ public class BreakParser extends KeywordParserFactory {
                     raiseParseException("Bad @break statement. Correct usage: @break()");
                 }
                 String matched = r.stringMatched();
+                String condition = r.stringMatched(2);
+                if (null != condition) {
+                    condition = S.stripBrace(condition);
+                }
                 step(matched.length());
                 IContext.Break b = ctx().peekBreak();
                 if (null == b) raiseParseException("Bad @break statement: No loop context");
-                return new CodeToken(b.getStatement(), ctx());
+                if (S.notEmpty(condition)) {
+                    return new IfThenToken(condition, "break", ctx());
+                } else {
+                    return new CodeToken(b.getStatement(), ctx());
+                }
             }
         };
     }
