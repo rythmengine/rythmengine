@@ -35,6 +35,10 @@ public class VerbatimParserTest extends TestBase {
         t = "@verbatim(){\n@args String s\n@s\n}";
         s = r(t);
         eq("@args String s\n@s");
+        
+        t = "@verbatim(){<pre>abc</pre>}";
+        s = r(t);
+        eq("<pre>abc</pre>");
     }
     
 }

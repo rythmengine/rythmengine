@@ -55,7 +55,7 @@ public class VerbatimParser extends KeywordParserFactory {
                         protected void output() {
                             s = compact(s);
                             s = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
-                            p("p(org.rythmengine.utils.S.escape(\"").p(s).p("\"));");
+                            p("p(org.rythmengine.utils.S.raw(\"").p(s).p("\"));");
                             pline();
                         }
                     };
