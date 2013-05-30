@@ -21,6 +21,7 @@ package org.rythmengine.advanced;
 
 import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
+import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.Transformer;
 import org.rythmengine.utils.S;
 import org.junit.Test;
@@ -161,7 +162,7 @@ public class TransformerTest extends TestBase {
     @Test
     public void testTransformerConf() {
         Map<String, Object> conf = new HashMap<String, Object>();
-        conf.put("transformer.udt", "org.rythmengine.advanced.TransformerTest");
+        conf.put(RythmConfigurationKey.EXT_TRANSFORMER.getKey(), "org.rythmengine.advanced.TransformerTest");
         Rythm.init(conf);
         
         String t = "@args String s, int i\n" +

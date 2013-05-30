@@ -89,7 +89,7 @@ public class GetParser extends KeywordParserFactory {
                 }
                 final String propName = s;
                 final String propDefVal = r.stringMatched(4);
-                logger.warn("@get directive is deprecated. Please follow instruction at http://localhost:9000/doc/directive.md#get to change your code");
+                logger.warn("@get directive is deprecated. Please follow instruction at http://rythmengine.org/doc/directive.md#get to change your code");
                 return new Token("", ctx()) {
                     @Override
                     protected void output() {

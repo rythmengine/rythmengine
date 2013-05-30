@@ -1263,7 +1263,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public final TemplateBase pe(Object o, Escape escape) {
         return (TemplateBase) super.pe(o, escape);
     }
-
+    
+    protected final Object __eval(String expr) {
+        return __engine().eval(expr, __renderArgs);
+    }
+    
     // --- debugging interface
     protected static void __log(String msg, Object... args) {
         __logger.info(msg, args);

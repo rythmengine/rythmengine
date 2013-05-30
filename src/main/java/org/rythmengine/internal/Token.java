@@ -21,6 +21,7 @@ package org.rythmengine.internal;
 
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.internal.parser.build_in.BlockToken;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
@@ -138,6 +139,7 @@ public class Token extends TextBuilder {
     private RythmEngine engine = null;
     private Iterable<IJavaExtension> javaExtensions = null;
     private boolean transformEnabled = true;
+    protected boolean dynamicExp = false;
     /*
      * Indicate whether token parse is good
      */
@@ -150,6 +152,7 @@ public class Token extends TextBuilder {
     protected Token(String s, TextBuilder caller) {
         this(s, caller, false);
     }
+    
 
     protected Token(String s, TextBuilder caller, boolean disableCompactMode) {
         super(caller);
@@ -159,7 +162,9 @@ public class Token extends TextBuilder {
         //TODO: dangerous engine assignment here. only called by AppendXXToken in AutoToStringCodeBuilder
         this.engine = Rythm.engine();
         this.javaExtensions = engine.extensionManager().javaExtensions();
-        this.transformEnabled = engine.conf().transformEnabled();
+        RythmConfiguration conf = engine.conf();
+        this.transformEnabled = conf.transformEnabled();
+        this.dynamicExp = conf.dynamicExpEnabled();
     }
 
     public Token(String s, IContext context) {
@@ -174,7 +179,9 @@ public class Token extends TextBuilder {
         this.engine = null == ctx ? Rythm.engine() : ctx.getEngine();
         this.javaExtensions = engine.extensionManager().javaExtensions();
         this.disableCompactMode = disableCompactMode;
-        this.transformEnabled = engine.conf().transformEnabled();
+        RythmConfiguration conf = engine.conf();
+        this.transformEnabled = conf.transformEnabled();
+        this.dynamicExp = conf.dynamicExpEnabled();
     }
 
     public boolean test(String line) {
@@ -259,9 +266,15 @@ public class Token extends TextBuilder {
         else p("\ntry{").p(s).p(";} catch (RuntimeException e) {__handleTemplateExecutionException(e);} ");
         pline();
     }
+    
+    private String evalStr(String s) {
+        if (!dynamicExp) return s;
+        if (s.matches(".*_(isOdd|parity|index|sep|isFirst|isLast|utils)$")) return s;
+        return "__eval(\"" + s + "\")"; 
+    }
 
     private String processExtensions(boolean stripExtensions) {
-        if (!transformEnabled) return s;
+        if (!transformEnabled) return evalStr(s);
         RythmEngine engine = this.engine;
         String s0 = s;
         boolean outerBracketsStripped;
@@ -304,6 +317,7 @@ public class Token extends TextBuilder {
         if (hasJavaExtension) {
             // process inner elvis expression
             s = processElvis(s);
+            s = evalStr(s);
             while (!allMatched.empty()) {
                 Pair p = allMatched.pop();
                 if (!stripExtensions) {
@@ -330,6 +344,7 @@ public class Token extends TextBuilder {
                 }
                 if (!matched) break;
             }
+            s = evalStr(s);
             while (!stripExtensions && !allMatched.empty()) {
                 // process inner elvis expression
                 s = processElvis(s);

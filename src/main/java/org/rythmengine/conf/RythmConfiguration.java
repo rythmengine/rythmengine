@@ -350,6 +350,15 @@ public class RythmConfiguration {
         }
         return _compactEnabled;
     }
+    
+    private Boolean _dynamicExp = null;
+    
+    public boolean dynamicExpEnabled() {
+        if (null == _dynamicExp) {
+            _dynamicExp = get(FEATURE_DYNAMIC_EXP);
+        }
+        return _dynamicExp;
+    }
 
     private IDurationParser _durationParser = null;
 

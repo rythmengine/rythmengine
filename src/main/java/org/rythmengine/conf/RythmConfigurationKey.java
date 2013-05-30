@@ -304,6 +304,13 @@ public enum RythmConfigurationKey {
      * <p>Default value: <code>true</code></p>
      */
     FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", false),
+    
+    /**
+     * "engine.dynamic_exp.eanbled": Generate code to enable evaluate dynamic expressions, 
+     * and the java beans spec can be supported when this option is turned on
+     */
+    FEATURE_DYNAMIC_EXP("feature.dynamic_exp.enabled", false),
+    
 
     /**
      * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
@@ -600,11 +607,19 @@ public enum RythmConfigurationKey {
     SANDBOX_SECURE_CODE("sandbox.secure_code", UUID.randomUUID().toString()),
 
     /**
-     * "transformer.udt": User defined transformers, should be a list of class names separated by ",". If configured
+     * "ext.transformer": User defined transformers, should be a list of class names separated by ",". If configured
      * then {@link org.rythmengine.RythmEngine#registerTransformer(Class[]) RythmEngine.registerTransformer} will
      * be called to register these user defined transformer classes. Default value: <code>null</code>
      */
-    TRANSFORMER_UDT("transformer.udt");
+    EXT_TRANSFORMER("ext.transformer"),
+    
+    /**
+     * "ext.prop_accessor": User defined property accessors, should be a list of class names separated by ",". If configured
+     * then {@link org.rythmengine.RythmEngine#registerPropertyAccessor(org.rythmengine.extension.IPropertyAccessor...)}  RythmEngine.registerPropertyAccessor} will
+     * be called to register these user defined property accessor classes. Default value: <code>null</code>
+     */
+    EXT_PROP_ACCESSOR("ext.prop_accessor");
+    
 
     private String key;
     private Object defVal;

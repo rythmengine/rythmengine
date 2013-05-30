@@ -19,6 +19,10 @@
 */
 package org.rythmengine;
 
+import org.mvel2.MVEL;
+import org.mvel2.integration.PropertyHandler;
+import org.mvel2.integration.PropertyHandlerFactory;
+import org.mvel2.integration.VariableResolverFactory;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.exception.RythmException;
@@ -51,9 +55,6 @@ import org.rythmengine.utils.IO;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -641,7 +642,7 @@ public class RythmEngine implements IEventDispatcher {
             }
         });
 
-        Object o = _conf.get(RythmConfigurationKey.TRANSFORMER_UDT);
+        Object o = _conf.get(RythmConfigurationKey.EXT_TRANSFORMER);
         if (null != o) {
             List<Class> udts = new ArrayList<Class>();
             if (o.getClass().isArray()) {
@@ -687,6 +688,93 @@ public class RythmEngine implements IEventDispatcher {
                 }
             }
             registerTransformer(udts.toArray(new Class[]{}));
+        }
+
+        o = _conf.get(RythmConfigurationKey.EXT_PROP_ACCESSOR);
+        if (null != o) {
+            List<IPropertyAccessor> udpa = new ArrayList<IPropertyAccessor>();
+            if (o instanceof IPropertyAccessor) {
+                udpa.add((IPropertyAccessor)o);
+            } else if (o.getClass().isArray()) {
+                int len = Array.getLength(o);
+                for (int i = 0; i < len; ++i) {
+                    Object e = Array.get(o, i);
+                    if (e instanceof IPropertyAccessor) {
+                        udpa.add((IPropertyAccessor)e);
+                    } else {
+                        Class c = null;
+                        if (e instanceof Class) {
+                            c = (Class)e;
+                        } else if (null != e) {
+                            String s = e.toString();
+                            try {
+                                c = Class.forName(s);
+                            } catch (ClassNotFoundException ce) {
+                                logger.warn("User defined property accessor class not found: %s", s);
+                            }
+                        }
+                        if (null != c) {
+                            try {
+                                IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                                udpa.add(a);
+                            } catch (Exception ce) {
+                                logger.warn("Invalid user defined property accessor class: %s", c);
+                            }
+                        }
+                    }
+                }
+            } else if (o instanceof List) {
+                List l = (List) o;
+                for (Object e : l) {
+                    if (e instanceof IPropertyAccessor) {
+                        udpa.add((IPropertyAccessor)e);
+                    } else {
+                        Class c = null;
+                        if (e instanceof Class) {
+                            c = (Class)e;
+                        } else if (null != e) {
+                            String s = e.toString();
+                            try {
+                                c = Class.forName(s);
+                            } catch (ClassNotFoundException ce) {
+                                logger.warn("User defined property accessor class not found: %s", s);
+                            }
+                        }
+                        if (null != c) {
+                            try {
+                                IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                                udpa.add(a);
+                            } catch (Exception ce) {
+                                logger.warn("Invalid user defined property accessor class: %s", c);
+                            }
+                        }
+                    }
+                }
+            } else if (o instanceof Class) {
+                Class c = (Class)o;
+                try {
+                    IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                    udpa.add(a);
+                } catch (Exception ce) {
+                    logger.warn("Invalid user defined property accessor class: %s", c);
+                }
+            } else {
+                String s = o.toString();
+                for (String tc : s.split("[, \t]+")) {
+                    try {
+                        Class c = Class.forName(tc);
+                        try {
+                            IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                            udpa.add(a);
+                        } catch (Exception ce) {
+                            logger.warn("Invalid user defined property accessor class: %s", c);
+                        }
+                    } catch (ClassNotFoundException e) {
+                        logger.warn("User defined property accessor class not found: %s", tc);
+                    }
+                }
+            }
+            registerPropertyAccessor(udpa.toArray(new IPropertyAccessor[]{}));
         }
 
         if (isDevMode()) {
@@ -775,6 +863,26 @@ public class RythmEngine implements IEventDispatcher {
                     jem.registerJavaExtension(new IJavaExtension.ParameterExtension(mwaive, mn, ".+", fullName, requireTemplate));
                 }
             }
+        }
+    }
+
+    /**
+     * Register user implemented {@link org.rythmengine.extension.IPropertyAccessor}
+     * @param accessors
+     */
+    public void registerPropertyAccessor(IPropertyAccessor ... accessors) {
+        for (final IPropertyAccessor a : accessors) {
+            PropertyHandlerFactory.registerPropertyHandler(a.getTargetType(), new PropertyHandler() {
+                @Override
+                public Object getProperty(String name, Object contextObj, VariableResolverFactory variableFactory) {
+                    return a.getProperty(name, contextObj);
+                }
+
+                @Override
+                public Object setProperty(String name, Object contextObj, VariableResolverFactory variableFactory, Object value) {
+                    return a.setProperty(name, contextObj, value);
+                }
+            });
         }
     }
 
@@ -1282,21 +1390,34 @@ public class RythmEngine implements IEventDispatcher {
      * @return the result
      */
     public Object eval(String script) {
-        // use Java's ScriptEngine at the moment
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
-        try {
-            return jsEngine.eval(script);
-        } catch (ScriptException e) {
-            throw new RuntimeException(e);
-        }
+//        // use Java's ScriptEngine at the moment
+//        ScriptEngineManager manager = new ScriptEngineManager();
+//        ScriptEngine jsEngine = manager.getEngineByName("JavaScript");
+//        try {
+//            return jsEngine.eval(script);
+//        } catch (ScriptException e) {
+//            throw new RuntimeException(e);
+//        }
+        return eval(script, Collections.EMPTY_MAP);
     }
+
+    private Map<String, Serializable> mvels = new HashMap<String, Serializable>();
+
+    public Object eval(String script, Map<String, Object> context) {
+            Serializable  ce = mvels.get(script);
+            if (null == ce) {
+                ce = MVEL.compileExpression(script);
+                mvels.put(script, ce);
+            }
+            return MVEL.executeExpression(ce, context);
+        }
 
     /* -----------------------------------------------------------------------------
       Tags
     -------------------------------------------------------------------------------*/
 
     private final Map<String, ITemplate> _templates = new HashMap<String, ITemplate>();
+    private final Map<String, JavaTagBase> _tags = new HashMap<String, JavaTagBase>();
     private final Set<String> _nonTmpls = new HashSet<String>();
 
     /**
@@ -1408,6 +1529,10 @@ public class RythmEngine implements IEventDispatcher {
         }
         return null;
     }
+    
+    public void registerFastTag(JavaTagBase tag) {
+        _tags.put(tag.__getName(), tag);
+    }
 
     /**
      * Register a template.
@@ -1478,9 +1603,13 @@ public class RythmEngine implements IEventDispatcher {
         Sandbox.enterSafeZone(secureCode);
         RythmEvents.ENTER_INVOKE_TEMPLATE.trigger(this, (TemplateBase) caller);
         try {
-            // try tag registry first
-            ITemplate t = _templates.get(name);
             TemplateClass tc = caller.__getTemplateClass(true);
+            
+            // try tag registry first
+            ITemplate t = _tags.get(name);
+            if (null == t) {
+                t = _templates.get(name);
+            }
             if (null == t) {
                 // is calling self
                 if (S.isEqual(name, caller.__getName())) t = caller;
@@ -1491,7 +1620,8 @@ public class RythmEngine implements IEventDispatcher {
                 if (null != tc.importPaths) {
                     for (String s : tc.importPaths) {
                         String name0 = s + "." + name;
-                        t = _templates.get(name0);
+                        t = _tags.get(name0);
+                        if (null == t) t = _templates.get(name0);
                         if (null != t) break;
                     }
                 }
@@ -1502,7 +1632,8 @@ public class RythmEngine implements IEventDispatcher {
                     int pos = callerName.lastIndexOf(".");
                     if (-1 != pos) {
                         String name0 = callerName.substring(0, pos) + "." + name;
-                        t = _templates.get(name0);
+                        t = _tags.get(name0);
+                        if (null == t) t = _templates.get(name0);
                     }
                 }
 

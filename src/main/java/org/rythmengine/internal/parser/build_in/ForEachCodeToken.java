@@ -167,6 +167,10 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("org.rythmengine.internal.LoopUtil ").p(varWithUtils).p(" = new org.rythmengine.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(", ").p(varname).p(");");
         pline();
+        if (dynamicExp) {
+            p("__setRenderArg(\"").p(varname).p("\", ").p(varname).p(");");
+            pline();
+        }
     }
     @Override
     public String closeBlock() {

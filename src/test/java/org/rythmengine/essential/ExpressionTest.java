@@ -19,13 +19,19 @@
 */
 package org.rythmengine.essential;
 
+import org.junit.Test;
+import org.mvel2.integration.PropertyHandler;
+import org.mvel2.integration.PropertyHandlerFactory;
+import org.mvel2.integration.VariableResolverFactory;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
-import org.junit.Test;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_DYNAMIC_EXP;
 import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static org.rythmengine.utils.NamedParams.from;
 import static org.rythmengine.utils.NamedParams.p;
@@ -83,6 +89,67 @@ public class ExpressionTest extends TestBase {
         t = "@d.foo";
         s = r(t, from(p("d", d)));
         eq("bar");
+    }
+    
+    public static class JavaBean {
+        private String id;
+        private int count;
+        private boolean enabled;
+        private Map<String, Object> attrs;
+        public JavaBean(String id, int count, boolean enabled) {
+            this.id  = id;
+            this.count = count;
+            this.enabled = enabled;
+            attrs = new HashMap<String, Object>();
+        }
+        public String getId() {
+            return id;
+        }
+        public int getCount() {
+            return count;
+        }
+        public boolean isEnabled() {
+            return enabled;
+        }
+        public void set(String key, Object val) {
+            attrs.put(key, val);
+        }
+        public Object get(String key) {
+            return attrs.get(key);
+        }
+    }
+    
+    @Test
+    public void testDynamicExpr() {
+        System.setProperty(FEATURE_DYNAMIC_EXP.getKey(), "true");
+        JavaBean bean = new JavaBean("foo", 11, true);
+        bean.set("engine", "Rythm");
+        t = "@b.getId()|@b.count|@b.enabled|@b.engine";
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("b", bean);
+        PropertyHandlerFactory.registerPropertyHandler(JavaBean.class, new PropertyHandler() {
+            @Override
+            public Object getProperty(String name, Object contextObj, VariableResolverFactory variableFactory) {
+                JavaBean jb = (JavaBean)contextObj;
+                if ("id".equals(name)) {
+                    return jb.getId();
+                } else if ("count".equals(name)) {
+                    return jb.getCount();
+                } else if ("enabled".equals(name)) {
+                    return jb.isEnabled();
+                } else {
+                }
+                return jb.get(name);
+            }
+
+            @Override
+            public Object setProperty(String name, Object contextObj, VariableResolverFactory variableFactory, Object value) {
+                ((JavaBean) contextObj).set("name", value);
+                return null;
+            }
+        });
+        s = r(t, params);
+        eq("foo|11|true|Rythm");
     }
 
     @Test
