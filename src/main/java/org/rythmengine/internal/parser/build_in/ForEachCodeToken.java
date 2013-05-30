@@ -56,7 +56,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         iterable = ExpressionParser.processPositionPlaceHolder(iterable);
         if (null != type) type = type.trim();
         this.type = ObjectType(type);
-        this.varname = null == varname ? "_" : varname;
+        this.varname = null == varname ? "_" : varname.trim();
         if (iterable.contains("..") || iterable.contains(" to ") || iterable.contains(" till ")) {
             iterable = "org.rythmengine.utils.Range.valueOf(\"" + iterable + "\")";
         }

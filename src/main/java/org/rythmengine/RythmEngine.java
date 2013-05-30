@@ -872,18 +872,22 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void registerPropertyAccessor(IPropertyAccessor ... accessors) {
         for (final IPropertyAccessor a : accessors) {
-            PropertyHandlerFactory.registerPropertyHandler(a.getTargetType(), new PropertyHandler() {
-                @Override
-                public Object getProperty(String name, Object contextObj, VariableResolverFactory variableFactory) {
-                    return a.getProperty(name, contextObj);
-                }
-
-                @Override
-                public Object setProperty(String name, Object contextObj, VariableResolverFactory variableFactory, Object value) {
-                    return a.setProperty(name, contextObj, value);
-                }
-            });
+            _registerPropertyAccessor(a);
         }
+    }
+    
+    private void _registerPropertyAccessor(final IPropertyAccessor a) {
+        PropertyHandlerFactory.registerPropertyHandler(a.getTargetType(), new PropertyHandler() {
+            @Override
+            public Object getProperty(String name, Object contextObj, VariableResolverFactory variableFactory) {
+                return a.getProperty(name, contextObj);
+            }
+
+            @Override
+            public Object setProperty(String name, Object contextObj, VariableResolverFactory variableFactory, Object value) {
+                return a.setProperty(name, contextObj, value);
+            }
+        });
     }
 
     /* -----------------------------------------------------------------------------
