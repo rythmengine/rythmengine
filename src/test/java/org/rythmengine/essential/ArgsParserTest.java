@@ -30,22 +30,22 @@ import java.util.Collections;
 public class ArgsParserTest extends TestBase {
     @Test
     public void testSimple() {
-        t = "@args String s = \"\", int i\ns:@s.getClass().getName(),i:@i.getClass().getName()";
+        t = "@args String s = \"\", int i\ns:@__getClass(s).getName(),i:@__getClass(i)";
         s = r(t);
-        eq("s:java.lang.String,i:java.lang.Integer");
+        eq("s:java.lang.String,i:int");
     }
     
     @Test
     public void testArray() {
-        t = "@args int[] a1, String[] a2\na1:@a1.getClass().isArray(),a2:@a2.getClass().isArray()";
+        t = "@args int[] a1, String[] a2\na1:@__getClass(a1).isArray(),a2:@__getClass(a2).isArray()";
         // note cannnot use new int[]{} here
-        s = r(t, new Integer[]{}, new String[]{});
+        s = r(t, new int[]{}, new String[]{});
         eq("a1:true,a2:true");
     }
     
     @Test
     public void testFullFormat() {
-        t = "@args() {Map<String, String> m\n, List<int> l,}@(m instanceof Map),@(l instanceof List)";
+        t = "@args() {Map<String, String> m\n, List<Integer> l,}@(m instanceof Map),@(l instanceof List)";
         s = r(t, Collections.EMPTY_MAP, Collections.EMPTY_LIST);
         eq("true,true");
     }

@@ -62,7 +62,6 @@ public abstract class TestBase extends Assert {
         System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
         System.setProperty("line.separator", "\n");
         System.getProperties().put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
-        System.setProperty(FEATURE_DYNAMIC_EXP.getKey(), "false");
         t = null;
         s = null;
     }

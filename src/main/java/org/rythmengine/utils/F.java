@@ -20,7 +20,9 @@
 package org.rythmengine.utils;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Utility classes
@@ -296,6 +298,12 @@ public class F {
 
         public T2(A _1, B _2) {
             super(_1, _2);
+        }
+        
+        public Map<A, B> asMap() {
+            Map<A, B> m = new HashMap<A, B>();
+            m.put(_1, _2);
+            return m;
         }
     }
 

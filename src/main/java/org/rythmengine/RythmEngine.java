@@ -309,6 +309,7 @@ public class RythmEngine implements IEventDispatcher {
         private RenderSettings(RythmConfiguration conf) {
             this.conf = conf;
         }
+
         private final RythmConfiguration conf;
         private final ThreadLocal<Locale> _locale = new ThreadLocal<Locale>() {
             @Override
@@ -403,7 +404,7 @@ public class RythmEngine implements IEventDispatcher {
      * The RenderSettings instance keep the environment settings for one render operation
      */
     public RenderSettings renderSettings;
-    
+
     private String secureCode = null;
 
     /**
@@ -492,7 +493,7 @@ public class RythmEngine implements IEventDispatcher {
         _initLogger(rawConf);
 
         // initialize the configuration with all loaded data 
-        RythmConfiguration rc = new RythmConfiguration(rawConf, this); 
+        RythmConfiguration rc = new RythmConfiguration(rawConf, this);
         this._conf = rc;
 
         // initialize logger factory
@@ -602,7 +603,7 @@ public class RythmEngine implements IEventDispatcher {
         } else if (file.isFile() && file.canRead()) {
             _initConf(conf, file);
         }
-        
+
         renderSettings = new RenderSettings(_conf);
 
         // post configuration initializations 
@@ -694,17 +695,17 @@ public class RythmEngine implements IEventDispatcher {
         if (null != o) {
             List<IPropertyAccessor> udpa = new ArrayList<IPropertyAccessor>();
             if (o instanceof IPropertyAccessor) {
-                udpa.add((IPropertyAccessor)o);
+                udpa.add((IPropertyAccessor) o);
             } else if (o.getClass().isArray()) {
                 int len = Array.getLength(o);
                 for (int i = 0; i < len; ++i) {
                     Object e = Array.get(o, i);
                     if (e instanceof IPropertyAccessor) {
-                        udpa.add((IPropertyAccessor)e);
+                        udpa.add((IPropertyAccessor) e);
                     } else {
                         Class c = null;
                         if (e instanceof Class) {
-                            c = (Class)e;
+                            c = (Class) e;
                         } else if (null != e) {
                             String s = e.toString();
                             try {
@@ -715,7 +716,7 @@ public class RythmEngine implements IEventDispatcher {
                         }
                         if (null != c) {
                             try {
-                                IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                                IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
                                 udpa.add(a);
                             } catch (Exception ce) {
                                 logger.warn("Invalid user defined property accessor class: %s", c);
@@ -727,11 +728,11 @@ public class RythmEngine implements IEventDispatcher {
                 List l = (List) o;
                 for (Object e : l) {
                     if (e instanceof IPropertyAccessor) {
-                        udpa.add((IPropertyAccessor)e);
+                        udpa.add((IPropertyAccessor) e);
                     } else {
                         Class c = null;
                         if (e instanceof Class) {
-                            c = (Class)e;
+                            c = (Class) e;
                         } else if (null != e) {
                             String s = e.toString();
                             try {
@@ -742,7 +743,7 @@ public class RythmEngine implements IEventDispatcher {
                         }
                         if (null != c) {
                             try {
-                                IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                                IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
                                 udpa.add(a);
                             } catch (Exception ce) {
                                 logger.warn("Invalid user defined property accessor class: %s", c);
@@ -751,9 +752,9 @@ public class RythmEngine implements IEventDispatcher {
                     }
                 }
             } else if (o instanceof Class) {
-                Class c = (Class)o;
+                Class c = (Class) o;
                 try {
-                    IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                    IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
                     udpa.add(a);
                 } catch (Exception ce) {
                     logger.warn("Invalid user defined property accessor class: %s", c);
@@ -764,7 +765,7 @@ public class RythmEngine implements IEventDispatcher {
                     try {
                         Class c = Class.forName(tc);
                         try {
-                            IPropertyAccessor a = (IPropertyAccessor)c.newInstance();
+                            IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
                             udpa.add(a);
                         } catch (Exception ce) {
                             logger.warn("Invalid user defined property accessor class: %s", c);
@@ -868,14 +869,16 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Register user implemented {@link org.rythmengine.extension.IPropertyAccessor}
+     *
      * @param accessors
      */
-    public void registerPropertyAccessor(IPropertyAccessor ... accessors) {
+    public void registerPropertyAccessor(IPropertyAccessor... accessors) {
         for (final IPropertyAccessor a : accessors) {
             _registerPropertyAccessor(a);
         }
+        PropertyHandlerFactory.unregisterPropertyHandler(Serializable.class);
     }
-    
+
     private void _registerPropertyAccessor(final IPropertyAccessor a) {
         PropertyHandlerFactory.registerPropertyHandler(a.getTargetType(), new PropertyHandler() {
             @Override
@@ -1407,14 +1410,23 @@ public class RythmEngine implements IEventDispatcher {
 
     private Map<String, Serializable> mvels = new HashMap<String, Serializable>();
 
-    public Object eval(String script, Map<String, Object> context) {
-            Serializable  ce = mvels.get(script);
-            if (null == ce) {
-                ce = MVEL.compileExpression(script);
-                mvels.put(script, ce);
-            }
-            return MVEL.executeExpression(ce, context);
+    public Object eval(String script, Map<String, Object> params) {
+        Serializable ce = mvels.get(script);
+        if (null == ce) {
+            ce = MVEL.compileExpression(script);
+            mvels.put(script, ce);
         }
+        return MVEL.executeExpression(ce, params);
+    }
+    
+    public Object eval(String script, Object context, Map<String, Object> params) {
+        Serializable ce = mvels.get(script);
+        if (null == ce) {
+            ce = MVEL.compileExpression(script);
+            mvels.put(script, ce);
+        }
+        return MVEL.executeExpression(ce, context, params);
+    }
 
     /* -----------------------------------------------------------------------------
       Tags
@@ -1533,7 +1545,7 @@ public class RythmEngine implements IEventDispatcher {
         }
         return null;
     }
-    
+
     public void registerFastTag(JavaTagBase tag) {
         _tags.put(tag.__getName(), tag);
     }
@@ -1608,7 +1620,7 @@ public class RythmEngine implements IEventDispatcher {
         RythmEvents.ENTER_INVOKE_TEMPLATE.trigger(this, (TemplateBase) caller);
         try {
             TemplateClass tc = caller.__getTemplateClass(true);
-            
+
             // try tag registry first
             ITemplate t = _tags.get(name);
             if (null == t) {
@@ -1845,7 +1857,7 @@ public class RythmEngine implements IEventDispatcher {
             code = conf().get(RythmConfigurationKey.SANDBOX_SECURE_CODE);
             rsm = new RythmSecurityManager(csm, code, this);
         } else {
-            rsm = ((RythmSecurityManager)ssm);
+            rsm = ((RythmSecurityManager) ssm);
             code = rsm.getCode();
         }
         secureCode = code;

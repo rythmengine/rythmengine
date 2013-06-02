@@ -942,7 +942,36 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         Object val = __renderArgs.get(name);
         return (T) (null != val ? val : (null != __caller ? caller().__getRenderArg(name) : null));
     }
-
+    
+    protected final <T> T __get(String name, Class<T> cls) {
+        Object o = __get(name);
+        if (null != o || null == cls) return (T)o;
+        if (cls.isAssignableFrom(List.class)) {
+            return (T) Collections.EMPTY_LIST;
+        } else if (cls.isAssignableFrom(Set.class)) {
+            return (T) Collections.EMPTY_SET;
+        } else if (cls.isAssignableFrom(Map.class)) {
+            return (T) Collections.EMPTY_MAP;
+        } else if (cls.equals(Integer.class)) {
+            return (T)Integer.valueOf(0);
+        } else if (cls.equals(Boolean.class)) {
+            return (T) Boolean.valueOf(false);
+        } else if (cls.equals(Double.class)) {
+            return (T) Double.valueOf(0);
+        } else if (cls.equals(Float.class)) {
+            return (T) Float.valueOf(0);
+        } else if (cls.equals(Long.class)) {
+            return (T) Long.valueOf(0);
+        } else if (cls.equals(Short.class)) {
+            return (T) Short.valueOf((short)0);
+        } else if (cls.equals(Byte.class)) {
+            return (T) Byte.valueOf((byte) 0);
+        } else if (cls.equals(Character.class)) {
+            return (T) Character.valueOf((char) 0);
+        } 
+        return null;
+    }
+    
     /**
      * Alias of {@link #__getRenderArg(String)}
      *
@@ -1264,8 +1293,47 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return (TemplateBase) super.pe(o, escape);
     }
     
+    protected final Class __getClass(int o) {
+        return int.class;
+    }
+    
+    protected final Class __getClass(boolean o) {
+        return boolean.class;
+    }
+    
+    protected final Class __getClass(char o) {
+        return char.class;
+    }
+
+    protected final Class __getClass(long o) {
+        return long.class;
+    }
+
+    protected final Class __getClass(float o) {
+        return float.class;
+    }
+    
+    protected final Class __getClass(double o) {
+        return double.class;
+    }
+
+    protected final Class __getClass(byte o) {
+        return byte.class;
+    }
+    
+    protected final Class __getClass(Object o) {
+        if (null == o) return Void.TYPE;
+        return o.getClass();
+    }
+    
     protected final Object __eval(String expr) {
-        return __engine().eval(expr, __renderArgs);
+        Map<String, Object> ctx = new HashMap<String, Object>(__renderArgs);
+        ctx.putAll(itrVars());
+        try {
+            return __engine().eval(expr, this, ctx);
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
     
     // --- debugging interface
@@ -1308,6 +1376,37 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return i18n.getMessage(this, key, args);
     }
 
+    private Stack<F.T2<String, Object>> itrVars = new Stack<F.T2<String, Object>>();
+    
+    protected void __pushItrVar(String name, Object val) {
+        itrVars.push(F.T2(name, val));
+    }
+    
+    protected void __popItrVar() {
+        if (itrVars.isEmpty()) return;
+        itrVars.pop();
+    }
+    
+    private Map<String, Object> itrVars() {
+        if (itrVars.isEmpty()) return Collections.EMPTY_MAP;
+        if (itrVars.size() == 1) return itrVars.peek().asMap();
+        Stack<F.T2<String, Object>> tmp = new Stack<F.T2<String, Object>>();
+        Map<String, Object> m = new HashMap<String, Object>();
+        Stack<F.T2<String, Object>> vs = itrVars;
+        while (!vs.isEmpty()) {
+            F.T2<String, Object> var = vs.pop();
+            tmp.push(var);
+            String k = var._1;
+            if (!m.containsKey(k)) {
+                m.put(k, var._2);
+            }
+        }
+        while (!tmp.isEmpty()) {
+            vs.push(tmp.pop());
+        }
+        return m;
+    }
+
     /**
      * The helper class to facilitate generating code for the "for" loop in
      * the template source
@@ -1315,260 +1414,357 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param <T>
      */
     protected static class __Itr<T> implements Iterable<T> {
-        private Object _o = null;
-        private int _size = -1;
-        private Iterator<T> iterator = null;
-        private int cursor = 0;
-
-        public __Itr(T[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return ((T[]) _o)[cursor++];  //To change body of implemented methods use File | Settings | File Templates.
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(int[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Integer) ((int[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(long[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Long) ((long[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(float[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Float) ((float[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(double[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Double) ((double[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(short[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Short) ((short[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(char[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Character) ((char[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(byte[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Byte) ((byte[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(boolean[] ta) {
-            _o = ta;
-            _size = ta.length;
-            iterator = new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return cursor < _size;
-                }
-
-                @Override
-                public T next() {
-                    return (T) ((Boolean) ((boolean[]) _o)[cursor++]);
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
-        public __Itr(Range range) {
-            _o = range;
-            _size = range.size();
-            iterator = range.iterator();
-        }
-
-        public __Itr(Object obj) {
-            if (null == obj) {
-                throw new NullPointerException();
+        protected Object _o = null;
+        protected int _size = -1;
+        protected Iterator<T> iterator = null;
+        protected int cursor = 0;
+        
+        private static final Iterator nullIterator = new Iterator() {
+            @Override
+            public boolean hasNext() {
+                return false;
             }
-            String s = obj.toString();
-            if (S.isEmpty(s)) {
-                _o = "";
-                _size = 0;
-                iterator = Collections.EMPTY_LIST.iterator();
+
+            @Override
+            public Object next() {
+                return null;
+            }
+
+            @Override
+            public void remove() {
                 return;
             }
-            List<String> seps = new ArrayList<String>();
-            RythmEngine engine = RythmEngine.get();
-            RythmConfiguration conf = engine.conf();
-            if ("zh".equals(conf.locale().getLanguage())) {
-                seps.addAll(Arrays.asList("\n,、,，,；,。,：".split(",")));
-            } else {
-                seps.add("\n");
+        };
+        
+
+        private static final __Itr EMPTY_ITR = new __Itr(){
+            @Override
+            public int size() {
+                return 0;
             }
-            seps.addAll(Arrays.asList(";^,^:^_^-".split("\\^")));
-            for (String sep : seps) {
-                if (s.contains(sep)) {
-                    List<String> ls = Arrays.asList(s.split(sep));
-                    List<String> ls0 = new ArrayList<String>();
-                    for (String s0 : ls) {
-                        ls0.add(s0.trim());
+
+            @Override
+            public Iterator iterator() {
+                return nullIterator;
+            }
+        }; 
+        
+        private __Itr() {}
+        
+        private __Itr(Object o) {
+            //this._o = o;
+            if (o.getClass().isArray()) {
+                _size = Array.getLength(o);
+                iterator = new Iterator<T>() {
+                    @Override
+                    public boolean hasNext() {
+                        return cursor < _size;
                     }
-                    _o = ls0;
-                    _size = ls.size();
-                    iterator = (Iterator<T>) ls0.iterator();
-                    break;
+
+                    @Override
+                    public T next() {
+                        return (T)Array.get(_o, cursor++);
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            } else {
+                String s = o.toString();
+                if (S.isEmpty(s)) {
+                    _o = "";
+                    _size = 0;
+                    iterator = Collections.EMPTY_LIST.iterator();
+                    return;
                 }
-            }
-            if (null == _o) {
-                List<String> ls = new ArrayList<String>();
-                ls.add(s);
-                _size = 1;
-                iterator = (Iterator<T>) ls.iterator();
+                List<String> seps = new ArrayList<String>();
+                RythmEngine engine = RythmEngine.get();
+                RythmConfiguration conf = engine.conf();
+                if ("zh".equals(conf.locale().getLanguage())) {
+                    seps.addAll(Arrays.asList("\n,、,，,；,。,：".split(",")));
+                } else {
+                    seps.add("\n");
+                }
+                seps.addAll(Arrays.asList(";^,^:^_^-".split("\\^")));
+                for (String sep : seps) {
+                    if (s.contains(sep)) {
+                        List<String> ls = Arrays.asList(s.split(sep));
+                        List<String> ls0 = new ArrayList<String>();
+                        for (String s0 : ls) {
+                            ls0.add(s0.trim());
+                        }
+                        _o = ls0;
+                        _size = ls.size();
+                        iterator = (Iterator<T>) ls0.iterator();
+                        break;
+                    }
+                }
+                if (null == _o) {
+                    List<String> ls = new ArrayList<String>();
+                    ls.add(s);
+                    _size = 1;
+                    iterator = (Iterator<T>) ls.iterator();
+                }
             }
         }
 
-        public __Itr(Iterable<T> tc) {
-            _o = tc;
-            if (tc instanceof Collection) {
-                _size = ((Collection) tc).size();
-            } else {
-                int i = 0;
-                for (Iterator itr = tc.iterator(); itr.hasNext(); itr.next()) {
-                    i++;
+        public static <T> __Itr<T> valueOf(T[] ta) {
+            final __Itr<T> itr = new __Itr<T>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
                 }
-                _size = i;
+
+                @Override
+                public T next() {
+                    return ((T[]) itr._o)[itr.cursor++]; 
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Integer> valueOf(int[] ta) {
+            final __Itr<Integer> itr = new __Itr<Integer>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Integer>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Integer next() {
+                    return ((int[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Long> valueOf(long[] ta) {
+            final __Itr<Long> itr = new __Itr<Long>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Long>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Long next() {
+                    return ((long[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Float> valueOf(float[] ta) {
+            final __Itr<Float> itr = new __Itr<Float>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Float>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Float next() {
+                    return ((float[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Double> valueOf(double[] ta) {
+            final __Itr<Double> itr = new __Itr<Double>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Double>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Double next() {
+                    return ((double[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Short> valueOf(short[] ta) {
+            final __Itr<Short> itr = new __Itr<Short>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Short>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Short next() {
+                    return ((short[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Character> valueOf(char[] ta) {
+            final __Itr<Character> itr = new __Itr<Character>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Character>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Character next() {
+                    return ((char[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Byte> valueOf(byte[] ta) {
+            final __Itr<Byte> itr = new __Itr<Byte>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Byte>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Byte next() {
+                    return ((byte[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static __Itr<Boolean> valueOf(boolean[] ta) {
+            final __Itr<Boolean> itr = new __Itr<Boolean>();
+            itr._o = ta;
+            itr._size = ta.length;
+            itr.iterator = new Iterator<Boolean>() {
+                @Override
+                public boolean hasNext() {
+                    return itr.cursor < itr._size;
+                }
+
+                @Override
+                public Boolean next() {
+                    return ((boolean[]) itr._o)[itr.cursor++];
+                }
+
+                @Override
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+            return itr;
+        }
+
+        public static <T extends Comparable> __Itr<T> valueOf(Range range) {
+            __Itr<T> itr = new __Itr<T>();
+            itr._o = range;
+            itr._size = range.size();
+            itr.iterator = range.iterator();
+            return itr;
+        }
+        
+        public static __Itr valueOf(final Object obj) {
+            if (null == obj) {
+                return EMPTY_ITR;
+            }
+            if (obj instanceof Iterable) {
+                return valueOf((Iterable)obj);
+            }
+            Class c = obj.getClass();
+            if (c.isArray()) {
+                Class ct = c.getComponentType();
+                if (ct.equals(int.class)) {
+                    return valueOf((int[])obj);
+                } else if (ct.equals(long.class)) {
+                    return valueOf((long[])obj);
+                } else if (ct.equals(float.class)) {
+                    return valueOf((float[])obj);
+                } else if (ct.equals(double.class)) {
+                    return valueOf((double[])obj);
+                } else if (ct.equals(char.class)) {
+                    return valueOf((char[])obj);
+                } else if (ct.equals(byte.class)) {
+                    return valueOf((byte[])obj);
+                } else if (ct.equals(boolean.class)) {
+                    return valueOf((boolean[])obj);
+                }
+            }
+            return new __Itr(obj);
+        }
+
+        public static <T> __Itr valueOf(Iterable<T> tc) {
+            final __Itr<T> itr = new __Itr<T>();
+            itr._o = tc;
+            if (tc instanceof Collection) {
+                itr._size = ((Collection) tc).size();
+            } else {
+                itr._size = -1;
             }
 
-            iterator = tc.iterator();
+            itr.iterator = tc.iterator();
+            return itr;
         }
         
         public int size() {
@@ -1578,6 +1774,15 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         @Override
         public Iterator<T> iterator() {
             return iterator;
+        }
+    }
+
+    public static void main(String[] args) {
+        Integer[] ia = new Integer[]{1, 2};
+        Object o = ia;
+        __Itr<Integer> it = __Itr.valueOf(o);
+        for (int i : it) {
+            System.out.println(i);
         }
     }
 

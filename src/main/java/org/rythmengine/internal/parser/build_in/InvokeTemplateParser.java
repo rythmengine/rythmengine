@@ -37,8 +37,10 @@ import java.util.regex.Pattern;
 /**
  * Parse tag invocation:
  *
- * @myApp.myTag(...) Note since this is also a pattern for expression parser, InvokeTagParser must
- * be put in front of expression parser
+ * <p>@myApp.myTag(...) Note since this is also a pattern for expression parser, InvokeTagParser must
+ * be put in front of expression parser</p>
+ * 
+ * <p>use @myApp.myTag(...)@ to indicate the params inside are dynamic expression</p>
  */
 public class InvokeTemplateParser extends CaretParserFactoryBase {
 
@@ -125,7 +127,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             // strip '(' and ')'
             line = line.trim();
             if (line.startsWith("(")) line = S.stripBrace(line);
-            Regex r = new Regex("\\G(\\s*,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*)|[_a-zA-Z][a-z_A-Z0-9]*)");
+            Regex r = new Regex("\\G(\\s*,\\s*)?((([a-zA-Z_][\\w$_]*)\\s*[=:]\\s*)?((?@())|'.'|(?@\"\")|[0-9\\.]+[l]?|[a-zA-Z_][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*(\\.[a-zA-Z][a-zA-Z0-9_\\.]*(?@())*(?@[])*(?@())*)*@?)|[_a-zA-Z][a-z_A-Z0-9]*@?)");
             line = line.replaceAll("^\\s+", ""); // allow line breaks in params
             line = S.strip(line, "{", "}");
             line = line.replaceAll("^\\s+", ""); // allow line breaks in params

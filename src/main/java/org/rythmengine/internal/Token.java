@@ -139,7 +139,6 @@ public class Token extends TextBuilder {
     private RythmEngine engine = null;
     private Iterable<IJavaExtension> javaExtensions = null;
     private boolean transformEnabled = true;
-    protected boolean dynamicExp = false;
     /*
      * Indicate whether token parse is good
      */
@@ -156,7 +155,7 @@ public class Token extends TextBuilder {
 
     protected Token(String s, TextBuilder caller, boolean disableCompactMode) {
         super(caller);
-        this.s = s;
+        this.s = checkDynaExp(s);
         line = -1;
         this.disableCompactMode = disableCompactMode;
         //TODO: dangerous engine assignment here. only called by AppendXXToken in AutoToStringCodeBuilder
@@ -164,7 +163,6 @@ public class Token extends TextBuilder {
         this.javaExtensions = engine.extensionManager().javaExtensions();
         RythmConfiguration conf = engine.conf();
         this.transformEnabled = conf.transformEnabled();
-        this.dynamicExp = conf.dynamicExpEnabled();
     }
 
     public Token(String s, IContext context) {
@@ -181,9 +179,8 @@ public class Token extends TextBuilder {
         this.disableCompactMode = disableCompactMode;
         RythmConfiguration conf = engine.conf();
         this.transformEnabled = conf.transformEnabled();
-        this.dynamicExp = conf.dynamicExpEnabled();
     }
-
+    
     public boolean test(String line) {
         return true;
     }
@@ -267,10 +264,22 @@ public class Token extends TextBuilder {
         pline();
     }
     
+    private boolean dynaExp = false;
+    
     private String evalStr(String s) {
-        if (!dynamicExp) return s;
-        if (s.matches(".*_(isOdd|parity|index|sep|isFirst|isLast|utils)$")) return s;
-        return "__eval(\"" + s + "\")"; 
+        if (!dynaExp) return s;
+        return "__eval(\"" + S.escapeJava(s) + "\")"; 
+    }
+    
+    private String checkDynaExp(String s) {
+        if (S.empty(s)) return s;
+        boolean b = (s.endsWith("@"));
+        if (b) {
+            dynaExp = true;
+            return s.substring(0, s.length() - 1);
+        } else {
+            return s;
+        }
     }
 
     private String processExtensions(boolean stripExtensions) {
@@ -279,6 +288,7 @@ public class Token extends TextBuilder {
         String s0 = s;
         boolean outerBracketsStripped;
         s = stripOuterBrackets(s);
+        s = checkDynaExp(s);
         outerBracketsStripped = s != s0;
         class Pair {
             IJavaExtension extension;

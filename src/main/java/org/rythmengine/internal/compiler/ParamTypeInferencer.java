@@ -33,13 +33,13 @@ public class ParamTypeInferencer {
 
     public static String typeTransform(String type) {
         type = type.trim();
-        if (type.contains("boolean") && type.matches("(.*[^a-zA-Z0-9_]+)?boolean([^a-zA-Z0-9_].*|$)")) return type.replace("boolean","Boolean");
-        else if (type.contains("int") && type.matches("(.*[^a-zA-Z0-9_]+)?int([^a-zA-Z0-9_].*|$)")) return type.replace("int","Integer");
-        else if (type.contains("float") && type.matches("(.*[^a-zA-Z0-9_]+)?float([^a-zA-Z0-9_].*|$)")) return type.replace("float","Float");
-        else if (type.contains("double") && type.matches("(.*[^a-zA-Z0-9_]+)?double([^a-zA-Z0-9_].*|$)")) return type.replace("double","Double");
-        else if (type.contains("char") && type.matches("(.*[^a-zA-Z0-9_]+)?char([^a-zA-Z0-9_].*|$)")) return type.replace("char","Character");
-        else if (type.contains("long") && type.matches("(.*[^a-zA-Z0-9_]+)?long([^a-zA-Z0-9_].*|$)")) return type.replace("long","Long");
-        else if (type.contains("byte") && type.matches("(.*[^a-zA-Z0-9_]+)?byte([^a-zA-Z0-9_].*|$)")) return type.replace("byte","Byte");
+        if (type.contains("Boolean") && type.matches("(.*[^a-zA-Z0-9_]+)?boolean([^a-zA-Z0-9_].*|$)")) return type.replace("Boolean","boolean");
+        else if (type.contains("Integer") && type.matches("(.*[^a-zA-Z0-9_]+)?int([^a-zA-Z0-9_].*|$)")) return type.replace("Integer","int");
+        else if (type.contains("Float") && type.matches("(.*[^a-zA-Z0-9_]+)?float([^a-zA-Z0-9_].*|$)")) return type.replace("Float","float");
+        else if (type.contains("Double") && type.matches("(.*[^a-zA-Z0-9_]+)?double([^a-zA-Z0-9_].*|$)")) return type.replace("Double","double");
+        else if (type.contains("Character") && type.matches("(.*[^a-zA-Z0-9_]+)?char([^a-zA-Z0-9_].*|$)")) return type.replace("Character","char");
+        else if (type.contains("Long") && type.matches("(.*[^a-zA-Z0-9_]+)?long([^a-zA-Z0-9_].*|$)")) return type.replace("Long","long");
+        else if (type.contains("Byte") && type.matches("(.*[^a-zA-Z0-9_]+)?byte([^a-zA-Z0-9_].*|$)")) return type.replace("Byte","byte");
         else return type;
     }
 

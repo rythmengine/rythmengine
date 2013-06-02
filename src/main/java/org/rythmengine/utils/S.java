@@ -988,7 +988,19 @@ public class S {
      */
     public static String format(ITemplate template, Number number, String pattern) {
         return format(template, number, pattern, null);
-    }    
+    }
+
+    /**
+     * Format general object: for the sake of dynamic expr evaluation
+     * @param o
+     * @return
+     */
+    public static String format(Object o) {
+        if (null == o) return "";
+        if (o instanceof Date) return format((Date)o);
+        if (o instanceof Number) return format((Number)o);
+        return o.toString();
+    }
 
     /**
      * Format a date with engine's default format corresponding
@@ -1000,6 +1012,19 @@ public class S {
     @Transformer(requireTemplate = true)
     public static String format(Date date) {
         return format(date, null, null, null);
+    }
+
+    /**
+     * Generalize format parameter for the sake of dynamic expr evaluation
+     * @param template
+     * @param o
+     * @return
+     */
+    public static String format(ITemplate template, Object o) {
+        if (null == o) return "";
+        if (o instanceof Date) return format(template, (Date) o);
+        if (o instanceof Number) return format(template, (Number) o);
+        return o.toString();
     }
 
     /**
@@ -1024,6 +1049,19 @@ public class S {
     public static String format(Date date, String pattern) {
         return format(date, pattern, null, null);
     }
+
+    /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(Object o, String pattern) {
+        if (null == o) return "";
+        if (o instanceof Date) return format((Date) o, pattern);
+        if (o instanceof Number) return format((Number) o, pattern);
+        return o.toString();
+    }
     
     /**
      * Format a date with specified pattern
@@ -1038,6 +1076,19 @@ public class S {
     }
 
     /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(ITemplate template, Object o, String pattern) {
+        if (null == o) return "";
+        if (o instanceof Date) return format(template, (Date) o, pattern);
+        if (o instanceof Number) return format(template, (Number) o, pattern);
+        return o.toString();
+    }
+    
+    /**
      * Transformer. Format a date with specified pattern, language and locale
      * @param date
      * @param pattern
@@ -1050,6 +1101,19 @@ public class S {
     }
 
     /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(Object o, String pattern, Locale locale) {
+        if (null == o) return "";
+        if (o instanceof Date) return format((Date) o, pattern, locale);
+        if (o instanceof Number) return format((Number) o, pattern, locale);
+        return o.toString();
+    }
+    
+    /**
      * See {@link #format(org.rythmengine.template.ITemplate, java.util.Date, String, java.util.Locale, String)}
      * @param template
      * @param date
@@ -1061,6 +1125,19 @@ public class S {
         return format(template, date, pattern, locale, null);
     }
 
+    /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(ITemplate template, Object o, String pattern, Locale locale) {
+        if (null == o) return "";
+        if (o instanceof Date) return format(template, (Date) o, pattern, locale);
+        if (o instanceof Number) return format(template, (Number) o, pattern, locale);
+        return o.toString();
+    }
+    
     /**
      * Transformer. Format a date with specified pattern, lang, locale and timezone.
      * 
@@ -1076,6 +1153,19 @@ public class S {
         return format(null, date, pattern, locale, timezone);
     }
 
+    /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(Object o, String pattern, Locale locale, String timezone) {
+        if (null == o) return "";
+        if (o instanceof Date) return format((Date) o, pattern, locale, timezone);
+        if (o instanceof Number) return format((Number) o, pattern, locale, timezone);
+        return o.toString();
+    }
+    
     /**
      * Format a date with specified pattern, lang, locale and timezone. The locale
      * comes from the engine instance specified
@@ -1100,6 +1190,19 @@ public class S {
         if (null != timezone) df.setTimeZone(TimeZone.getTimeZone(timezone));
         
         return df.format(date);
+    }
+    
+    /**
+     * Generalize format parameter for the sake of dynamic evaluation
+     * @param o
+     * @param pattern
+     * @return
+     */
+    public static String format(ITemplate template, Object o, String pattern, Locale locale, String timezone) {
+        if (null == o) return "";
+        if (o instanceof Date) return format(template, (Date) o, pattern, locale, timezone);
+        if (o instanceof Number) return format(template, (Number) o, pattern, locale);
+        return o.toString();
     }
     
     /**

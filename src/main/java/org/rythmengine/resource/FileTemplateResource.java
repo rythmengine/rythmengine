@@ -171,6 +171,7 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
                 ".csv",
                 ".xml",
                 ".txt",
+                ".rythm",
                 ""
         }));
         ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);

@@ -145,12 +145,12 @@ public class GHIssueTest extends TestBase {
     
     @Test
     public void test146() {
-        t = "@if(true){\n{true}\n}";
-        s = r(t);
-        eq("{true}");
         t = "@for(\"a\"){\n{true}\n}";
         s = r(t);
         eq("{true}\n");
+        t = "@if(true){\n{true}\n}";
+        s = r(t);
+        eq("{true}");
         t = "@for(int i = 0; i < 1; ++i){\n{true}\n}";
         s = r(t);
         eq("{true}\n");

@@ -62,7 +62,45 @@ public class CodeBuilder extends TextBuilder {
         public String type;
         public String defVal;
         public int lineNo;
+        
+        private static final Map<String, String> byPrimitive; static {
+            HashMap<String, String> m = new HashMap<String, String>();
+            m.put("int", "Integer");
+            m.put("long", "Long");
+            m.put("short", "Short");
+            m.put("byte", "Byte");
+            m.put("float", "Float");
+            m.put("double", "Double");
+            m.put("char", "Character");
+            m.put("boolean", "Boolean");
+            byPrimitive = m;
+        }
+        
+        private static char DEF_CHAR;
 
+        public String objectType() {
+            String s = byPrimitive.get(type);
+            return null != s ? s : toNonGeneric(type);
+        }
+        
+        private static final Map<String, String> nullVals; static {
+            HashMap<String, String> m = new HashMap<String, String>();
+            m.put("int", "0");
+            m.put("long", "0L");
+            m.put("short", "0");
+            m.put("byte", "0");
+            m.put("float", "0f");
+            m.put("double", "0d");
+            m.put("char", String.valueOf(DEF_CHAR));
+            m.put("boolean", "false");
+            nullVals = m;
+        }
+        
+        public String nullVal() {
+            String s = nullVals.get(type);
+            return (null == s) ? "null" : s;
+        }
+        
         public RenderArgDeclaration(int lineNo, String type, String name) {
             this(-1, lineNo, type, name);
         }
@@ -91,6 +129,8 @@ public class CodeBuilder extends TextBuilder {
             if ("long".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "L";
             if ("float".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "f";
             if ("double".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "d";
+            if ("short".equalsIgnoreCase(type) && defVal.matches("[0-9]+]")) return "((short)" + defVal + ")";
+            if ("byte".equalsIgnoreCase(type) && defVal.matches("[0-9]+]")) return "((byte)" + defVal + ")";
             return defVal;
         }
 
@@ -696,6 +736,19 @@ public class CodeBuilder extends TextBuilder {
         try {
             RythmEngine engine = engine();
             parser.parse();
+            if (!"__global.rythm".equals(this.templateClass.getKey())) {
+                boolean enableGlobalInclude = true;
+                if (null != requiredDialect) {
+                    if (requiredDialect instanceof BasicRythm || requiredDialect instanceof ToStringTemplateBase) {
+                        enableGlobalInclude = false;
+                    } 
+                }
+                if (enableGlobalInclude && conf.hasGlobalInclude()) {
+                    String code = addInclude("__global.rythm", -1);
+                    CodeToken ck = new CodeToken(code, parser);
+                    addBuilder(ck);
+                }
+            }
             invokeDirectives();
             //if (!basicTemplate()) addDefaultRenderArgs();
             RythmEvents.ON_BUILD_JAVA_SOURCE.trigger(engine, this);
@@ -907,7 +960,7 @@ public class CodeBuilder extends TextBuilder {
         first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.type).p(")__args.get(\"").p(argName).pn("\");");
+            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.objectType()).p(")__args.get(\"").p(argName).pn("\");");
         }
         p2tn("return this;");
 //        for (String argName : renderArgs.keySet()) {
@@ -927,7 +980,7 @@ public class CodeBuilder extends TextBuilder {
                 for (RenderArgDeclaration arg : renderArgList) {
                     p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
                             .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); \n\t\t\t")
-                            .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v);\n\t\t\t __renderArgs.put(\"").p(arg.name.trim()).p("\",v);}\n");
+                            .p(arg.name).p(" = (").p(arg.objectType()).p(")(isString ? (null == v ? \"\" : v.toString()) : v);\n\t\t\t __renderArgs.put(\"").p(arg.name.trim()).p("\",v);}\n");
                     if (--i == 0) break;
                 }
             }
@@ -962,7 +1015,7 @@ public class CodeBuilder extends TextBuilder {
                     p2t("else ");
                 }
                 String argName = arg.name;
-                p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p("=(").p(arg.type).pn(")__arg;");
+                p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p("=(").p(arg.objectType()).pn(")__arg;");
             }
         }
         p2t("super.__setRenderArg(__name, __arg);\n\t\treturn this;\n\t}\n");
@@ -982,7 +1035,7 @@ public class CodeBuilder extends TextBuilder {
                 }
                 p("if (__p++ == __pos) { Object v = __arg; boolean isString = (\"java.lang.String\".equals(\"")
                         .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                        .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
+                        .p(arg.name).p(" = (").p(arg.objectType()).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
             }
         }
         // the first argument has a default name "arg"
@@ -1020,9 +1073,9 @@ public class CodeBuilder extends TextBuilder {
         }
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (").p(argName).p(" == null) {");
+            p2t("if (").p(argName).p(" == ").p(arg.nullVal()).p(") {");
             //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-            p(argName).p("=(").p(arg.type).p(")__get(\"").p(argName).p("\");}\n");
+            p(argName).p("=(").p(arg.objectType()).p(")__get(\"").p(argName).p("\",").p(arg.objectType()).p(".class) ;}\n");
         }
         ptn("}");
     }
@@ -1097,7 +1150,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pInlineTags() {
         pn();
         for (InlineTag tag : inlineTags) {
-            p("\nprotected ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature);
+            p("\npublic ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature);
             p("{\norg.rythmengine.template.TemplateBase oldParent = this.__parent;\ntry{\nthis.__parent = this;\n");
             boolean isVoid = tag.autoRet;
             StringBuilder sb = buffer();

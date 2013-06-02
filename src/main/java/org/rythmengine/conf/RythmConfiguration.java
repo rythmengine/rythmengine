@@ -23,6 +23,7 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.*;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
+import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.utils.RawData;
 
 import java.io.File;
@@ -351,15 +352,6 @@ public class RythmConfiguration {
         return _compactEnabled;
     }
     
-    private Boolean _dynamicExp = null;
-    
-    public boolean dynamicExpEnabled() {
-        if (null == _dynamicExp) {
-            _dynamicExp = get(FEATURE_DYNAMIC_EXP);
-        }
-        return _dynamicExp;
-    }
-
     private IDurationParser _durationParser = null;
 
     /**
@@ -514,6 +506,14 @@ public class RythmConfiguration {
         return _sandboxTmpIO;
     }
     
+    private Boolean _hasGlobalInclude = null;
+    public boolean hasGlobalInclude() {
+        if (null == _hasGlobalInclude) {
+            ITemplateResource rsrc = engine.resourceManager().getResource("__global.rythm");
+            _hasGlobalInclude = rsrc.isValid();
+        }
+        return _hasGlobalInclude;
+    }
 
     public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP, null); 
     

@@ -129,41 +129,41 @@ public class ForParserTest extends TestBase {
     
     @Test
     public void testDifferentSeparators() {
-        t = "@for (String item in items) @(item)@item_sep@";
+        t = "@for (String item in items) @(item)@(item_sep)@";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
 
-        t = "@for (String item <- items) @(item)@item_sep@";
+        t = "@for (String item <- items) @(item)@(item_sep)@";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
     }
     
     @Test
     public void testDifferentDirectives() {
-        t = "@each (String item in items) @(item)@item_sep@";
+        t = "@each (String item in items) @(item)@(item_sep)@";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
 
-        t = "@forEach (String item in items) @(item)@item_sep@";
+        t = "@forEach (String item in items) @(item)@(item_sep)@";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
     }
     
     @Test
     public void testSimpleStyle() {
-        t = "@for (int i = 0; i < 5; ++i) @i@";
+        t = "@for (int i = 0; i < 5; ++i) @(i)@";
         s = r(t);
         assertEquals("01234", s);
 
-        t = "@for (String item: items) @(item)@item_sep@";
+        t = "@for (String item: items) @(item)@(item_sep)@";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
 
-        t = "@for (@1) @(_.length())@_sep@";
+        t = "@for (@1) @(_.length())@(_sep)@";
         s = r(t, Arrays.asList("abc,bc,c".split(",")));
         assertEquals("3,2,1", s);
 
-        t = "@for (1 till 5) @_@";
+        t = "@for (1 till 5) @_ @";
         s = r(t);
         assertEquals("12345", s);
     }
@@ -262,7 +262,7 @@ public class ForParserTest extends TestBase {
     
     @Test
     public void testLoopVarIndex() {
-        t = "@for(\"a,b,c\")@_|@(_index)@_sep@";
+        t = "@for(\"a,b,c\")@_|@(_index)@(_sep)@";
         assertEquals("a|1,b|2,c|3", r(t));
     }
     

@@ -305,12 +305,6 @@ public enum RythmConfigurationKey {
      */
     FEATURE_NATURAL_TEMPLATE_ENABLED("feature.natural_template.enabled", false),
     
-    /**
-     * "engine.dynamic_exp.eanbled": Generate code to enable evaluate dynamic expressions, 
-     * and the java beans spec can be supported when this option is turned on
-     */
-    FEATURE_DYNAMIC_EXP("feature.dynamic_exp.enabled", false),
-    
 
     /**
      * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}

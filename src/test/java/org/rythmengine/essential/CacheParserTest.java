@@ -19,14 +19,14 @@
 */
 package org.rythmengine.essential;
 
-import org.rythmengine.TestBase;
-import static org.rythmengine.conf.RythmConfigurationKey.*;
-
-import org.rythmengine.cache.SimpleCacheService;
 import org.junit.Before;
 import org.junit.Test;
+import org.rythmengine.TestBase;
 
 import java.util.Random;
+
+import static org.rythmengine.conf.RythmConfigurationKey.CACHE_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 
 /**
  * Test @args parser
@@ -78,7 +78,7 @@ public class CacheParserTest extends TestBase {
     
     @Test
     public void testShortNotation() {
-        t = "@cache()@1@";
+        t = "@cache()@(1)@";
         s = r(t, 5);
         eq("5");
         

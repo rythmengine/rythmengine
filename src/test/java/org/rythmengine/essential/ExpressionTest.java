@@ -26,12 +26,12 @@ import org.mvel2.integration.VariableResolverFactory;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.utils.S;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_DYNAMIC_EXP;
 import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static org.rythmengine.utils.NamedParams.from;
 import static org.rythmengine.utils.NamedParams.p;
@@ -95,11 +95,13 @@ public class ExpressionTest extends TestBase {
         private String id;
         private int count;
         private boolean enabled;
+        private Date date;
         private Map<String, Object> attrs;
-        public JavaBean(String id, int count, boolean enabled) {
+        public JavaBean(String id, int count, boolean enabled, Date date) {
             this.id  = id;
             this.count = count;
             this.enabled = enabled;
+            this.date = date;
             attrs = new HashMap<String, Object>();
         }
         public String getId() {
@@ -111,6 +113,9 @@ public class ExpressionTest extends TestBase {
         public boolean isEnabled() {
             return enabled;
         }
+        public Date getDate() {
+            return date;
+        }
         public void set(String key, Object val) {
             attrs.put(key, val);
         }
@@ -121,10 +126,11 @@ public class ExpressionTest extends TestBase {
     
     @Test
     public void testDynamicExpr() {
-        System.setProperty(FEATURE_DYNAMIC_EXP.getKey(), "true");
-        JavaBean bean = new JavaBean("foo", 11, true);
+        System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
+        Date today = new Date();
+        JavaBean bean = new JavaBean("foo", 11, true, today);
         bean.set("engine", "Rythm");
-        t = "@b.getId()|@b.count|@b.enabled|@b.engine";
+        t = "@b?.getId()|@b.count@|@b.enabled@|@b.engine@|@b.date.format()@";
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("b", bean);
         PropertyHandlerFactory.registerPropertyHandler(JavaBean.class, new PropertyHandler() {
@@ -137,7 +143,8 @@ public class ExpressionTest extends TestBase {
                     return jb.getCount();
                 } else if ("enabled".equals(name)) {
                     return jb.isEnabled();
-                } else {
+                } else if ("date".equals(name)) {
+                    return jb.getDate();
                 }
                 return jb.get(name);
             }
@@ -149,7 +156,8 @@ public class ExpressionTest extends TestBase {
             }
         });
         s = r(t, params);
-        eq("foo|11|true|Rythm");
+        contains("foo|11|true|Rythm");
+        contains(S.format(today));
     }
 
     @Test

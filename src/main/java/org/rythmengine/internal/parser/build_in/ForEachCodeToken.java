@@ -23,6 +23,7 @@ import org.rythmengine.exception.ParseException;
 import org.rythmengine.internal.CodeBuilder;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.TemplateParser;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.dialect.BasicRythm;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.utils.S;
@@ -54,6 +55,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         if (null == iterable) throw new NullPointerException();
         iterable = iterable.trim();
         iterable = ExpressionParser.processPositionPlaceHolder(iterable);
+        iterable = Token.processRythmExpression(iterable, context);
         if (null != type) type = type.trim();
         this.type = ObjectType(type);
         this.varname = null == varname ? "_" : varname.trim();
@@ -135,7 +137,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varWithUtils = prefix + "__utils";
 
         String varItr = cb.newVarName();
-        p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = new __Itr(").p(iterable).p(");");
+        p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
         pline();
         p("int ").p(varSize).p(" = ").p(varItr).p(".size();");
         pline();
@@ -167,13 +169,11 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("org.rythmengine.internal.LoopUtil ").p(varWithUtils).p(" = new org.rythmengine.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(", ").p(varname).p(");");
         pline();
-        if (dynamicExp) {
-            p("__setRenderArg(\"").p(varname).p("\", ").p(varname).p(");");
-            pline();
-        }
+        p("__pushItrVar(\"").p(varname).p("\", ").p(varname).p(");");
+        pline();
     }
     @Override
     public String closeBlock() {
-        return "\n\t}\n}\n}\n";
+        return "\n\t__popItrVar();\n\t}\n}\n}\n";
     }
 }
