@@ -135,9 +135,9 @@ public class CodeBuilder extends TextBuilder {
         }
 
         private static String defVal(String type) {
-            if (type.equalsIgnoreCase("String"))
+            if (type.equalsIgnoreCase("String")) {
                 return "\"\"";
-            else if (type.equalsIgnoreCase("boolean"))
+            } else if (type.equalsIgnoreCase("boolean"))
                 return "false";
             else if (type.equalsIgnoreCase("int"))
                 return "0";
@@ -960,7 +960,7 @@ public class CodeBuilder extends TextBuilder {
         first = true;
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p("=(").p(arg.objectType()).p(")__args.get(\"").p(argName).pn("\");");
+            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p(" = __get(__args,\"").p(argName).p("\",").p(arg.objectType()).pn(".class);");
         }
         p2tn("return this;");
 //        for (String argName : renderArgs.keySet()) {
@@ -978,9 +978,7 @@ public class CodeBuilder extends TextBuilder {
                 p2tn("int __p = 0, __l = __args.length;");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
-                    p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; boolean isString = (\"java.lang.String\".equals(\"")
-                            .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); \n\t\t\t")
-                            .p(arg.name).p(" = (").p(arg.objectType()).p(")(isString ? (null == v ? \"\" : v.toString()) : v);\n\t\t\t __renderArgs.put(\"").p(arg.name.trim()).p("\",v);}\n");
+                    p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; \n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t\t__renderArgs.put(\"").p(arg.name).p("\",").p(arg.name).p(");\n\t\t}\n"); 
                     if (--i == 0) break;
                 }
             }
@@ -1015,7 +1013,7 @@ public class CodeBuilder extends TextBuilder {
                     p2t("else ");
                 }
                 String argName = arg.name;
-                p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p("=(").p(arg.objectType()).pn(")__arg;");
+                p("if (\"").p(argName).p("\".equals(__name)) this.").p(argName).p(" = __safeCast(__arg, ").p(arg.objectType()).pn(".class);");
             }
         }
         p2t("super.__setRenderArg(__name, __arg);\n\t\treturn this;\n\t}\n");
@@ -1033,9 +1031,7 @@ public class CodeBuilder extends TextBuilder {
                 } else {
                     p2t("else ");
                 }
-                p("if (__p++ == __pos) { Object v = __arg; boolean isString = (\"java.lang.String\".equals(\"")
-                        .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                        .p(arg.name).p(" = (").p(arg.objectType()).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }").pn();
+                p2t("if (__p++ == __pos) { \n\t\t\tObject v = __arg; \n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t\t__renderArgs.put(\"").p(arg.name).p("\", ").p(arg.name).p(");\n\t\t}\n"); 
             }
         }
         // the first argument has a default name "arg"
@@ -1073,9 +1069,9 @@ public class CodeBuilder extends TextBuilder {
         }
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (").p(argName).p(" == ").p(arg.nullVal()).p(") {");
+            p2t("if (__isDefVal(").p(argName).p(")) {");
             //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-            p(argName).p("=(").p(arg.objectType()).p(")__get(\"").p(argName).p("\",").p(arg.objectType()).p(".class) ;}\n");
+            p(argName).p(" = __get(\"").p(argName).p("\",").p(arg.objectType()).p(".class) ;}\n");
         }
         ptn("}");
     }

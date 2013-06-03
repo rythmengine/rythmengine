@@ -137,7 +137,11 @@ public class ForEachCodeToken extends BlockCodeToken {
         String varWithUtils = prefix + "__utils";
 
         String varItr = cb.newVarName();
-        p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+        if ("java.lang.Object".equals(type)) {
+            p("{\n__Itr ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+        } else {
+            p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+        }
         pline();
         p("int ").p(varSize).p(" = ").p(varItr).p(".size();");
         pline();

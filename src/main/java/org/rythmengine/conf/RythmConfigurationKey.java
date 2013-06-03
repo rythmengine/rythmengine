@@ -745,8 +745,16 @@ public enum RythmConfigurationKey {
         }
         if (isAbsolute) return new File(s);
         try {
-            URL url = Thread.currentThread().getContextClassLoader().getResource(s);
-            return new File(url.getPath());
+            if (s.startsWith("..")) {
+                URL url = Thread.currentThread().getContextClassLoader().getResource(".");
+                String path = url.getPath();
+                if (path.endsWith("/")) path = path + s;
+                else path = path + "/" + s;
+                return new File(path);
+            } else {
+                URL url = Thread.currentThread().getContextClassLoader().getResource(s);
+                return new File(url.getPath());
+            }
         } catch (Exception e) {
             throw new ConfigurationException(e, "Error reading file configuration %s", key);
         }

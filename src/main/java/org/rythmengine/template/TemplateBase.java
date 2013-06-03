@@ -450,7 +450,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             for (String s : callerRenderArgs.keySet()) {
                 if (tmpl.__renderArgs.containsKey(s)) continue;
                 Object o = callerRenderArgs.get(s);
-                if (null == o) continue;
+                if (null == o || __isDefVal(o)) continue;
                 Class<?> c = types.get(s);
 
                 if (null == c || c.isAssignableFrom(o.getClass())) {
@@ -796,7 +796,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected Map<String, Class> __renderArgTypeMap() {
         return Collections.EMPTY_MAP;
     }
-
+    
     @Override
     public ITemplate __setRenderArgs(Map<String, Object> args) {
         __renderArgs.putAll(args);
@@ -940,19 +940,34 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     public <T> T __getRenderArg(String name) {
         Object val = __renderArgs.get(name);
-        return (T) (null != val ? val : (null != __caller ? caller().__getRenderArg(name) : null));
+        //if (null == val) return null;
+        if (null != __caller) {
+            if (!__isDefVal(val)) return (T)val;
+            else return caller().__getRenderArg(name);
+        } else {
+            return (T) val;
+        }
+    }
+    
+    protected final static <T> T __get(Map<String, Object> map, String name, Class<T> cls) {
+        Object o = map.get(name);
+        return (null != o) ? (T) o : __transNull(cls);
     }
     
     protected final <T> T __get(String name, Class<T> cls) {
         Object o = __get(name);
-        if (null != o || null == cls) return (T)o;
-        if (cls.isAssignableFrom(List.class)) {
-            return (T) Collections.EMPTY_LIST;
-        } else if (cls.isAssignableFrom(Set.class)) {
-            return (T) Collections.EMPTY_SET;
-        } else if (cls.isAssignableFrom(Map.class)) {
-            return (T) Collections.EMPTY_MAP;
-        } else if (cls.equals(Integer.class)) {
+        return (null != o) ? (T) o : __transNull(cls);
+    }
+    
+    protected final static <T> T __safeCast(Object o, Class<T> cls) {
+        return (null != o) ? (T) o : __transNull(cls);
+    }
+    
+    protected final static <T> T __transNull(Class<T> cls) {
+        if (null == cls) return null; 
+        if (cls.equals(String.class)) {
+            return (T) "";
+        } if (cls.equals(Integer.class)) {
             return (T)Integer.valueOf(0);
         } else if (cls.equals(Boolean.class)) {
             return (T) Boolean.valueOf(false);
@@ -968,8 +983,22 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return (T) Byte.valueOf((byte) 0);
         } else if (cls.equals(Character.class)) {
             return (T) Character.valueOf((char) 0);
-        } 
+        }
         return null;
+    }
+    
+    protected final static boolean __isDefVal(Object o) {
+        if (null == o) return true;
+        if (o instanceof String) return ("".equals(o));
+        if (o instanceof Boolean) return (Boolean.valueOf(false).equals(o));
+        if (o instanceof Integer) return (Integer.valueOf(0).equals(o));
+        if (o instanceof Double) return (Double.valueOf(0).equals(o));
+        if (o instanceof Float) return (Float.valueOf(0).equals(o));
+        if (o instanceof Long) return (Long.valueOf(0).equals(o));
+        if (o instanceof Short) return (Short.valueOf((short)0).equals(o));
+        if (o instanceof Byte) return (Byte.valueOf((byte)0).equals(o));
+        if (o instanceof Character) return (Character.valueOf((char)0).equals(o));
+        return false;
     }
     
     /**
@@ -1008,8 +1037,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @return a render property
      */
     protected final <T> T __getRenderProperty(String name, T def) {
-        Object o = renderProperties.get(name);
-        return (T) (null == o ? def : o);
+        Object o = __renderArgs.get(name);
+        return (T) (__isDefVal(o) ? def : o);
     }
 
     /**
@@ -1050,7 +1079,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @see #__getRenderProperty(String, Object)
      */
     protected final void __setRenderProperty(String name, Object val) {
-        renderProperties.put(name, val);
+        __renderArgs.put(name, val);
     }
 
     /**

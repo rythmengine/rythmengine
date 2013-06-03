@@ -237,7 +237,7 @@ public class Token extends TextBuilder {
         String elvis = sa[1];
         if (S.isEmpty(elvis)) return s;
         elvis = elvis.replaceFirst("^\\s*\\?\\s*:\\s*", "");
-        return String.format("((null == %1$s) ? %2$s : %1$s)", s, elvis);
+        return String.format("((__isDefVal(%1$s)) ? %2$s : %1$s)", s, elvis);
     }
 
     protected final void outputExpression(List<String> nullValueTester) {
@@ -364,7 +364,7 @@ public class Token extends TextBuilder {
             if (!S.isEmpty(elvis)) {
                 // process outer elvis expression
                 elvis = elvis.replaceFirst("^\\s*\\?\\s*:\\s*", "");
-                s = String.format("((null == %1$s) ? %2$s : %1$s)", s, elvis);
+                s = String.format("((__isDefVal(%1$s)) ? %2$s : %1$s)", s, elvis);
             }
         }
         if (outerBracketsStripped) {
