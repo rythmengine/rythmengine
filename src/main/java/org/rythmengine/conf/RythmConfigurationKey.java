@@ -336,7 +336,12 @@ public enum RythmConfigurationKey {
     HOME_TMP("home.tmp.dir") {
         @Override
         protected Object getDefVal(Map<String, ?> configuration) {
-            return new File(System.getProperty("java.io.tmpdir"), "__rythm");
+            String tmp = System.getProperty("java.io.tmpdir");
+            File f =  new File(tmp, "__rythm");
+            if (!f.exists() && !f.mkdirs()) {
+                f = new File(tmp);
+            }
+            return f;
         }
     },
 
