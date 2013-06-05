@@ -136,7 +136,9 @@ public class TemplateResourceManager {
         if (file.isFile() && file.canRead()) {
             load_(file);
         } else {
-            for (File f: file.listFiles()) {
+            File[] files = file.listFiles();
+            if (null == files) return;
+            for (File f: files) {
                 scan_(f);
             }
         }
@@ -151,5 +153,9 @@ public class TemplateResourceManager {
                 return null;
             }
         });
+    }
+    
+    public void shutdown() {
+        loadingService.shutdown();
     }
 }

@@ -1,5 +1,10 @@
 package models;
 
+import org.rythmengine.RythmEngine;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: luog
@@ -19,5 +24,22 @@ public class Bar {
     }
     public String _() {
         return _;
+    }
+
+    public static void main(String... args) throws Exception {
+       Map<String, Object> config = new HashMap<String, Object>();
+ 
+       config.put("engine.mode", "dev");
+       config.put("home.template.dir", "p:/jfinal-rythm-demo/WebRoot/css");
+ 
+       final RythmEngine engine = new RythmEngine(config);
+ 
+       WL("Prod Mode:" + engine.isProdMode());
+       WL(engine.render("my.html", "brian N"));
+       //engine.shutdown();
+    }
+ 
+    public static void WL(String s) {
+       System.out.println(s);
     }
 }

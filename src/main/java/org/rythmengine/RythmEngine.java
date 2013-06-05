@@ -185,15 +185,24 @@ public class RythmEngine implements IEventDispatcher {
     private String _id = null;
 
     /**
-     * Return the instance {@link org.rythmengine.conf.RythmConfigurationKey#ENGINE_ID}
+     * Return the instance {@link org.rythmengine.conf.RythmConfigurationKey#ENGINE_ID ID}
      *
-     * @return the id
+     * @return the engine id
      */
     public String id() {
         if (null == _id) {
             _id = conf().get(RythmConfigurationKey.ENGINE_ID);
         }
         return _id;
+    }
+
+    /**
+     * Alias of {@link #id()}
+     * 
+     * @return the engine id
+     */
+    public String getId() {
+        return id();
     }
 
     /**
@@ -781,6 +790,14 @@ public class RythmEngine implements IEventDispatcher {
         if (isDevMode()) {
             resourceManager().scan(conf().templateHome());
         }
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                logger.info("Shutting down Rythm Engine [%s]", RythmEngine.this.id());
+                RythmEngine.this.shutdown();
+            }
+        });
 
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }
@@ -2015,6 +2032,13 @@ public class RythmEngine implements IEventDispatcher {
                 _secureExecutor.shutdown();
             } catch (Exception e) {
                 logger.error(e, "Error shutdown secure executor");
+            }
+        }
+        if (null != _resourceManager) {
+            try {
+                _resourceManager.shutdown();
+            } catch (Exception e) {
+                logger.error(e, "Error shutdown resource manager");
             }
         }
         if (null != shutdownListener) {
