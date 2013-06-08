@@ -213,6 +213,16 @@ public class GHIssueTest extends TestBase {
         no(null);
     }
     
+    @Test
+    public void test176() {
+        t = "@for (int i = 0; i < 10; ++i) {\n" +
+                "    @continue(i % 5)\n" +
+                "    @i\n" +
+                "}";
+        s = r(t);
+        eq("0\n5\n");
+    }
+    
     public static void main(String[] args) {
         run(GHIssueTest.class);
     }

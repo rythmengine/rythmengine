@@ -55,11 +55,17 @@ public class IfThenToken extends CodeToken {
         int size = ifthen.size();
         if (size == 0) return;
         F.T2<String, String> pair = ifthen.get(0);
-        p("if (").p(pair._1).p(") {").p(pair._2).p(";}");
+        String IF = pair._1.trim();
+        if (IF.endsWith("@")) {
+            IF = IF.substring(0, IF.length() - 1);
+            IF = "__eval(\"" + IF + "\")";
+        }
+        IF = "org.rythmengine.utils.Eval.eval(" + IF + ")";
+        p("if (").p(IF).p(") {").p(pair._2).p(";}");
         pline();
         for (int i = 1; i < size; ++i) {
             pair = ifthen.get(i);
-            p("else if (").p(pair._1).p(") {").p(pair._2).p(";}");
+            p("else if (").p(IF).p(") {").p(pair._2).p(";}");
             pline();
         }
     }
