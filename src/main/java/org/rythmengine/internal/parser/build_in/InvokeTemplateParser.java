@@ -391,12 +391,12 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             p3tline("@Override public Object __getProperty(String name) {");
             p4tline("return __getRenderArg(name); ");
             p3tline("}");
-            p3tline("@Override protected void __setBodyArgByName(String name, Object val) {");
+            p3tline("@Override protected void __setBodyArgByName(String __name, Object __val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByName(argList);
             }
             p3tline("}");
-            p3tline("@Override protected void __setBodyArgByPos(int pos, Object val) {");
+            p3tline("@Override protected void __setBodyArgByPos(int __pos, Object __val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByPos(argList);
             }
@@ -418,17 +418,15 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
 
         private void buildSetBodyArgByName(List<CodeBuilder.RenderArgDeclaration> al) {
             for (CodeBuilder.RenderArgDeclaration arg : al) {
-                p4t("if (\"").p(arg.name).p("\".equals(name)) this.").p(arg.name).p("=(").p(arg.type).p(")val;");
+                p4t("if (\"").p(arg.name).p("\".equals(__name)) this.").p(arg.name).p(" = __safeCast(__val, ").p(arg.objectType()).pn(".class);");
                 pline();
             }
         }
 
         private void buildSetBodyArgByPos(List<CodeBuilder.RenderArgDeclaration> al) {
-            p4tline("int p = 0;");
+            p4tline("int __p = 0;");
             for (CodeBuilder.RenderArgDeclaration arg : al) {
-                p4t("if (p++ == pos) { Object v = val; boolean isString = (\"java.lang.String\".equals(\"")
-                        .p(arg.type).p("\") || \"String\".equals(\"").p(arg.type).p("\")); ")
-                        .p(arg.name).p(" = (").p(arg.type).p(")(isString ? (null == v ? \"\" : v.toString()) : v); }");
+                p4t("if (__p++ == __pos) { \n\t\t\tObject v = __val; \n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t}\n"); 
                 pline();
             }
         }

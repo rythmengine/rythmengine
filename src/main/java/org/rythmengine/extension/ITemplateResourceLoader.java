@@ -24,15 +24,17 @@ import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.resource.TemplateResourceManager;
 
-
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 27/01/12
- * Time: 7:45 AM
- * To change this template use File | Settings | File Templates.
+ * Defines the behavior of a template resource loader
  */
 public interface ITemplateResourceLoader {
+
+    /**
+     * Return root path of this resource loader
+     * 
+     * @return the root path
+     */
+    String getResourceLoaderRoot();
 
     /**
      * Load template resource by path
@@ -52,22 +54,16 @@ public interface ITemplateResourceLoader {
     TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerTemplateClass);
 
     /**
-     * Return a template's tag name in full notation 
-     * 
-     * @param tc
-     * @param engine
-     * @return the tag name
-     */
-    String getFullName(TemplateClass tc, RythmEngine engine);
-
-    /**
      * Scan the folder and try to load all template files under the folder.
      * Once a resource is located, it should be passed to the 
      * {@link org.rythmengine.resource.TemplateResourceManager resource manager} by 
      * {@link org.rythmengine.resource.TemplateResourceManager#resourceLoaded(ITemplateResource)} call
      * 
-     * @param root the root folder
+     * <p>Note it is up to the loader implementation to decide the root path where
+     * to start the scan</p>
+     * 
+     * @param manager the resource manager
      */
-    void scan(String root, TemplateResourceManager manager);
+    void scan(TemplateResourceManager manager);
 
 }

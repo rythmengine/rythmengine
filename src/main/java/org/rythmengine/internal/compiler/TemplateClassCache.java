@@ -48,11 +48,12 @@ public class TemplateClassCache {
         this.mode = engine.mode();
     }
 
-    /**
-     * is class cache enabled on the {@link #engine} instance
-     */
-    private boolean enabled() {
-        return ((mode.isDev() || conf.loadPrecompiled() || conf.precompileMode()) && !RythmEngine.insideSandbox());
+    private boolean readEnabled() {
+        return (mode.isDev() || conf.loadPrecompiled()) && !RythmEngine.insideSandbox();
+    }
+    
+    private boolean writeEnabled() {
+        return (mode.isDev() || !conf.disableFileWrite() || conf.precompileMode()) && !RythmEngine.insideSandbox();
     }
 
     /**
@@ -61,6 +62,7 @@ public class TemplateClassCache {
      * @param tc The template class
      */
     public void deleteCache(TemplateClass tc) {
+        if (!writeEnabled()) return;
         try {
             File f = getCacheFile(tc);
             if (f.exists()) {
@@ -77,7 +79,7 @@ public class TemplateClassCache {
      * @param tc
      */
     public void loadTemplateClass(TemplateClass tc) {
-        if (!enabled()) {
+        if (!readEnabled()) {
             return;
         }
         try {
@@ -135,41 +137,6 @@ public class TemplateClassCache {
                 }
             } // else it must be an inner class
 
-//            read = -1;
-//            StringBuilder imported = new StringBuilder();
-//            while ((read = is.read()) != 0) {
-//                imported.append((char)read);
-//                offset++;
-//            }
-//            if (imported.length() != 0) {
-//                String s = imported.toString();
-//                String[] sa = s.split(";");
-//                tc.importPaths = new HashSet<String>();
-//                for (String path: sa) {
-//                    if ("java.lang.*".equals(path)) continue;
-//                    tc.importPaths.add(path);
-//                }
-//            }
-
-//            // --- load version info
-//            while ((read = is.read()) != 0) {
-//                if (engine.isDevMode() && engine.hotswapAgent == null && !tc.isInner()) {
-//                    tc.setVersion(read);
-//                }
-//                offset++;
-//            }
-
-//            // -- load included template classes
-//            StringBuilder included = new StringBuilder();
-//            while((read = is.read()) != 0) {
-//                included.append((char)read);
-//                offset++;
-//            }
-//            if (included.length() != 0) {
-//                String s = included.toString();
-//                tc.includeTemplateClassNames = s;
-//            }
-
             // --- load byte code
             byte[] byteCode = new byte[(int) f.length() - (offset + 2)];
             is.read(byteCode);
@@ -182,7 +149,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClassSource(TemplateClass tc) {
-        if (!enabled()) {
+        if (!writeEnabled()) {
             return;
         }
         try {
@@ -196,7 +163,7 @@ public class TemplateClassCache {
     }
 
     public void cacheTemplateClass(TemplateClass tc) {
-        if (!enabled()) {
+        if (!writeEnabled()) {
             return;
         }
         String hash = hash(tc);
@@ -231,43 +198,6 @@ public class TemplateClassCache {
                 }
                 os.write(tb.toString().getBytes("utf-8"));
             } // else the tc is an inner class thus we don't have javaSource at all
-
-//            // --- cache class version
-//            os.write(0);
-//            if (engine.reloadByIncClassVersion() && !tc.isInner()) {
-//                // find out version number
-//                final String sep = TemplateClass.CN_SUFFIX + "v";
-//                String cn = tc.name();
-//                int pos = cn.lastIndexOf(sep);
-//                String sv = cn.substring(pos + sep.length());
-//                int nv = Integer.valueOf(sv);
-//                os.write(nv);
-//            }
-
-//            // --- cache included template class names
-//            os.write(0);
-//            tc.refreshIncludeTemplateClassNames();
-//            os.write(tc.includeTemplateClassNames.getBytes("utf-8"));
-
-            //}
-
-//            // -- cache import paths
-//            os.write(0);
-//            if (tc.importPaths == null) {
-//                tc.importPaths = new HashSet<String>(0);
-//                tc.importPaths.add("java.lang.*");
-//            }
-//            TextBuilder tb = new TextBuilder();
-//            boolean  first = true;
-//            for (String s : tc.importPaths) {
-//                if (!first) {
-//                    tb.p(";");
-//                } else {
-//                    first = false;
-//                }
-//                tb.p(s);
-//            }
-//            os.write(tb.toString().getBytes("utf-8"));
 
             // --- cache byte code
             os.write(0);

@@ -162,7 +162,7 @@ public class TransformerTest extends TestBase {
     @Test
     public void testTransformerConf() {
         Map<String, Object> conf = new HashMap<String, Object>();
-        conf.put(RythmConfigurationKey.EXT_TRANSFORMER.getKey(), "org.rythmengine.advanced.TransformerTest");
+        conf.put(RythmConfigurationKey.EXT_TRANSFORMER_IMPLS.getKey(), "org.rythmengine.advanced.TransformerTest");
         Rythm.init(conf);
         
         String t = "@args String s, int i\n" +

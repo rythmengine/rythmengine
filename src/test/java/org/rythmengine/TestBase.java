@@ -19,18 +19,19 @@
 */
 package org.rythmengine;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.internal.RealSystem;
+import org.junit.runner.JUnitCore;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.TemplateBase;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.JUnitCore;
 
 import java.util.Locale;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,16 +53,17 @@ public abstract class TestBase extends Assert {
     @Before
     public void initRythm() {
         Rythm.shutdown();
-        System.setProperty(HOME_TEMPLATE.getKey(), "root");
-        System.setProperty(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
-        System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
-        System.setProperty(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
-        System.setProperty(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
-        System.setProperty(CODEGEN_COMPACT_ENABLED.getKey(), "false");
-        System.setProperty(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
-        System.getProperties().put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
-        System.setProperty("line.separator", "\n");
-        System.getProperties().put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
+        Properties prop = System.getProperties();
+        prop.put(HOME_TEMPLATE.getKey(), "root");
+        prop.put(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
+        prop.put(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
+        prop.put(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        prop.put(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
+        prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
+        prop.put("line.separator", "\n");
+        prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
         t = null;
         s = null;
     }

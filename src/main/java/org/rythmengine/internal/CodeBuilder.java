@@ -184,10 +184,6 @@ public class CodeBuilder extends TextBuilder {
     private String pName;
     private String tagName;
 
-    private boolean isTag() {
-        return null != tagName;
-    }
-
     private String initCode = null;
 
     public void setInitCode(String code) {
@@ -199,7 +195,7 @@ public class CodeBuilder extends TextBuilder {
     private String extended; // the cName of the extended template
 
     protected String extended() {
-        String defClass = isTag() ? TagBase.class.getName() : TemplateBase.class.getName();
+        String defClass = TagBase.class.getName();
         return null == extended ? defClass : extended;
     }
 
@@ -263,8 +259,8 @@ public class CodeBuilder extends TextBuilder {
 
     public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine, IDialect requiredDialect) {
         tmpl = template;
-        this.tagName = (null == tagName) ? className : tagName;
         className = className.replace('/', '.');
+        this.tagName = (null == tagName) ? className : tagName;
         cName = className;
         int i = className.lastIndexOf('.');
         if (-1 < i) {
@@ -493,7 +489,7 @@ public class CodeBuilder extends TextBuilder {
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
-            logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, engine.resourceManager().getFullTagName(extendedTemplateClass));
+            logger.warn("Template[%s]: Extended template declaration \"%s\" is deprecated, please switch to the new style \"%s\"", templateClass.getKey(), extended, extendedTemplateClass.getTagName());
         } else {
             TemplateBase tb = (TemplateBase) engine.getRegisteredTemplate(fullName);
             TemplateClass tc = tb.__getTemplateClass(false);
@@ -1070,7 +1066,6 @@ public class CodeBuilder extends TextBuilder {
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (__isDefVal(").p(argName).p(")) {");
-            //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
             p(argName).p(" = __get(\"").p(argName).p("\",").p(arg.objectType()).p(".class) ;}\n");
         }
         ptn("}");
@@ -1083,7 +1078,6 @@ public class CodeBuilder extends TextBuilder {
     }
 
     protected void pTagImpl() {
-        if (!isTag()) return;
         pn();
         pt("@Override public java.lang.String __getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }

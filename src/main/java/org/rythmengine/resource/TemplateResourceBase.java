@@ -147,11 +147,6 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     public String getSuggestedClassName() {
         return "C" + UUID.randomUUID().toString().replace('-', '_');
     }
-
-    @Override
-    public String tagName() {
-        return null;
-    }
     
     public static ICodeType getTypeOfPath(RythmEngine engine, String s) {
         String suffix = engine.conf().resourceNameSuffix();

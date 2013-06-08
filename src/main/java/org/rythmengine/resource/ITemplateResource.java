@@ -25,16 +25,14 @@ import org.rythmengine.extension.ICodeType;
 import java.io.Serializable;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 20/01/12
- * Time: 10:52 PM
- * To change this template use File | Settings | File Templates.
+ * Implement a template resource which can be load from some where. For example, a file in a
+ * file system or an input stream from the network, or even from the database
  */
 public interface ITemplateResource extends Serializable {
 
     /**
-     * The unique identifier used to fetch this resource from ResourceManager
+     * The unique identifier used to fetch this resource by a 
+     * {@link org.rythmengine.extension.ITemplateResourceLoader resource loader}
      *
      * @return the key of the resource
      */
@@ -68,13 +66,6 @@ public interface ITemplateResource extends Serializable {
      * @return true if it's a valid resource
      */
     boolean isValid();
-
-    /**
-     * Return non-null value if this resource present a tag
-     *
-     * @return tag name
-     */
-    String tagName();
 
     /**
      * Return code type suggested by this resource, e.g. html or js etc 

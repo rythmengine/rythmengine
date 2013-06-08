@@ -77,6 +77,24 @@ public class RythmConfiguration {
     }
 
     /**
+     * Return a configuration value as list
+     * @param key
+     * @param c
+     * @param <T>
+     * @return the list
+     */
+    public <T> List<T> getList(RythmConfigurationKey key, Class<T> c) {
+        Object o = data.get(key);
+        if (null == o) {
+            List<T> l = RythmConfigurationKey.getImplList(key.getKey(), raw, c);
+            data.put(key, l);
+            return l;
+        } else {
+            return (List)o;
+        }
+    }
+
+    /**
      * Look up configuration by a <code>String<code/> key. If the String key
      * can be converted into {@link RythmConfigurationKey rythm configuration key}, then
      * it is converted and call to {@link #get(RythmConfigurationKey)} method. Otherwise

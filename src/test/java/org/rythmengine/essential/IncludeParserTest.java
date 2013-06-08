@@ -28,20 +28,20 @@ import org.junit.Test;
 public class IncludeParserTest extends TestBase {
     @Test
     public void test() {
-        s = r("root/foo/includeTest.html");
-        eqf("root/foo/includeTest.result");
+        s = r("foo/includeTest.html");
+        eqf("foo/includeTest.result");
     }
     
     @Test
     public void testIncludeInlineFunction() {
-        s = r("root/foo/includeInlineFunction.html");
-        eqf("root/foo/includeInlineFunction.result");
+        s = r("foo/includeInlineFunction.html");
+        eqf("foo/includeInlineFunction.result");
     }
     
     @Test
     public void testIncludeInLayoutTemplate() {
-        s = r("root/foo/includeInLayoutTemplate.html");
-        eqf("root/foo/includeInLayoutTemplate.result");
+        s = r("foo/includeInLayoutTemplate.html");
+        eqf("foo/includeInLayoutTemplate.result");
     }
 
     public static void main(String[] args) {

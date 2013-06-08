@@ -25,6 +25,7 @@ import org.rythmengine.exception.CompileException;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.IByteCodeEnhancer;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.internal.CodeBuilder;
 import org.rythmengine.internal.IDialect;
 import org.rythmengine.logger.ILogger;
@@ -120,10 +121,28 @@ public class TemplateClass {
             } else {
                 first = false;
             }
-            sb.append(engine().resourceManager().getFullTagName(tc));
+            sb.append(tc.tagName);
         }
         includeTemplateClassNames = sb.toString();
         return sb.toString();
+    }
+
+    /**
+     * Convert the key to canonical template name
+     * @param key the resource key
+     * @param root the resource loader root path
+     * @return
+     */
+    private static String toCanonicalName(String key, String root) {
+        if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
+        if (key.startsWith(root)) {
+            key = key.replace(root, "");
+        }
+        if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
+        int pos = key.lastIndexOf(".");
+        if (-1 != pos) key = key.substring(0, pos);
+        key = key.replace('/', '.').replace('\\', '.');
+        return key;
     }
 
     private Map<String, String> includeTagTypes = new HashMap<String, String>();
@@ -164,30 +183,13 @@ public class TemplateClass {
         }
     }
 
+    private String tagName;
     /**
      * If not null then this template is a tag
      */
-    public String tagName() {
-        return null != templateResource ? templateResource.tagName() : null;
+    public String getTagName() {
+        return tagName;
     }
-
-    transient private String fullName;
-
-    public void setFullName(String fn) {
-        fullName = fn;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-    
-    public String getFullName(boolean resolve) {
-        if (null == fullName) {
-            fullName = engine().resourceManager().getFullTagName(this);
-        }
-        return fullName;
-    }
-
     /**
      * the template resource
      */
@@ -272,6 +274,15 @@ public class TemplateClass {
     private TemplateBase templateInstance;
 
     /**
+     * Store the resource loader class name
+     */
+    private String resourceLoaderClass;
+    
+    public String getResourceLoaderClass() {
+        return resourceLoaderClass;
+    }
+
+    /**
      * specify the dialect for the template
      */
     transient private IDialect dialect;
@@ -337,8 +348,8 @@ public class TemplateClass {
      *
      * @return
      */
-    public Object getKey() {
-        return null == templateResource ? name() : templateResource.getKey();
+    public String getKey() {
+        return null == templateResource ? name() : templateResource.getKey().toString();
     }
 
     @SuppressWarnings("unchecked")
@@ -440,7 +451,7 @@ public class TemplateClass {
         importPaths = new HashSet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
-        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, dialect);
+        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, this, engine, dialect);
         codeBuilder.includingCName = includingClassName;
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
@@ -456,9 +467,9 @@ public class TemplateClass {
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
         if (null == dialect)
-            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine, null);
+            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, this, engine, null);
         else
-            codeBuilder = dialect.createCodeBuilder(templateResource.asTemplateContent(), name(), tagName(), this, engine);
+            codeBuilder = dialect.createCodeBuilder(templateResource.asTemplateContent(), name(), tagName, this, engine);
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();
@@ -492,6 +503,7 @@ public class TemplateClass {
         if (refreshing()) return false;
         if (inner) return false;
         refreshing(true);
+        final ITemplateResource templateResource = this.templateResource;
         try {
             RythmEngine engine = engine();
             if (!templateResource.isValid()) {
@@ -514,6 +526,11 @@ public class TemplateClass {
                 name = templateResource.getSuggestedClassName() + CN_SUFFIX;
                 if (engine.conf().typeInferenceEnabled()) {
                     name += ParamTypeInferencer.uuid();
+                }
+                ITemplateResourceLoader loader = engine().resourceManager().whichLoader(templateResource);
+                if (null != loader) {
+                    Object k = templateResource.getKey();
+                    tagName = toCanonicalName(k.toString(), loader.getResourceLoaderRoot());
                 }
                 //name = templateResource.getSuggestedClassName();
                 engine.registerTemplateClass(this);

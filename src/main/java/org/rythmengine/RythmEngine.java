@@ -56,7 +56,6 @@ import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -652,143 +651,15 @@ public class RythmEngine implements IEventDispatcher {
             }
         });
 
-        Object o = _conf.get(RythmConfigurationKey.EXT_TRANSFORMER);
-        if (null != o) {
-            List<Class> udts = new ArrayList<Class>();
-            if (o.getClass().isArray()) {
-                int len = Array.getLength(o);
-                for (int i = 0; i < len; ++i) {
-                    Object e = Array.get(o, i);
-                    if (e instanceof Class) {
-                        udts.add((Class) e);
-                    } else if (null != e) {
-                        String s = e.toString();
-                        try {
-                            udts.add(Class.forName(s));
-                        } catch (ClassNotFoundException ce) {
-                            logger.warn("User defined transformer class not found: %s", s);
-                        }
-                    }
-                }
-            } else if (o instanceof List) {
-                List l = (List) o;
-                for (Object e : l) {
-                    if (e instanceof Class) {
-                        udts.add((Class) e);
-                    } else if (null != e) {
-                        String s = e.toString();
-                        try {
-                            udts.add(Class.forName(s));
-                        } catch (ClassNotFoundException ce) {
-                            logger.warn("User defined transformer class not found: %s", s);
-                        }
-                    }
-                }
-            } else if (o instanceof Class) {
-                udts.add((Class) o);
-            } else {
-                String s = o.toString();
-                for (String tc : s.split("[, \t]+")) {
-                    try {
-                        Class c = Class.forName(tc);
-                        udts.add(c);
-                    } catch (ClassNotFoundException e) {
-                        logger.warn("User defined transformer class not found: %s", tc);
-                    }
-                }
-            }
-            registerTransformer(udts.toArray(new Class[]{}));
-        }
 
-        o = _conf.get(RythmConfigurationKey.EXT_PROP_ACCESSOR);
-        if (null != o) {
-            List<IPropertyAccessor> udpa = new ArrayList<IPropertyAccessor>();
-            if (o instanceof IPropertyAccessor) {
-                udpa.add((IPropertyAccessor) o);
-            } else if (o.getClass().isArray()) {
-                int len = Array.getLength(o);
-                for (int i = 0; i < len; ++i) {
-                    Object e = Array.get(o, i);
-                    if (e instanceof IPropertyAccessor) {
-                        udpa.add((IPropertyAccessor) e);
-                    } else {
-                        Class c = null;
-                        if (e instanceof Class) {
-                            c = (Class) e;
-                        } else if (null != e) {
-                            String s = e.toString();
-                            try {
-                                c = Class.forName(s);
-                            } catch (ClassNotFoundException ce) {
-                                logger.warn("User defined property accessor class not found: %s", s);
-                            }
-                        }
-                        if (null != c) {
-                            try {
-                                IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
-                                udpa.add(a);
-                            } catch (Exception ce) {
-                                logger.warn("Invalid user defined property accessor class: %s", c);
-                            }
-                        }
-                    }
-                }
-            } else if (o instanceof List) {
-                List l = (List) o;
-                for (Object e : l) {
-                    if (e instanceof IPropertyAccessor) {
-                        udpa.add((IPropertyAccessor) e);
-                    } else {
-                        Class c = null;
-                        if (e instanceof Class) {
-                            c = (Class) e;
-                        } else if (null != e) {
-                            String s = e.toString();
-                            try {
-                                c = Class.forName(s);
-                            } catch (ClassNotFoundException ce) {
-                                logger.warn("User defined property accessor class not found: %s", s);
-                            }
-                        }
-                        if (null != c) {
-                            try {
-                                IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
-                                udpa.add(a);
-                            } catch (Exception ce) {
-                                logger.warn("Invalid user defined property accessor class: %s", c);
-                            }
-                        }
-                    }
-                }
-            } else if (o instanceof Class) {
-                Class c = (Class) o;
-                try {
-                    IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
-                    udpa.add(a);
-                } catch (Exception ce) {
-                    logger.warn("Invalid user defined property accessor class: %s", c);
-                }
-            } else {
-                String s = o.toString();
-                for (String tc : s.split("[, \t]+")) {
-                    try {
-                        Class c = Class.forName(tc);
-                        try {
-                            IPropertyAccessor a = (IPropertyAccessor) c.newInstance();
-                            udpa.add(a);
-                        } catch (Exception ce) {
-                            logger.warn("Invalid user defined property accessor class: %s", c);
-                        }
-                    } catch (ClassNotFoundException e) {
-                        logger.warn("User defined property accessor class not found: %s", tc);
-                    }
-                }
-            }
-            registerPropertyAccessor(udpa.toArray(new IPropertyAccessor[]{}));
-        }
+        List<Class> udts = _conf.getList(RythmConfigurationKey.EXT_TRANSFORMER_IMPLS, Class.class);
+        registerTransformer(udts.toArray(new Class[]{}));
+
+        List<IPropertyAccessor> udpa = _conf.getList(RythmConfigurationKey.EXT_PROP_ACCESSOR_IMPLS, IPropertyAccessor.class);
+        registerPropertyAccessor(udpa.toArray(new IPropertyAccessor[]{}));
 
         if (isDevMode()) {
-            resourceManager().scan(conf().templateHome());
+            resourceManager().scan();
         }
         
         Runtime.getRuntime().addShutdownHook(new Thread(){
@@ -909,6 +780,10 @@ public class RythmEngine implements IEventDispatcher {
             }
         });
     }
+    
+    public void registerResourceLoader(ITemplateResourceLoader... loaders) {
+        
+    }
 
     /* -----------------------------------------------------------------------------
       Rendering methods and APIs
@@ -952,7 +827,6 @@ public class RythmEngine implements IEventDispatcher {
     //static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
 
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
-        //set(this);
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
@@ -966,21 +840,9 @@ public class RythmEngine implements IEventDispatcher {
         TemplateClass tc = classes().getByTemplate(key);
         if (null == tc) {
             tc = new TemplateClass(template, this, dialect);
-            //classes().add(key, tc);
         }
         ITemplate t = tc.asTemplate(this);
-        String fullTagName = tc.getFullName(true);
-        //_templates.put(fullTagName, t);
         setRenderArgs(t, args);
-//        try {
-//            __setRenderArgs(t, args);
-//        } catch (ClassCastException ce) {
-//            if (mode.isDev()) {
-//                handleCCE(ce);
-//                return getTemplate(dialect, template, args);
-//            }
-//            throw ce;
-//        }
         return t;
     }
 
@@ -1049,9 +911,7 @@ public class RythmEngine implements IEventDispatcher {
             tc = new TemplateClass(file, this);
             t = tc.asTemplate(this);
             if (null == t) return null;
-            String fullTagName = resourceManager().getFullTagName(tc);
-            tc.setFullName(fullTagName);
-            _templates.put(fullTagName, t);
+            _templates.put(tc.getKey(), t);
             //classes().add(key, tc);
         } else {
             t = tc.asTemplate(this);
@@ -1498,8 +1358,6 @@ public class RythmEngine implements IEventDispatcher {
      * @return this engine instance
      */
     public RythmEngine registerTemplateClass(TemplateClass tc) {
-        String fullName = resourceManager().getFullTagName(tc);
-        tc.setFullName(fullName);
         classes().add(tc);
         return this;
     }
@@ -1515,7 +1373,7 @@ public class RythmEngine implements IEventDispatcher {
      */
     public String testTemplate(String name, TemplateClass callerClass) {
         if (Keyword.THIS.toString().equals(name)) {
-            return resourceManager().getFullTagName(callerClass);
+            return callerClass.getTagName();
         }
         if (mode().isProd() && _nonTmpls.contains(name)) return null;
         if (templateRegistered(name)) return name;
@@ -1529,17 +1387,19 @@ public class RythmEngine implements IEventDispatcher {
         // try relative path
         // TODO: handle logic error here, caller foo.bar.html, tag: zee
         // then should try foo.zee.html, if tag is zee.js, then should try foo.zee.js
-        String callerName = resourceManager().getFullTagName(callerClass);
-        int pos = callerName.lastIndexOf(".");
-        if (-1 != pos) {
-            String s = callerName.substring(0, pos);
-            String name0 = s + "." + name;
-            if (_templates.containsKey(name0)) return name0;
-            pos = s.lastIndexOf(".");
+        String callerName = callerClass.getTagName();
+        if (null != callerName) {
+            int pos = callerName.lastIndexOf(".");
             if (-1 != pos) {
-                s = callerName.substring(0, pos);
-                name0 = s + "." + name;
+                String s = callerName.substring(0, pos);
+                String name0 = s + "." + name;
                 if (_templates.containsKey(name0)) return name0;
+                pos = s.lastIndexOf(".");
+                if (-1 != pos) {
+                    s = callerName.substring(0, pos);
+                    name0 = s + "." + name;
+                    if (_templates.containsKey(name0)) return name0;
+                }
             }
         }
 
@@ -1550,7 +1410,7 @@ public class RythmEngine implements IEventDispatcher {
                 if (mode().isProd()) _nonTmpls.add(name);
                 return null;
             }
-            String fullName = tc.getFullName();
+            String fullName = tc.getTagName();
             return fullName;
         } catch (TagLoadException e) {
             throw e;
@@ -1577,7 +1437,7 @@ public class RythmEngine implements IEventDispatcher {
         if (template instanceof JavaTagBase) {
             name = template.__getName();
         } else {
-            name = template.__getTemplateClass(false).getFullName();
+            name = template.__getTemplateClass(false).getTagName();
         }
         registerTemplate(name, template);
     }
@@ -1661,8 +1521,9 @@ public class RythmEngine implements IEventDispatcher {
 
                 // try relative path
                 if (null == t) {
-                    String callerName = resourceManager().getFullTagName(tc);
-                    int pos = callerName.lastIndexOf(".");
+                    String callerName = tc.getTagName();
+                    int pos = -1;
+                    if (null != callerName) pos = callerName.lastIndexOf(".");
                     if (-1 != pos) {
                         String name0 = callerName.substring(0, pos) + "." + name;
                         t = _tags.get(name0);
@@ -1673,7 +1534,7 @@ public class RythmEngine implements IEventDispatcher {
                 // try load the tag from resource
                 if (null == t) {
                     tc = resourceManager().tryLoadTemplate(name, tc);
-                    if (null != tc) t = _templates.get(tc.getFullName());
+                    if (null != tc) t = _templates.get(tc.getTagName());
                     if (null == t) {
                         if (ignoreNonExistsTag) {
                             if (logger.isDebugEnabled()) {

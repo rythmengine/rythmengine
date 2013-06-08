@@ -66,8 +66,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
         for (String argName : renderArgs.keySet()) {
             RenderArgDeclaration arg = renderArgs.get(argName);
             p2t("if (").p(argName).p(" == null) {");
-            //p("\n\tif (").p(argName).p(" == ").p(RenderArgDeclaration.defVal(arg.type)).p(") {");
-            p(argName).p("=(").p(arg.type).p(")__get(\"").p(argName).p("\");}\n");
+            p(argName).p("=(").p(arg.objectType()).p(")__get(\"").p(argName).p("\");}\n");
         }
         ptn("}");
     }

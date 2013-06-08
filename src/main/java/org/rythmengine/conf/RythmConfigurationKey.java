@@ -27,11 +27,14 @@ import org.rythmengine.exception.ConfigurationException;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.IDurationParser;
 import org.rythmengine.extension.II18nMessageResolver;
+import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.JDKLogger;
+import org.rythmengine.logger.Logger;
 import org.rythmengine.sandbox.SandboxThreadFactory;
 import org.rythmengine.utils.S;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.*;
 
@@ -307,7 +310,7 @@ public enum RythmConfigurationKey {
     
 
     /**
-     * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPL}
+     * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPLS}
      * is not configured, therefore the {@link org.rythmengine.resource.TemplateResourceManager} will
      * try to load {@link org.rythmengine.resource.FileTemplateResource} from this template home dir
      * configured.
@@ -458,16 +461,16 @@ public enum RythmConfigurationKey {
     RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
 
     /**
-     * "resource.loader.impl": The {@link org.rythmengine.extension.ITemplateResourceLoader resource loader}
-     * implementation
-     * <p>Default value: <code>null</code>. But if this is not configured, try templates will be loaded as
+     * "resource.loader.impls": Set one or more {@link org.rythmengine.extension.ITemplateResourceLoader resource loader}
+     * implementation, should be a list of class names separated by ",", or list of resource loader instance
+     * <p>Default value: <code>null</code>. If this is not configured, try templates will be loaded as
      * {@link org.rythmengine.resource.FileTemplateResource file template resource} first and if
      * still not found then try to load as
      * {@link org.rythmengine.resource.ClasspathTemplateResource classpath resource}.</p>
      *
      * @see #HOME_TEMPLATE
      */
-    RESOURCE_LOADER_IMPL("resource.loader.impl"),
+    RESOURCE_LOADER_IMPLS("resource.loader.impls"),
 
     /**
      * "resource.name.suffix": does resource name has special rythm suffix attached? 
@@ -610,18 +613,19 @@ public enum RythmConfigurationKey {
      * then {@link org.rythmengine.RythmEngine#registerTransformer(Class[]) RythmEngine.registerTransformer} will
      * be called to register these user defined transformer classes. Default value: <code>null</code>
      */
-    EXT_TRANSFORMER("ext.transformer"),
+    EXT_TRANSFORMER_IMPLS("ext.transformer.impls"),
     
     /**
      * "ext.prop_accessor": User defined property accessors, should be a list of class names separated by ",". If configured
      * then {@link org.rythmengine.RythmEngine#registerPropertyAccessor(org.rythmengine.extension.IPropertyAccessor...)}  RythmEngine.registerPropertyAccessor} will
      * be called to register these user defined property accessor classes. Default value: <code>null</code>
      */
-    EXT_PROP_ACCESSOR("ext.prop_accessor");
+    EXT_PROP_ACCESSOR_IMPLS("ext.prop_accessor.impls");
     
 
     private String key;
     private Object defVal;
+    private static ILogger logger = Logger.get(RythmConfigurationKey.class);
 
     private RythmConfigurationKey(String key) {
         this(key, null);
@@ -676,7 +680,7 @@ public enum RythmConfigurationKey {
         return l;
     }
     
-    private Object getValFromAliases(Map<String, ?> configuration, String key, String suffix) {
+    private static Object getValFromAliases(Map<String, ?> configuration, String key, String suffix, Object defVal) {
         Object v = configuration.get(key);
         if (null == v) {
             for (String k0 : aliases(key, suffix)) {
@@ -685,7 +689,7 @@ public enum RythmConfigurationKey {
             }
             if (null == v) {
                 // still not found, load default value
-                v = getDefVal(configuration);
+                v = defVal;
             }
         }
         return v;
@@ -697,17 +701,17 @@ public enum RythmConfigurationKey {
         return Boolean.parseBoolean(v.toString());
     } 
 
-    private Boolean getEnabled(String key, Map<String, ?> configuration) {
-        Object v = getValFromAliases(configuration, key, "enabled");
+    private static Boolean getEnabled(String key, Map<String, ?> configuration, Object defVal) {
+        Object v = getValFromAliases(configuration, key, "enabled", defVal);
         if (null == v) {
-            v = getValFromAliases(configuration, key, "disabled");
+            v = getValFromAliases(configuration, key, "disabled", defVal);
             return !toBoolean(v);
         }
         return toBoolean(v);
     }
     
-    private <T> T getImpl(String key, Map<String, ?> configuration) {
-        Object v = getValFromAliases(configuration, key, "impl");
+    private static <T> T getImpl(String key, Map<String, ?> configuration, Object defVal) {
+        Object v = getValFromAliases(configuration, key, "impl", defVal);
         if (null == v) return null;
         if (v instanceof Class) {
             try {
@@ -734,9 +738,135 @@ public enum RythmConfigurationKey {
             }
         }
     }
+    
+    private static <T> T newInstance(String key, Class c, Class<T> expectedClass) {
+        if (!expectedClass.isAssignableFrom(c)) {
+            logger.warn("Mismatched type found for configuration %s", key);
+            return null;
+        }
+        try {
+            return (T)c.newInstance();
+        } catch (Exception e) {
+            logger.warn(e, "Cannot create new instance for configuration %s", key);
+            return null;
+        }
+    }
 
-    private File getFile(String key, Map<String, ?> configuration) {
-        Object v = getValFromAliases(configuration, key, "dir");
+    public static <T> List<T> getImplList(String key, Map<String, ?> configuration, Class<T> c) {
+        final Object v = getValFromAliases(configuration, key, "impls", null);
+        if (null == v) return Collections.EMPTY_LIST;
+        final boolean needClass = (Class.class.isAssignableFrom(c));
+        final List<T> l = new ArrayList<T>();
+        final Class vc = v.getClass();
+        if (c.isAssignableFrom(vc)) {
+            l.add((T)v);
+            return l;
+        }
+        if (v instanceof Class) {
+            if (needClass) {
+                l.add((T)v);
+            } else {
+                T inst = newInstance(key, (Class) v, c);
+                if (null != inst) {
+                    l.add(inst);
+                }
+            }
+            return l;
+        }
+        if (vc.isArray()) {
+            int len = Array.getLength(v);
+            for (int i = 0; i < len; ++i) {
+                Object el = Array.get(v, i);
+                if (null == el) {
+                    continue;
+                }
+                Class elc = el.getClass();
+                if (c.isAssignableFrom(elc)) {
+                    l.add((T)el);
+                } else if (el instanceof Class) {
+                    if (needClass) {
+                        l.add((T)el);
+                    } else {
+                        T inst = newInstance(key, (Class) el, c);
+                        if (null != inst) {
+                            l.add(inst);
+                        }
+                    }
+                } else {
+                    try {
+                        elc = Class.forName(el.toString());
+                        if (needClass) {
+                            l.add((T)elc);
+                        } else {
+                            T inst = newInstance(key, elc, c);
+                            if (null != inst) {
+                                l.add(inst);
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.warn(e, "Error getting impl class out from %s for configuration %s", el, key);
+                    }
+                }
+            }
+            return l;
+        } else if (Collection.class.isAssignableFrom(vc)) {
+            Collection col = (Collection)v;
+            for (Object el : col) {
+                if (null == el) {
+                    continue;
+                }
+                Class elc = el.getClass();
+                if (c.isAssignableFrom(elc)) {
+                    l.add((T)el);
+                } else if (el instanceof Class) {
+                    if (needClass) {
+                        l.add((T)el);
+                    } else {
+                        T inst = newInstance(key, (Class) el, c);
+                        if (null != inst) {
+                            l.add(inst);
+                        }
+                    }
+                } else {
+                    try {
+                        elc = Class.forName(el.toString());
+                        if (needClass) {
+                            l.add((T) elc);
+                        } else {
+                            T inst = newInstance(key, elc, c);
+                            if (null != inst) {
+                                l.add(inst);
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.warn(e, "Error getting impl class out from %s for configuration %s", el, key);
+                    }
+                }
+            }
+            return l;
+        }
+        
+        for (String s: v.toString().split("[ \t,;]+")) {
+            try {
+                Class ec = Class.forName(s);
+                if (needClass) {
+                    l.add((T) ec);
+                } else {
+                    T inst = newInstance(key, ec, c);
+                    if (null != inst) {
+                        l.add(inst);
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn(e, "Error getting impl class out from %s for configuration %s", s, key);
+            }
+        }
+        
+        return l;
+    }
+
+    private static File getFile(String key, Map<String, ?> configuration, Object defVal) {
+        Object v = getValFromAliases(configuration, key, "dir", defVal);
         if (null == v) return null;
         if (v instanceof File) {
             return (File) v;
@@ -775,16 +905,17 @@ public enum RythmConfigurationKey {
      */
     public <T> T getConfiguration(Map<String, ?> configuration) {
         String key = this.key;
+        Object defVal = getDefVal(configuration);
         if (key.endsWith(".enabled")) {
-            return (T) getEnabled(key, configuration);
+            return (T) getEnabled(key, configuration, defVal);
         }
         if (key.endsWith(".impl")) {
-            return getImpl(key, configuration);
+            return getImpl(key, configuration, defVal);
         }
         if (key.endsWith(".dir")) {
-            return (T) getFile(key, configuration);
+            return (T) getFile(key, configuration, defVal);
         }
-        return (T) getValFromAliases(configuration, key, null);
+        return (T) getValFromAliases(configuration, key, null, defVal);
     }
 
     /**

@@ -19,19 +19,20 @@
 */
 package org.rythmengine.essential;
 
+import models.JavaBean;
+import models.MyPropertyAccessor;
 import org.junit.Test;
-import org.mvel2.integration.PropertyHandler;
-import org.mvel2.integration.PropertyHandlerFactory;
-import org.mvel2.integration.VariableResolverFactory;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.IPropertyAccessor;
 import org.rythmengine.utils.S;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.rythmengine.conf.RythmConfigurationKey.EXT_PROP_ACCESSOR_IMPLS;
 import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static org.rythmengine.utils.NamedParams.from;
 import static org.rythmengine.utils.NamedParams.p;
@@ -91,70 +92,16 @@ public class ExpressionTest extends TestBase {
         eq("bar");
     }
     
-    public static class JavaBean {
-        private String id;
-        private int count;
-        private boolean enabled;
-        private Date date;
-        private Map<String, Object> attrs;
-        public JavaBean(String id, int count, boolean enabled, Date date) {
-            this.id  = id;
-            this.count = count;
-            this.enabled = enabled;
-            this.date = date;
-            attrs = new HashMap<String, Object>();
-        }
-        public String getId() {
-            return id;
-        }
-        public int getCount() {
-            return count;
-        }
-        public boolean isEnabled() {
-            return enabled;
-        }
-        public Date getDate() {
-            return date;
-        }
-        public void set(String key, Object val) {
-            attrs.put(key, val);
-        }
-        public Object get(String key) {
-            return attrs.get(key);
-        }
-    }
-    
     @Test
     public void testDynamicExpr() {
         System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
+        System.getProperties().put(EXT_PROP_ACCESSOR_IMPLS.getKey(), new IPropertyAccessor[]{new MyPropertyAccessor()});
         Date today = new Date();
         JavaBean bean = new JavaBean("foo", 11, true, today);
         bean.set("engine", "Rythm");
         t = "@b?.getId()|@b.count@|@b.enabled@|@b.engine@|@b.date.format()@";
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("b", bean);
-        PropertyHandlerFactory.registerPropertyHandler(JavaBean.class, new PropertyHandler() {
-            @Override
-            public Object getProperty(String name, Object contextObj, VariableResolverFactory variableFactory) {
-                JavaBean jb = (JavaBean)contextObj;
-                if ("id".equals(name)) {
-                    return jb.getId();
-                } else if ("count".equals(name)) {
-                    return jb.getCount();
-                } else if ("enabled".equals(name)) {
-                    return jb.isEnabled();
-                } else if ("date".equals(name)) {
-                    return jb.getDate();
-                }
-                return jb.get(name);
-            }
-
-            @Override
-            public Object setProperty(String name, Object contextObj, VariableResolverFactory variableFactory, Object value) {
-                ((JavaBean) contextObj).set("name", value);
-                return null;
-            }
-        });
         s = r(t, params);
         contains("foo|11|true|Rythm");
         contains(S.format(today));
