@@ -45,8 +45,8 @@ public class TemplateResourceManager {
     private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
 
     private List<ITemplateResourceLoader> loaders;
-    private ITemplateResourceLoader fileLoader;
-    private Iterable<ITemplateResourceLoader> allLoaders;
+    
+    private FileResourceLoader adhocFileLoader = null;
 
     // the <key, loader> map allows 
     private Map<Object, ITemplateResourceLoader> whichLoader = new HashMap<Object, ITemplateResourceLoader>();
@@ -56,36 +56,15 @@ public class TemplateResourceManager {
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
         RythmConfiguration conf = engine.conf();
-        loaders = conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class);
-        fileLoader = new FileResourceLoader(engine);
-        allLoaders = new Iterable<ITemplateResourceLoader>() {
-            @Override
-            public Iterator<ITemplateResourceLoader> iterator() {
-                return new Iterator<ITemplateResourceLoader>() {
-                    private int cursor;
-                    private int size = loaders.size() + 1;
-                    public boolean hasNext() {
-                        return cursor < size;
-                    }
-
-                    @Override
-                    public ITemplateResourceLoader next() {
-                        if (cursor < size - 1) {
-                            return loaders.get(cursor++);
-                        } else {
-                            cursor++;
-                            return fileLoader;
-                        }
-                    }
-
-                    @Override
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        loaders = new ArrayList(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
+        List<File> roots = conf.templateHome();
+        for (File root : roots) {
+            FileResourceLoader frl = new FileResourceLoader(engine, root);
+            if (null == adhocFileLoader) {
+                adhocFileLoader = frl;
             }
-        };
-        
+            loaders.add(frl);
+        }
         typeInference = conf.typeInferenceEnabled();
     }
 
@@ -99,7 +78,7 @@ public class TemplateResourceManager {
     public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass) {
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
-        for (ITemplateResourceLoader loader : allLoaders) {
+        for (ITemplateResourceLoader loader : loaders) {
             tc = loader.tryLoadTemplate(tmplName, engine, callerClass);
             if (null != tc) {
                 break;
@@ -109,12 +88,12 @@ public class TemplateResourceManager {
     }
     
     public ITemplateResource get(File file) {
-        return cache(new FileTemplateResource(file, engine));
+        return cache(new FileTemplateResource(file, adhocFileLoader));
     }
 
     public ITemplateResource get(String str) {
         ITemplateResource resource = getResource(str);
-        if (!resource.isValid()) resource = new StringTemplateResource(str, engine);
+        if (!resource.isValid()) resource = new StringTemplateResource(str);
         return cache(resource);
     }
 
@@ -126,7 +105,7 @@ public class TemplateResourceManager {
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
 
-        for (ITemplateResourceLoader loader : allLoaders) {
+        for (ITemplateResourceLoader loader : loaders) {
             resource = loader.load(str);
             if (null != resource && resource.isValid()) {
                 whichLoader.put(resource.getKey(), loader);
@@ -138,25 +117,26 @@ public class TemplateResourceManager {
     }
     
     public void scan() {
-        for (ITemplateResourceLoader loader : allLoaders) {
+        for (ITemplateResourceLoader loader : loaders) {
             loader.scan(this);
         }
     }
 
-    public void resourceLoaded(final ITemplateResource resource, final ITemplateResourceLoader loader) {
-        resourceLoaded(resource, loader, true);
+    public void resourceLoaded(final ITemplateResource resource) {
+        resourceLoaded(resource, true);
     }
     
-    public TemplateClass resourceLoaded(final ITemplateResource resource, final ITemplateResourceLoader loader, boolean async) {
+    public TemplateClass resourceLoaded(final ITemplateResource resource, boolean async) {
+        final ITemplateResourceLoader loader = resource.getLoader();
         if (!async) {
             whichLoader.put(resource.getKey(), loader);
-            return resourceLoaded(resource);
+            return _resourceLoaded(resource);
         } else {
             loadingService.submit(new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
                     whichLoader.put(resource.getKey(), loader);
-                    resourceLoaded(resource);
+                    _resourceLoaded(resource);
                     return null;
                 }
             });
@@ -164,7 +144,7 @@ public class TemplateResourceManager {
         }
     }
     
-    private TemplateClass resourceLoaded(ITemplateResource resource) {
+    private TemplateClass _resourceLoaded(ITemplateResource resource) {
         if (!resource.isValid()) return null;
         String key = S.str(resource.getKey());
         if (typeInference) {

@@ -19,7 +19,6 @@
 */
 package org.rythmengine.resource;
 
-import org.rythmengine.RythmEngine;
 import org.rythmengine.utils.IO;
 
 import java.io.File;
@@ -37,39 +36,21 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return 1000 * 5;
     }
 
-    public FileTemplateResource(String path) {
-        this(path, null);
-    }
-
-    public FileTemplateResource(String path, RythmEngine engine) {
-        super(engine);
+    public FileTemplateResource(String path, FileResourceLoader loader) {
+        super(loader);
         File f = new File(path);
-        if (null == f || !f.canRead()) {
-            File home = engine().conf().templateHome();
-            if (null != home) {
-                f = new File(home, path);
-            }
+        if (!isValid(f)) {
+            File home = loader.getRoot();
+            f = new File(home, path);
         }
         file = f;
-        key = path.replace("\\", "/");
+        key = path.replace('\\', '/');
     }
 
-    public FileTemplateResource(File templateFile) {
-        this(templateFile, null);
-    }
-
-    public FileTemplateResource(File templateFile, RythmEngine engine) {
-        super(engine);
-        file = templateFile;
-        key = file.getPath();
-        File home = engine().conf().templateHome();
-        String homePath = null == home ? null : home.getPath();
-        if (null != homePath && key.startsWith(homePath)) {
-            key = key.replace(homePath, "");
-            if (key.startsWith("/") || key.startsWith("\\")) {
-                key = key.substring(1);
-            }
-        }
+    FileTemplateResource(File file, FileResourceLoader loader) {
+        super(loader);
+        this.file = file;
+        this.key = file.getPath().replace('\\', '/');
     }
 
     @Override
@@ -82,9 +63,13 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return file.lastModified();
     }
 
+    protected boolean isValid(File file) {
+        return null != file && !file.isDirectory() && file.canRead();
+    }
+
     @Override
     public boolean isValid() {
-        return null != file && !file.isDirectory() && file.canRead();
+        return isValid(file);
     }
 
     @Override

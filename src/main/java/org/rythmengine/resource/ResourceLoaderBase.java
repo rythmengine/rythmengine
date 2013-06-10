@@ -19,6 +19,16 @@ import java.util.List;
 public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
 
     protected static ILogger logger = Logger.get(ResourceLoaderBase.class);
+    
+    private RythmEngine engine;
+    
+    public RythmEngine getEngine() {
+        return this.engine;
+    }
+
+    public void setEngine(RythmEngine engine) {
+        this.engine = engine;
+    }
 
     public String getFullName(TemplateClass tc) {
         String key = tc.getKey().toString();
@@ -92,7 +102,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         }
 
         final List<String> roots = new ArrayList<String>();
-        final String root0 = getResourceLoaderRoot();
+        final String root0 = "";
         roots.add(root0);
 
         // call tag with import path
@@ -108,7 +118,9 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         int pos = currentPath.lastIndexOf("/");
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
-            if (currentPath.startsWith("/")) currentPath = currentPath.substring(1);
+            if (currentPath.startsWith("/")) {
+                currentPath = currentPath.substring(1);
+            }            
             if (!currentPath.startsWith(root0)) currentPath = root0 + "/" + currentPath;
             roots.add(currentPath);
         }
@@ -121,7 +133,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                 if (null == resource || !resource.isValid()) {
                     continue;
                 }
-                TemplateClass tc = engine.resourceManager().resourceLoaded(resource, this, false);
+                TemplateClass tc = engine.resourceManager().resourceLoaded(resource, false);
 //                TemplateClass tc = engine.classes().getByTemplate(resource.getKey(), false);
 //                if (null == tc) {
 //                    tc = new TemplateClass(resource, engine);

@@ -19,7 +19,6 @@
 */
 package org.rythmengine.resource;
 
-import org.rythmengine.RythmEngine;
 import org.rythmengine.internal.dialect.AutoToString;
 
 import java.io.UnsupportedEncodingException;
@@ -37,11 +36,6 @@ public class ToStringTemplateResource extends TemplateResourceBase implements IT
     private AutoToString.AutoToStringData meta;
 
     public ToStringTemplateResource(AutoToString.AutoToStringData data) {
-        meta = data;
-    }
-
-    public ToStringTemplateResource(AutoToString.AutoToStringData data, RythmEngine engine) {
-        super(engine);
         meta = data;
     }
 

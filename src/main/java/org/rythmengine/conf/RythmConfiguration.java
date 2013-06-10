@@ -412,14 +412,14 @@ public class RythmConfiguration {
         return _tmpDir;
     }
 
-    private File _templateHome = null;
+    private List<File> _templateHome = null;
 
     /**
      * Return {@link RythmConfigurationKey#HOME_TEMPLATE} without lookup
      *
      * @return template home
      */
-    public File templateHome() {
+    public List<File> templateHome() {
         if (null == _templateHome) {
             _templateHome = get(RythmConfigurationKey.HOME_TEMPLATE);
         }

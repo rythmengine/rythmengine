@@ -21,6 +21,7 @@ package org.rythmengine.tag;
 
 import org.rythmengine.TestBase;
 import org.junit.Test;
+import org.rythmengine.conf.RythmConfigurationKey;
 
 /**
  * Test invoke other templates
@@ -116,6 +117,14 @@ public class InvokeTemplateTest extends TestBase {
     public void testTagWithCallback() {
         s = r("testTagWithCallback.html", "abc");
         eqf("testTagWithCallback.result");
+    }
+    
+    @Test
+    public void testMultipleRoot() {
+        System.setProperty(RythmConfigurationKey.HOME_TEMPLATE.getKey(), "root, root2");
+        t = "@x.voo()";
+        s = r(t);
+        eq("voo");
     }
 
     public static void main(String[] args) {

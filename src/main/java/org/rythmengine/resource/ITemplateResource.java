@@ -21,6 +21,7 @@ package org.rythmengine.resource;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.ITemplateResourceLoader;
 
 import java.io.Serializable;
 
@@ -72,12 +73,12 @@ public interface ITemplateResource extends Serializable {
      * 
      * @return code type suggested
      */
-    ICodeType codeType();
+    ICodeType codeType(RythmEngine engine);
 
     /**
-     * Set engine instance to the resource
-     * @param engine
+     * Return the loader that loaded this resource
+     * @return
      */
-    void setEngine(RythmEngine engine);
+    ITemplateResourceLoader getLoader();
 
 }

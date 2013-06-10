@@ -29,6 +29,10 @@ import org.rythmengine.resource.TemplateResourceManager;
  */
 public interface ITemplateResourceLoader {
 
+    void setEngine(RythmEngine engine);
+    
+    RythmEngine getEngine();
+
     /**
      * Return root path of this resource loader
      * 

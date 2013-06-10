@@ -19,8 +19,6 @@
 */
 package org.rythmengine.resource;
 
-import org.rythmengine.RythmEngine;
-
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
@@ -36,11 +34,6 @@ public class StringTemplateResource extends TemplateResourceBase implements ITem
     private String content;
 
     public StringTemplateResource(String templateContent) {
-        content = templateContent;
-    }
-
-    public StringTemplateResource(String templateContent, RythmEngine engine) {
-        super(engine);
         content = templateContent;
     }
 

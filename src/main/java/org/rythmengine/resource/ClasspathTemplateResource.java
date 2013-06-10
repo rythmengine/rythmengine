@@ -42,7 +42,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     }
 
     public ClasspathTemplateResource(String path, RythmEngine engine) {
-        super(engine);
+        //super(engine);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         if (null == cl) {
             cl = Rythm.class.getClassLoader();
@@ -82,7 +82,7 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
     @Override
     protected long lastModified() {
-        if (engine().isProdMode()) return 0;
+        if (getEngine().isProdMode()) return 0;
 
         String fileName;
         if ("file".equals(url.getProtocol())) {

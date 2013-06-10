@@ -19,9 +19,9 @@
 */
 package org.rythmengine.resource;
 
-import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
@@ -29,11 +29,7 @@ import org.rythmengine.utils.S;
 import java.util.UUID;
 
 /**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 20/01/12
- * Time: 11:48 PM
- * To change this template use File | Settings | File Templates.
+ * Encapsulate the common logic of an {@link ITemplateResource} implementation
  */
 public abstract class TemplateResourceBase implements ITemplateResource {
 
@@ -44,23 +40,28 @@ public abstract class TemplateResourceBase implements ITemplateResource {
      * <p/>
      * This field should be set to null if needs to serialize the template resource to some where, e.g. Cache
      */
-    private RythmEngine engine;
+    protected final ITemplateResourceLoader loader;
+    
+    protected boolean isProdMode = false;
 
+    /**
+     * There are certain cases that a type of resource does not need a specific loader. E.g the 
+     * {@link ToStringTemplateResource}
+     */
     public TemplateResourceBase() {
+        loader = null;
     }
 
-    public TemplateResourceBase(RythmEngine engine) {
-        if (null == engine) return;
-        this.engine = engine.isSingleton() ? null : engine;
+    public TemplateResourceBase(ITemplateResourceLoader loader) {
+        if (null == loader) {
+            throw new NullPointerException();
+        }
+        this.loader = loader;
+        this.isProdMode = getEngine().isProdMode();
     }
 
-    @Override
-    public void setEngine(RythmEngine engine) {
-        this.engine = engine;
-    }
-
-    protected RythmEngine engine() {
-        return null == engine ? Rythm.engine() : engine;
+    protected RythmEngine getEngine() {
+        return loader.getEngine();
     }
 
     @Override
@@ -84,7 +85,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     }
 
     private long checkInterval() {
-        if (engine().isProdMode()) return -1; // never check when running in product mode
+        if (isProdMode) return -1; // never check when running in product mode
         Long intv = userCheckInterval();
         return null == intv ? defCheckInterval() : intv;
     }
@@ -172,11 +173,15 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     }
 
     @Override
-    public ICodeType codeType() {
-        RythmEngine engine = engine();
+    public ICodeType codeType(RythmEngine engine) {
         Object key = getKey();
         String s = S.str(key);
         return getTypeOfPath(engine, s);
+    }
+
+    @Override
+    public ITemplateResourceLoader getLoader() {
+        return loader;
     }
 
     protected static String path2CN(String path) {

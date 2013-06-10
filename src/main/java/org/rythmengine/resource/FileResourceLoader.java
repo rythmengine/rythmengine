@@ -9,21 +9,24 @@ import java.io.File;
  */
 public class FileResourceLoader extends ResourceLoaderBase {
 
-    private RythmEngine engine;
-    private String root;
+    private File root;
 
-    public FileResourceLoader(RythmEngine engine) {
-        this.engine = engine;
-        this.root = engine.conf().templateHome().getPath().replace('\\', '/');
+    public FileResourceLoader(RythmEngine engine, File root) {
+        this.root = root;
+        setEngine(engine);
     }
 
     @Override
     public ITemplateResource load(String path) {
-        return new FileTemplateResource(path);
+        return new FileTemplateResource(path, this);
     }
 
     @Override
     public String getResourceLoaderRoot() {
+        return root.getPath();
+    }
+    
+    public File getRoot() {
         return root;
     }
 
@@ -46,6 +49,6 @@ public class FileResourceLoader extends ResourceLoaderBase {
     }
     
     private void load_(final File file, final TemplateResourceManager manager) {
-        manager.resourceLoaded(new FileTemplateResource(file, engine), this);
+        manager.resourceLoaded(new FileTemplateResource(file, this));
     }
 }

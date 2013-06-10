@@ -310,7 +310,7 @@ public enum RythmConfigurationKey {
     
 
     /**
-     * "home.template.dir": Set the home dir of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPLS}
+     * "home.template.dir": Set the home dir(s) of template files. This configuration is used when the {@link #RESOURCE_LOADER_IMPLS}
      * is not configured, therefore the {@link org.rythmengine.resource.TemplateResourceManager} will
      * try to load {@link org.rythmengine.resource.FileTemplateResource} from this template home dir
      * configured.
@@ -325,6 +325,44 @@ public enum RythmConfigurationKey {
             URL url = Thread.currentThread().getContextClassLoader().getResource("rythm");
             if (null != url) return new File(url.getPath());
             return new File("rythm");
+        }
+
+        @Override
+        public <T> T getConfiguration(Map<String, ?> configuration) {
+            Object defVal = getDefVal(configuration);
+            String key = getKey();
+            Object o = getValFromAliases(configuration, getKey(), "dir", defVal);
+            List<File> fl = new ArrayList<File>();
+            if (o instanceof File) {
+                fl.add((File) o);
+            } else if (o instanceof List) {
+                for (Object el: (List)o) {
+                    if (null == el) {
+                        continue;
+                    }
+                    if (el instanceof File) {
+                        fl.add((File) el);
+                    } else {
+                        fl.add(asFile(el.toString(), key));
+                    }
+                }
+            } else if (o.getClass().isArray()) {
+                int len = Array.getLength(o);
+                for (int i = 0; i < len; ++i) {
+                    Object el = Array.get(o, i);
+                    if (el instanceof File) {
+                        fl.add((File) el);
+                    } else {
+                        fl.add(asFile(el.toString(), key));
+                    }
+                }
+            } else {
+                String s = o.toString();
+                for (String el: s.split("[,;]")) {
+                    fl.add(asFile(el.trim(), key));
+                }
+            }
+            return (T) fl;
         }
     },
 
@@ -864,14 +902,8 @@ public enum RythmConfigurationKey {
         
         return l;
     }
-
-    private static File getFile(String key, Map<String, ?> configuration, Object defVal) {
-        Object v = getValFromAliases(configuration, key, "dir", defVal);
-        if (null == v) return null;
-        if (v instanceof File) {
-            return (File) v;
-        }
-        String s = v.toString();
+    
+    private static File asFile(String s, String key) {
         boolean isAbsolute = false;
         if (s.startsWith("/") || s.startsWith(File.separator)) {
             isAbsolute = true;
@@ -893,6 +925,16 @@ public enum RythmConfigurationKey {
         } catch (Exception e) {
             throw new ConfigurationException(e, "Error reading file configuration %s", key);
         }
+    }
+
+    private static File getFile(String key, Map<String, ?> configuration, Object defVal) {
+        Object v = getValFromAliases(configuration, key, "dir", defVal);
+        if (null == v) return null;
+        if (v instanceof File) {
+            return (File) v;
+        }
+        String s = v.toString();
+        return asFile(s, key);
     }
 
     /**

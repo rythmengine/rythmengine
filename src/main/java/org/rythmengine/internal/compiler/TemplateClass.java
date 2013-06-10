@@ -329,7 +329,7 @@ public class TemplateClass {
     public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh) {
         this(engine);
         if (null == resource) throw new NullPointerException();
-        resource.setEngine(engine());
+        //resource.setEngine(engine());
         templateResource = resource;
         if (!noRefresh) refresh();
     }
@@ -337,7 +337,7 @@ public class TemplateClass {
     public TemplateClass(ITemplateResource resource, RythmEngine engine, boolean noRefresh, IDialect dialect) {
         this(engine);
         if (null == resource) throw new NullPointerException();
-        resource.setEngine(engine());
+        //resource.setEngine(engine());
         templateResource = resource;
         this.dialect = dialect;
         if (!noRefresh) refresh();
@@ -514,7 +514,7 @@ public class TemplateClass {
             }
             ICodeType type = engine.renderSettings.codeType();
             if (null == type) {
-                type = templateResource.codeType();
+                type = templateResource.codeType(engine());
             }
             if (null == type || ICodeType.DefImpl.RAW == type) {
                 type = engine.conf().defaultCodeType();
