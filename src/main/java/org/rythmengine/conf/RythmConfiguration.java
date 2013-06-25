@@ -508,6 +508,14 @@ public class RythmConfiguration {
         return _suffix;
     }
     
+    private Boolean _autoScan = null;
+    public boolean autoScan() {
+        if (null == _autoScan) {
+            _autoScan = get(RESOURCE_AUTO_SCAN);
+        }
+        return _autoScan;
+    }
+    
     private String _allowedSysProps = null;
     public String allowedSystemProperties() {
         if (null == _allowedSysProps) {

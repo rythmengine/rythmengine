@@ -605,7 +605,6 @@ public class S {
      * <p/>
      * <p>After the object get escaped, the output string is safe to put inside a XML
      * attribute
-     *
      * @param o
      * @return XML escaped data
      */

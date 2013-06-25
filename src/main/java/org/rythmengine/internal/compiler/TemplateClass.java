@@ -499,7 +499,7 @@ public class TemplateClass {
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
      */
-    public boolean refresh(boolean forceRefresh) {
+    public synchronized boolean refresh(boolean forceRefresh) {
         if (refreshing()) return false;
         if (inner) return false;
         refreshing(true);
@@ -647,15 +647,24 @@ public class TemplateClass {
         engine().invalidate(this);
         javaClass = null;
     }
+    
+    private String magic = S.random(4);
+    private String magic() {
+        return name + magic;
+    }
 
     /**
      * Compile the class from Java source
      *
      * @return the bytes that comprise the class file
      */
-    public byte[] compile() {
-        if (null != javaByteCode) return javaByteCode;
-        if (null == javaSource) throw new IllegalStateException("Cannot find java source when compiling " + getKey());
+    public synchronized byte[] compile() {
+        if (null != javaByteCode) {
+            return javaByteCode;
+        }
+        if (null == javaSource) {
+            throw new IllegalStateException("Cannot find java source when compiling " + getKey());
+        }
         compiling = true;
         long start = System.currentTimeMillis();
         try {

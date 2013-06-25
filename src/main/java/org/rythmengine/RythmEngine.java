@@ -658,7 +658,7 @@ public class RythmEngine implements IEventDispatcher {
         List<IPropertyAccessor> udpa = _conf.getList(RythmConfigurationKey.EXT_PROP_ACCESSOR_IMPLS, IPropertyAccessor.class);
         registerPropertyAccessor(udpa.toArray(new IPropertyAccessor[]{}));
 
-        if (isDevMode()) {
+        if (conf().autoScan()) {
             resourceManager().scan();
         }
         

@@ -26,7 +26,6 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.IByteCodeHelper;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
-import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.IO;
 
@@ -223,10 +222,13 @@ public class TemplateClassLoader extends ClassLoader {
 
     @Override
     protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+        if (name.contains("UrlResolver")) {
+            logger.info("loading UrlResovler...");
+        }
         // init secure context for sandbox
-        SecurityManager sm;
-        RythmSecurityManager rsm = null;
-        String pass = null;
+//        SecurityManager sm;
+//        RythmSecurityManager rsm = null;
+//        String pass = null;
         try {
             if (Rythm.insideSandbox()) {
                 if (conf.restrictedClasses().contains(name)) {

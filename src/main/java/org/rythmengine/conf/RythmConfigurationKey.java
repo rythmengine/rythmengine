@@ -528,6 +528,14 @@ public enum RythmConfigurationKey {
     },
 
     /**
+     * "resource.autoScan": when set to true, then resource manager call resource loaders to auto
+     * scan resources.
+     * 
+     * <p>Default value: <code>false</code></p>
+     */
+    RESOURCE_AUTO_SCAN("resource.autoScan", false),
+
+    /**
      * "sandbox.security_manager.impl": Set the security manager to be used when running a template in
      * {@link org.rythmengine.Sandbox sandbox} mode.
      * <p>Default value: <code>null</code>. When no security manager is configured, when the sandbox mode is running, an

@@ -128,7 +128,8 @@ public class TemplateResourceManager {
     
     public TemplateClass resourceLoaded(final ITemplateResource resource, boolean async) {
         final ITemplateResourceLoader loader = resource.getLoader();
-        if (!async) {
+        //if (!async) { no async load at the moment
+        if (true) {
             whichLoader.put(resource.getKey(), loader);
             return _resourceLoaded(resource);
         } else {
@@ -165,7 +166,10 @@ public class TemplateResourceManager {
         }
     }
 
-    private ScheduledExecutorService loadingService = new ScheduledThreadPoolExecutor(10, new ScannerThreadFactory());
+    /* 
+     * At the moment we don't support parsing templates in parallel, so ...
+     */
+    private ScheduledExecutorService loadingService = new ScheduledThreadPoolExecutor(1, new ScannerThreadFactory());
     
     public void shutdown() {
         loadingService.shutdown();
