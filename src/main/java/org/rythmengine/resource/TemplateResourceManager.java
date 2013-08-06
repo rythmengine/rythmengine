@@ -26,10 +26,15 @@ import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.internal.RythmThreadFactory;
 import org.rythmengine.internal.compiler.ParamTypeInferencer;
 import org.rythmengine.internal.compiler.TemplateClass;
+import org.rythmengine.logger.ILogger;
+import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -39,6 +44,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * get loaded
  */
 public class TemplateResourceManager {
+
+    private static final ILogger logger = Logger.get(TemplateResourceManager.class); 
 
     private RythmEngine engine;
 

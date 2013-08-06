@@ -36,13 +36,17 @@ public class Logger {
 
     private static class Proxy implements ILogger {
         private Class<?> c_;
+        private ILogger l_;
 
         Proxy(Class<?> clazz) {
             c_ = clazz;
         }
 
         ILogger impl() {
-            return getLogger_(c_);
+            if (null == l_) {
+                l_ = fact.getLogger(c_);
+            }
+            return l_;
         }
 
         @Override
@@ -123,15 +127,6 @@ public class Logger {
 
     private static Map<Class<?>, ILogger> loggers = new HashMap<Class<?>, ILogger>();
 
-    private static ILogger getLogger_(Class<?> clazz) {
-        ILogger logger = loggers.get(clazz);
-        if (null == logger) {
-            logger = fact.getLogger(clazz);
-            loggers.put(clazz, logger);
-        }
-        return logger;
-    }
-
     private static ILoggerFactory userFact = null;
     private static final ILoggerFactory fact = new ILoggerFactory() {
         private ILoggerFactory defFact = new JDKLogger.Factory();
@@ -143,7 +138,12 @@ public class Logger {
     };
 
     public static ILogger get(Class<?> clazz) {
-        return new Proxy(clazz);
+        ILogger logger = loggers.get(clazz);
+        if (null == logger) {
+            logger = new Proxy(clazz);
+            loggers.put(clazz, logger);
+        }
+        return logger;
     }
 
     private static ILogger def = null;

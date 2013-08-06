@@ -102,7 +102,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         }
 
         final List<String> roots = new ArrayList<String>();
-        final String root0 = "";
+        final String root0 = this.getResourceLoaderRoot().replace('\\', '/');
         roots.add(root0);
 
         // call tag with import path
@@ -118,11 +118,15 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         int pos = currentPath.lastIndexOf("/");
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
-            if (currentPath.startsWith("/")) {
-                currentPath = currentPath.substring(1);
-            }            
-            if (!currentPath.startsWith(root0)) currentPath = root0 + "/" + currentPath;
-            roots.add(currentPath);
+            if (currentPath.startsWith(root0)) {
+                roots.add(currentPath);
+            } else {
+                if (currentPath.startsWith("/")) {
+                    currentPath = currentPath.substring(1);
+                }
+                if (!currentPath.startsWith(root0)) currentPath = root0 + "/" + currentPath;
+                roots.add(currentPath);
+            }
         }
         
         for (String root : roots) {
