@@ -26,8 +26,10 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.IRenderExceptionHandler;
 import org.rythmengine.extension.IRythmListener;
 import org.rythmengine.extension.ISourceCodeEnhancer;
+import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
+import org.rythmengine.resource.TemplateResourceManager;
 import org.rythmengine.template.ITag;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.template.TemplateBase;
@@ -168,6 +170,13 @@ public class EventBus implements IEventDispatcher {
                 return tmpl;
             }
         });
+        m.put(RythmEvents.PARSE_FAILED, new IEventHandler<Void, TemplateClass>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, TemplateClass tc) {
+                TemplateResourceManager.rollbackTmpBlackList();
+                return null;
+            }
+        });
         m.put(RythmEvents.ON_BUILD_JAVA_SOURCE, new IEventHandler<Void, CodeBuilder>() {
             @Override
             public Void handleEvent(RythmEngine engine, CodeBuilder cb) {
@@ -188,6 +197,20 @@ public class EventBus implements IEventDispatcher {
                 for (String s : ce.imports()) {
                     cb.addImport(s, -1);
                 }
+                return null;
+            }
+        });
+        m.put(RythmEvents.COMPILED, new IEventHandler<byte[], byte[]>() {
+            @Override
+            public byte[] handleEvent(RythmEngine engine, byte[] bytes) {
+                TemplateResourceManager.commitTmpBlackList();
+                return bytes;
+            }
+        });
+        m.put(RythmEvents.COMPILE_FAILED, new IEventHandler<Void, TemplateClass>() {
+            @Override
+            public Void handleEvent(RythmEngine engine, TemplateClass tc) {
+                TemplateResourceManager.rollbackTmpBlackList();
                 return null;
             }
         });

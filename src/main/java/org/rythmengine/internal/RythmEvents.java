@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal;
 
+import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.template.TemplateBase;
 import org.rythmengine.utils.F;
@@ -55,6 +56,12 @@ public class RythmEvents<RETURN, PARAM> implements IEvent<RETURN, PARAM> {
     IEvent<Void, CodeBuilder> PARSED = new RythmEvents<Void, CodeBuilder>(true);
 
     /**
+     * Triggered upon parse exception
+     */
+    public static final
+    IEvent<Void, TemplateClass> PARSE_FAILED = new RythmEvents<Void, TemplateClass>(true);
+
+    /**
      * Right before template compilation started
      */
     public static final
@@ -62,9 +69,16 @@ public class RythmEvents<RETURN, PARAM> implements IEvent<RETURN, PARAM> {
 
     /**
      * Immediately after template compilation finished and before get cached on disk
+     * A good place to do byte code enhancement
      */
     public static final
-    IEvent<Void, String> COMPILED = new RythmEvents<Void, String>(true);
+    IEvent<byte[], byte[]> COMPILED = new RythmEvents<byte[], byte[]>(true);
+
+    /**
+     * Triggered upon compilation of a template class failed
+     */
+    public static final
+    IEvent<Void, TemplateClass> COMPILE_FAILED = new RythmEvents<Void, TemplateClass>(true);
 
     /**
      * Before template render start. A good place to set implicit render args

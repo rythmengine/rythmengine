@@ -28,6 +28,7 @@ import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.internal.CodeBuilder;
 import org.rythmengine.internal.IDialect;
+import org.rythmengine.internal.RythmEvents;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.ITemplateResource;
@@ -783,6 +784,7 @@ public class TemplateClass {
         javaByteCode = code;
         //enhancedByteCode = code;
         compiled = true;
+        RythmEvents.COMPILED.trigger(engine(), code);
         enhance();
         //compiled(code, false);
     }

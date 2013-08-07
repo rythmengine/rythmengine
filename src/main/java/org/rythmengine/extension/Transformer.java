@@ -87,4 +87,11 @@ public @interface Transformer {
      * @return true if require passing template instance as the implicit first parameter 
      */
     boolean requireTemplate() default false;
+
+    /**
+     * Indicate whether the expression been transformed should be passed to the transformer function
+     * as first or last param
+     * @return true if the expression been transformed should be passed in as the last param.
+     */
+    boolean lastParam() default false;
 }

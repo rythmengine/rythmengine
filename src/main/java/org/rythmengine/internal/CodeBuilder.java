@@ -516,7 +516,9 @@ public class CodeBuilder extends TextBuilder {
             tc = engine.classes().getByTemplate(extended);
             if (null == tc) {
                 ITemplateResource resource = engine.resourceManager().getResource(extended);
-                if (resource.isValid()) tc = new TemplateClass(resource, engine);
+                if (resource.isValid()) {
+                    tc = new TemplateClass(resource, engine);
+                }
             }
         }
         if (null == tc && !extended.startsWith("/")) {

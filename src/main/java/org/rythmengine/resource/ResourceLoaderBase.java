@@ -55,6 +55,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
     }
     
     private TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, boolean processTagName) {
+        //logger.info(">>> try load %s on [%s] with processTagName: %s", tmplName, callerClass.getKey(), processTagName);
         if (null == engine) {
             engine = getDefaultEngine();
         }
@@ -149,7 +150,11 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                 return tc;
             }
         }
-        return processTagName ? tryLoadTemplate(tagNameOrigin, engine, callerClass, false) : null;
+        TemplateClass tc = processTagName ? tryLoadTemplate(tagNameOrigin, engine, callerClass, false) : null; 
+        if (null == tc) {
+            TemplateResourceManager.reportNonResource(tmplName);
+        }
+        return tc;
     }
 
     @Override

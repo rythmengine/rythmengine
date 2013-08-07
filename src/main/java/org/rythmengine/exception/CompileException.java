@@ -20,6 +20,7 @@
 package org.rythmengine.exception;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.internal.RythmEvents;
 import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.internal.parser.build_in.ExpressionParser;
 
@@ -51,6 +52,7 @@ public class CompileException extends RythmException {
 
     public CompileException(RythmEngine engine, TemplateClass tc, int javaLineNumber, String message) {
         super(engine, tc, javaLineNumber, -1, message);
+        RythmEvents.COMPILE_FAILED.trigger(engine, tc);
     }
 
 }

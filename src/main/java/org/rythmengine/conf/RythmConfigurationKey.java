@@ -511,6 +511,15 @@ public enum RythmConfigurationKey {
     RESOURCE_LOADER_IMPLS("resource.loader.impls"),
 
     /**
+     * "resource.def_loader.enabled": Enable/Disable default resource loader. When this option is disabled and
+     * there is no user configured {@link #RESOURCE_LOADER_IMPLS resource loader}, then the default file system resource
+     * loader will not initialized
+     * 
+     * <p>default value: <code>true</code></p>
+     */
+    RESOURCE_DEF_LOADER_ENABLED("resource.loader.def.enabled", true),
+
+    /**
      * "resource.name.suffix": does resource name has special rythm suffix attached? 
      * E.g. <tt>.rythm</tt> or <tt>.rtl</tt> etc. Default is empty string 
      * 

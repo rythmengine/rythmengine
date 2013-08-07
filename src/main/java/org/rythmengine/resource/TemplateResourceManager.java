@@ -22,6 +22,7 @@ package org.rythmengine.resource;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
+import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.internal.RythmThreadFactory;
 import org.rythmengine.internal.compiler.ParamTypeInferencer;
@@ -31,10 +32,7 @@ import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -46,6 +44,43 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class TemplateResourceManager {
 
     private static final ILogger logger = Logger.get(TemplateResourceManager.class); 
+    
+    public static final ITemplateResource NULL = new ITemplateResource() {
+        @Override
+        public Object getKey() {
+            return null;
+        }
+
+        @Override
+        public String getSuggestedClassName() {
+            return null;
+        }
+
+        @Override
+        public String asTemplateContent() {
+            return null;
+        }
+
+        @Override
+        public boolean refresh() {
+            return false;
+        }
+
+        @Override
+        public boolean isValid() {
+            return false;
+        }
+
+        @Override
+        public ICodeType codeType(RythmEngine engine) {
+            return null;
+        }
+
+        @Override
+        public ITemplateResourceLoader getLoader() {
+            return null;
+        }
+    };
 
     private RythmEngine engine;
 
@@ -60,10 +95,48 @@ public class TemplateResourceManager {
     
     private boolean typeInference;
 
+    /**
+     * Store the String that is NOT a resource
+     */
+    public static Set<String> blackList = new HashSet<String>();
+    
+    private static ThreadLocal<Stack<Set<String>>> tmpBlackList = new ThreadLocal<Stack<Set<String>>>() {
+        @Override
+        protected Stack<Set<String>> initialValue() {
+            return new Stack<Set<String>>();
+        }
+    };
+    
+    public static void setUpTmpBlackList() {
+        tmpBlackList.get().push(new HashSet<String>());
+    } 
+    
+    public static void reportNonResource(String str) {
+        //logger.info(">>> report non resource: %s", str);
+        tmpBlackList.get().peek().add(str);
+    }
+    
+    public static void commitTmpBlackList() {
+        Set<String> ss = tmpBlackList.get().pop();
+        //logger.info(">>> commit black list: [%s]", ss);
+        blackList.addAll(ss);
+    }
+    
+    public static void rollbackTmpBlackList() {
+        tmpBlackList.get().pop();
+    }
+
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
         RythmConfiguration conf = engine.conf();
+        typeInference = conf.typeInferenceEnabled();
         loaders = new ArrayList(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
+        if (!loaders.isEmpty()) {
+            Boolean defLoader = conf.get(RythmConfigurationKey.RESOURCE_DEF_LOADER_ENABLED);
+            if (!defLoader) {
+                return;
+            }
+        }
         List<File> roots = conf.templateHome();
         for (File root : roots) {
             FileResourceLoader frl = new FileResourceLoader(engine, root);
@@ -72,7 +145,6 @@ public class TemplateResourceManager {
             }
             loaders.add(frl);
         }
-        typeInference = conf.typeInferenceEnabled();
     }
 
     private ITemplateResource cache(ITemplateResource resource) {
@@ -83,6 +155,10 @@ public class TemplateResourceManager {
     }
 
     public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass) {
+        if (blackList.contains(tmplName)) {
+            //logger.info(">>> %s is in the black list", tmplName);
+            return null;
+        }
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
         for (ITemplateResourceLoader loader : loaders) {
@@ -100,7 +176,9 @@ public class TemplateResourceManager {
 
     public ITemplateResource get(String str) {
         ITemplateResource resource = getResource(str);
-        if (!resource.isValid()) resource = new StringTemplateResource(str);
+        if (!resource.isValid()) {
+            resource = new StringTemplateResource(str);
+        }
         return cache(resource);
     }
 
@@ -120,7 +198,7 @@ public class TemplateResourceManager {
             }
         }
 
-        return cache(resource);
+        return null == resource ? NULL : cache(resource);
     }
     
     public void scan() {

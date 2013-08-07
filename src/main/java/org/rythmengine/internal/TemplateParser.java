@@ -28,6 +28,7 @@ import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.internal.dialect.DialectManager;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
+import org.rythmengine.resource.TemplateResourceManager;
 import org.rythmengine.utils.TextBuilder;
 import org.apache.commons.lang3.StringUtils;
 
@@ -103,6 +104,7 @@ public class TemplateParser implements IContext {
             cursor = 0;
             cb.rewind();
             dm.beginParse(this);
+            TemplateResourceManager.setUpTmpBlackList();
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(this);
                 for (TextBuilder builder : tt) {

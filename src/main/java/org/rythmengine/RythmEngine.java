@@ -711,6 +711,7 @@ public class RythmEngine implements IEventDispatcher {
                 waive = t.waivePattern();
             }
             boolean clsRequireTemplate = null == t ? false : t.requireTemplate();
+            boolean clsLastParam = null == t ? false : t.lastParam();
             for (Method m : extensionClass.getDeclaredMethods()) {
                 int flag = m.getModifiers();
                 if (!Modifier.isPublic(flag) || !Modifier.isStatic(flag)) continue;
@@ -739,6 +740,11 @@ public class RythmEngine implements IEventDispatcher {
                 if (null != tm && tm.requireTemplate()) {
                     requireTemplate = true;
                 }
+                
+                boolean lastParam = clsLastParam;
+                if (null != tm && tm.lastParam()) {
+                    lastParam = true;
+                }
 
                 String cn0 = extensionClass.getName();
                 String mn = m.getName();
@@ -749,7 +755,7 @@ public class RythmEngine implements IEventDispatcher {
                 if (len == 1) {
                     jem.registerJavaExtension(new IJavaExtension.VoidParameterExtension(mwaive, mn, fullName, requireTemplate));
                 } else {
-                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(mwaive, mn, ".+", fullName, requireTemplate));
+                    jem.registerJavaExtension(new IJavaExtension.ParameterExtension(mwaive, mn, ".+", fullName, requireTemplate, lastParam));
                 }
             }
         }

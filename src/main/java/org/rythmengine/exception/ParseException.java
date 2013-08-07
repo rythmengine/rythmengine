@@ -20,6 +20,7 @@
 package org.rythmengine.exception;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.internal.RythmEvents;
 import org.rythmengine.internal.compiler.TemplateClass;
 
 public class ParseException extends RythmException {
@@ -30,6 +31,7 @@ public class ParseException extends RythmException {
 
     public ParseException(RythmEngine engine, Throwable cause, TemplateClass tc, int line, String message, Object... args) {
         super(engine, cause, tc, -1, line, String.format(message, args));
+        RythmEvents.PARSE_FAILED.trigger(engine, tc);
     }
 
 }

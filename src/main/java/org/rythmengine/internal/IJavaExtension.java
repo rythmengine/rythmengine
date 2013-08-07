@@ -93,17 +93,23 @@ public interface IJavaExtension {
         private Pattern pattern1 = null;
         private Pattern pattern2 = null;
         private boolean requireTemplate = false;
+        private boolean lastParam = false;
 
         public ParameterExtension(String waiveName, String name, String signature, String fullName) {
             this(waiveName, name, signature, fullName, false);
         }
         
         public ParameterExtension(String waiveName, String name, String signature, String fullName, boolean requireTemplate) {
+            this(waiveName, name, signature, fullName, requireTemplate, false);
+        }
+        
+        public ParameterExtension(String waiveName, String name, String signature, String fullName, boolean requireTemplate, boolean lastParam) {
             methodName = name;
             fullMethodName = fullName;
             pattern1 = Pattern.compile(String.format(".*(?<!%s)\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", waiveName, methodName, signature));
             pattern2 = Pattern.compile(String.format("\\.%s\\s*\\((\\s*%s?\\s*)\\)\\s*$", methodName, signature));
             this.requireTemplate = requireTemplate;
+            this.lastParam = lastParam;
         }
 
         @Override
@@ -122,7 +128,11 @@ public interface IJavaExtension {
             if (requireTemplate) {
                 ptn = "%s(this, %s, %s)";
             }
-            return String.format(ptn, fullMethodName, s, signature);
+            if (lastParam) {
+                return String.format(ptn, fullMethodName, signature, s);
+            } else {
+                return String.format(ptn, fullMethodName, s, signature);
+            }
         }
 
         @Override

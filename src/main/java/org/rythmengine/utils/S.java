@@ -1478,7 +1478,7 @@ public class S {
      */
     @Transformer
     public static String join(Iterable itr) {
-        return join(itr, ",");
+        return join(",", itr);
     }
     
     /**
@@ -1488,8 +1488,8 @@ public class S {
      * @param sep
      * @return the String joined
      */
-    @Transformer
-    public static String join(Iterable itr, String sep) {
+    @Transformer(lastParam = true)
+    public static String join(String sep, Iterable itr) {
         StringBuilder sb = new StringBuilder();
         Iterator i = itr.iterator();
         if (!i.hasNext()) return "";
@@ -1507,15 +1507,15 @@ public class S {
      * @param sep
      * @return joined string
      */
-    public static String join(Iterable itr, char sep) {
-        return join(itr, String.valueOf(sep));
+    public static String join(char sep, Iterable itr) {
+        return join(String.valueOf(sep), itr);
     }
     
     public static String join(Character[] a) {
-        return join(a, ",");
+        return join(",", a);
     }
     
-    public static String join (Character[] a, String sep) {
+    public static String join (String sep, Character[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1525,15 +1525,15 @@ public class S {
         return sb.toString();
     }
     
-    public static String join(Character[] a, char sep) {
-        return join(a, String.valueOf(sep));
+    public static String join(char sep, Character[] a) {
+        return join(String.valueOf(sep), a);
     }
 
     public static String join(Integer[] a) {
-        return join(a, ",");
+        return join(",", a);
     }
     
-    public static String join (Integer[] a, String sep) {
+    public static String join (String sep, Integer[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1543,15 +1543,15 @@ public class S {
         return sb.toString();
     }
     
-    public static String join(Integer[] a, char sep) {
-        return join(a, String.valueOf(sep));
+    public static String join(char sep, Integer[] a) {
+        return join(String.valueOf(sep), a);
     }
     
     public static String join(Long[] a) {
-        return join(a, ",");
+        return join(",", a);
     }
     
-    public static String join (Long[] a, String sep) {
+    public static String join (String sep, Long[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1561,15 +1561,15 @@ public class S {
         return sb.toString();
     }
     
-    public static String join(Long[] a, char sep) {
-        return join(a, String.valueOf(sep));
+    public static String join(char sep, Long[] a) {
+        return join(String.valueOf(sep),a );
     }
 
     public static String join(Float[] a) {
-        return join(a, ",");
+        return join(",", a);
     }
     
-    public static String join (Float[] a, String sep) {
+    public static String join (String sep, Float[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1579,15 +1579,15 @@ public class S {
         return sb.toString();
     }
     
-    public static String join(Float[] a, char sep) {
-        return join(a, String.valueOf(sep));
+    public static String join(char sep, Float[] a) {
+        return join(String.valueOf(sep), a);
     }
 
     public static String join(Double[] a) {
-        return join(a, ",");
+        return join(",", a);
     }
     
-    public static String join (Double[] a, String sep) {
+    public static String join (String sep, Double[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1597,8 +1597,8 @@ public class S {
         return sb.toString();
     }
     
-    public static String join(Double[] a, char sep) {
-        return join(a, String.valueOf(sep));
+    public static String join(char sep, Double[] a) {
+        return join(String.valueOf(sep), a);
     }
 
 }

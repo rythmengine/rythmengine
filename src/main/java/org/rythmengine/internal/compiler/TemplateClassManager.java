@@ -95,7 +95,9 @@ public class TemplateClassManager {
         if (checkResource && null == tc) {
             // try to see if resourceLoader has some kind of name transform
             ITemplateResource r = engine.resourceManager().getResource(name.toString());
-            if (null == r) return null;
+            if (!r.isValid()) {
+                return null;
+            }
             tc = tmplIdx.get(r.getKey());
         }
         checkUpdate(tc);

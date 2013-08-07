@@ -115,9 +115,9 @@ public class GHIssueTest extends TestBase {
     
     @Test
     public void test143() {
-        s = S.join(new Integer[]{1,2,3}, "::");
+        s = S.join("::", new Integer[]{1,2,3});
         eq("1::2::3");
-        s = S.join(new Double[]{1.0, 2.0, 3.0}, ":");
+        s = S.join(":", new Double[]{1.0, 2.0, 3.0});
         eq("1.0:2.0:3.0");
     }
     
