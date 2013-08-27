@@ -665,7 +665,6 @@ public class RythmEngine implements IEventDispatcher {
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run() {
-                logger.info("Shutting down Rythm Engine [%s]", RythmEngine.this.id());
                 RythmEngine.this.shutdown();
             }
         });
@@ -1883,10 +1882,15 @@ public class RythmEngine implements IEventDispatcher {
         this.shutdownListener = listener;
     }
 
+    private boolean zombie = false;
     /**
      * Shutdown this rythm engine
      */
     public void shutdown() {
+        if (zombie) {
+            return;
+        }
+        logger.info("Shutting down Rythm Engine: [%s]", id());
         if (null != _cacheService) {
             try {
                 _cacheService.shutdown();
@@ -1919,6 +1923,8 @@ public class RythmEngine implements IEventDispatcher {
         if (null != _classes) _classes.clear();
         if (null != _nonExistsTags) _nonExistsTags.clear();
         if (null != _nonTmpls) _nonTmpls.clear();
+        _classLoader = null;
+        zombie = true;
     }
 
 }

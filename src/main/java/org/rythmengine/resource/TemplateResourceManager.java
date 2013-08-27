@@ -98,7 +98,7 @@ public class TemplateResourceManager {
     /**
      * Store the String that is NOT a resource
      */
-    public static Set<String> blackList = new HashSet<String>();
+    private static Set<String> blackList = new HashSet<String>();
     
     private static ThreadLocal<Stack<Set<String>>> tmpBlackList = new ThreadLocal<Stack<Set<String>>>() {
         @Override
