@@ -26,7 +26,6 @@ import org.rythmengine.internal.Keyword;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 /**
  * Parse @return() statement. Which break the current template execution and return to caller
@@ -40,7 +39,7 @@ public class ReturnParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("error parsing @return, correct usage: @return()");

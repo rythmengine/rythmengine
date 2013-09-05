@@ -19,12 +19,9 @@
 */
 package org.rythmengine.internal;
 
-import org.rythmengine.utils.TextBuilder;
-
-
 public interface IParser {
 
-    TextBuilder go();
+    Token go();
     
     IContext ctx();
 }

@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
@@ -26,8 +27,6 @@ import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.Locale;
 
@@ -43,7 +42,7 @@ public class LocaleParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) return null;
                 final String matched = r.stringMatched();

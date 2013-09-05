@@ -19,11 +19,10 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 public class ExitIfNoClassParser extends KeywordParserFactory {
 
@@ -34,7 +33,7 @@ public class ExitIfNoClassParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("error parsing @debug, correct usage: @__exitIfNoClass__(My.Class.Name)");

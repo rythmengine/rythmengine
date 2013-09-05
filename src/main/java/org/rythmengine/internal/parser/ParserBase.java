@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal.parser;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.Sandbox;
@@ -27,8 +28,6 @@ import org.rythmengine.internal.parser.build_in.CaretParserFactoryBase;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.regex.Pattern;
 
@@ -36,7 +35,7 @@ public abstract class ParserBase implements IParser {
 
     public static final ParserBase NULL_INST = new ParserBase() {
         @Override
-        public TextBuilder go() {
+        public Token go() {
             return null;
         }
     };

@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.Sandbox;
@@ -45,7 +46,6 @@ import org.rythmengine.template.TagBase;
 import org.rythmengine.template.TemplateBase;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.*;
 
@@ -215,21 +215,21 @@ public class CodeBuilder extends TextBuilder {
     private int extendDeclareLineNo = -1;
     // <argName, argClass>
     public Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
-    private List<TextBuilder> builders = new ArrayList<TextBuilder>();
-    private List<TextBuilder> builders() {
+    private List<Token> builders = new ArrayList<Token>();
+    private List<Token> builders() {
         if (macroStack.empty()) return builders;
         String macro = macroStack.peek();
-        List<TextBuilder> bl = macros.get(macro);
+        List<Token> bl = macros.get(macro);
         if (null == bl) {
-            bl = new ArrayList<TextBuilder>();
+            bl = new ArrayList<Token>();
             macros.put(macro, bl);
         }
         return bl;
     }
     public boolean isLastBuilderLiteral() {
-        List<TextBuilder> bl = builders();
+        List<Token> bl = builders();
         for (int i = bl.size() - 1; i >= 0; --i) {
-            TextBuilder tb = bl.get(i);
+            Token tb = bl.get(i);
             if (tb instanceof Token.StringToken) {
                 if (((Token.StringToken)tb).empty()) continue;
                 return true;
@@ -371,7 +371,7 @@ public class CodeBuilder extends TextBuilder {
         String retType = "void";
         String body;
         boolean autoRet = false;
-        List<TextBuilder> builders = new ArrayList<TextBuilder>();
+        List<Token> builders = new ArrayList<Token>();
 
         InlineTag(String name, String ret, String sig, String body) {
             tagName = name;
@@ -383,8 +383,8 @@ public class CodeBuilder extends TextBuilder {
         InlineTag clone(CodeBuilder newCaller) {
             InlineTag tag = new InlineTag(tagName, retType, signature, body);
             tag.builders.clear();
-            for (TextBuilder tb : builders) {
-                TextBuilder newTb = tb.clone(newCaller);
+            for (Token tb : builders) {
+                Token newTb = tb.clone(newCaller);
                 tag.builders.add(newTb);
             }
             tag.autoRet = autoRet;
@@ -413,7 +413,7 @@ public class CodeBuilder extends TextBuilder {
         return templateClass.returnObject(tagName);
     }
 
-    private Stack<List<TextBuilder>> inlineTagBodies = new Stack<List<TextBuilder>>();
+    private Stack<List<Token>> inlineTagBodies = new Stack<List<Token>>();
 
     public InlineTag defTag(String tagName, String retType, String signature, String body) {
         tagName = tagName.trim();
@@ -575,7 +575,7 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private Map<String, List<TextBuilder>> macros = new HashMap<String, List<TextBuilder>>();
+    private Map<String, List<Token>> macros = new HashMap<String, List<Token>>();
     private Stack<String> macroStack = new Stack<String>();
 
     public void pushMacro(String macro) {
@@ -583,7 +583,7 @@ public class CodeBuilder extends TextBuilder {
             throw new ParseException(engine, templateClass, parser.currentLine(), "Macro already defined: %s", macro);
         }
         macroStack.push(macro);
-        macros.put(macro, new ArrayList<TextBuilder>());
+        macros.put(macro, new ArrayList<Token>());
     }
 
     public void popMacro() {
@@ -597,16 +597,16 @@ public class CodeBuilder extends TextBuilder {
         return macros.containsKey(macro);
     }
 
-    public List<TextBuilder> getMacro(String macro) {
-        List<TextBuilder> list = this.macros.get(macro);
+    public List<Token> getMacro(String macro) {
+        List<Token> list = this.macros.get(macro);
         if (null == list) throw new NullPointerException();
         return list;
     }
     
     public boolean lastIsBlockToken() {
-        List<TextBuilder> bs = builders();
+        List<Token> bs = builders();
         for (int i = bs.size() - 1; i >= 0; --i) {
-            TextBuilder tb = bs.get(i);
+            Token tb = bs.get(i);
             if (tb instanceof BlockCodeToken) return true;
             else if (tb instanceof Token.StringToken) {
                 String s = tb.toString();
@@ -620,11 +620,11 @@ public class CodeBuilder extends TextBuilder {
     }
     
     public boolean removeNextLF = false;
-    public void addBuilder(TextBuilder builder) {
+    public void addBuilder(Token builder) {
         if (builder == Token.EMPTY_TOKEN) {
             return;
         }
-        Token token = (Token)builder;
+        Token token = builder;
         if (removeNextLF && token != Token.EMPTY_TOKEN2) {
             if (token.removeLeadingLineBreak()) {
                 removeNextLF = false;
@@ -642,7 +642,7 @@ public class CodeBuilder extends TextBuilder {
      */
     public void removeSpaceToLastLineBreak(IContext ctx) {
         boolean shouldRemoveSpace = true;
-        List<TextBuilder> bl = builders();
+        List<Token> bl = builders();
         for (int i = bl.size() - 1; i >= 0; --i) {
             TextBuilder tb = bl.get(i);
             if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
@@ -685,9 +685,9 @@ public class CodeBuilder extends TextBuilder {
      */
     public void removeSpaceTillLastLineBreak(IContext ctx) {
         boolean shouldRemoveSpace = true;
-        List<TextBuilder> bl = builders();
+        List<Token> bl = builders();
         for (int i = bl.size() - 1; i >= 0; --i) {
-            TextBuilder tb = bl.get(i);
+            Token tb = bl.get(i);
             if (tb == Token.EMPTY_TOKEN || tb instanceof IDirective) {
                 continue;
             }
@@ -1103,11 +1103,11 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private List<TextBuilder> mergeStringTokens(List<TextBuilder> builders) {
-        List<TextBuilder> merged = new ArrayList<TextBuilder>();
+    private List<Token> mergeStringTokens(List<Token> builders) {
+        List<Token> merged = new ArrayList<Token>();
         Token.StringToken curTk = new Token.StringToken("", parser);
         for (int i = 0; i < builders.size(); ++i) {
-            TextBuilder tb = builders.get(i);
+            Token tb = builders.get(i);
             if (tb == Token.EMPTY_TOKEN) {
                 continue;
             }
@@ -1145,13 +1145,12 @@ public class CodeBuilder extends TextBuilder {
             p("\npublic ").p(tag.retType).p(" ").p(tag.tagName).p(tag.signature);
             p("{\norg.rythmengine.template.TemplateBase oldParent = this.__parent;\ntry{\nthis.__parent = this;\n");
             boolean isVoid = tag.autoRet;
-            StringBuilder sb = buffer();
             if (!isVoid) {
                 p(tag.body);
             } else {
-                List<TextBuilder> merged = mergeStringTokens(tag.builders);
-                for (TextBuilder b : merged) {
-                    b.build();
+                List<Token> merged = mergeStringTokens(tag.builders);
+                for (Token b : merged) {
+                    b.build(parser);
                 }
             }
             p("\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
@@ -1167,8 +1166,8 @@ public class CodeBuilder extends TextBuilder {
         StringBuilder old = buffer();
         __setBuffer(sb);
         // try merge strings
-        List<TextBuilder> merged = mergeStringTokens(this.builders);
-        for (TextBuilder b : merged) {
+        List<Token> merged = mergeStringTokens(this.builders);
+        for (Token b : merged) {
             b.build();
         }
         buildBody = sb.toString();

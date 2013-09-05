@@ -24,14 +24,13 @@ import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 public class ForEachParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
 
         return new RemoveLeadingSpacesIfLineBreakParser(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = new Regex(String.format(patternStr2(), dialect().a(), keyword()));
                 String remain = remain();
                 if (!r.search(remain)) {

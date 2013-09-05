@@ -19,14 +19,13 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.dialect.DialectManager;
 import org.rythmengine.internal.parser.Directive;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.F;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +42,7 @@ public class ArgsParser extends KeywordParserFactory {
             /*
              * parse @args {...}
              */
-            public TextBuilder go2(String s) {
+            public Token go2(String s) {
                 Regex r = reg(dialect());
                 final List<F.T4<Integer, String, String, String>> ral = new ArrayList();
                 s = s.replaceAll("[\\n\\r]+", ",").replaceAll("[,]+", ",");
@@ -72,7 +71,7 @@ public class ArgsParser extends KeywordParserFactory {
             /*
              * parse @args String s...
              */
-            public TextBuilder go() {
+            public Token go() {
                 String remain = remain();
                 Regex r = new Regex(String.format("\\n?[ \\t\\x0B\\f]*%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))\\n?", a(), keyword()));
                 if (r.search(remain)) {

@@ -22,8 +22,8 @@ package org.rythmengine.internal.parser.build_in;
 import org.rythmengine.exception.ParseException;
 import org.rythmengine.internal.CodeBuilder;
 import org.rythmengine.internal.IContext;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.CodeToken;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.List;
 
@@ -46,8 +46,8 @@ public class ExecMacroToken extends CodeToken {
         if (!cb.hasMacro(s)) {
             throw new ParseException(ctx.getEngine(), ctx.getTemplateClass(), line, "Cannot find macro definition for \"%s\"", s);
         }
-        List<TextBuilder> list = cb.getMacro(s);
-        for (TextBuilder tb : list) {
+        List<Token> list = cb.getMacro(s);
+        for (Token tb : list) {
             tb.build();
         }
     }

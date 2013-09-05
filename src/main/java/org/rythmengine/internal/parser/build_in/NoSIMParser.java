@@ -19,13 +19,13 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * Mark a template as not a SIM template
@@ -39,7 +39,7 @@ public class NoSIMParser extends KeywordParserFactory {
 
     public IParser create(IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (r.search(remain())) {
                     String s = r.stringMatched();

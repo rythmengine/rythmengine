@@ -45,7 +45,7 @@ public class DebugParser extends KeywordParserFactory implements IRemoveLeadingL
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("error parsing @debug, correct usage: @debug(\"msg\", args...)");

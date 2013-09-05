@@ -29,13 +29,12 @@ import org.rythmengine.internal.parser.build_in.*;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.F;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TemplateTokenizer implements Iterable<TextBuilder> {
+public class TemplateTokenizer implements Iterable<Token> {
     private final static ILogger logger = Logger.get(TemplateTokenizer.class);
     private IContext ctx;
     private List<IParser> parsers = new ArrayList<IParser>();
@@ -60,7 +59,7 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
         // add a fail through parser to prevent unlimited loop
         parsers.add(new ParserBase(ctx) {
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 TemplateParser p = (TemplateParser) ctx();
                 if (lastCursor < p.cursor) return null;
                 //logger.warn("fail-through parser reached. is there anything wrong in your template? line: %s", ctx.currentLine());
@@ -72,8 +71,8 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
     }
 
     @Override
-    public Iterator<TextBuilder> iterator() {
-        return new Iterator<TextBuilder>() {
+    public Iterator<Token> iterator() {
+        return new Iterator<Token>() {
 
             @Override
             public boolean hasNext() {
@@ -81,10 +80,10 @@ public class TemplateTokenizer implements Iterable<TextBuilder> {
             }
 
             @Override
-            public TextBuilder next() {
+            public Token next() {
                 for (IParser p : parsers) {
-                    TextBuilder t;
-                    F.T2<IParser, TextBuilder> t2 = null;
+                    Token t;
+                    F.T2<IParser, Token> t2 = null;
                     if (p instanceof ParserDispatcher) {
                         t2 = ((ParserDispatcher) p).go2();
                         t = null == t2 ? null : t2._2;

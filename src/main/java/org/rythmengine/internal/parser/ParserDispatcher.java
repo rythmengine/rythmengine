@@ -22,9 +22,9 @@ package org.rythmengine.internal.parser;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.IParserFactory;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.dialect.DialectBase;
 import org.rythmengine.utils.F;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +46,7 @@ public class ParserDispatcher extends ParserBase {
         P = pattern("\\n?[ \\t\\x0B\\f]*%s(%s)(\\s*|\\(|\\{).*", a(), Patterns.VarName);
     }
     
-    public F.T2<IParser, TextBuilder> go2() {
+    public F.T2<IParser, Token> go2() {
         DialectBase d = (DialectBase) dialect();
         IContext c = ctx();
         Matcher m = P.matcher(remain());
@@ -54,19 +54,19 @@ public class ParserDispatcher extends ParserBase {
             String s = m.group(1);
             IParser p = d.createBuildInParser(s, c);
             if (null != p) {
-                TextBuilder tb = p.go();
+                Token tb = p.go();
                 if (null != tb) return F.T2(p, tb);
             }
         }
         for (IParserFactory f : d.freeParsers()) {
             IParser p = f.create(c);
-            TextBuilder tb = p.go();
+            Token tb = p.go();
             if (null != tb) return F.T2(p, tb);
         }
         return null;
     }
 
-    public TextBuilder go() {
+    public Token go() {
         throw new UnsupportedOperationException();
     }
 

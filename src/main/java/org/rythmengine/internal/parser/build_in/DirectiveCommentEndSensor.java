@@ -24,7 +24,6 @@ import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +43,7 @@ public class DirectiveCommentEndSensor extends RemoveLeadingLineBreakAndSpacesPa
     private static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
 
     @Override
-    public TextBuilder go() {
+    public Token go() {
         IContext ctx = ctx();
         if (!ctx.insideDirectiveComment()) {
             return null;

@@ -19,14 +19,13 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
-import org.rythmengine.utils.Escape;
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.internal.parser.Patterns;
+import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -499,7 +498,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             }
 
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = new Regex(String.format(patternStr(), dialect().a()));
                 if (!r.search(remain())) return null;
                 String tagName = r.stringMatched(2);

@@ -19,14 +19,14 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 public class BreakParser extends KeywordParserFactory {
 
@@ -41,7 +41,7 @@ public class BreakParser extends KeywordParserFactory {
 
     public IParser create(IContext c) {
         return new RemoveLeadingLineBreakAndSpacesParser(c) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Bad @break statement. Correct usage: @break()");

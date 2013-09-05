@@ -107,7 +107,7 @@ public class TemplateParser implements IContext {
             TemplateResourceManager.setUpTmpBlackList();
             try {
                 TemplateTokenizer tt = new TemplateTokenizer(this);
-                for (TextBuilder builder : tt) {
+                for (Token builder : tt) {
                     cb.addBuilder(builder);
                 }
                 dm.endParse(this);

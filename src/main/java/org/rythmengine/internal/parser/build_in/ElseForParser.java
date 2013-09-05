@@ -19,14 +19,14 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.exception.ParseException;
 import org.rythmengine.internal.IBlockHandler;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * else branch for @for loop, executed in case the loop variable is empty
@@ -40,7 +40,7 @@ public class ElseForParser extends CaretParserFactoryBase {
         return new RemoveLeadingSpacesIfLineBreakParser(ctx) {
 
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 IBlockHandler bh = ctx().currentBlock();
                 if (null == bh || !(bh instanceof ForEachCodeToken)) return null;
 

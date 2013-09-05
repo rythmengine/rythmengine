@@ -1,11 +1,10 @@
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * Parsing @i18n() directive
@@ -29,7 +28,7 @@ public class I18nParser extends KeywordParserFactory {
     @Override
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 String remain = remain();
                 Regex r = reg(dialect());
                 if (!r.search(remain)) {

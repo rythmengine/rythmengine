@@ -23,7 +23,6 @@ import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.RemoveLeadingLineBreakAndSpacesParser;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +38,7 @@ import java.util.regex.Pattern;
 public class CommentParser extends CaretParserFactoryBase {
     public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Pattern p = inlineComment();
                 Matcher m = p.matcher(remain());
                 if (!m.matches()) {

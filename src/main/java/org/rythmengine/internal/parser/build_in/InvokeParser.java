@@ -19,11 +19,10 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
 
@@ -45,7 +44,7 @@ public class InvokeParser extends KeywordParserFactory {
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @invoke statement. Correct usage: @invoke(\"tagname\", ...)");
@@ -91,11 +90,11 @@ public class InvokeParser extends KeywordParserFactory {
                 Matcher m0 = InvokeTemplateParser.P_HEREDOC_SIMBOL.matcher(s);
                 Matcher m1 = InvokeTemplateParser.P_STANDARD_BLOCK.matcher(s);
                 if (m0.matches()) {
-                    TextBuilder tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    Token tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m0.group(1).length());
                     return tb;
                 } else if (m1.matches()) {
-                    TextBuilder tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
+                    Token tb = InvokeTemplateParser.InvokeTagWithBodyToken.dynamicTagToken(tagName, params, r.stringMatched(4), ctx());
                     ctx().step(m1.group(1).length());
                     return tb;
                 } else {

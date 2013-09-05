@@ -22,7 +22,6 @@ package org.rythmengine.internal.parser.build_in;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.ParserBase;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +41,7 @@ public class StringTokenParser extends ParserBase {
     private static final String PTN = "(%s%s.*?|.*?)([\\n\\r@\\<\\#\\$\\&\\{\\}\\-\\*\\/].*|$)";
 
     @Override
-    public TextBuilder go() {
+    public Token go() {
         IContext ctx = ctx();
         String s = ctx.getRemain();
         if (s.length() == 0) {

@@ -23,7 +23,6 @@ import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,7 +42,7 @@ public class BraceParser implements IParserFactory {
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 String remain = remain();
                 char c = remain.charAt(0);
                 if ('{' == c) {

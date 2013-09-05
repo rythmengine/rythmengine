@@ -27,7 +27,6 @@ import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.RemoveLeadingSpacesIfLineBreakParser;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 public class IfParser extends KeywordParserFactory {
 
@@ -42,7 +41,7 @@ public class IfParser extends KeywordParserFactory {
     public IParser create(final IContext ctx) {
         return new RemoveLeadingSpacesIfLineBreakParser(ctx) {
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @if statement. Correct usage: @if (some-condition) {some-template-code}");

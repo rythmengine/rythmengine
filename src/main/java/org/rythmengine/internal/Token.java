@@ -189,10 +189,21 @@ public class Token extends TextBuilder {
         return ok;
     }
 
-    public final TextBuilder build() {
+    public final Token build() {
         if (ok) output();
         else {
             pp(s);
+        }
+        return this;
+    }
+
+    public final Token build(IContext includeCtx) {
+        IContext ctx0 = ctx;
+        ctx = includeCtx;
+        try {
+            build();
+        } finally {
+            ctx = ctx0;
         }
         return this;
     }
@@ -437,6 +448,10 @@ public class Token extends TextBuilder {
         }
         p("p(\"").p(s).p("\");");
         pline();
+    }
+
+    public Token clone(TextBuilder caller) {
+        return (Token)super.clone(caller);
     }
 
     private static final Pattern P_C1 = Pattern.compile("\\n+", Pattern.DOTALL);

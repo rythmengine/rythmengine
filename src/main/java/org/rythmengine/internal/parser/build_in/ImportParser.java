@@ -19,11 +19,10 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
 
@@ -40,7 +39,7 @@ public class ImportParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 String remain = remain();
                 String line;
                 Regex r = new Regex(String.format("\\n?[ \\t\\x0B\\f]*%s%s(\\([ \t\f]*\\))?[ \t\f]*((?@{}))[ \\t\\x0B\\f]*\\n?", a(), keyword()));

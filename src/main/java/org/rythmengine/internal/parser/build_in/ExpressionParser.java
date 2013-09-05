@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.exception.DialectNotSupportException;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.dialect.BasicRythm;
@@ -28,8 +29,6 @@ import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.internal.parser.Patterns;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * Single line expression parser
@@ -132,7 +131,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
 
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 String s = remain();
                 if (r1.search(s)) {
                     s = r1.stringMatched();

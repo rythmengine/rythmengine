@@ -42,7 +42,7 @@ public class RawParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;
                 final String matched = m.group(1);

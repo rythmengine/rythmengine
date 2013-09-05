@@ -27,7 +27,6 @@ import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 
 /**
  * Parse @escape("JS") {...}
@@ -41,7 +40,7 @@ public class EscapeParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) return null;
                 final String matched = r.stringMatched();

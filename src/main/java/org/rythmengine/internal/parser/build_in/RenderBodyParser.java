@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
@@ -26,8 +27,6 @@ import org.rythmengine.internal.Token;
 import org.rythmengine.internal.dialect.Rythm;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 /**
  * Parse @renderBody - callback to tag body
@@ -71,7 +70,7 @@ public class RenderBodyParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("bad @renderBody statement. Correct usage: @renderBody(params...)");

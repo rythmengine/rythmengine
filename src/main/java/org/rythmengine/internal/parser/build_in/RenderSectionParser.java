@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
+import com.stevesoft.pat.Regex;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Keyword;
@@ -28,8 +29,6 @@ import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.internal.parser.Patterns;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.regex.Matcher;
 
@@ -79,7 +78,7 @@ public class RenderSectionParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Matcher m = ptn(dialect()).matcher(remain());
                 if (!m.matches()) return null;
                 String matched = m.group(1);

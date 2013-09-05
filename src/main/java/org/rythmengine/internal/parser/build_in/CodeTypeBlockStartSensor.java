@@ -21,9 +21,9 @@ package org.rythmengine.internal.parser.build_in;
 
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.IContext;
+import org.rythmengine.internal.Token;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
-import org.rythmengine.utils.TextBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class CodeTypeBlockStartSensor extends ParserBase {
     private static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
 
     @Override
-    public TextBuilder go() {
+    public Token go() {
         IContext ctx = ctx();
         ICodeType curType = ctx.peekCodeType();
         if (!curType.allowInternalTypeBlock()) return null;

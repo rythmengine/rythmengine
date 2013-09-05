@@ -19,15 +19,11 @@
 */
 package org.rythmengine.internal.parser.build_in;
 
-import org.rythmengine.internal.ExtensionManager;
-import org.rythmengine.internal.IContext;
-import org.rythmengine.internal.IDialect;
-import org.rythmengine.internal.IParser;
+import com.stevesoft.pat.Regex;
+import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
-import com.stevesoft.pat.Regex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +47,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
 
             @Override
-            public TextBuilder go() {
+            public Token go() {
                 final String caret_ = dialect.a();
                 final Regex r1 = new Regex(String.format(patternStr1(), caret_));
                 final Regex r2 = new Regex(String.format(patternStr2(), caret_));

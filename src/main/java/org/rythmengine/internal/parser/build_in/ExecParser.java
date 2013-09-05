@@ -44,7 +44,7 @@ public class ExecParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
                     raiseParseException("Error parsing @exec statement. Correct usage: @exec(myMacro)");

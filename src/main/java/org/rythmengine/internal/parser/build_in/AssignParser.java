@@ -108,7 +108,7 @@ public class AssignParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
-            public TextBuilder go() {
+            public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain()))
                     raiseParseException("bad @assign statement. Correct usage: @assign(myVariable){...}");
