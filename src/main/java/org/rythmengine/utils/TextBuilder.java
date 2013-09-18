@@ -524,7 +524,7 @@ public class TextBuilder implements Cloneable {
             tb.__caller = caller;
             return tb;
         } catch (CloneNotSupportedException e) {
-            throw new FastRuntimeException("Unexpected");
+            throw new RuntimeException("Unexpected");
         }
     }
 }

@@ -112,18 +112,24 @@ public class TemplateResourceManager {
     } 
     
     public static void reportNonResource(String str) {
-        //logger.info(">>> report non resource: %s", str);
         tmpBlackList.get().peek().add(str);
     }
     
     public static void commitTmpBlackList() {
-        Set<String> ss = tmpBlackList.get().pop();
-        //logger.info(">>> commit black list: [%s]", ss);
-        blackList.addAll(ss);
+        try {
+            Set<String> ss = tmpBlackList.get().pop();
+            blackList.addAll(ss);
+        } catch (EmptyStackException e){
+            // ignore it
+        }
     }
     
     public static void rollbackTmpBlackList() {
-        tmpBlackList.get().pop();
+        try {
+            tmpBlackList.get().pop();
+        } catch (EmptyStackException e){
+            // ignore it
+        }
     }
 
     public TemplateResourceManager(RythmEngine engine) {
