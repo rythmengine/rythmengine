@@ -241,6 +241,15 @@ public enum RythmConfigurationKey {
     ENGINE_FILE_WRITE_ENABLED("engine.file_write.enabled", true),
 
     /**
+     * "engine.gae.enabled": Enable/disable google application engine. This option is used by rythm to check if
+     * if it is running in a GAE environment. If this option is enabled, then file write is always disabled
+     * regardless the setting of {@link #ENGINE_FILE_WRITE_ENABLED}
+     * <p/>
+     * <p>Default value: <code>false</code></p>
+     */
+    ENGINE_GAE_ENABLED("engine.gae.enabled", false),
+
+    /**
      * "engine.precompile_mode.enabled": Set/unset precompile mode. This option is used by play-rythm plugin (could also
      * be other plugin) to notify rythm that is is doing a precompile. User application
      * should not use this option

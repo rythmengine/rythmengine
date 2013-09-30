@@ -19,6 +19,7 @@
 */
 package org.rythmengine;
 
+import com.google.appengine.api.LifecycleManager;
 import org.mvel2.MVEL;
 import org.mvel2.integration.PropertyHandler;
 import org.mvel2.integration.PropertyHandlerFactory;
@@ -661,13 +662,22 @@ public class RythmEngine implements IEventDispatcher {
         if (conf().autoScan()) {
             resourceManager().scan();
         }
-        
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                RythmEngine.this.shutdown();
-            }
-        });
+
+        if (conf().gae()) {
+            LifecycleManager.getInstance().setShutdownHook(new LifecycleManager.ShutdownHook() {
+                @Override
+                public void shutdown() {
+                    RythmEngine.this.shutdown();
+                }
+            });
+        } else {
+            Runtime.getRuntime().addShutdownHook(new Thread(){
+                @Override
+                public void run() {
+                    RythmEngine.this.shutdown();
+                }
+            });
+        }
 
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }

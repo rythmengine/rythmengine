@@ -214,9 +214,20 @@ public class RythmConfiguration {
     public boolean disableFileWrite() {
         if (null == _disableFileWrite) {
             boolean b = (Boolean) get(ENGINE_FILE_WRITE_ENABLED);
+            b = b && !gae();
             _disableFileWrite = !b;
         }
         return _disableFileWrite;
+    }
+
+    private Boolean _gae = null;
+
+    public boolean gae() {
+        if (null == _gae) {
+            boolean b = (Boolean) get(ENGINE_GAE_ENABLED);
+            _gae = b;
+        }
+        return _gae;
     }
 
     private Set<String> _restrictedClasses = null;
