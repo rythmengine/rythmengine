@@ -19,7 +19,6 @@
 */
 package org.rythmengine;
 
-import com.google.appengine.api.LifecycleManager;
 import org.mvel2.MVEL;
 import org.mvel2.integration.PropertyHandler;
 import org.mvel2.integration.PropertyHandlerFactory;
@@ -663,7 +662,22 @@ public class RythmEngine implements IEventDispatcher {
             resourceManager().scan();
         }
 
-        if (conf().gae()) {
+
+		ShutdownService service = getShutdownService( conf().gae() ) ; 
+		service.setShutdown( new Runnable() {
+				@Override
+                public void run() {
+                    RythmEngine.this.shutdown();
+                }
+            });
+		if (conf().gae()) 
+			logger.warn("Rythm engine : GAE in cloud enabled");
+       /* if (conf().gae()) {
+			logger.warn("Rythm engine : GAE in cloud enabled");
+			
+			{
+		
+			}
             LifecycleManager.getInstance().setShutdownHook(new LifecycleManager.ShutdownHook() {
                 @Override
                 public void shutdown() {
@@ -677,11 +691,31 @@ public class RythmEngine implements IEventDispatcher {
                     RythmEngine.this.shutdown();
                 }
             });
-        }
+        }*/
 
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }
 
+
+	public static ShutdownService getShutdownService( boolean isGaeAvailable) 
+	{
+		if( !isGaeAvailable) 
+			return new DefaultShutdownService() ; 
+
+		try
+		{
+			String classname = "org.rythmengine.GaeShutdownService" ; 
+			Class clazz = Class.forName(classname);
+			ShutdownService result = (ShutdownService) clazz.newInstance() ;
+			return result ;
+		}
+		catch (Throwable t)
+		{
+			// Nothing to do
+			t.printStackTrace();
+		}
+		return new DefaultShutdownService()  ;
+	}
     /* -----------------------------------------------------------------------------
       Registrations
     -------------------------------------------------------------------------------*/
