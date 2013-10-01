@@ -222,10 +222,51 @@ public class RythmConfiguration {
 
     private Boolean _gae = null;
 
-    public boolean gae() {
+	public static boolean isGaeSdkInClasspath() 
+	{
+		try
+		{
+			String classname = "com.google.appengine.api.LifecycleManager" ; 
+			Class clazz = Class.forName(classname);
+			return clazz != null ;
+		}
+		catch (Throwable t)
+		{
+			// Nothing to do
+		}
+		return false ;
+	}
+
+	public static ServerConfig getServerConfig( boolean isGaeAvailable) 
+	{
+		if( !isGaeAvailable) 
+			return new DefaultConfig() ; 
+
+		try
+		{
+			String classname = "org.rythmengine.conf.GaeConfig" ; 
+			Class clazz = Class.forName(classname);
+			ServerConfig result = (ServerConfig) clazz.newInstance() ;
+			return result ;
+		}
+		catch (Throwable t)
+		{
+			// Nothing to do
+			t.printStackTrace();
+		}
+		return new DefaultConfig()  ;
+	}
+
+	public boolean gae() {
         if (null == _gae) {
-            boolean b = (Boolean) get(ENGINE_GAE_ENABLED);
-            _gae = b;
+            // boolean b = (Boolean) get(ENGINE_GAE_ENABLED);
+			boolean b = isGaeSdkInClasspath() ;
+			if( b ) {
+				ServerConfig config = getServerConfig( true ) ;
+				boolean isInCloud = config.isInGaeCloud() ; 
+				b = b && isInCloud ;
+			}
+            _gae = b ;
         }
         return _gae;
     }
