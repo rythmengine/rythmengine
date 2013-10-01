@@ -19,20 +19,6 @@
 */
 package org.rythmengine.conf;
 
-public class GaeConfig implements ServerConfig {
-    
-	@Override
-	public boolean isInGaeCloud() 
-	{
-		try
-		{
-			boolean result = com.google.appengine.api.utils.SystemProperty.environment.value() == com.google.appengine.api.utils.SystemProperty.Environment.Value.Production ;
-			return result ; 
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-		}
-		return false ;
-	}
+interface GAEDetector {
+	public boolean isInGaeCloud() ;
 }

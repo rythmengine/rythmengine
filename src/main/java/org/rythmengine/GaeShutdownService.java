@@ -21,24 +21,23 @@ package org.rythmengine;
 
 import com.google.appengine.api.LifecycleManager;
 
-public class GaeShutdownService implements ShutdownService {
-    
-	@Override
-	public void setShutdown( final Runnable runnable ) 
-	{
-		try
-		{
+enum GaeShutdownService implements ShutdownService {
+
+    INSTANCE;
+
+    @Override
+    public void setShutdown(final Runnable runnable) {
+        try {
             LifecycleManager.getInstance().setShutdownHook(new LifecycleManager.ShutdownHook() {
                 @Override
                 public void shutdown() {
-					if (runnable != null )
-						runnable.run() ;                    
+                    if (runnable != null) {
+                        runnable.run();
+                    }
                 }
             });
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-		}
-	}
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+    }
 }

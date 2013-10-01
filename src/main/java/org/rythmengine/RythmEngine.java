@@ -197,7 +197,7 @@ public class RythmEngine implements IEventDispatcher {
 
     /**
      * Alias of {@link #id()}
-     * 
+     *
      * @return the engine id
      */
     public String getId() {
@@ -663,59 +663,36 @@ public class RythmEngine implements IEventDispatcher {
         }
 
 
-		ShutdownService service = getShutdownService( conf().gae() ) ; 
-		service.setShutdown( new Runnable() {
-				@Override
-                public void run() {
-                    RythmEngine.this.shutdown();
-                }
-            });
-		if (conf().gae()) 
-			logger.warn("Rythm engine : GAE in cloud enabled");
-       /* if (conf().gae()) {
-			logger.warn("Rythm engine : GAE in cloud enabled");
-			
-			{
-		
-			}
-            LifecycleManager.getInstance().setShutdownHook(new LifecycleManager.ShutdownHook() {
-                @Override
-                public void shutdown() {
-                    RythmEngine.this.shutdown();
-                }
-            });
-        } else {
-            Runtime.getRuntime().addShutdownHook(new Thread(){
-                @Override
-                public void run() {
-                    RythmEngine.this.shutdown();
-                }
-            });
-        }*/
-
+        ShutdownService service = getShutdownService(conf().gae());
+        service.setShutdown(new Runnable() {
+            @Override
+            public void run() {
+                RythmEngine.this.shutdown();
+            }
+        });
+        if (conf().gae()) {
+            logger.warn("Rythm engine : GAE in cloud enabled");
+        }
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }
 
 
-	public static ShutdownService getShutdownService( boolean isGaeAvailable) 
-	{
-		if( !isGaeAvailable) 
-			return new DefaultShutdownService() ; 
+    public static ShutdownService getShutdownService(boolean isGaeAvailable) {
+        if (!isGaeAvailable) {
+            return DefaultShutdownService.INSTANCE;
+        }
 
-		try
-		{
-			String classname = "org.rythmengine.GaeShutdownService" ; 
-			Class clazz = Class.forName(classname);
-			ShutdownService result = (ShutdownService) clazz.newInstance() ;
-			return result ;
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-			t.printStackTrace();
-		}
-		return new DefaultShutdownService()  ;
-	}
+        try {
+            String classname = "org.rythmengine.GaeShutdownService";
+            Class clazz = Class.forName(classname);
+            Object[] oa = clazz.getEnumConstants();
+            ShutdownService result = (ShutdownService) oa[0];
+            return result;
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+        return DefaultShutdownService.INSTANCE;
+    }
     /* -----------------------------------------------------------------------------
       Registrations
     -------------------------------------------------------------------------------*/
@@ -783,7 +760,7 @@ public class RythmEngine implements IEventDispatcher {
                 if (null != tm && tm.requireTemplate()) {
                     requireTemplate = true;
                 }
-                
+
                 boolean lastParam = clsLastParam;
                 if (null != tm && tm.lastParam()) {
                     lastParam = true;
@@ -829,9 +806,9 @@ public class RythmEngine implements IEventDispatcher {
             }
         });
     }
-    
+
     public void registerResourceLoader(ITemplateResourceLoader... loaders) {
-        
+
     }
 
     /* -----------------------------------------------------------------------------
@@ -1344,7 +1321,7 @@ public class RythmEngine implements IEventDispatcher {
         }
         return MVEL.executeExpression(ce, params);
     }
-    
+
     public Object eval(String script, Object context, Map<String, Object> params) {
         Serializable ce = mvels.get(script);
         if (null == ce) {
@@ -1927,6 +1904,7 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     private boolean zombie = false;
+
     /**
      * Shutdown this rythm engine
      */

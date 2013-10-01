@@ -20,24 +20,22 @@
 package org.rythmengine;
 
 
-public class DefaultShutdownService implements ShutdownService {
-    
-	@Override
-	public void setShutdown( final Runnable runnable ) 
-	{
-		try
-		{
-			 Runtime.getRuntime().addShutdownHook(new Thread(){
+enum DefaultShutdownService implements ShutdownService {
+
+    INSTANCE;
+
+    @Override
+    public void setShutdown(final Runnable runnable) {
+        try {
+            Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
-                    if (runnable != null )
-						runnable.run() ; 
-					}
-              }) ;
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-		}
-	}
+                    if (runnable != null)
+                        runnable.run();
+                }
+            });
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+    }
 }

@@ -363,7 +363,12 @@ public class TemplateClass {
                 refresh();
             }
         }
-        Class<?> c = engine().classLoader().loadClass(name(), true);
+        RythmEngine engine = engine();
+        TemplateClassLoader cl = engine.classLoader();
+        if (null == cl) {
+            throw new NullPointerException();
+        }
+        Class<?> c = cl.loadClass(name(), true);
         if (null == javaClass) javaClass = (Class<ITemplate>) c;
         return c;
     }

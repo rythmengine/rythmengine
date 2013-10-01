@@ -19,11 +19,15 @@
 */
 package org.rythmengine.conf;
 
-public class DefaultConfig implements ServerConfig {
-    
-	@Override
-	public boolean isInGaeCloud()
-	{
-		return false ; 
-	}
+class GAEDetectorImpl implements GAEDetector {
+
+    @Override
+    public boolean isInGaeCloud() {
+        try {
+            return com.google.appengine.api.utils.SystemProperty.environment.value() == com.google.appengine.api.utils.SystemProperty.Environment.Value.Production;
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+        return false;
+    }
 }

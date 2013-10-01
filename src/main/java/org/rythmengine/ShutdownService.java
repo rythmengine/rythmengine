@@ -19,7 +19,6 @@
 */
 package org.rythmengine;
 
-public interface ShutdownService {
-    
-	public void setShutdown( final Runnable runnable ) ;
+interface ShutdownService {
+    public void setShutdown(final Runnable runnable);
 }

@@ -78,6 +78,7 @@ public class RythmConfiguration {
 
     /**
      * Return a configuration value as list
+     *
      * @param key
      * @param c
      * @param <T>
@@ -90,7 +91,7 @@ public class RythmConfiguration {
             data.put(key, l);
             return l;
         } else {
-            return (List)o;
+            return (List) o;
         }
     }
 
@@ -184,7 +185,8 @@ public class RythmConfiguration {
      */
     public boolean loadPrecompiled() {
         if (null == _loadPrecompiled) {
-            _loadPrecompiled = get(ENGINE_LOAD_PRECOMPILED_ENABLED);
+            Boolean b = get(ENGINE_LOAD_PRECOMPILED_ENABLED);
+            _loadPrecompiled = b || gae();
         }
         return _loadPrecompiled;
     }
@@ -222,51 +224,30 @@ public class RythmConfiguration {
 
     private Boolean _gae = null;
 
-	public static boolean isGaeSdkInClasspath() 
-	{
-		try
-		{
-			String classname = "com.google.appengine.api.LifecycleManager" ; 
-			Class clazz = Class.forName(classname);
-			return clazz != null ;
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-		}
-		return false ;
-	}
+    private static boolean isGaeSdkInClasspath() {
+        try {
+            Class.forName("com.google.appengine.api.LifecycleManager");
+            return true;
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+        return false;
+    }
 
-	public static ServerConfig getServerConfig( boolean isGaeAvailable) 
-	{
-		if( !isGaeAvailable) 
-			return new DefaultConfig() ; 
-
-		try
-		{
-			String classname = "org.rythmengine.conf.GaeConfig" ; 
-			Class clazz = Class.forName(classname);
-			ServerConfig result = (ServerConfig) clazz.newInstance() ;
-			return result ;
-		}
-		catch (Throwable t)
-		{
-			// Nothing to do
-			t.printStackTrace();
-		}
-		return new DefaultConfig()  ;
-	}
-
-	public boolean gae() {
+    public boolean gae() {
         if (null == _gae) {
-            // boolean b = (Boolean) get(ENGINE_GAE_ENABLED);
-			boolean b = isGaeSdkInClasspath() ;
-			if( b ) {
-				ServerConfig config = getServerConfig( true ) ;
-				boolean isInCloud = config.isInGaeCloud() ; 
-				b = b && isInCloud ;
-			}
-            _gae = b ;
+            boolean b = isGaeSdkInClasspath();
+            if (b) {
+                try {
+                    Class clz = Class.forName("org.rythmengine.conf.GAEDetectorImpl");
+                    GAEDetector detector = (GAEDetector)clz.newInstance();
+                    b = detector.isInGaeCloud();
+                } catch (Throwable t) {
+                    logger.warn(t, "error detecting gae environment");
+                    b = false;
+                }
+            }
+            _gae = b;
         }
         return _gae;
     }
@@ -320,7 +301,7 @@ public class RythmConfiguration {
      */
     public boolean smartEscapeEnabled() {
         if (null == _smartEscapeEnabled) {
-            _smartEscapeEnabled = (Boolean)get(FEATURE_SMART_ESCAPE_ENABLED);
+            _smartEscapeEnabled = (Boolean) get(FEATURE_SMART_ESCAPE_ENABLED);
         }
         return _smartEscapeEnabled;
     }
@@ -334,21 +315,21 @@ public class RythmConfiguration {
      */
     public boolean naturalTemplateEnabled() {
         if (null == _naturalTemplateEnabled) {
-            _naturalTemplateEnabled = (Boolean)get(FEATURE_NATURAL_TEMPLATE_ENABLED);
+            _naturalTemplateEnabled = (Boolean) get(FEATURE_NATURAL_TEMPLATE_ENABLED);
         }
         return _naturalTemplateEnabled;
     }
-    
+
     private Boolean _debugJavaSourceEnabled = null;
-    
+
     /**
      * Get {@link RythmConfigurationKey#ENGINE_OUTPUT_JAVA_SOURCE_ENABLED} without lookup
      *
-     * @return true if debug java source is enabled 
+     * @return true if debug java source is enabled
      */
     public boolean debugJavaSourceEnabled() {
         if (null == _debugJavaSourceEnabled) {
-            _debugJavaSourceEnabled = (Boolean)get(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED);
+            _debugJavaSourceEnabled = (Boolean) get(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED);
         }
         return _debugJavaSourceEnabled;
     }
@@ -421,7 +402,7 @@ public class RythmConfiguration {
         }
         return _compactEnabled;
     }
-    
+
     private IDurationParser _durationParser = null;
 
     /**
@@ -501,8 +482,9 @@ public class RythmConfiguration {
         }
         return _byteCodeEnhancer;
     }
-    
+
     private ISourceCodeEnhancer _srcEnhancer = null;
+
     public ISourceCodeEnhancer sourceEnhancer() {
         if (null == _srcEnhancer) {
             _srcEnhancer = get(CODEGEN_SOURCE_CODE_ENHANCER);
@@ -523,11 +505,11 @@ public class RythmConfiguration {
         }
         return _locale;
     }
-    
+
     private List<String> _messageSources = null;
 
     /**
-     * Get {@link RythmConfigurationKey#I18N_MESSAGE_SOURCES} without lookup 
+     * Get {@link RythmConfigurationKey#I18N_MESSAGE_SOURCES} without lookup
      */
     public List<String> messageSources() {
         if (null == _messageSources) {
@@ -535,7 +517,7 @@ public class RythmConfiguration {
         }
         return _messageSources;
     }
-    
+
     private II18nMessageResolver _i18n = null;
 
     /**
@@ -547,9 +529,9 @@ public class RythmConfiguration {
         }
         return _i18n;
     }
-    
+
     private String _suffix = null;
-    
+
     /**
      * Get {@link RythmConfigurationKey#RESOURCE_NAME_SUFFIX} without lookup
      */
@@ -559,32 +541,36 @@ public class RythmConfiguration {
         }
         return _suffix;
     }
-    
+
     private Boolean _autoScan = null;
+
     public boolean autoScan() {
         if (null == _autoScan) {
             _autoScan = get(RESOURCE_AUTO_SCAN);
         }
         return _autoScan;
     }
-    
+
     private String _allowedSysProps = null;
+
     public String allowedSystemProperties() {
         if (null == _allowedSysProps) {
             _allowedSysProps = get(SANDBOX_ALLOWED_SYSTEM_PROPERTIES);
         }
         return _allowedSysProps;
     }
-    
+
     private Boolean _sandboxTmpIO = null;
+
     public boolean sandboxTmpIO() {
         if (null == _sandboxTmpIO) {
             _sandboxTmpIO = get(SANDBOX_TEMP_IO_ENABLED);
         }
         return _sandboxTmpIO;
     }
-    
+
     private Boolean _hasGlobalInclude = null;
+
     public boolean hasGlobalInclude() {
         if (null == _hasGlobalInclude) {
             ITemplateResource rsrc = engine.resourceManager().getResource("__global.rythm");
@@ -593,13 +579,13 @@ public class RythmConfiguration {
         return _hasGlobalInclude;
     }
 
-    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP, null); 
-    
+    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP, null);
+
     /**
-     * Return <tt>RythmConfiguration</tt> instance of current RythmEngine, or 
+     * Return <tt>RythmConfiguration</tt> instance of current RythmEngine, or
      * if it is not inside a RythmEngine runtime context, an {@link #EMPTY_CONF empty configuration}
      * is returned
-     * 
+     *
      * @return the configuration instance associated with engine running in the current thread
      */
     public static RythmConfiguration get() {
@@ -608,6 +594,7 @@ public class RythmConfiguration {
     }
 
     private final static ILogger logger = Logger.get(RythmConfiguration.class);
+
     public void debug() {
         logger.info("start to dump rythm configuration >>>");
         for (RythmConfigurationKey k : RythmConfigurationKey.values()) {
