@@ -39,7 +39,7 @@ public class FileResourceLoader extends ResourceLoaderBase {
     private void scan_(File file, TemplateResourceManager manager) {
         if (file.isFile() && file.canRead()) {
             load_(file, manager);
-        } else {
+        } else if (file.isDirectory()) {
             File[] files = file.listFiles();
             if (null == files) return;
             for (File f: files) {
