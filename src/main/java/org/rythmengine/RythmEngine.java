@@ -98,9 +98,23 @@ public class RythmEngine implements IEventDispatcher {
      * <p><b>Note</b>, this method is NOT an API to be called by user application</p>
      *
      * @param engine
+     * @return {@code true} if engine instance set to the threadlocal, {@code false}
+     *         if the threadlocal has set an instance already
      */
-    public static void set(RythmEngine engine) {
-        _engine.set(engine);
+    public static boolean set(RythmEngine engine) {
+        if (_engine.get() == null) {
+            _engine.set(engine);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Clear the engine threadlocal variable
+     */
+    public static void remove() {
+        _engine.remove();
     }
 
     /**
@@ -1946,6 +1960,7 @@ public class RythmEngine implements IEventDispatcher {
         if (null != _nonExistsTags) _nonExistsTags.clear();
         if (null != _nonTmpls) _nonTmpls.clear();
         _classLoader = null;
+        Rythm.RenderTime.clear();
         zombie = true;
     }
 

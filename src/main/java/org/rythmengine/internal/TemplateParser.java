@@ -19,6 +19,7 @@
 */
 package org.rythmengine.internal;
 
+import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.exception.FastRuntimeException;
@@ -29,8 +30,6 @@ import org.rythmengine.internal.dialect.DialectManager;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.TemplateResourceManager;
-import org.rythmengine.utils.TextBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Locale;
 import java.util.Stack;
@@ -116,8 +115,8 @@ public class TemplateParser implements IContext {
                 dm.endParse(this);
                 break;
             } catch (RewindableException e) {
+                dm.endParse(this);
                 if (null != cb.requiredDialect) {
-                    dm.endParse(this);
                     throw e;
                 }
             } catch (RuntimeException e) {

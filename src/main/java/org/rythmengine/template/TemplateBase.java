@@ -553,7 +553,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     @Override
     public final String render() {
         RythmEngine engine = __engine();
-        RythmEngine.set(engine);
+        boolean engineSet = RythmEngine.set(engine);
         try {
             long l = 0l;
             boolean logTime = __logTime();
@@ -579,6 +579,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         } catch (ClassReloadException e) {
             engine.restart(e);
             return render();
+        } finally {
+            if (engineSet) {
+                RythmEngine.remove();
+            }
         }
     }
 

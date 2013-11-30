@@ -469,7 +469,19 @@ public enum RythmConfigurationKey {
      * <p/>
      * <p>Default value: <code>org.rythmengine.logger.JDKLogger.Factory</code></p>
      */
-    LOG_FACTORY_IMPL("log.factory.impl", JDKLogger.Factory.class),
+    LOG_FACTORY_IMPL("log.factory.impl") {
+        @Override
+        protected Object getDefVal(Map<String, ?> configuration) {
+            try {
+                // if commons logging exists then use it
+                Class.forName("org.apache.commons.logging.Log");
+                Class<?> logFactCls = Class.forName("org.rythmengine.logger.CommonsLoggerFactory");
+                return logFactCls;
+            } catch (Exception e) {
+                return new JDKLogger.Factory();
+            }
+        }
+    },
 
     /**
      * "log.source.java.enabled": Print out relevant java source lines when exception encountered

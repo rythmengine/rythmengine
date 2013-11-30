@@ -66,7 +66,7 @@ public class DialectManager {
         }
     };
 
-    public static void push(IDialect dialect) {
+    private static void push(IDialect dialect) {
         if (null == dialect) throw new NullPointerException();
         cur.get().push(dialect);
     }
@@ -75,8 +75,13 @@ public class DialectManager {
         return cur.get().peek();
     }
 
-    public static IDialect pop() {
-        return cur.get().pop();
+    private static IDialect pop() {
+        Stack<IDialect> sd = cur.get();
+        IDialect d = sd.pop();
+        if (sd.isEmpty()) {
+            cur.remove();
+        }
+        return d;
     }
 
     public void beginParse(IContext ctx) {
