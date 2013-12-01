@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * A simple cache service implementation
  */
 public class SimpleCacheService implements ICacheService {
+
     private static final ILogger logger = Logger.get(SimpleCacheService.class);
 
     public static final SimpleCacheService INSTANCE = new SimpleCacheService();
@@ -104,6 +105,11 @@ public class SimpleCacheService implements ICacheService {
     public Serializable remove(String key) {
         Item item = cache_.remove(key);
         return null == item ? null : item.value;
+    }
+
+    @Override
+    public void evict(String key) {
+        cache_.remove(key);
     }
 
     @Override

@@ -21,8 +21,8 @@ package org.rythmengine.conf;
 
 import org.rythmengine.Rythm;
 import org.rythmengine._Rythm;
+import org.rythmengine.cache.CacheServiceFactory;
 import org.rythmengine.cache.NoCacheService;
-import org.rythmengine.cache.SimpleCacheService;
 import org.rythmengine.exception.ConfigurationException;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.IDurationParser;
@@ -95,7 +95,10 @@ public enum RythmConfigurationKey {
         @Override
         protected Object getDefVal(Map<String, ?> configuration) {
             Boolean cacheEnabled = CACHE_ENABLED.getConfiguration(configuration);
-            return cacheEnabled ? SimpleCacheService.INSTANCE : NoCacheService.INSTANCE;
+            if (!cacheEnabled) {
+                return NoCacheService.INSTANCE;
+            }
+            return CacheServiceFactory.INSTANCE.get();
         }
     },
 

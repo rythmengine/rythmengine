@@ -113,7 +113,7 @@ public class RythmEngine implements IEventDispatcher {
     /**
      * Clear the engine threadlocal variable
      */
-    public static void remove() {
+    public static void clear() {
         _engine.remove();
     }
 

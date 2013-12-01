@@ -581,7 +581,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return render();
         } finally {
             if (engineSet) {
-                RythmEngine.remove();
+                RythmEngine.clear();
             }
         }
     }

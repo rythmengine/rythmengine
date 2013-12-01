@@ -49,8 +49,15 @@ public interface ICacheService {
      *
      * @param key
      * @return the value associated with the key
+     * @deprecated use {@link #evict(String)} instead
      */
     Serializable remove(String key);
+
+    /**
+     * Remove an item from the cache service by key
+     * @param key
+     */
+    void evict(String key);
 
     /**
      * Return an item from the cache service by key
@@ -65,6 +72,7 @@ public interface ICacheService {
      *
      * @param key
      * @return true if key is found in the cache
+     * @deprecated
      */
     boolean contains(String key);
 
