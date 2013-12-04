@@ -93,6 +93,14 @@ public class RythmException extends FastRuntimeException {
         this.javaSourceInfo = t4._4;
     }
 
+    public String errorTitle() {
+        return "RythmException";
+    }
+
+    public String errorDesc() {
+        return String.format("Generic Rythm Exception: <strong>%s</strong>", originalMessage.replace("<", "&lt;"));
+    }
+
     public String javaSourceInfo() {
         if (null != javaSourceInfo) return javaSourceInfo;
         String javaSource = getJavaSource();

@@ -34,4 +34,13 @@ public class ParseException extends RythmException {
         RythmEvents.PARSE_FAILED.trigger(engine, tc);
     }
 
+    @Override
+    public String errorTitle() {
+        return "Rythm parse error";
+    }
+
+    @Override
+    public String errorDesc() {
+        return String.format("The template[%s] cannot be parsed: <strong>%s</strong>", getTemplateName(), originalMessage.replace("<", "&lt;"));
+    }
 }

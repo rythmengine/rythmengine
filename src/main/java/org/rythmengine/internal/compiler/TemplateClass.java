@@ -813,4 +813,5 @@ public class TemplateClass {
     public int hashCode() {
         return getKey().hashCode();
     }
+
 }

@@ -55,4 +55,13 @@ public class CompileException extends RythmException {
         RythmEvents.COMPILE_FAILED.trigger(engine, tc);
     }
 
+    @Override
+    public String errorTitle() {
+        return "Rythm Compilation Error";
+    }
+
+    @Override
+    public String errorDesc() {
+        return String.format("The template[%s] cannot be compiled: <strong>%s</strong>", this.getTemplateName(), this.originalMessage.replace("<", "&lt;"));
+    }
 }
