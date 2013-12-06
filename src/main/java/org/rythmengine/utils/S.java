@@ -294,11 +294,13 @@ public class S {
      * @return true if s1 equals s2
      */
     public static boolean isEqual(String s1, String s2, int modifier) {
+        if (s1 == s2) return true;
         if (null == s1) {
             return s2 == null;
         }
-        if (null == s2)
+        if (null == s2) {
             return false;
+        }
         if ((modifier & IGNORESPACE) != 0) {
             s1 = s1.trim();
             s2 = s2.trim();
