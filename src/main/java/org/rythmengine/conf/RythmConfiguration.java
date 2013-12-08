@@ -454,7 +454,12 @@ public class RythmConfiguration {
      */
     public List<File> templateHome() {
         if (null == _templateHome) {
-            _templateHome = get(RythmConfigurationKey.HOME_TEMPLATE);
+            Object o = get(RythmConfigurationKey.HOME_TEMPLATE);
+            if (o instanceof File) {
+                _templateHome = Arrays.asList(new File[]{(File)o});
+            } else if (o instanceof List) {
+                _templateHome = (List<File>)o;
+            }
         }
         return _templateHome;
     }
