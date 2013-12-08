@@ -1693,6 +1693,18 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     /**
+     * Evict an object from cache service by key
+     *
+     * @param key identify the object should be removed from cache service
+     */
+    public void evict(String key) {
+        if (conf().cacheDisabled()) {
+            return;
+        }
+        _cacheService.evict(key);
+    }
+
+    /**
      * Get cached value using key and a list of argument values
      * <p/>
      * <p>Not an API for user application</p>
