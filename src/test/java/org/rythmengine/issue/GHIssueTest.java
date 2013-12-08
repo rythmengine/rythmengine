@@ -224,6 +224,13 @@ public class GHIssueTest extends TestBase {
     }
 
     @Test
+    public void test188() {
+        t = "gh188/foo.txt";
+        s = r(t);
+        eq("good");
+    }
+
+    @Test
     public void test193() {
         t = "@if(true) {a} else { \nb\n}";
         s = r(t);
