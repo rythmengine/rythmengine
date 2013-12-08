@@ -1,6 +1,7 @@
 package org.rythmengine.issue;
 
 import models.Foo;
+import models.GH185Model;
 import org.junit.Test;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
@@ -221,6 +222,14 @@ public class GHIssueTest extends TestBase {
                 "}";
         s = r(t);
         eq("0\n5\n");
+    }
+
+    @Test
+    public void test185() {
+        GH185Model model = new GH185Model("bar");
+        t = "@args models.GH185Model model\n@if (model.foo@) {@model.foo@}";
+        s = r(t, model);
+        eq("bar");
     }
 
     @Test
