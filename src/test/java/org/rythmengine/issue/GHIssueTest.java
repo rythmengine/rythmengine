@@ -222,6 +222,13 @@ public class GHIssueTest extends TestBase {
         s = r(t);
         eq("0\n5\n");
     }
+
+    @Test
+    public void test193() {
+        t = "@if(true) {a} else { \nb\n}";
+        s = r(t);
+        eq("a");
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

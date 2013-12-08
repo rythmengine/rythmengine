@@ -14,7 +14,8 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -159,7 +160,7 @@
             <version>0.8</version>
         </dependency>
         -->
-                
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -168,10 +169,10 @@
         </dependency>
 
         <dependency>
-        	<groupId>com.google.appengine</groupId>
-        	<artifactId>appengine-api-1.0-sdk</artifactId>
-        	<version>1.8.1</version>
-        	<scope>provided</scope>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
+            <version>1.8.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -196,10 +197,17 @@
         </dependency>
 
         <dependency>
-        	<groupId>net.sf.ehcache</groupId>
-        	<artifactId>ehcache</artifactId>
-        	<version>2.7.0</version>
-        	<scope>provided</scope>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>2.7.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.spy</groupId>
+            <artifactId>spymemcached</artifactId>
+            <version>2.10.3</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -241,7 +249,7 @@
                         <configuration>
                             <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
                             <excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
-                            <quiet />
+                            <quiet/>
                         </configuration>
                         <executions>
                             <execution>
