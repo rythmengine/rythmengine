@@ -1362,7 +1362,7 @@ public class RythmEngine implements IEventDispatcher {
      * @return true if there is a template with the name specified
      */
     public boolean templateRegistered(String tmplName) {
-        return _templates.containsKey(tmplName);
+        return _templates.containsKey(tmplName) || _tags.containsKey(tmplName);
     }
 
     /**
@@ -1536,8 +1536,6 @@ public class RythmEngine implements IEventDispatcher {
         Sandbox.enterSafeZone(secureCode);
         RythmEvents.ENTER_INVOKE_TEMPLATE.trigger(this, (TemplateBase) caller);
         try {
-            TemplateClass tc = caller.__getTemplateClass(true);
-
             // try tag registry first
             ITemplate t = _tags.get(name);
             if (null == t) {
@@ -1550,6 +1548,7 @@ public class RythmEngine implements IEventDispatcher {
 
             if (null == t) {
                 // try imported path
+                TemplateClass tc = caller.__getTemplateClass(true);
                 if (null != tc.importPaths) {
                     for (String s : tc.importPaths) {
                         String name0 = s + "." + name;
