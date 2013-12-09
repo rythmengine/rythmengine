@@ -245,6 +245,12 @@ public class GHIssueTest extends TestBase {
         s = r(t);
         eq("a");
     }
+
+    @Test
+    public void test202() {
+        t = "@def echo(String s){@s}@echo(\"okay?\")";
+        eq("okay?");
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

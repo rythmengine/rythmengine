@@ -90,7 +90,8 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                         curExp.append(s0);
                     }
                 }
-                exp = exp.replaceAll("\\?", "");
+                //exp = exp.replaceAll("\\?", "");
+                exp = exp.replaceAll("(\".*?\"|\\?)", "$1§").replaceAll("\\??§", "");
                 return new CodeToken(exp, ctx()) {
                     @Override
                     public void output() {

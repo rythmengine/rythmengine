@@ -1628,7 +1628,7 @@ public class RythmEngine implements IEventDispatcher {
             }
             if (null != body) {
                 t.__setRenderArg("__body", body);
-                t.__setRenderArg("_body", body); // for compatiblity
+                t.__setRenderArg("_body", body); // for compatibility
             }
             RythmEvents.ON_TAG_INVOCATION.trigger(this, F.T2((TemplateBase) caller, t));
             try {
