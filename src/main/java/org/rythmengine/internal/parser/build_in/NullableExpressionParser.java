@@ -91,7 +91,10 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
                     }
                 }
                 //exp = exp.replaceAll("\\?", "");
-                exp = exp.replaceAll("(\".*?\"|\\?)", "$1§").replaceAll("\\??§", "");
+                //exp = exp.replaceAll("(\".*?\"|\\?)", "$1§").replaceAll("\\??§", "");
+                //see http://stackoverflow.com/questions/20466535
+                String regex = "(?s)(\"(?>[^\\\\\"]++|\\\\{2}|\\\\.)*\")|\\?";
+                exp = exp.replaceAll(regex, "$1");
                 return new CodeToken(exp, ctx()) {
                     @Override
                     public void output() {
