@@ -46,7 +46,13 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
 
         // strip leading slash so path will work with classes in a JAR file
         while (path.startsWith("/")) path = path.substring(1);
+
         url = cl.getResource(path);
+
+        if( !isValid() ) {
+            url = cl.getResource( loader.getResourceLoaderRoot() + "/" + path );
+        }
+
         key = path;
     }
 

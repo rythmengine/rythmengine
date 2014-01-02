@@ -5,9 +5,21 @@ package org.rythmengine.resource;
  */
 public class ClasspathResourceLoader extends ResourceLoaderBase {
 
+    private String root;
+
+    public ClasspathResourceLoader() {
+         this("");
+
+    }
+
+    public ClasspathResourceLoader(String root) {
+        super();
+        this.root = root;
+    }
+
     @Override
     public String getResourceLoaderRoot() {
-        return "/";
+        return root;
     }
 
     @Override
