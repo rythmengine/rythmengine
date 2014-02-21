@@ -19,8 +19,7 @@
 */
 package org.rythmengine.resource;
 
-import org.rythmengine.Rythm;
-import org.rythmengine.RythmEngine;
+import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.utils.IO;
 
 import java.net.URL;
@@ -41,32 +40,19 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
         this(path, null);
     }
 
-    public ClasspathTemplateResource(String path, RythmEngine engine) {
-        //super(engine);
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (null == cl) {
-            cl = Rythm.class.getClassLoader();
-        }
+    public ClasspathTemplateResource(String path, ITemplateResourceLoader loader) {
+        super(loader);
+        ClassLoader cl = loader.getEngine().classLoader();
+
         // strip leading slash so path will work with classes in a JAR file
         while (path.startsWith("/")) path = path.substring(1);
+
         url = cl.getResource(path);
-//        if (null == url) {
-//            final String[] suffixes = {
-//                ".rythm",
-//                ".html",
-//                ".json",
-//                ".xml",
-//                ".csv",
-//                ".tag",
-//                ".txt"
-//            };
-//
-//            for (String s: suffixes) {
-//                String p = path + s;
-//                url = cl.getResource(p);
-//                if (null != url) break;
-//            }
-//        }
+
+        if( !isValid() ) {
+            url = cl.getResource( loader.getResourceLoaderRoot() + "/" + path );
+        }
+
         key = path;
     }
 
