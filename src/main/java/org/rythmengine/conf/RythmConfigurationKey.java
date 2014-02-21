@@ -693,6 +693,14 @@ public enum RythmConfigurationKey {
      * be called to register these user defined transformer classes. Default value: <code>null</code>
      */
     EXT_TRANSFORMER_IMPLS("ext.transformer.impls"),
+
+    /**
+     * "ext.formatter": User defined formatters, should be a list of class names separated by ",". The formatter
+     * class shall implement the interface {@link org.rythmengine.extension.IFormatter}. If configured then
+     * {@link org.rythmengine.RythmEngine#registerTransformer(Class[])} will be called to register these
+     * user defined formatter. Default value: <code>null</code>
+     */
+    EXT_FORMATTER_IMPLS("ext.formatter.impls"),
     
     /**
      * "ext.prop_accessor": User defined property accessors, should be a list of class names separated by ",". If configured

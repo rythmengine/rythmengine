@@ -99,7 +99,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param engine
      * @return {@code true} if engine instance set to the threadlocal, {@code false}
-     *         if the threadlocal has set an instance already
+     * if the threadlocal has set an instance already
      */
     public static boolean set(RythmEngine engine) {
         if (_engine.get() == null) {
@@ -672,10 +672,22 @@ public class RythmEngine implements IEventDispatcher {
         List<IPropertyAccessor> udpa = _conf.getList(RythmConfigurationKey.EXT_PROP_ACCESSOR_IMPLS, IPropertyAccessor.class);
         registerPropertyAccessor(udpa.toArray(new IPropertyAccessor[]{}));
 
+        List<Class> udfmt = _conf.getList(RythmConfigurationKey.EXT_FORMATTER_IMPLS, Class.class);
+        registerFormatter(udfmt.toArray(new Class[]{}));
+
+        // -- built-in formatters
+        try {
+            Class.forName("org.joda.time.DateTime");
+            Class<IFormatter> fmtCls = (Class<IFormatter>)Class.forName("org.rythmengine.extension.JodaDateTimeFormatter");
+            IFormatter fmt = fmtCls.newInstance();
+            extensionManager().registerFormatter(fmt);
+        } catch (Exception e) {
+            // ignore;
+        }
+
         if (conf().autoScan()) {
             resourceManager().scan();
         }
-
 
         ShutdownService service = getShutdownService(conf().gae());
         service.setShutdown(new Runnable() {
@@ -710,6 +722,28 @@ public class RythmEngine implements IEventDispatcher {
     /* -----------------------------------------------------------------------------
       Registrations
     -------------------------------------------------------------------------------*/
+
+    /**
+     * Register {@link org.rythmengine.extension.IFormatter formatters}
+     *
+     * @param formatterClasses
+     */
+    public void registerFormatter(Class<IFormatter>... formatterClasses) {
+        for (Class<IFormatter> cls : formatterClasses) {
+            try {
+                IFormatter fmt = cls.newInstance();
+                extensionManager().registerFormatter(fmt);
+            } catch (Exception e) {
+                Logger.error(e, "Error get formatter instance from class[%s]", cls);
+            }
+        }
+    }
+
+    public void registerFormatter(IFormatter... formatters) {
+        for (IFormatter fmt : formatters) {
+            extensionManager().registerFormatter(fmt);
+        }
+    }
 
     /**
      * Register {@link Transformer transformers} using namespace specified in

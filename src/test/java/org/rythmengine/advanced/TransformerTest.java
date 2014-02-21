@@ -19,12 +19,15 @@
 */
 package org.rythmengine.advanced;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.junit.Test;
 import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.Transformer;
 import org.rythmengine.utils.S;
-import org.junit.Test;
 
 import java.util.*;
 
@@ -121,6 +124,14 @@ public class TransformerTest extends TestBase {
 
         s = Rythm.render("@1.eq(@2)", null, null);
         eq("true");
+
+        // format joda date time
+        DateTime dt = new DateTime();
+        s = r("@1.format(\"dd/MM/yyyy hh:mm\")", dt);
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy hh:mm");
+        eq(fmt.print(dt));
+        System.out.println(s);
     }
     
     @Test

@@ -21,17 +21,16 @@ package org.rythmengine.internal;
 
 import org.rythmengine.RythmEngine;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.IFormatter;
 import org.rythmengine.utils.S;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class ExtensionManager {
 
     private final Set<IJavaExtension> _extensions = new HashSet<IJavaExtension>();
+    private final List<IFormatter> _fmts = new ArrayList<IFormatter>();
     private final RythmEngine engine;
 
     public ExtensionManager(RythmEngine engine) {
@@ -110,6 +109,20 @@ public class ExtensionManager {
 
     public boolean hasTemplateLangs() {
         return !codeTypeList.isEmpty();
+    }
+
+    public ExtensionManager registerFormatter(IFormatter fmt) {
+        _fmts.add(fmt);
+        return this;
+    }
+
+    public Iterable<IFormatter> formatters() {
+        return new Iterable<IFormatter>() {
+            @Override
+            public Iterator<IFormatter> iterator() {
+                return _fmts.iterator();
+            }
+        };
     }
 
 }

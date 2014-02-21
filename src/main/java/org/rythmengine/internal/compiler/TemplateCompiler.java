@@ -78,10 +78,13 @@ public class TemplateCompiler {
         this.settings.put(CompilerOptions.OPTION_Encoding, "UTF-8");
         this.settings.put(CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE);
         String javaVersion = CompilerOptions.VERSION_1_5;
-        if (System.getProperty("java.version").startsWith("1.6")) {
+        String provisionedJavaVersion = System.getProperty("java.version");
+        if (provisionedJavaVersion.startsWith("1.6")) {
             javaVersion = CompilerOptions.VERSION_1_6;
-        } else if (System.getProperty("java.version").startsWith("1.7")) {
+        } else if (provisionedJavaVersion.startsWith("1.7")) {
             javaVersion = CompilerOptions.VERSION_1_7;
+//        } else if (provisionedJavaVersion.startsWith("1.8")) {
+//            javaVersion = CompilerOptions.VERSION_1_8;
         }
         this.settings.put(CompilerOptions.OPTION_Source, javaVersion);
         this.settings.put(CompilerOptions.OPTION_TargetPlatform, javaVersion);
@@ -116,6 +119,11 @@ public class TemplateCompiler {
             for (int i = 0; i < packageName.length; i++) {
                 packageName[i] = st.nextToken().toCharArray();
             }
+        }
+
+        @Override
+        public boolean ignoreOptionalProblems() {
+            return false;
         }
 
         public char[] getFileName() {

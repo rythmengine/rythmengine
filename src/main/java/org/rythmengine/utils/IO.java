@@ -157,5 +157,22 @@ public class IO {
         }
     }
 
+    public static void close(InputStream is) {
+        if (null == is) return;
+        try {
+            is.close();
+        } catch (IOException e) {
+            // ignore it
+        }
+    }
+
+    public static void close(Writer w) {
+        if (null == w) return;
+        try {
+            w.close();
+        } catch (IOException e) {
+            // ignore it
+        }
+    }
 
 }

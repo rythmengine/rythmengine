@@ -22,6 +22,7 @@ package org.rythmengine.utils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
+import org.rythmengine.extension.IFormatter;
 import org.rythmengine.extension.II18nMessageResolver;
 import org.rythmengine.extension.Transformer;
 import org.rythmengine.internal.CacheKey;
@@ -998,9 +999,7 @@ public class S {
      */
     public static String format(Object o) {
         if (null == o) return "";
-        if (o instanceof Date) return format((Date)o);
-        if (o instanceof Number) return format((Number)o);
-        return o.toString();
+        return format(null, o, null, null, null);
     }
 
     /**
@@ -1023,9 +1022,7 @@ public class S {
      */
     public static String format(ITemplate template, Object o) {
         if (null == o) return "";
-        if (o instanceof Date) return format(template, (Date) o);
-        if (o instanceof Number) return format(template, (Number) o);
-        return o.toString();
+        return format(template, o, null, null, null);
     }
 
     /**
@@ -1059,9 +1056,7 @@ public class S {
      */
     public static String format(Object o, String pattern) {
         if (null == o) return "";
-        if (o instanceof Date) return format((Date) o, pattern);
-        if (o instanceof Number) return format((Number) o, pattern);
-        return o.toString();
+        return format(null, o, pattern, null, null);
     }
     
     /**
@@ -1084,9 +1079,7 @@ public class S {
      */
     public static String format(ITemplate template, Object o, String pattern) {
         if (null == o) return "";
-        if (o instanceof Date) return format(template, (Date) o, pattern);
-        if (o instanceof Number) return format(template, (Number) o, pattern);
-        return o.toString();
+        return format(template, o, pattern, null, null);
     }
     
     /**
@@ -1109,9 +1102,7 @@ public class S {
      */
     public static String format(Object o, String pattern, Locale locale) {
         if (null == o) return "";
-        if (o instanceof Date) return format((Date) o, pattern, locale);
-        if (o instanceof Number) return format((Number) o, pattern, locale);
-        return o.toString();
+        return format(null, o, pattern, locale, null);
     }
     
     /**
@@ -1134,9 +1125,7 @@ public class S {
      */
     public static String format(ITemplate template, Object o, String pattern, Locale locale) {
         if (null == o) return "";
-        if (o instanceof Date) return format(template, (Date) o, pattern, locale);
-        if (o instanceof Number) return format(template, (Number) o, pattern, locale);
-        return o.toString();
+        return format(template, o, pattern, locale, null);
     }
     
     /**
@@ -1162,11 +1151,9 @@ public class S {
      */
     public static String format(Object o, String pattern, Locale locale, String timezone) {
         if (null == o) return "";
-        if (o instanceof Date) return format((Date) o, pattern, locale, timezone);
-        if (o instanceof Number) return format((Number) o, pattern, locale, timezone);
-        return o.toString();
+        return format(null, o, pattern, locale, timezone);
     }
-    
+
     /**
      * Format a date with specified pattern, lang, locale and timezone. The locale
      * comes from the engine instance specified
@@ -1192,7 +1179,7 @@ public class S {
         
         return df.format(date);
     }
-    
+
     /**
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
@@ -1203,6 +1190,17 @@ public class S {
         if (null == o) return "";
         if (o instanceof Date) return format(template, (Date) o, pattern, locale, timezone);
         if (o instanceof Number) return format(template, (Number) o, pattern, locale);
+        if (null == locale) {
+            locale = I18N.locale(template);
+        }
+        RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
+        if (null == engine) return o.toString();
+        for(IFormatter fmt: engine.extensionManager().formatters()) {
+            String s = fmt.format(o, pattern, locale, timezone);
+            if (null != s) {
+                return s;
+            }
+        }
         return o.toString();
     }
     
