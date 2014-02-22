@@ -734,12 +734,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
     }
 
+    protected boolean __hasParent() {
+        return null != __parent && __parent != this;
+    }
+
     /**
      * Not to be used in user application or template
      */
     protected String __internalRender() {
         __internalBuild();
-        if (null != __parent && __parent != this) {
+        if (__hasParent()) {
             __parent.__setLayoutContent(toString());
             __parent.addAllLayoutSections(layoutSections);
             __parent.addAllRenderProperties(renderProperties);

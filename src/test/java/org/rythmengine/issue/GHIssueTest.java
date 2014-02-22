@@ -3,6 +3,7 @@ package org.rythmengine.issue;
 import models.Foo;
 import models.GH185Model;
 import org.junit.Test;
+import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -10,6 +11,7 @@ import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -244,6 +246,26 @@ public class GHIssueTest extends TestBase {
         t = "@if(true) {a} else { \nb\n}";
         s = r(t);
         eq("a");
+    }
+
+    @Test
+    public void test194() {
+        // This is known issue.
+        // The workaround could be use ESCAPED WORD
+//        t = "@verbatim{\\}";
+//        s = r(t);
+//        eq("\\");
+    }
+
+    @Test
+    public void test201() {
+        t = "gh201/gh201.txt";
+        StringWriter sw = new StringWriter();
+        Rythm.engine().render(sw, t);
+        s = sw.toString();
+        contains("header");
+        contains("inner");
+        contains("footer");
     }
 
     @Test
