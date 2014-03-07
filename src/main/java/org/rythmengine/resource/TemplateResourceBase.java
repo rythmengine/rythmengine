@@ -128,8 +128,8 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         long now = System.currentTimeMillis();
         if (nextCheckPoint < now) {
             checkModified();
+            nextCheckPoint = now + checkInterval;
         }
-        nextCheckPoint = now + checkInterval;
         return isModified();
     }
 

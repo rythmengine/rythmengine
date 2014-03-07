@@ -734,7 +734,8 @@ public class CodeBuilder extends TextBuilder {
         try {
             RythmEngine engine = engine();
             parser.parse();
-            if (!"__global.rythm".equals(this.templateClass.getKey())) {
+            String key = templateClass.getKey();
+            if (!key.endsWith("/__global.rythm")) {
                 boolean enableGlobalInclude = true;
                 if (null != requiredDialect) {
                     if (requiredDialect instanceof BasicRythm || requiredDialect instanceof ToStringTemplateBase) {

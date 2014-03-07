@@ -72,6 +72,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                 ".tag",
                 ".xml",
                 ".txt",
+                ".rythm",
                 ""
         }));
         ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
