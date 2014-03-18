@@ -1,24 +1,14 @@
-**Notice** proposed by community, I decided to change the package name from `com.greenlaw110.rythm` to `org.rythmengine`
-
 Rythm
 =====
 
 A "Razor" like, rich featured, high performance and easy to use Java template engine
 
-Rythm is now 1 year old. It has been put into several real projects at least in China and Austrlia. 
+Rythm is now 2 years old. It has been put into several real projects at least in China and Austrlia. 
 
-Online document is still work in progress, but you can already read part on http://rythmengine.org/doc/index
+Belows are several useful links:
 
-A great fiddle tool can also help you learn and understand this template engine. Check it out at http://fiddle.rythmengine.org/
-
-If you are using Play!framework 1.2.x, then you are lucky to have comprehensive document at http://www.playframework.com/modules/rythm, though most
-of the content also applies to using rythm-engine in a pure Java environment.
-
-For SpringMVC users, please checkout https://github.com/lawrence0819/spring-web-rythm-template.
-
-I am now working hard to prepare it for R1.0 targeted Jun. The current work load is on improving tests, 
-documentation and sample applications.
-
-Just stay tuned!
-
-Green
+* The [document](http://rythmengine.org/doc/index)
+* A [fiddle](http://fiddle.rythmengine.org/) site to help you learn Rythm by interactively creating rythm template and see the result instantly.
+* [play-rythm](https://github.com/greenlaw110/play-rythm) for Play!Framework 1.x users. And the [document](http://www.playframework.com/modules/rythm-1.0.0-20121210/home) for play-rythm
+* [spring-rythm](https://github.com/greenlaw110/spring-rythm) for Spring 3.x users, and the [samples](https://github.com/greenlaw110/spring-rythm-samples) for learning how to use spring-rythm
+* [jfinal-rythm](https://github.com/greenlaw110/jfinal-rythm) for JFinal users and the [sample](https://github.com/greenlaw110/jfinal-bbs) to learn how to use jfinal-rythm
