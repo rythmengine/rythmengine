@@ -116,20 +116,32 @@ public class TemplateResourceManager {
     }
     
     public static void commitTmpBlackList() {
-        try {
-            Set<String> ss = tmpBlackList.get().pop();
+        Stack<Set<String>> sss = tmpBlackList.get();
+        if (!sss.isEmpty()) {
+            Set<String> ss = sss.pop();
             blackList.addAll(ss);
-        } catch (EmptyStackException e){
-            // ignore it
+        }
+        if (sss.isEmpty()) {
+            tmpBlackList.remove();
         }
     }
     
     public static void rollbackTmpBlackList() {
-        try {
-            tmpBlackList.get().pop();
-        } catch (EmptyStackException e){
-            // ignore it
+        Stack<Set<String>> sss = tmpBlackList.get();
+        if (!sss.isEmpty()) {
+            sss.pop();
         }
+        if (sss.isEmpty()) {
+            tmpBlackList.remove();
+        }
+    }
+
+    public static void cleanUpTmplBlackList() {
+        Stack<Set<String>> ss = tmpBlackList.get();
+        if (null != ss) {
+            ss.clear();
+        }
+        tmpBlackList.remove();
     }
 
     public TemplateResourceManager(RythmEngine engine) {

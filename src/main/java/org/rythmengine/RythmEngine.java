@@ -678,7 +678,7 @@ public class RythmEngine implements IEventDispatcher {
         // -- built-in formatters
         try {
             Class.forName("org.joda.time.DateTime");
-            Class<IFormatter> fmtCls = (Class<IFormatter>)Class.forName("org.rythmengine.extension.JodaDateTimeFormatter");
+            Class<IFormatter> fmtCls = (Class<IFormatter>) Class.forName("org.rythmengine.extension.JodaDateTimeFormatter");
             IFormatter fmt = fmtCls.newInstance();
             extensionManager().registerFormatter(fmt);
         } catch (Exception e) {
@@ -1009,8 +1009,12 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String render(String template, Object... args) {
-        ITemplate t = getTemplate(template, args);
-        return t.render();
+        try {
+            ITemplate t = getTemplate(template, args);
+            return t.render();
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1029,8 +1033,12 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void render(OutputStream os, String template, Object... args) {
         outputMode.set(OutputMode.os);
-        ITemplate t = getTemplate(template, args);
-        t.render(os);
+        try {
+            ITemplate t = getTemplate(template, args);
+            t.render(os);
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1049,8 +1057,12 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void render(Writer w, String template, Object... args) {
         outputMode.set(OutputMode.writer);
-        ITemplate t = getTemplate(template, args);
-        t.render(w);
+        try {
+            ITemplate t = getTemplate(template, args);
+            t.render(w);
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1065,8 +1077,12 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String render(File file, Object... args) {
-        ITemplate t = getTemplate(file, args);
-        return t.render();
+        try {
+            ITemplate t = getTemplate(file, args);
+            return t.render();
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1083,8 +1099,12 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void render(OutputStream os, File file, Object... args) {
         outputMode.set(OutputMode.os);
-        ITemplate t = getTemplate(file, args);
-        t.render(os);
+        try {
+            ITemplate t = getTemplate(file, args);
+            t.render(os);
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1101,8 +1121,12 @@ public class RythmEngine implements IEventDispatcher {
      */
     public void render(Writer w, File file, Object... args) {
         outputMode.set(OutputMode.writer);
-        ITemplate t = getTemplate(file, args);
-        t.render(w);
+        try {
+            ITemplate t = getTemplate(file, args);
+            t.render(w);
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1141,14 +1165,18 @@ public class RythmEngine implements IEventDispatcher {
         if (typeInferenceEnabled) {
             key += ParamTypeInferencer.uuid();
         }
-        TemplateClass tc = classes().getByTemplate(key, false);
-        if (null == tc) {
-            tc = new TemplateClass(new StringTemplateResource(template), this);
-            //classes().add(key, tc);
+        try {
+            TemplateClass tc = classes().getByTemplate(key, false);
+            if (null == tc) {
+                tc = new TemplateClass(new StringTemplateResource(template), this);
+                //classes().add(key, tc);
+            }
+            ITemplate t = tc.asTemplate(this);
+            setRenderArgs(t, args);
+            return t.render();
+        } finally {
+            renderCleanUp();
         }
-        ITemplate t = tc.asTemplate(this);
-        setRenderArgs(t, args);
-        return t.render();
     }
 
     /**
@@ -1165,8 +1193,12 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String substitute(String template, Object... args) {
-        ITemplate t = getTemplate(BasicRythm.INSTANCE, template, args);
-        return t.render();
+        try {
+            ITemplate t = getTemplate(BasicRythm.INSTANCE, template, args);
+            return t.render();
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1181,8 +1213,12 @@ public class RythmEngine implements IEventDispatcher {
      * @return render result
      */
     public String substitute(File file, Object... args) {
-        ITemplate t = getTemplate(file, args, BasicRythm.INSTANCE);
-        return t.render();
+        try {
+            ITemplate t = getTemplate(file, args, BasicRythm.INSTANCE);
+            return t.render();
+        } finally {
+            renderCleanUp();
+        }
     }
 
     /**
@@ -1203,14 +1239,18 @@ public class RythmEngine implements IEventDispatcher {
             argClass = obj.getClass().getSuperclass();
         }
         String key = template + argClass;
-        TemplateClass tc = classes().getByTemplate(key);
-        if (null == tc) {
-            tc = new TemplateClass(template, this, new ToString(argClass));
-            //classes().add(key, tc);
+        try {
+            TemplateClass tc = classes().getByTemplate(key);
+            if (null == tc) {
+                tc = new TemplateClass(template, this, new ToString(argClass));
+                //classes().add(key, tc);
+            }
+            ITemplate t = tc.asTemplate(this);
+            t.__setRenderArg(0, obj);
+            return t.render();
+        } finally {
+            renderCleanUp();
         }
-        ITemplate t = tc.asTemplate(this);
-        t.__setRenderArg(0, obj);
-        return t.render();
     }
 
     /**
@@ -1237,15 +1277,19 @@ public class RythmEngine implements IEventDispatcher {
     public String toString(Object obj, ToStringOption option, ToStringStyle style) {
         Class<?> c = obj.getClass();
         AutoToString.AutoToStringData key = new AutoToString.AutoToStringData(c, option, style);
-        //String template = AutoToString.templateStr(c, option, style);
-        TemplateClass tc = classes().getByTemplate(key);
-        if (null == tc) {
-            tc = new TemplateClass(new ToStringTemplateResource(key), this, new AutoToString(c, key));
-            //classes().add(key, tc);
+        try {
+            //String template = AutoToString.templateStr(c, option, style);
+            TemplateClass tc = classes().getByTemplate(key);
+            if (null == tc) {
+                tc = new TemplateClass(new ToStringTemplateResource(key), this, new AutoToString(c, key));
+                //classes().add(key, tc);
+            }
+            ITemplate t = tc.asTemplate(this);
+            t.__setRenderArg(0, obj);
+            return t.render();
+        } finally {
+            renderCleanUp();
         }
-        ITemplate t = tc.asTemplate(this);
-        t.__setRenderArg(0, obj);
-        return t.render();
     }
 
     /**
@@ -1317,23 +1361,27 @@ public class RythmEngine implements IEventDispatcher {
             key += ParamTypeInferencer.uuid();
         }
 
-        TemplateClass tc = classes().getByTemplate(template);
-        if (null == tc) {
-            ITemplateResource rsrc = resourceManager().getResource(template);
-            if (rsrc.isValid()) {
-                tc = new TemplateClass(rsrc, this);
-                //classes().add(key, tc);
-            } else {
-                nonExistsTemplates.add(template);
-                if (isDevMode() && nonExistsTemplatesChecker == null) {
-                    nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+        try {
+            TemplateClass tc = classes().getByTemplate(template);
+            if (null == tc) {
+                ITemplateResource rsrc = resourceManager().getResource(template);
+                if (rsrc.isValid()) {
+                    tc = new TemplateClass(rsrc, this);
+                    //classes().add(key, tc);
+                } else {
+                    nonExistsTemplates.add(template);
+                    if (isDevMode() && nonExistsTemplatesChecker == null) {
+                        nonExistsTemplatesChecker = new NonExistsTemplatesChecker();
+                    }
+                    return "";
                 }
-                return "";
             }
+            ITemplate t = tc.asTemplate(this);
+            setRenderArgs(t, args);
+            return t.render();
+        } finally {
+            renderCleanUp();
         }
-        ITemplate t = tc.asTemplate(this);
-        setRenderArgs(t, args);
-        return t.render();
     }
     
     /* -----------------------------------------------------------------------------
@@ -1909,6 +1957,11 @@ public class RythmEngine implements IEventDispatcher {
      */
     public static OutputMode outputMode() {
         return outputMode.get();
+    }
+
+    public static void renderCleanUp() {
+        outputMode.remove();
+        TemplateResourceManager.cleanUpTmplBlackList();
     }
 
     /* -----------------------------------------------------------------------------

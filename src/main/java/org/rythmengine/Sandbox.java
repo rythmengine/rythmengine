@@ -35,15 +35,11 @@ public class Sandbox {
 
     private static final ILogger logger = Logger.get(Sandbox.class);
 
-    private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>() {
-        @Override
-        protected Boolean initialValue() {
-            return false;
-        }
-    };
+    private static final InheritableThreadLocal<Boolean> sandboxMode = new InheritableThreadLocal<Boolean>();
 
     static boolean sandboxMode() {
-        return sandboxMode.get();
+        Boolean mode = sandboxMode.get();
+        return null == mode ? false : mode;
     }
     
     RythmEngine engine;
@@ -90,7 +86,7 @@ public class Sandbox {
         try {
             return secureExecutor.execute(userContext, template, args);
         } finally {
-            sandboxMode.set(false);
+            sandboxMode.remove();
         }
     }
 
@@ -99,7 +95,7 @@ public class Sandbox {
         try {
             return secureExecutor.execute(userContext,file, args);
         } finally {
-            sandboxMode.set(false);
+            sandboxMode.remove();
         }
     }
 
