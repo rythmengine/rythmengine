@@ -152,6 +152,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     /**
+     * Used for Java extension/transformer
+     * @return
+     */
+    protected ITemplate __template() {
+        return this;
+    }
+
+    /**
      * Invoke a tag. Usually should not used directly in user template
      *
      * @param line

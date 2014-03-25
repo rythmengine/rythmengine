@@ -272,6 +272,13 @@ public class GHIssueTest extends TestBase {
         t = "@def echo(String s){@s}@echo(\"okay?\")";
         eq("okay?");
     }
+
+    @Test
+    public void test211() {
+        t = "gh211/foo.txt";
+        s = r(t);
+        System.out.println(s);
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

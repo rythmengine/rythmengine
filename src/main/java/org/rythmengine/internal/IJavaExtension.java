@@ -126,7 +126,7 @@ public interface IJavaExtension {
         public String extend(String s, String signature) {
             String ptn = "%s(%s, %s)";
             if (requireTemplate) {
-                ptn = "%s(this, %s, %s)";
+                ptn = "%s(__template(), %s, %s)";
             }
             if (lastParam) {
                 return String.format(ptn, fullMethodName, signature, s);

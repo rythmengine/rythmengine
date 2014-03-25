@@ -265,6 +265,10 @@ public interface ITag {
             call(out);
         }
 
+        protected ITemplate __template() {
+            return __context != null ? __context : caller();
+        }
+
         protected abstract void __call();
 
         public abstract void __setProperty(String name, Object val);

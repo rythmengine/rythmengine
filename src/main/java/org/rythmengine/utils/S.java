@@ -1081,7 +1081,7 @@ public class S {
         if (null == o) return "";
         return format(template, o, pattern, null, null);
     }
-    
+
     /**
      * Transformer. Format a date with specified pattern, language and locale
      * @param date

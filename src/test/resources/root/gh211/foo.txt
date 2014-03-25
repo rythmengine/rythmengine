@@ -1,0 +1,7 @@
+@args Date today = new Date()
+
+@bar() {
+@for (String s: "1,2,3".split(",")) {
+@today.format("dd/MM/yyyy")
+}
+}
