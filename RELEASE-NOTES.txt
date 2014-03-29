@@ -1,6 +1,6 @@
 
                             Rythm Engine
-                        Version R1.0.1-SNAPSHOT
+                        Version R1.1-SNAPSHOT
                            Release Notes
 
 
