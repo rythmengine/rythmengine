@@ -2062,4 +2062,8 @@ public class RythmEngine implements IEventDispatcher {
         zombie = true;
     }
 
+    public static void main(String[] args) {
+        System.out.println(new RythmEngine().render("hello @who", "world"));
+    }
+
 }

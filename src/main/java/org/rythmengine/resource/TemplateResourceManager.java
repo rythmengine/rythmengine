@@ -112,7 +112,14 @@ public class TemplateResourceManager {
     } 
     
     public static void reportNonResource(String str) {
-        tmpBlackList.get().peek().add(str);
+        Stack<Set<String>> ss = tmpBlackList.get();
+        if (ss.isEmpty()) {
+            // invoked dynamically when running @invoke(...)
+            tmpBlackList.remove();
+            blackList.add(str);
+        } else {
+            ss.peek().add(str);
+        }
     }
     
     public static void commitTmpBlackList() {
