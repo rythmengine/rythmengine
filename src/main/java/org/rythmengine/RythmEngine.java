@@ -2063,7 +2063,11 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     public static void main(String[] args) {
-        System.out.println(new RythmEngine().render("hello @who", "world"));
+        Map<String, String> m = new HashMap<String, String>();
+        m.put("a", "A");
+        m.put("b", "B");
+        int i = 0;
+        System.out.println(new RythmEngine().render("@args Map<String, String> m\nhello @m.a@", m, i));
     }
 
 }

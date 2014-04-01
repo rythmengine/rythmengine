@@ -61,7 +61,8 @@ public abstract class TestBase extends Assert {
         prop.put(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
         prop.put(CODEGEN_COMPACT_ENABLED.getKey(), "false");
         prop.put(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
-        prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
+        //prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
+        prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.getDefault());
         prop.put("line.separator", "\n");
         prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
         t = null;

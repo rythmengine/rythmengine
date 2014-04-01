@@ -105,9 +105,10 @@ public class TransformerTest extends TestBase {
         
         // format currency
         s = Rythm.render("@1.formatCurrency()", 100000/100);
-        eq("$1,000.00");
+        eq(S.formatCurrency("1000.00"));
+
         s = Rythm.render("@args int x;@s().formatCurrency(x)", 100000/100);
-        eq("$1,000.00");
+        eq(S.formatCurrency("1000.00"));
         
         // eq
         s = Rythm.render("@1.eq(@2)", "a", "b");
@@ -155,7 +156,8 @@ public class TransformerTest extends TestBase {
                 "double of [@i] is [@i.app_dbl().format(\"0000.00\")]";
         String s = Rythm.render(t, "Java", 99);
         assertContains(s, "double of \"Java\" is \"JavaJava\"");
-        assertContains(s, "double of [99] is [0198.00]");
+        //assertContains(s, "double of [99] is [0198.00]");
+        assertContains(s, "double of [99] is [" + S.format(dbl(99), "0000.00") + "]");
     }
 
     @Test
@@ -167,7 +169,8 @@ public class TransformerTest extends TestBase {
                 "double of [@i] is [@i.foo_dbl().format(\"0000.00\")]";
         String s = Rythm.render(t, "Java", 99);
         assertContains(s, "double of \"Java\" is \"JavaJava\"");
-        assertContains(s, "double of [99] is [0198.00]");
+        //assertContains(s, "double of [99] is [0198.00]");
+        assertContains(s, "double of [99] is [" + S.format(dbl(99), "0000.00") + "]");
     }
     
     @Test
@@ -181,7 +184,8 @@ public class TransformerTest extends TestBase {
                 "double of [@i] is [@i.app_dbl().format(\"0000.00\")]";
         String s = Rythm.render(t, "Java", 99);
         assertContains(s, "double of \"Java\" is \"JavaJava\"");
-        assertContains(s, "double of [99] is [0198.00]");
+        //assertContains(s, "double of [99] is [0198.00]");
+        assertContains(s, "double of [99] is [" + S.format(dbl(99), "0000.00") + "]");
     }
 
     public static void main(String[] args) {

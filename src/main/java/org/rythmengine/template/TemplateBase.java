@@ -1375,8 +1375,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         Map<String, Object> ctx = new HashMap<String, Object>(__renderArgs);
         ctx.putAll(itrVars());
         try {
-            return __engine().eval(expr, this, ctx);
+            Object retval = __engine().eval(expr, this, ctx);
+            return retval;
         } catch (RuntimeException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -1418,7 +1420,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (i18n == null) {
             i18n = __engine().conf().i18nMessageResolver();
         }
-        return i18n.getMessage(this, key, args);
+        return i18n.getMessage(TemplateBase.this, key, args);
     }
 
     private Stack<F.T2<String, Object>> itrVars = new Stack<F.T2<String, Object>>();
