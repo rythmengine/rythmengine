@@ -1803,14 +1803,19 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
         public static <T> __Itr valueOf(Iterable<T> tc) {
             final __Itr<T> itr = new __Itr<T>();
-            itr._o = tc;
             if (tc instanceof Collection) {
                 itr._size = ((Collection) tc).size();
+                itr._o = tc;
+                itr.iterator = tc.iterator();
             } else {
-                itr._size = -1;
+                List<T> l = new ArrayList<T>();
+                for (T t : tc) {
+                    l.add(t);
+                }
+                itr._size = l.size();
+                itr._o = l;
+                itr.iterator = l.iterator();
             }
-
-            itr.iterator = tc.iterator();
             return itr;
         }
         
