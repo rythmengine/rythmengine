@@ -64,7 +64,7 @@ public class LayoutTest extends TestBase {
         s = r("foo/index10.html");
         eqf("foo/index10.result");
     }
-    
+
     @Test
     public void testExtendsTemplateInCurDir() {
         s = r("foo/index7.html");
