@@ -62,6 +62,7 @@ public class SimpleRythm extends DialectBase {
                 "@extends",
                 "@section",
                 "@render",
+                "@inherited",
                 "@doLayout",
                 "@doBody",
                 "@include",

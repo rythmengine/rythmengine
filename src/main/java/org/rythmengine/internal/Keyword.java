@@ -134,6 +134,7 @@ public enum Keyword implements IKeyword {
      * Output sub template render content in place
      */
     RENDER_BODY("(renderBody|doBody)"),
+    RENDER_INHERITED("(inherited|renderInherited)"),
     /**
      * Output sub template section content in place
      */

@@ -257,7 +257,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     /* to be used by dynamic generated sub classes */
     private String layoutContent = "";
+    // store the current template section content
     private Map<String, String> layoutSections = new HashMap<String, String>();
+    // store the parent default section content
+    private Map<String, String> layoutSections0 = new HashMap<String, String>();
     private Map<String, Object> renderProperties = new HashMap<String, Object>();
 
     /**
@@ -320,9 +323,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      * @param section
      */
-    private void __addLayoutSection(String name, String section) {
-        if (layoutSections.containsKey(name)) return;
-        layoutSections.put(name, section);
+    private void __addLayoutSection(String name, String section, boolean def) {
+        Map<String, String> m = def ? layoutSections0 : layoutSections;
+        if (m.containsKey(name)) return;
+        m.put(name, section);
     }
 
     private StringBuilder tmpOut = null;
@@ -359,7 +363,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      */
     protected void __endSection(boolean def) {
         if (null == tmpOut && null == tmpCaller) throw new IllegalStateException("section has not been started");
-        __addLayoutSection(section, __buffer.toString());
+        __addLayoutSection(section, __buffer.toString(), def);
         __buffer = tmpOut;
         __caller = tmpCaller;
         tmpOut = null;
@@ -372,7 +376,24 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @param name
      */
     protected void __pLayoutSection(String name) {
-        p(layoutSections.get(name));
+        String s = layoutSections.get(name);
+        if (null == s) s = layoutSections0.get(name);
+        else {
+            String s0 = layoutSections0.get(name);
+            if (s0 == null) s0 = "";
+            s = s.replace("\u0000\u0000inherited\u0000\u0000", s0);
+        }
+        p(s);
+    }
+
+    /**
+     * Print default section content inside child template
+     * section content.
+     *
+     * @param name
+     */
+    protected void __pLayoutSectionInherited(String name) {
+        p("\u0000\u0000inherited\u0000\u0000");
     }
 
     /**

@@ -63,6 +63,7 @@ public class BasicRythm extends SimpleRythm {
                 "@extends",
                 "@section",
                 "@render",
+                "@inherited",
                 "@i18n",
                 "@import",
                 "@include",

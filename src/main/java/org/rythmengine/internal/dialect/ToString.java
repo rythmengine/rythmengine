@@ -69,6 +69,7 @@ public class ToString extends SimpleRythm {
                 "@extends",
                 "@section",
                 "@render",
+                "@inherited",
                 "@import",
                 "@include",
                 "@invoke",

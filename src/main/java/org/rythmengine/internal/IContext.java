@@ -99,6 +99,12 @@ public interface IContext {
      */
     String closeBlock() throws ParseException;
 
+    /**
+     * Returns the current section name
+     * @return the name of the current section
+     */
+    String currentSection();
+
     void setDialect(IDialect dialect);
 
     IDialect getDialect();

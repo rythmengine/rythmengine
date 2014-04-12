@@ -58,6 +58,12 @@ public class LayoutTest extends TestBase {
         s = r("foo/index6.html");
         eqf("foo/index6.result");
     }
+
+    @Test
+    public void testRenderInherited() {
+        s = r("foo/index10.html");
+        eqf("foo/index10.result");
+    }
     
     @Test
     public void testExtendsTemplateInCurDir() {
