@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 
 import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static org.rythmengine.utils.NamedParams.from;
@@ -360,6 +361,24 @@ public class ForParserTest extends TestBase {
         t = "@for(items){@__sep}";
         s = r(t, from(p("items", Collections.EMPTY_LIST)));
         eq("");
+    }
+
+    @Test
+    public void testEnumeration() {
+        final Enumeration<Integer> en = new Enumeration<Integer>() {
+            int i = 0;
+            @Override
+            public boolean hasMoreElements() {
+                return i < 4;
+            }
+
+            @Override
+            public Integer nextElement() {
+                return i++;
+            }
+        };
+        s = r("@for(items).join(){@_}", from(p("items", en)));
+        eq("0,1,2,3");
     }
     
     @Test

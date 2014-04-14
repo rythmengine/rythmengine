@@ -68,8 +68,10 @@ public class ParamTypeInferencer {
                 //anonymous or embedded class, let's try parent type
                 if (clsName.startsWith("java.")) {
                     clsName = c.getSuperclass().getName();  
-                } else {
+                } else if (!clsName.matches(".*\\$[0-9]+$")) {
                     clsName = clsName.replace('$', '.');
+                } else {
+                    clsName = "Object";
                 }
             }
             if (c.isArray()) {

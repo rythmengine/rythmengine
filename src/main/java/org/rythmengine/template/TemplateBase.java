@@ -153,6 +153,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     /**
      * Used for Java extension/transformer
+     *
      * @return
      */
     protected ITemplate __template() {
@@ -833,7 +834,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected Map<String, Class> __renderArgTypeMap() {
         return Collections.EMPTY_MAP;
     }
-    
+
     @Override
     public ITemplate __setRenderArgs(Map<String, Object> args) {
         __renderArgs.putAll(args);
@@ -979,33 +980,34 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         Object val = __renderArgs.get(name);
         //if (null == val) return null;
         if (null != __caller) {
-            if (!__isDefVal(val)) return (T)val;
+            if (!__isDefVal(val)) return (T) val;
             else return caller().__getRenderArg(name);
         } else {
             return (T) val;
         }
     }
-    
+
     protected final static <T> T __get(Map<String, Object> map, String name, Class<T> cls) {
         Object o = map.get(name);
         return (null != o) ? (T) o : __transNull(cls);
     }
-    
+
     protected final <T> T __get(String name, Class<T> cls) {
         Object o = __get(name);
         return (null != o) ? (T) o : __transNull(cls);
     }
-    
+
     protected final static <T> T __safeCast(Object o, Class<T> cls) {
         return (null != o) ? (T) o : __transNull(cls);
     }
-    
+
     protected final static <T> T __transNull(Class<T> cls) {
-        if (null == cls) return null; 
+        if (null == cls) return null;
         if (cls.equals(String.class)) {
             return (T) "";
-        } if (cls.equals(Integer.class)) {
-            return (T)Integer.valueOf(0);
+        }
+        if (cls.equals(Integer.class)) {
+            return (T) Integer.valueOf(0);
         } else if (cls.equals(Boolean.class)) {
             return (T) Boolean.valueOf(false);
         } else if (cls.equals(Double.class)) {
@@ -1015,7 +1017,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         } else if (cls.equals(Long.class)) {
             return (T) Long.valueOf(0);
         } else if (cls.equals(Short.class)) {
-            return (T) Short.valueOf((short)0);
+            return (T) Short.valueOf((short) 0);
         } else if (cls.equals(Byte.class)) {
             return (T) Byte.valueOf((byte) 0);
         } else if (cls.equals(Character.class)) {
@@ -1023,7 +1025,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
         return null;
     }
-    
+
     protected final static boolean __isDefVal(Object o) {
         if (null == o) return true;
         if (o instanceof String) return ("".equals(o));
@@ -1032,12 +1034,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         if (o instanceof Double) return (Double.valueOf(0).equals(o));
         if (o instanceof Float) return (Float.valueOf(0).equals(o));
         if (o instanceof Long) return (Long.valueOf(0).equals(o));
-        if (o instanceof Short) return (Short.valueOf((short)0).equals(o));
-        if (o instanceof Byte) return (Byte.valueOf((byte)0).equals(o));
-        if (o instanceof Character) return (Character.valueOf((char)0).equals(o));
+        if (o instanceof Short) return (Short.valueOf((short) 0).equals(o));
+        if (o instanceof Byte) return (Byte.valueOf((byte) 0).equals(o));
+        if (o instanceof Character) return (Character.valueOf((char) 0).equals(o));
         return false;
     }
-    
+
     /**
      * Alias of {@link #__getRenderArg(String)}
      *
@@ -1358,15 +1360,15 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public final TemplateBase pe(Object o, Escape escape) {
         return (TemplateBase) super.pe(o, escape);
     }
-    
+
     protected final Class __getClass(int o) {
         return int.class;
     }
-    
+
     protected final Class __getClass(boolean o) {
         return boolean.class;
     }
-    
+
     protected final Class __getClass(char o) {
         return char.class;
     }
@@ -1378,7 +1380,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected final Class __getClass(float o) {
         return float.class;
     }
-    
+
     protected final Class __getClass(double o) {
         return double.class;
     }
@@ -1386,12 +1388,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     protected final Class __getClass(byte o) {
         return byte.class;
     }
-    
+
     protected final Class __getClass(Object o) {
         if (null == o) return Void.TYPE;
         return o.getClass();
     }
-    
+
     protected final Object __eval(String expr) {
         Map<String, Object> ctx = new HashMap<String, Object>(__renderArgs);
         ctx.putAll(itrVars());
@@ -1403,7 +1405,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return null;
         }
     }
-    
+
     // --- debugging interface
     protected static void __log(String msg, Object... args) {
         __logger.info(msg, args);
@@ -1445,16 +1447,16 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     private Stack<F.T2<String, Object>> itrVars = new Stack<F.T2<String, Object>>();
-    
+
     protected void __pushItrVar(String name, Object val) {
         itrVars.push(F.T2(name, val));
     }
-    
+
     protected void __popItrVar() {
         if (itrVars.isEmpty()) return;
         itrVars.pop();
     }
-    
+
     private Map<String, Object> itrVars() {
         if (itrVars.isEmpty()) return Collections.EMPTY_MAP;
         if (itrVars.size() == 1) return itrVars.peek().asMap();
@@ -1486,7 +1488,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         protected int _size = -1;
         protected Iterator<T> iterator = null;
         protected int cursor = 0;
-        
+
         private static final Iterator nullIterator = new Iterator() {
             @Override
             public boolean hasNext() {
@@ -1503,9 +1505,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 return;
             }
         };
-        
 
-        private static final __Itr EMPTY_ITR = new __Itr(){
+
+        private static final __Itr EMPTY_ITR = new __Itr() {
             @Override
             public int size() {
                 return 0;
@@ -1515,10 +1517,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             public Iterator iterator() {
                 return nullIterator;
             }
-        }; 
-        
-        private __Itr() {}
-        
+        };
+
+        private __Itr() {
+        }
+
         private __Itr(Object o) {
             //this._o = o;
             if (o.getClass().isArray()) {
@@ -1531,7 +1534,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                     @Override
                     public T next() {
-                        return (T)Array.get(_o, cursor++);
+                        return (T) Array.get(_o, cursor++);
                     }
 
                     @Override
@@ -1590,7 +1593,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public T next() {
-                    return ((T[]) itr._o)[itr.cursor++]; 
+                    return ((T[]) itr._o)[itr.cursor++];
                 }
 
                 @Override
@@ -1792,31 +1795,34 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             itr.iterator = range.iterator();
             return itr;
         }
-        
+
         public static __Itr valueOf(final Object obj) {
             if (null == obj) {
                 return EMPTY_ITR;
             }
             if (obj instanceof Iterable) {
-                return valueOf((Iterable)obj);
+                return valueOf((Iterable) obj);
+            }
+            if (obj instanceof Enumeration) {
+                return valueOf((Enumeration) obj);
             }
             Class c = obj.getClass();
             if (c.isArray()) {
                 Class ct = c.getComponentType();
                 if (ct.equals(int.class)) {
-                    return valueOf((int[])obj);
+                    return valueOf((int[]) obj);
                 } else if (ct.equals(long.class)) {
-                    return valueOf((long[])obj);
+                    return valueOf((long[]) obj);
                 } else if (ct.equals(float.class)) {
-                    return valueOf((float[])obj);
+                    return valueOf((float[]) obj);
                 } else if (ct.equals(double.class)) {
-                    return valueOf((double[])obj);
+                    return valueOf((double[]) obj);
                 } else if (ct.equals(char.class)) {
-                    return valueOf((char[])obj);
+                    return valueOf((char[]) obj);
                 } else if (ct.equals(byte.class)) {
-                    return valueOf((byte[])obj);
+                    return valueOf((byte[]) obj);
                 } else if (ct.equals(boolean.class)) {
-                    return valueOf((boolean[])obj);
+                    return valueOf((boolean[]) obj);
                 }
             }
             return new __Itr(obj);
@@ -1839,7 +1845,19 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
             return itr;
         }
-        
+
+        public static <T> __Itr valueOf(Enumeration<T> enu) {
+            final __Itr<T> itr = new __Itr<T>();
+            List<T> l = new ArrayList<T>();
+            while (enu.hasMoreElements()) {
+                l.add(enu.nextElement());
+            }
+            itr._size = l.size();
+            itr._o = l;
+            itr.iterator = l.iterator();
+            return itr;
+        }
+
         public int size() {
             return _size;
         }
