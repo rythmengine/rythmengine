@@ -336,6 +336,16 @@ public class S {
     }
 
     /**
+     * Alias of {@link #toString(Object)}
+     *
+     * @param o
+     * @return the string representation of object
+     */
+    public static String string(Object o) {
+        return null == o ? "" : o.toString();
+    }
+
+    /**
      * Safe convert an Object to String. if the Object
      * is <code>null</code> than <code>""</code> is
      * returned
@@ -1372,11 +1382,12 @@ public class S {
      * the locale of the processing, and the rest elements are used as format arguments
      * @return the i18n message
      */
-    public static String i18n(ITemplate template, String key, Object... args) {
+    public static String i18n(ITemplate template, Object key, Object... args) {
+        String k = string(key);
         if (null != template) {
             II18nMessageResolver resolver = template.__engine().conf().i18nMessageResolver();
             if (null != resolver && II18nMessageResolver.DefaultImpl.INSTANCE != resolver) {
-                return resolver.getMessage(template, key, args);
+                return resolver.getMessage(template, k, args);
             }
         }
         boolean useFormat = args.length > 0;
@@ -1396,7 +1407,7 @@ public class S {
         RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
         String cacheKey = null;
         if (null != template && null != locale) {
-            cacheKey = CacheKey.i18nMsg(template, key, useFormat, locale);
+            cacheKey = CacheKey.i18nMsg(template, k, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);
         }
@@ -1404,7 +1415,7 @@ public class S {
         for (String msgSrc: RythmConfiguration.get().messageSources()) {
             bundle = I18N.bundle(template, msgSrc, locale);
             if (null != bundle) {
-                String data = getMessage(template, bundle, key, locale, args);
+                String data = getMessage(template, bundle, k, locale, args);
                 if (null != data) {
                     if (null != engine) {
                         engine.cache(cacheKey, data, -1);
@@ -1413,7 +1424,7 @@ public class S {
                 }
             }
         }
-        return key;
+        return k;
     }
 
     /**
@@ -1424,12 +1435,12 @@ public class S {
      * @return the i18n message
      */
     @Transformer(requireTemplate = true)
-    public static String i18n(String key, Object... args) {
+    public static String i18n(Object key, Object... args) {
         return i18n(null, key, args);
     }
     
     @Transformer(requireTemplate = true)
-    public static String i18n(String key) {
+    public static String i18n(Object key) {
         return i18n(null, key, new Object[0]);
     }
 
