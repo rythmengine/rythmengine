@@ -1501,8 +1501,11 @@ public class S {
      */
     @Transformer(lastParam = true)
     public static String join(String sep, Iterable itr) {
+        return join(sep, itr.iterator());
+    }
+
+    public static String join(String sep, Iterator i) {
         StringBuilder sb = new StringBuilder();
-        Iterator i = itr.iterator();
         if (!i.hasNext()) return "";
         sb.append(i.next());
         while (i.hasNext()) {
@@ -1510,6 +1513,25 @@ public class S {
             sb.append(i.next());
         }
         return sb.toString();
+    }
+
+    public static String join(String sep, Object obj) {
+        if (null == obj) return "";
+        if (obj instanceof Iterable) {
+            return join(sep, (Iterable) obj);
+        } else if (obj instanceof Iterator) {
+            return join(sep, (Iterator) obj);
+        } else if (obj.getClass().isArray()) {
+            int n = Array.getLength(obj);
+            if (n == 0) return "";
+            StringBuilder sb = new StringBuilder(n);
+            sb.append(Array.get(obj, 0));
+            for (int i = 1; i < n; ++i) {
+                sb.append(sep).append(Array.get(obj, i));
+            }
+            return sb.toString();
+        }
+        return obj.toString();
     }
 
     /**
@@ -1526,7 +1548,7 @@ public class S {
         return join(",", a);
     }
     
-    public static String join (String sep, Character[] a) {
+    public static String join(String sep, Character[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1535,7 +1557,7 @@ public class S {
         }
         return sb.toString();
     }
-    
+
     public static String join(char sep, Character[] a) {
         return join(String.valueOf(sep), a);
     }

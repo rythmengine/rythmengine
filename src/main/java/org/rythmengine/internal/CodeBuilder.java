@@ -1154,7 +1154,7 @@ public class CodeBuilder extends TextBuilder {
                     b.build(parser);
                 }
             }
-            p("\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
+            p("\n}catch(RuntimeException __e){\n throw __e;\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
         }
     }
 

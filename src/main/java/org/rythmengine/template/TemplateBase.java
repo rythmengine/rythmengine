@@ -681,6 +681,61 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         }
     };
 
+    private void handleThrowable(Throwable e) {
+        StackTraceElement[] stackTrace = e.getStackTrace();
+        String msg = null;
+        for (StackTraceElement se : stackTrace) {
+            String cName = se.getClassName();
+            if (cName.contains(TemplateClass.CN_SUFFIX)) {
+                // is it the embedded class?
+                if (cName.indexOf("$") != -1) {
+                    cName = cName.substring(0, cName.lastIndexOf("$"));
+                }
+                TemplateClass tc = __engine.classes().getByClassName(cName);
+                if (null == tc) {
+                    continue;
+                }
+                if (null == msg) {
+                    msg = e.getMessage();
+                    if (S.isEmpty(msg)) {
+                        msg = "Rythm runtime exception caused by " + e.getClass().getName();
+                    }
+                }
+                RythmException re = new RythmException(__engine, e, tc, se.getLineNumber(), -1, msg);
+                int lineNo = re.templateLineNumber;
+                String key = tc.getKey().toString();
+                int i = key.indexOf('\n');
+                if (i == -1) i = key.indexOf('\r');
+                if (i > -1) {
+                    key = key.substring(0, i - 1) + "...";
+                }
+                if (key.length() > 80) key = key.substring(0, 80) + "...";
+                if (lineNo != -1) {
+                    StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
+                    newStack[0] = new StackTraceElement(tc.name(), "", key, lineNo);
+                    System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
+                    re.setStackTrace(newStack);
+                } else {
+                    Throwable t = e.getCause();
+                    while (null != t) {
+                        stackTrace = t.getStackTrace();
+                        for (StackTraceElement se0 : stackTrace) {
+                            RythmException re0 = new RythmException(__engine, t, tc, se0.getLineNumber(), -1, msg);
+                            if (re0.templateLineNumber > -1) {
+                                re.templateLineNumber = re0.templateLineNumber;
+                                break;
+                            } else {
+                                t = t.getCause();
+                            }
+                        }
+                    }
+                }
+                throw re;
+            }
+        }
+        throw (e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e));
+    }
+
     /**
      * Not to be used in user application or template
      */
@@ -705,54 +760,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         } catch (RythmException e) {
             throw e;
         } catch (Throwable e) {
-//                    if (engine.isDevMode() && e instanceof ClassCastException) {
-//                        // give one time retry for CCE
-//                        boolean cce = cce_.get();
-//                        if (!cce) {
-//                            cce_.set(true);
-//                            throw (ClassCastException)e;
-//                        } else {
-//                            cce_.set(false);
-//                        }
-//                    }
-            StackTraceElement[] stackTrace = e.getStackTrace();
-            String msg = null;
-            for (StackTraceElement se : stackTrace) {
-                String cName = se.getClassName();
-                if (cName.contains(TemplateClass.CN_SUFFIX)) {
-                    // is it the embedded class?
-                    if (cName.indexOf("$") != -1) {
-                        cName = cName.substring(0, cName.lastIndexOf("$"));
-                    }
-                    TemplateClass tc = __engine.classes().getByClassName(cName);
-                    if (null == tc) {
-                        continue;
-                    }
-                    if (null == msg) {
-                        msg = e.getMessage();
-                        if (S.isEmpty(msg)) {
-                            msg = "Rythm runtime exception caused by " + e.getClass().getName();
-                        }
-                    }
-                    RythmException re = new RythmException(__engine, e, tc, se.getLineNumber(), -1, msg);
-                    int lineNo = re.templateLineNumber;
-                    String key = tc.getKey().toString();
-                    int i = key.indexOf('\n');
-                    if (i == -1) i = key.indexOf('\r');
-                    if (i > -1) {
-                        key = key.substring(0, i - 1) + "...";
-                    }
-                    if (key.length() > 80) key = key.substring(0, 80) + "...";
-                    if (lineNo != -1) {
-                        StackTraceElement[] newStack = new StackTraceElement[stackTrace.length + 1];
-                        newStack[0] = new StackTraceElement(tc.name(), "", key, lineNo);
-                        System.arraycopy(stackTrace, 0, newStack, 1, stackTrace.length);
-                        re.setStackTrace(newStack);
-                    }
-                    throw re;
-                }
-            }
-            throw (e instanceof RuntimeException ? (RuntimeException) e : new RuntimeException(e));
+            handleThrowable(e);
         }
         if (null != w_) {
             try {
