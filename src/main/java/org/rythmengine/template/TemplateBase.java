@@ -1126,7 +1126,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @see #__getRenderProperty(String, Object)
      */
     protected final void __setRenderProperty(String name, Object val) {
-        __renderArgs.put(name, val);
+        //__renderArgs.put(name, val);
+        __setRenderArg(name, val);
     }
 
     /**

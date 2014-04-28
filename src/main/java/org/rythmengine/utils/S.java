@@ -1337,12 +1337,50 @@ public class S {
             number = Double.parseDouble(data.toString());
         }
         if (null == locale) locale = I18N.locale(template);
-        Currency currency = null == currencyCode ? Currency.getInstance(locale) : Currency.getInstance(currencyCode);
+        if (null == locale.getCountry() || locale.getCountry().length() != 2) {
+            // try best to guess
+            String lan = locale.getLanguage();
+            if (eq(lan, "en")) {
+                if (null != currencyCode) {
+                    if (eq("AUD", currencyCode)) {
+                        locale = new Locale(lan, "AU");
+                    } else if (eq("USD", currencyCode)) {
+                        locale = Locale.US;
+                    } else if (eq("GBP", currencyCode)) {
+                        locale = Locale.UK;
+                    }
+                }
+            } else if (eq(lan, "zh")) {
+                locale = Locale.SIMPLIFIED_CHINESE;
+            }
+        }
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
-        numberFormat.setCurrency(currency);
-        numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        Currency currency = null;
+        if (null == currencyCode) {
+            String country = locale.getCountry();
+            if (null != country && country.length() == 2) {
+                currency = Currency.getInstance(locale);
+            }
+            if (null == currency) currencyCode = "$"; // default
+        }
+
+        if (null == currency) {
+            if (currencyCode.length() != 3) {
+                // it must be something like '$' or '￥' etc
+            } else {
+                currency = Currency.getInstance(currencyCode);
+            }
+        }
+        if (null != currency) {
+            numberFormat.setCurrency(currency);
+            numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        } else {
+            DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+            dfs.setCurrencySymbol(currencyCode);
+            ((DecimalFormat) numberFormat).setDecimalFormatSymbols(dfs);
+        }
         String s = numberFormat.format(number);
-        s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
+        if (null != currency) s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
         return s;
     }
     
