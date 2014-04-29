@@ -84,7 +84,8 @@ public class SetParser extends KeywordParserFactory {
                 }
                 final String propName = s;
                 final String propVal = r.stringMatched(2);
-                logger.warn("@set directive is deprecated. Please follow instruction at http://rythmengine.org/doc/directive.md#get to change your code");
+                // @set is actually needed to pass information to parent template
+                //logger.warn("@set directive is deprecated. Please follow instruction at http://rythmengine.org/doc/directive.md#get to change your code");
                 return new Token("", ctx()) {
                     @Override
                     protected void output() {
