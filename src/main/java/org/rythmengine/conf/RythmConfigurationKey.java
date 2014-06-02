@@ -365,7 +365,8 @@ public enum RythmConfigurationKey {
                     if (el instanceof File) {
                         fl.add((File) el);
                     } else {
-                        fl.add(asFile(el.toString(), key));
+                        File f = asFile(el.toString(), key);
+                        if (null != f) fl.add(f);
                     }
                 }
             } else {
@@ -456,7 +457,7 @@ public enum RythmConfigurationKey {
     /**
      * "i18n.message.resolver.impl": Set i18n message resolver. Should implement {@link org.rythmengine.extension.II18nMessageResolver}
      * interface. Default value: {@link org.rythmengine.extension.II18nMessageResolver.DefaultImpl#INSTANCE}, which delegate
-     * to {@link org.rythmengine.utils.S#i18n(org.rythmengine.template.ITemplate, String, Object...)} method
+     * to {@link org.rythmengine.utils.S#i18n(org.rythmengine.template.ITemplate, Object, Object...)} method
      */
     I18N_MESSAGE_RESOLVER("i18n.message.resolver.impl", II18nMessageResolver.DefaultImpl.INSTANCE),
 
@@ -969,6 +970,7 @@ public enum RythmConfigurationKey {
                 return new File(path);
             } else {
                 URL url = Thread.currentThread().getContextClassLoader().getResource(s);
+                //if (S.eq(url.getProtocol(), "jar")) return null;
                 return new File(url.getPath());
             }
         } catch (Exception e) {
