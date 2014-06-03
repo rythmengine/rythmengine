@@ -32,6 +32,7 @@ import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.io.File;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
@@ -162,13 +163,22 @@ public class TemplateResourceManager {
                 return;
             }
         }
-        List<File> roots = conf.templateHome();
-        for (File root : roots) {
-            FileResourceLoader frl = new FileResourceLoader(engine, root);
-            if (null == adhocFileLoader) {
-                adhocFileLoader = frl;
+        List<URI> roots = conf.templateHome();
+        for (URI root : roots) {
+            String scheme = root.getScheme();
+            if (S.eq(scheme, "jar")) {
+                String s = root.getSchemeSpecificPart();
+                int pos = s.indexOf(".jar!");
+                String home = s.substring(pos + 5);
+                ClasspathResourceLoader crl = new ClasspathResourceLoader(engine, home);
+                loaders.add(crl);
+            } else if (S.eq(scheme, "file")) {
+                FileResourceLoader frl = new FileResourceLoader(engine, new File(root.getPath()));
+                if (null == adhocFileLoader) {
+                    adhocFileLoader = frl;
+                }
+                loaders.add(frl);
             }
-            loaders.add(frl);
         }
     }
 
