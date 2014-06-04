@@ -304,27 +304,27 @@ public class ForParserTest extends TestBase {
     
     @Test
     public void testBreakWithIf() {
-        t = "@for(int i in 1..10){@(i) @break(i > 3)}";
+        t = "@for(int i in 1..10){@(i) @breakIf(i > 3)}";
         eq("1234");
     }
     
     @Test
     public void testContinue() {
-        t = "@for(int i in 1..10){@if((i % 2) == 0){@continue}@i}";
+        t = "@for(int i in 1..10){@if((i % 2) == 0){@continueIf}@i}";
         eq("13579");
 
         t = "@for(int i in 1..10){@if((i % 2) == 0){\n\t@continue\n}@i}";
         s = r(t);
         eq("13579");
 
-        t = "@for(int i in 1..10){@if((i % 2) == 0){\n\tE\n\t@continue\n}@i}";
+        t = "@for(int i in 1..10){@if((i % 2) == 0){\n\tE\n\t@continueIf\n}@i}";
         s = r(t);
         eq("1\tE3\tE5\tE7\tE9");
     }
     
     @Test
     public void testContinueWithIf() {
-        t = "@for(int i in 1..10){@continue(i % 2 == 0) @i}";
+        t = "@for(int i in 1..10){@continueIf(i % 2 == 0) @i}";
         eq("13579");
     }
 

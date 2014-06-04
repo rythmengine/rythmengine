@@ -28,13 +28,15 @@ import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
 
 /**
- * Parse @return() statement. Which break the current template execution and return to caller
+ * Parse @returnIf(expression) statement. Which break the current
+ * template execution and return to caller if the expression
+ * evaluated to {@code true}
  */
-public class ReturnParser extends KeywordParserFactory {
+public class ReturnIfParser extends KeywordParserFactory {
 
     @Override
     public Keyword keyword() {
-        return Keyword.RETURN;
+        return Keyword.RETURN_IF;
     }
 
     public IParser create(final IContext ctx) {
@@ -42,7 +44,7 @@ public class ReturnParser extends KeywordParserFactory {
             public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("error parsing @return, correct usage: @return()");
+                    raiseParseException("error parsing @returnIf, correct usage: @returnIf(<expression>)");
                 }
                 final String matched = r.stringMatched();
                 if (matched.startsWith("\n") || matched.endsWith("\n")) {
@@ -69,9 +71,7 @@ public class ReturnParser extends KeywordParserFactory {
                     condition = S.stripBrace(condition);
                 }
                 if (S.empty(condition)) {
-                    condition = "true";
-                } else {
-                    logger.warn("@return(<expression>) is deprecated. Please use @returnIf(expression)");
+                    raiseParseException("expression required by @returnIf directive");
                 }
                 return new IfThenToken(condition, "return this", ctx());
             }
@@ -80,7 +80,7 @@ public class ReturnParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))?[\\s;]*)";
+        return "^(\\n?[ \\t\\x0B\\f]*%s%s\\s*((?@()))[\\s;]*)";
     }
 
 }
