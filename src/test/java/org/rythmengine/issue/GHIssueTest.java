@@ -11,6 +11,7 @@ import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -96,7 +97,10 @@ public class GHIssueTest extends TestBase {
     public void test140() {
         t = "@args Date d;@d.format(\"yyyy-MM-dd\"):@args Number n;@n.format()";
         s = r(t, null, null);
-        eq("1970-01-01:0");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String refValue = sdf.format(new Date(0)) + ":0";
+        eq(refValue);
     }
     
     @Test
