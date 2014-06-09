@@ -3,7 +3,7 @@ Rythm
 
 A "Razor" like, rich featured, high performance and easy to use Java template engine
 
-Rythm is now 2 years old. It has been put into several real projects at least in China and Austrlia. 
+Rythm is now 2 years old. It has been put into several real projects at least in China and Australia. 
 
 Belows are several useful links:
 
