@@ -71,11 +71,11 @@ public class TemplateCompiler {
         this.classCache = classCache;
         this.settings = new HashMap<String, String>();
         this.settings.put(CompilerOptions.OPTION_ReportMissingSerialVersion, CompilerOptions.IGNORE);
-        this.settings.put(CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE);
-        this.settings.put(CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE);
         this.settings.put(CompilerOptions.OPTION_ReportDeprecation, CompilerOptions.IGNORE);
         this.settings.put(CompilerOptions.OPTION_ReportUnusedImport, CompilerOptions.IGNORE);
         this.settings.put(CompilerOptions.OPTION_Encoding, "UTF-8");
+        this.settings.put(CompilerOptions.OPTION_LineNumberAttribute, CompilerOptions.GENERATE);
+        this.settings.put(CompilerOptions.OPTION_SourceFileAttribute, CompilerOptions.GENERATE);
         this.settings.put(CompilerOptions.OPTION_LocalVariableAttribute, CompilerOptions.GENERATE);
         String javaVersion = CompilerOptions.VERSION_1_5;
         String provisionedJavaVersion = System.getProperty("java.version");

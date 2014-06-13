@@ -380,6 +380,10 @@ public class CodeBuilder extends TextBuilder {
             this.body = body;
         }
 
+        public boolean noArgs() {
+            return S.empty(signature) || signature.matches("\\(\\s*\\)");
+        }
+
         InlineTag clone(CodeBuilder newCaller) {
             InlineTag tag = new InlineTag(tagName, retType, signature, body);
             tag.builders.clear();
@@ -408,6 +412,15 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
+
+    public boolean hasInlineTagWithoutArgument(String tagName) {
+        for (InlineTag tag : inlineTags) {
+            if (S.eq(tag.tagName, tagName) && tag.noArgs()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean needsPrint(String tagName) {
         return templateClass.returnObject(tagName);
