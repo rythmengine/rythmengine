@@ -95,6 +95,14 @@ public class I18nTest extends TestBase {
 
     }
 
+    @Test
+    public void testDateFormatInChineseLocale() {
+        t = "@args Date date;@locale(\"zh\", \"CN\"){@date.format()}";
+        Date date = new Date();
+        s = r(t, date);
+        eq(DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.CHINESE).format(date));
+    }
+
 
     public static void main(String[] args) {
         run(I18nTest.class);

@@ -280,6 +280,7 @@ public class GHIssueTest extends TestBase {
 
     @Test
     public void test211() {
+        // the test pass in case no exception thrown out
         t = "gh211/foo.txt";
         s = r(t);
         System.out.println(s);

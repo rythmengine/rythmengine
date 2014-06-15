@@ -108,14 +108,6 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         final String root0 = this.getResourceLoaderRoot().replace('\\', '/');
         roots.add(root0);
 
-        // call tag with import path
-        if (null != callerClass.importPaths) {
-            for (String s: callerClass.importPaths) {
-                roots.add(root0 + "/" + s.replace('.', '/'));
-            }
-        }
-
-        String tmplName0 = tmplName;
         // call template using relative path
         String currentPath = callerClass.getKey().toString();
         int pos = currentPath.lastIndexOf("/");
@@ -132,6 +124,14 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
             }
         }
         
+        // call tag with import path
+        if (null != callerClass.importPaths) {
+            for (String s: callerClass.importPaths) {
+                roots.add(0, root0 + "/" + s.replace('.', '/'));
+            }
+        }
+
+        String tmplName0 = tmplName;
         for (String root : roots) {
             tmplName = root + "/" + tmplName0;
             for (String suffix : suffixes) {
