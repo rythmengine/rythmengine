@@ -122,13 +122,13 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
             if (currentPath.startsWith(root0)) {
-                roots.add(currentPath);
+                roots.add(0, currentPath);
             } else {
                 if (currentPath.startsWith("/")) {
                     currentPath = currentPath.substring(1);
                 }
                 if (!currentPath.startsWith(root0)) currentPath = root0 + "/" + currentPath;
-                roots.add(currentPath);
+                roots.add(0, currentPath);
             }
         }
         

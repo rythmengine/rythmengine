@@ -2,7 +2,9 @@ package org.rythmengine.issue;
 
 import models.Foo;
 import models.GH185Model;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -10,6 +12,7 @@ import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -247,24 +250,26 @@ public class GHIssueTest extends TestBase {
     }
 
     @Test
+    @Ignore
     public void test194() {
         // This is known issue.
         // The workaround could be use ESCAPED WORD
-//        t = "@verbatim{\\}";
-//        s = r(t);
-//        eq("\\");
+        t = "@verbatim{\\}";
+        s = r(t);
+        eq("\\");
     }
 
     @Test
+    @Ignore
     public void test201() {
         // Known issue
-//        t = "gh201/gh201.txt";
-//        StringWriter sw = new StringWriter();
-//        Rythm.engine().render(sw, t);
-//        s = sw.toString();
-//        contains("header");
-//        contains("inner");
-//        contains("footer");
+        t = "gh201/gh201.txt";
+        StringWriter sw = new StringWriter();
+        Rythm.engine().render(sw, t);
+        s = sw.toString();
+        contains("header");
+        contains("inner");
+        contains("footer");
     }
 
     @Test
@@ -278,6 +283,24 @@ public class GHIssueTest extends TestBase {
         t = "gh211/foo.txt";
         s = r(t);
         System.out.println(s);
+    }
+
+    @Test
+    public void test222() {
+        t = "gh222/gh222.html";
+        s = r(t);
+        eq("AAA");
+    }
+
+    @Test
+    public void test223() {
+        t = "gh223/foo2.html";
+        s = r(t);
+        eq("bar2-in-root");
+
+        t = "gh223/foo.html";
+        s = r(t);
+        eq("bar-in-gh223");
     }
     
     public static void main(String[] args) {
