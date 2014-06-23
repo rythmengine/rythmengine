@@ -579,6 +579,7 @@ public class RythmConfiguration {
     private Boolean _hasGlobalInclude = null;
 
     public boolean hasGlobalInclude() {
+        if (engine.insideSandbox()) return false;
         if (null == _hasGlobalInclude) {
             ITemplateResource rsrc = engine.resourceManager().getResource("__global.rythm");
             _hasGlobalInclude = rsrc.isValid();

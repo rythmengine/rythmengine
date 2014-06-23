@@ -133,7 +133,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
 
         String tmplName0 = tmplName;
         for (String root : roots) {
-            tmplName = root + "/" + tmplName0;
+            tmplName = tmplName0.startsWith(root) ? tmplName0 : root + "/" + tmplName0;
             for (String suffix : suffixes) {
                 String path = tmplName + suffix;
                 ITemplateResource resource = load(path);

@@ -2,9 +2,11 @@ package org.rythmengine.issue;
 
 import models.Foo;
 import models.GH185Model;
+import models.SandboxModel;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rythmengine.Rythm;
+import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -302,6 +304,17 @@ public class GHIssueTest extends TestBase {
         t = "gh223/foo.html";
         s = r(t);
         eq("bar-in-gh223");
+    }
+
+    @Test
+    @Ignore
+    public void test224() {
+        Map<String, Object> conf = new HashMap<String, Object>();
+        conf.put(RythmConfigurationKey.SANDBOX_TIMEOUT.getKey(), 10000);
+        RythmEngine engine = new RythmEngine(conf);
+        t = "@args models.SandboxModel model\n@model";
+        s = engine.sandbox().render(t, new SandboxModel("10", engine));
+        eq("Bar[10]");
     }
     
     public static void main(String[] args) {

@@ -20,6 +20,7 @@
 package org.rythmengine.resource;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -224,6 +225,8 @@ public class TemplateResourceManager {
     public ITemplateResource getResource(String str) {
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
+
+        if (Sandbox.isRestricted()) return NULL;
 
         for (ITemplateResourceLoader loader : loaders) {
             resource = loader.load(str);

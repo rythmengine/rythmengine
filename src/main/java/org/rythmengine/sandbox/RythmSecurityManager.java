@@ -23,6 +23,8 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
+import org.rythmengine.logger.ILogger;
+import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 import sun.security.util.SecurityConstants;
 
@@ -35,6 +37,8 @@ import java.security.Permission;
  * The default security manager to ensure template code run in a secure mode
  */
 public class RythmSecurityManager extends SecurityManager {
+
+    private static ILogger logger = Logger.get(RythmSecurityManager.class);
 
     private SecurityManager osm;
     private SecurityManager csm; // customized security manager
@@ -261,7 +265,10 @@ public class RythmSecurityManager extends SecurityManager {
             return;
         }
         String s = e.conf().allowedSystemProperties();
-        if (s.indexOf(key) > -1) return; 
+        if (s.indexOf(key) > -1) return;
+        if (e.isDevMode()) {
+            logger.info("checking security on property[%s] access on [%s]", key, s);
+        }
         checkRythm();
         if (null != csm) csm.checkPropertyAccess(key);
         if (null != osm) osm.checkPropertyAccess(key);
