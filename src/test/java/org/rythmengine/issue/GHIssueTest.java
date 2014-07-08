@@ -316,6 +316,13 @@ public class GHIssueTest extends TestBase {
         s = engine.sandbox().render(t, new SandboxModel("10", engine));
         eq("Bar[10]");
     }
+
+    @Test
+    public void test226() {
+        String s = "aaa\u0000bbb";
+        String s0 = S.escapeJSON(s).toString();
+        assertTrue(s0.contains("u0000"));
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

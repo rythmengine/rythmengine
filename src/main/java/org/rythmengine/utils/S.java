@@ -19,6 +19,8 @@
 */
 package org.rythmengine.utils;
 
+import com.alibaba.fastjson.serializer.JSONSerializer;
+import com.alibaba.fastjson.serializer.StringCodec;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
@@ -536,7 +538,7 @@ public class S {
         if (o instanceof RawData)
             return (RawData) o;
         String s0 = o.toString();
-        s0 = s0.replace("\\", "\\\\").replaceAll("[\n\r]+", "\\\\\\n").replaceAll("\"", "\\\\\"");
+        s0 = StringEscapeUtils.escapeJson(s0);
         return new RawData(s0);
     }
 
