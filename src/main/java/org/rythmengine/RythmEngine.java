@@ -644,7 +644,7 @@ public class RythmEngine implements IEventDispatcher {
         // register built-in transformers if enabled
         boolean enableBuiltInJavaExtensions = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED);
         if (enableBuiltInJavaExtensions) {
-            registerTransformer("rythm", "(org.rythmengine.utils.S|s\\(\\))", S.class);
+            registerTransformer("rythm", "([^a-zA-Z0-9_]s\\(\\)|^s\\(\\))", S.class);
         }
 
         boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED);

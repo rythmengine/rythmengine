@@ -2,6 +2,7 @@ package org.rythmengine.issue;
 
 import models.Foo;
 import models.GH185Model;
+import models.GH227Model;
 import models.SandboxModel;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -322,6 +323,20 @@ public class GHIssueTest extends TestBase {
         String s = "aaa\u0000bbb";
         String s0 = S.escapeJSON(s).toString();
         assertTrue(s0.contains("u0000"));
+    }
+
+    @Test
+    public void test227() {
+        t = "@args models.GH227Model h\n@h.getSales().format(\"###,000,000.00\")";
+        s = r(t, new GH227Model());
+        eq("000,010.30");
+    }
+
+    @Test
+    public void test227a() {
+        t = "@s().format(10.3, \"###,000,000.00\")";
+        s = r(t);
+        eq("000,010.30");
     }
     
     public static void main(String[] args) {
