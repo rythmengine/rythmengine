@@ -856,7 +856,12 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     public void registerResourceLoader(ITemplateResourceLoader... loaders) {
-
+        if (null == _resourceManager) {
+            throw new IllegalStateException("Engine not initialized");
+        }
+        for (ITemplateResourceLoader loader: loaders) {
+            _resourceManager.addResourceLoader(loader);
+        }
     }
 
     /* -----------------------------------------------------------------------------
