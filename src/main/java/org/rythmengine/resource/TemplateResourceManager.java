@@ -159,6 +159,9 @@ public class TemplateResourceManager {
         typeInference = conf.typeInferenceEnabled();
         loaders = new ArrayList(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
         if (!loaders.isEmpty()) {
+            for (ITemplateResourceLoader loader: loaders) {
+                loader.setEngine(this.engine);
+            }
             Boolean defLoader = conf.get(RythmConfigurationKey.RESOURCE_DEF_LOADER_ENABLED);
             if (!defLoader) {
                 return;
