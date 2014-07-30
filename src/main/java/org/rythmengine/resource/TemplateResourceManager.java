@@ -169,6 +169,7 @@ public class TemplateResourceManager {
         }
         List<URI> roots = conf.templateHome();
         for (URI root : roots) {
+            if (null == root) continue;
             String scheme = root.getScheme();
             if (S.eq(scheme, "jar")) {
                 String s = root.getSchemeSpecificPart();
