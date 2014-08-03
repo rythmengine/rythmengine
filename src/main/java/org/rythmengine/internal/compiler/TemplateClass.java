@@ -141,7 +141,7 @@ public class TemplateClass {
         }
         if (key.startsWith("/") || key.startsWith("\\")) key = key.substring(1);
         int pos = key.lastIndexOf(".");
-        if (-1 != pos) key = key.substring(0, pos);
+        //if (-1 != pos) key = key.substring(0, pos);
         key = key.replace('/', '.').replace('\\', '.');
         return key;
     }
