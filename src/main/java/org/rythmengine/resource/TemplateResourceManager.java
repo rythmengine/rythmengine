@@ -191,6 +191,10 @@ public class TemplateResourceManager {
         if (!loaders.contains(loader)) loaders.add(loader);
     }
 
+    public void prependResourceLoader(ITemplateResourceLoader loader) {
+        if (!loaders.contains(loader)) loaders.add(0, loader);
+    }
+
     private ITemplateResource cache(ITemplateResource resource) {
         if (resource.isValid()) {
             cache.put(resource.getKey(), resource);
