@@ -1334,7 +1334,7 @@ public class RythmEngine implements IEventDispatcher {
                     toBeRemoved.clear();
                     TemplateClass tc = classes().all().get(0);
                     for (String tag : _nonExistsTags) {
-                        if (null != resourceManager().tryLoadTemplate(tag, tc)) {
+                        if (null != resourceManager().tryLoadTemplate(tag, tc, null)) {
                             toBeRemoved.add(tag);
                         }
                     }
@@ -1499,7 +1499,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param callerClass
      * @return template name
      */
-    public String testTemplate(String name, TemplateClass callerClass) {
+    public String testTemplate(String name, TemplateClass callerClass, ICodeType codeType) {
         if (Keyword.THIS.toString().equals(name)) {
             return callerClass.getTagName();
         }
@@ -1533,7 +1533,7 @@ public class RythmEngine implements IEventDispatcher {
 
         try {
             // try to ask resource manager
-            TemplateClass tc = resourceManager().tryLoadTemplate(name, callerClass);
+            TemplateClass tc = resourceManager().tryLoadTemplate(name, callerClass, codeType);
             if (null == tc) {
                 if (mode().isProd()) _nonTmpls.add(name);
                 return null;
@@ -1660,7 +1660,7 @@ public class RythmEngine implements IEventDispatcher {
 
                 // try load the tag from resource
                 if (null == t) {
-                    tc = resourceManager().tryLoadTemplate(name, tc);
+                    tc = resourceManager().tryLoadTemplate(name, tc, caller.__curCodeType());
                     if (null != tc) t = _templates.get(tc.getTagName());
                     if (null == t) {
                         if (ignoreNonExistsTag) {

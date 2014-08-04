@@ -456,16 +456,16 @@ public class CodeBuilder extends TextBuilder {
         builders = inlineTagBodies.pop();
     }
 
-    public String addIncludes(String includes, int lineNo) {
+    public String addIncludes(String includes, int lineNo, ICodeType codeType) {
         StringBuilder sb = new StringBuilder();
         for (String s : includes.split("[\\s,;:]+")) {
-            sb.append(addInclude(s, lineNo));
+            sb.append(addInclude(s, lineNo, codeType));
         }
         return sb.toString();
     }
 
-    public String addInclude(String include, int lineNo) {
-        String tmplName = engine.testTemplate(include, templateClass);
+    public String addInclude(String include, int lineNo, ICodeType codeType) {
+        String tmplName = engine.testTemplate(include, templateClass, codeType);
         if (null == tmplName) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
@@ -498,7 +498,7 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
-        String fullName = engine.testTemplate(extended, templateClass);
+        String fullName = engine.testTemplate(extended, templateClass, null);
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
@@ -756,7 +756,7 @@ public class CodeBuilder extends TextBuilder {
                     } 
                 }
                 if (enableGlobalInclude && conf.hasGlobalInclude()) {
-                    String code = addInclude("__global.rythm", -1);
+                    String code = addInclude("__global.rythm", -1, null);
                     CodeToken ck = new CodeToken(code, parser);
                     addBuilder(ck);
                 }

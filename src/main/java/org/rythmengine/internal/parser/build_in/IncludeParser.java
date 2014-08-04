@@ -73,7 +73,7 @@ public class IncludeParser extends KeywordParserFactory {
                 }
                 s = S.stripBraceAndQuotation(s);
                 try {
-                    String code = ctx().getCodeBuilder().addIncludes(s, lineNo);
+                    String code = ctx().getCodeBuilder().addIncludes(s, lineNo, ctx.peekCodeType());
                     if (matched.endsWith("\n")) {
                         code = code + ";p(\"\\n\");";
                     }

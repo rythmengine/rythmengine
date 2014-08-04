@@ -490,11 +490,11 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
     static final Pattern P_STANDARD_BLOCK = Pattern.compile("(\\s*\\{).*", Pattern.DOTALL);
 
     @Override
-    public IParser create(IContext ctx) {
+    public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
 
             String testTag(String name) {
-                return engine_.testTemplate(name, ctx().getTemplateClass());
+                return engine_.testTemplate(name, ctx().getTemplateClass(), ctx.peekCodeType());
             }
 
             @Override

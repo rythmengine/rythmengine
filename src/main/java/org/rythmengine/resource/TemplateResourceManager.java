@@ -202,7 +202,7 @@ public class TemplateResourceManager {
         return resource;
     }
 
-    public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass) {
+    public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass, ICodeType codeType) {
         if (blackList.contains(tmplName)) {
             //logger.info(">>> %s is in the black list", tmplName);
             return null;
@@ -210,7 +210,7 @@ public class TemplateResourceManager {
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
         for (ITemplateResourceLoader loader : loaders) {
-            tc = loader.tryLoadTemplate(tmplName, engine, callerClass);
+            tc = loader.tryLoadTemplate(tmplName, engine, callerClass, codeType);
             if (null != tc) {
                 break;
             }

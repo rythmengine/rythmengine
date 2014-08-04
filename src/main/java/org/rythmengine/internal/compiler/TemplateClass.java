@@ -573,7 +573,7 @@ public class TemplateClass {
                 for (String tcName : includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;
                     tcName = tcName.trim();
-                    String fullName = engine().testTemplate(tcName, this);
+                    String fullName = engine().testTemplate(tcName, this, null);
                     if (null == fullName) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;

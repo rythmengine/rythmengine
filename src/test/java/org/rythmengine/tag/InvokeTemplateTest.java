@@ -104,13 +104,13 @@ public class InvokeTemplateTest extends TestBase {
     
     @Test
     public void testInvokeWithSuffix() {
+        t = "@bar.echo.js(\"rythm\")";
+        s = r(t, "rythm");
+        eq("alert('rythm')");
+
         t = "@args String p;@bar.echo(p)";
         s = r(t, "rythm");
         eq("rythm");
-        
-        t = "@args String p;@bar.echo.js(p)";
-        s = r(t, "rythm");
-        eq("alert('rythm')");
     }
     
     @Test
