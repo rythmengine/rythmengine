@@ -338,6 +338,13 @@ public class GHIssueTest extends TestBase {
         s = r(t);
         eq("000,010.30");
     }
+
+    @Test
+    public void test235() {
+        t = "gh(235)/main.html";
+        s = r(t);
+        eq("hello rythm");
+    }
     
     public static void main(String[] args) {
         run(GHIssueTest.class);

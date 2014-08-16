@@ -500,7 +500,30 @@ public class TemplateClass {
             }
         }
     }
+
     private RefreshLock lock;
+
+    private static String canonicalClassName(String name) {
+        if (S.empty(name)) throw new IllegalArgumentException("name must not be empty");
+        StringBuilder sb = new StringBuilder();
+        char[] ca = name.toCharArray();
+        int len = ca.length;
+        char c = ca[0];
+        if (!Character.isJavaIdentifierStart(c)) {
+            sb.append('_');
+        } else {
+            sb.append(c);
+        }
+        for (int i = 1; i < len; ++i) {
+            c = ca[i];
+            if (!Character.isJavaIdentifierPart(c)) {
+                sb.append('_');
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
 
     /**
      * @return true if this class has changes refreshed, otherwise this class has not been changed yet
@@ -529,7 +552,7 @@ public class TemplateClass {
             if (null == name) {
                 // this is the root level template class
                 root = this;
-                name = templateResource.getSuggestedClassName() + CN_SUFFIX;
+                name = canonicalClassName(templateResource.getSuggestedClassName()) + CN_SUFFIX;
                 if (engine.conf().typeInferenceEnabled()) {
                     name += ParamTypeInferencer.uuid();
                 }
