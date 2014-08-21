@@ -345,8 +345,12 @@ public class GHIssueTest extends TestBase {
         s = r(t);
         eq("hello rythm");
     }
-    
-    public static void main(String[] args) {
-        run(GHIssueTest.class);
+
+    @Test
+    public void test236() {
+        t = "@if(false){\nfalse\n} else {\n{abc}\n}";
+        s = r(t);
+        eq("{abc}");
     }
+    
 }

@@ -57,12 +57,14 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 int line = ctx.currentLine();
                 String s1;
                 boolean expression = false;
+                boolean needsToProcessFollowingOpenBrace = false;
                 final String matched;
                 if (r1.search(s)) {
                     s1 = r1.stringMatched(1);
                     matched = s1;
                     if (null == s1) return null;
                     step(s1.length());
+                    needsToProcessFollowingOpenBrace = !s1.trim().endsWith("{");
                     s1 = r1.stringMatched(4);
                     expression = true;
                 } else if (r2.search(s)) {
@@ -70,6 +72,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                     if (null == s1) return null;
                     matched = s1;
                     step(s1.length());
+                    needsToProcessFollowingOpenBrace = !s1.trim().endsWith("{");
                     s1 = r2.stringMatched(4);
                 } else {
                     return null;
@@ -112,7 +115,9 @@ public class ElseIfParser extends CaretParserFactoryBase {
 //                if (needsToAddLF) {
 //                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
 //                }
-                processFollowingOpenBraceAndLineBreak(false);
+                if (needsToProcessFollowingOpenBrace) {
+                    processFollowingOpenBraceAndLineBreak(false);
+                }
                 return new IfParser.IfBlockCodeToken(s1, ctx, line);
             }
 
