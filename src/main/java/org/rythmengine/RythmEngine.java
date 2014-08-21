@@ -44,10 +44,7 @@ import org.rythmengine.resource.ToStringTemplateResource;
 import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.sandbox.SandboxExecutingService;
 import org.rythmengine.sandbox.SandboxThreadFactory;
-import org.rythmengine.template.ITag;
-import org.rythmengine.template.ITemplate;
-import org.rythmengine.template.JavaTagBase;
-import org.rythmengine.template.TemplateBase;
+import org.rythmengine.template.*;
 import org.rythmengine.toString.ToStringOption;
 import org.rythmengine.toString.ToStringStyle;
 import org.rythmengine.utils.F;
@@ -907,6 +904,11 @@ public class RythmEngine implements IEventDispatcher {
     //static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
 
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
+
+        if (S.empty(template)) {
+            return EmptyTemplate.INSTANCE;
+        }
+
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);

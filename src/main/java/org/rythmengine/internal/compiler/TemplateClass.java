@@ -504,7 +504,7 @@ public class TemplateClass {
     private RefreshLock lock;
 
     private static String canonicalClassName(String name) {
-        if (S.empty(name)) throw new IllegalArgumentException("name must not be empty");
+        if (S.empty(name)) return "";
         StringBuilder sb = new StringBuilder();
         char[] ca = name.toCharArray();
         int len = ca.length;

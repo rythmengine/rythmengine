@@ -840,7 +840,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * @return render args types mapped by name
      */
     protected Map<String, Class> __renderArgTypeMap() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override
