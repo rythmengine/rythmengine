@@ -352,5 +352,15 @@ public class GHIssueTest extends TestBase {
         s = r(t);
         eq("{abc}");
     }
-    
+
+    @Test
+    public void test237() {
+        t = "gh237/tmpl1.html";
+        s = r(t);
+        assertTrue(s.contains("tmpl1"));
+
+        t = "gh237/tmpl2.html";
+        s = r(t);
+        assertTrue(s.contains("tmpl2"));
+    }
 }

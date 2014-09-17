@@ -466,6 +466,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.__renderArgs = new HashMap<String, Object>(__renderArgs.size());
         //tmpl.layoutContent = "";
         tmpl.layoutSections = new HashMap<String, String>();
+        tmpl.layoutSections0 = new HashMap<String, String>();
         tmpl.renderProperties = new HashMap<String, Object>();
         //tmpl.section = null;
         //tmpl.tmpCaller = null;
