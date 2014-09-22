@@ -1317,7 +1317,7 @@ public class RythmEngine implements IEventDispatcher {
 
     private Set<String> nonExistsTemplates = new HashSet<String>();
 
-    private class NonExistsTemplatesChecker {
+    private class NonExistsTemplatesChecker implements IShutdownListener {
         boolean started = false;
         private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
@@ -1344,6 +1344,11 @@ public class RythmEngine implements IEventDispatcher {
                     toBeRemoved.clear();
                 }
             }, 0, 1000 * 10, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public void onShutdown() {
+            scheduler.shutdown();
         }
     }
 
@@ -2061,21 +2066,17 @@ public class RythmEngine implements IEventDispatcher {
                 logger.error(e, "Error execute shutdown listener");
             }
         }
+        if (null != nonExistsTemplatesChecker) {
+            nonExistsTemplatesChecker.onShutdown();
+        }
         if (null != _templates) _templates.clear();
         if (null != _classes) _classes.clear();
         if (null != _nonExistsTags) _nonExistsTags.clear();
+        if (null != nonExistsTemplates) nonExistsTemplates.clear();
         if (null != _nonTmpls) _nonTmpls.clear();
         _classLoader = null;
         Rythm.RenderTime.clear();
         zombie = true;
-    }
-
-    public static void main(String[] args) {
-        Map<String, String> m = new HashMap<String, String>();
-        m.put("a", "A");
-        m.put("b", "B");
-        int i = 0;
-        System.out.println(new RythmEngine().render("@args Map<String, String> m\nhello @m.a@", m, i));
     }
 
 }
