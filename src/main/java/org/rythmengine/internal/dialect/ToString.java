@@ -76,6 +76,7 @@ public class ToString extends SimpleRythm {
                 "@set",
                 "@get",
                 "@init",
+                "@finally",
                 "@expand",
                 "@exec",
                 "@macro",

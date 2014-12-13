@@ -185,11 +185,22 @@ public class CodeBuilder extends TextBuilder {
     private String tagName;
 
     private String initCode = null;
+    private String finalCode = null;
 
     public void setInitCode(String code) {
-        if (null != initCode)
-            throw new ParseException(engine, templateClass, parser.currentLine(), "@init section already declared.");
-        initCode = code;
+        if (S.empty(initCode)) {
+            initCode = code;
+        } else {
+            initCode = initCode + ";\n" + code;
+        }
+    }
+
+    public void setFinalCode(String code) {
+        if (S.empty(finalCode)) {
+            finalCode = code;
+        } else {
+            finalCode = finalCode + ";\n" + code;
+        }
     }
 
     private String extended; // the cName of the extended template
@@ -289,6 +300,7 @@ public class CodeBuilder extends TextBuilder {
         this.pName = null;
         this.tagName = null;
         this.initCode = null;
+        this.finalCode = null;
         this.extended = null;
         this.extendedTemplateClass = null;
         if (null != this.extendArgs) this.extendArgs.pl.clear();
@@ -314,6 +326,7 @@ public class CodeBuilder extends TextBuilder {
     public void rewind() {
         renderArgCounter = 0;
         this.initCode = null;
+        this.finalCode = null;
         this.extended = null;
         this.extendedTemplateClass = null;
         if (null != this.extendArgs) this.extendArgs.pl.clear();
@@ -337,6 +350,7 @@ public class CodeBuilder extends TextBuilder {
             inlineTags.add(tag.clone(this));
         }
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
+        this.finalCode = new StringBuilder(S.toString(this.finalCode)).append(S.toString(codeBuilder.finalCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
         this.importLineMap.putAll(codeBuilder.importLineMap);
         renderArgCounter += codeBuilder.renderArgCounter;
@@ -774,6 +788,7 @@ public class CodeBuilder extends TextBuilder {
             pRenderArgs();
             pInlineTags();
             pBuild();
+            pFinalCode();
             RythmEvents.ON_CLOSING_JAVA_CLASS.trigger(engine, this);
             pClassClose();
             if (conf.debugJavaSourceEnabled()) {
@@ -1091,6 +1106,12 @@ public class CodeBuilder extends TextBuilder {
         if (S.isEmpty(initCode)) return;
         pn();
         pt("@Override public void __init() {").p(initCode).p(";").pn("\n\t}");
+    }
+
+    protected void pFinalCode() {
+        if (S.isEmpty(finalCode)) return;
+        pn();
+        pt("@Override public void __finally() {").p(finalCode).p(";").pn("\n\t}");
     }
 
     protected void pTagImpl() {

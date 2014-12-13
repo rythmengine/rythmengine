@@ -146,10 +146,10 @@ public class TemplateResourceManager {
     }
 
     public static void cleanUpTmplBlackList() {
-        Stack<Set<String>> ss = tmpBlackList.get();
-        if (null != ss) {
-            ss.clear();
-        }
+//        Stack<Set<String>> ss = tmpBlackList.get();
+//        if (null != ss) {
+//            ss.clear();
+//        }
         tmpBlackList.remove();
     }
 

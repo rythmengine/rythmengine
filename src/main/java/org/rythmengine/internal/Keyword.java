@@ -74,6 +74,11 @@ public enum Keyword implements IKeyword {
      */
     EXTENDS,
     /**
+     * Mark a finally section. There can be at most one
+     * @finally{} section per template
+     */
+    FINALLY,
+    /**
      * Fetch named content from this or sub template
      */
     GET,

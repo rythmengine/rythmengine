@@ -197,6 +197,6 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         //path = path.substring(0, lastDotPos);
 
         // replace characters that are invalid in a java identifier with '_'
-        return path.replaceAll("[.\\\\/ -~]", "_");
+        return path.replaceAll("[.\\\\/ -]", "_").replace('~', '_');
     }
 }

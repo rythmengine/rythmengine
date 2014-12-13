@@ -753,6 +753,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 __internalInit();
                 build();
             } finally {
+                __finally();
                 Sandbox.leaveCurZone(code);
             }
             if (__logTime()) {
@@ -804,6 +805,12 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     public TextBuilder build() {
         return this;
     }
+
+    /**
+     * Template could rewrite this method to make sure operation get called after template
+     * rendered even in the case there are exception thrown out
+     */
+    protected void __finally() {}
 
     private Map<String, Object> userCtx;
 

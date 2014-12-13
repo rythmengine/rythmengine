@@ -72,6 +72,7 @@ public class BasicRythm extends SimpleRythm {
                 "@set",
                 "@get",
                 "@init",
+                "@finally",
                 "@expand",
                 "@exec",
                 "@macro",

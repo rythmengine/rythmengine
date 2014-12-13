@@ -69,6 +69,7 @@ public class SimpleRythm extends DialectBase {
                 "@set",
                 "@get",
                 "@init",
+                "@finally",
                 "@nosim"
         };
         for (String s : forbidden) {
