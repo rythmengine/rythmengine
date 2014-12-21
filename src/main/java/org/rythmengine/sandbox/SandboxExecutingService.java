@@ -51,13 +51,13 @@ public class SandboxExecutingService {
             @Override
             public Object call() throws Exception {
                 try {
-                    engine.prepare(userCtx);
+                    RythmEngine e2 = engine.prepare(userCtx);
                     ITemplate t = tmpl;
                     if (null != t) {
                     } else if (null != template) {
-                        t = engine.getTemplate(template, args);
+                        t = e2.getTemplate(template, args);
                     } else if (null != file) {
-                        t = engine.getTemplate(file, args);
+                        t = e2.getTemplate(file, args);
                     } else {
                         throw new NullPointerException();
                     }

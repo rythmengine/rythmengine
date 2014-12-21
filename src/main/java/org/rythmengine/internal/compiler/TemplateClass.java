@@ -541,7 +541,7 @@ public class TemplateClass {
                 engine.classes().remove(this);
                 return false;
             }
-            ICodeType type = engine.renderSettings.codeType();
+            ICodeType type = engine.renderSettings().codeType();
             if (null == type) {
                 type = templateResource.codeType(engine());
             }

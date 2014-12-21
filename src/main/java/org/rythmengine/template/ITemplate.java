@@ -260,11 +260,11 @@ public interface ITemplate extends ITag, Cloneable {
          */
         public void init(TemplateBase templateBase, ICodeType type, Locale locale, TemplateClass tc,  RythmEngine engine) {
             if (null == type) {
-                type = engine.renderSettings.codeType();
+                type = engine.renderSettings().codeType();
                 if (null == type) type = tc.codeType;
             }
             if (null == locale) {
-                locale = engine.renderSettings.locale();
+                locale = engine.renderSettings().locale();
             }
             codeTypeStack.push(type);
             localeStack.push(locale);

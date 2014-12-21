@@ -495,6 +495,9 @@ public class RythmConfiguration {
     public ISourceCodeEnhancer sourceEnhancer() {
         if (null == _srcEnhancer) {
             _srcEnhancer = get(CODEGEN_SOURCE_CODE_ENHANCER);
+            if (null == _srcEnhancer) {
+                _srcEnhancer = ISourceCodeEnhancer.INSTS.NULL;
+            }
         }
         return _srcEnhancer;
     }

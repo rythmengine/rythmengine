@@ -388,7 +388,7 @@ public class Rythm {
     public static final class RenderTime {
         private static final ThreadLocal<Escape> escape_ = new ThreadLocal<Escape>();
         public static void setEscape(Escape e) {
-            escape_.set(e);
+            //escape_.set(e);
         }
         public static Escape getEscape() {
             Escape e = escape_.get();
@@ -401,7 +401,7 @@ public class Rythm {
         
         private static final ThreadLocal<ICodeType> type_ = new ThreadLocal<ICodeType>();
         public static void setCodeType(ICodeType type) {
-            type_.set(type);
+            //type_.set(type);
         }
 
         public static ICodeType getCodeType() {
@@ -409,8 +409,8 @@ public class Rythm {
         }
         
         public static void clear() {
-            escape_.remove();
-            type_.remove();
+//            escape_.remove();
+//            type_.remove();
         }
     }
 

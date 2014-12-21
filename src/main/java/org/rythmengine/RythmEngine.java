@@ -99,19 +99,15 @@ public class RythmEngine implements IEventDispatcher {
      * if the threadlocal has set an instance already
      */
     public static boolean set(RythmEngine engine) {
-        if (_engine.get() == null) {
-            _engine.set(engine);
-            return true;
-        } else {
-            return false;
-        }
+        _engine.set(engine);
+        return true;
     }
 
     /**
      * Clear the engine threadlocal variable
      */
     public static void clear() {
-        _engine.remove();
+        //_engine.remove();
     }
 
     /**
@@ -321,23 +317,19 @@ public class RythmEngine implements IEventDispatcher {
     private ICacheService _cacheService = null;
 
     /**
-     * Define the render time settings, which is intialized each time a renderXX method
+     * Define the render time settings, which is initialized each time a renderXX method
      * get called
      */
-    public class RenderSettings {
+    public static class RenderSettings {
         private RenderSettings(RythmConfiguration conf) {
             this.conf = conf;
+            this._locale = conf.locale();
         }
 
         private final RythmConfiguration conf;
-        private final ThreadLocal<Locale> _locale = new ThreadLocal<Locale>() {
-            @Override
-            protected Locale initialValue() {
-                return conf.locale();
-            }
-        };
-        private final ThreadLocal<ICodeType> _codeType = new ThreadLocal<ICodeType>();
-        private final ThreadLocal<Map<String, Object>> _usrCtx = new ThreadLocal<Map<String, Object>>();
+        private Locale _locale;
+        private ICodeType _codeType;
+        private Map<String, Object> _usrCtx = new HashMap<String, Object>();
 
         /**
          * Init the render time by setting {@link org.rythmengine.extension.ICodeType code type}.
@@ -347,8 +339,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return the render setting instance
          */
         public final RenderSettings init(ICodeType codeType) {
-            if (null != codeType) _codeType.set(codeType);
-            else _codeType.remove();
+            _codeType = codeType;
             return this;
         }
 
@@ -360,8 +351,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return the render setting instance
          */
         public final RenderSettings init(Locale locale) {
-            if (null != locale) _locale.set(locale);
-            else _locale.remove();
+            _locale = locale;
             return this;
         }
 
@@ -373,8 +363,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return the render setting instance
          */
         public final RenderSettings init(Map<String, Object> usrCtx) {
-            if (null != usrCtx) _usrCtx.set(usrCtx);
-            else _usrCtx.remove();
+            _usrCtx = usrCtx;
             return this;
         }
 
@@ -384,7 +373,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return locale setting for this render process
          */
         public final Locale locale() {
-            return _locale.get();
+            return _locale;
         }
 
         /**
@@ -393,7 +382,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return {@link org.rythmengine.extension.ICodeType code type} setting for this render process
          */
         public final ICodeType codeType() {
-            return _codeType.get();
+            return _codeType;
         }
 
         /**
@@ -402,7 +391,7 @@ public class RythmEngine implements IEventDispatcher {
          * @return the user context map
          */
         public final Map<String, Object> userContext() {
-            return _usrCtx.get();
+            return _usrCtx;
         }
 
         /**
@@ -410,19 +399,26 @@ public class RythmEngine implements IEventDispatcher {
          *
          * @return this engine instance
          */
-        public final RythmEngine clear() {
-            _locale.remove();
-            _codeType.remove();
-            _usrCtx.remove();
-            return RythmEngine.this;
+        public final void clear() {
         }
 
     }
 
+    private volatile RenderSettings settings;
+
     /**
      * The RenderSettings instance keep the environment settings for one render operation
      */
-    public RenderSettings renderSettings;
+    public RenderSettings renderSettings() {
+        if (null == settings) {
+            synchronized (this) {
+                if (null == settings) {
+                    settings = new RenderSettings(conf());
+                }
+            }
+        }
+        return settings;
+    }
 
     private String secureCode = null;
 
@@ -435,8 +431,8 @@ public class RythmEngine implements IEventDispatcher {
      * @return the engine instance itself
      */
     public final RythmEngine prepare(ICodeType codeType, Locale locale, Map<String, Object> usrCtx) {
-        renderSettings.init(codeType).init(locale).init(usrCtx);
-        return this;
+        RenderSettings settings = new RenderSettings(conf()).init(codeType).init(locale).init(usrCtx);
+        return new ContextualEngine(this, settings);
     }
 
     /**
@@ -446,8 +442,8 @@ public class RythmEngine implements IEventDispatcher {
      * @return the engine instance itself
      */
     public final RythmEngine prepare(ICodeType codeType) {
-        renderSettings.init(codeType);
-        return this;
+        RenderSettings settings = new RenderSettings(conf()).init(codeType);
+        return new ContextualEngine(this, settings);
     }
 
     /**
@@ -457,19 +453,19 @@ public class RythmEngine implements IEventDispatcher {
      * @return the engine instance itself
      */
     public final RythmEngine prepare(Locale locale) {
-        renderSettings.init(locale);
-        return this;
+        RenderSettings settings = new RenderSettings(conf()).init(locale);
+        return new ContextualEngine(this, settings);
     }
 
     /**
      * Prepare the render operation environment settings
      *
-     * @param userContext
+     * @param usrCtx
      * @return the engine instance itself
      */
-    public final RythmEngine prepare(Map<String, Object> userContext) {
-        renderSettings.init(userContext);
-        return this;
+    public final RythmEngine prepare(Map<String, Object> usrCtx) {
+        RenderSettings settings = new RenderSettings(conf()).init(usrCtx);
+        return new ContextualEngine(this, settings);
     }
 
     /* -----------------------------------------------------------------------------
@@ -531,6 +527,11 @@ public class RythmEngine implements IEventDispatcher {
      * @see org.rythmengine.conf.RythmConfigurationKey
      */
     public RythmEngine() {
+        this(false);
+    }
+
+    protected RythmEngine(boolean noInit) {
+        if (noInit) return;
         init(null, null);
     }
 
@@ -623,9 +624,7 @@ public class RythmEngine implements IEventDispatcher {
             _initConf(conf, file);
         }
 
-        renderSettings = new RenderSettings(_conf);
-
-        // post configuration initializations 
+        // post configuration initializations
         _mode = _conf.get(RythmConfigurationKey.ENGINE_MODE);
         _classes = new TemplateClassManager(this);
         _classLoader = new TemplateClassLoader(this);
@@ -1956,7 +1955,7 @@ public class RythmEngine implements IEventDispatcher {
         }
     }
 
-    private final static InheritableThreadLocal<OutputMode> outputMode = new InheritableThreadLocal<OutputMode>() {
+    private final static ThreadLocal<OutputMode> outputMode = new ThreadLocal<OutputMode>() {
         @Override
         protected OutputMode initialValue() {
             return OutputMode.str;

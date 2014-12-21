@@ -488,8 +488,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                     tmpl.__setRenderArg(s, o);
                 }
             }
+            tmpl.__setUserContext(((TemplateBase) caller).userCtx);
+        } else {
+            tmpl.__setUserContext(engine.renderSettings().userContext());
         }
-        tmpl.__setUserContext(engine.renderSettings.userContext());
         return tmpl;
     }
 

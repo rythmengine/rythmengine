@@ -77,7 +77,7 @@ public class EscapeParser extends KeywordParserFactory {
                     raiseParseException("Error parsing @escape statement. Escape parameter expected to be one of %s, found: %s", Arrays.asList(Escape.stringValues()), s);
                 }
                 */
-                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.valueOfIngoreCase(this, %s));", s);
+                s = String.format("__ctx.pushEscape(org.rythmengine.utils.Escape.valueOfIgnoreCase(this, %s));", s);
                 return new BlockCodeToken(s, ctx()) {
                     @Override
                     public void openBlock() {

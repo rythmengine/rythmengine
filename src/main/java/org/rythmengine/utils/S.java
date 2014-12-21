@@ -19,11 +19,8 @@
 */
 package org.rythmengine.utils;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.StringCodec;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
-import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.extension.IFormatter;
 import org.rythmengine.extension.II18nMessageResolver;
 import org.rythmengine.extension.Transformer;
@@ -1452,7 +1449,7 @@ public class S {
             if (S.notEmpty(cached)) return S.str(cached);
         }
         ResourceBundle bundle;
-        for (String msgSrc: RythmConfiguration.get().messageSources()) {
+        for (String msgSrc: engine.conf().messageSources()) {
             bundle = I18N.bundle(template, msgSrc, locale);
             if (null != bundle) {
                 String data = getMessage(template, bundle, k, locale, args);

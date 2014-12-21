@@ -36,7 +36,6 @@ import org.rythmengine.template.TemplateBase;
 import org.rythmengine.utils.F;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +54,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void onRender(ITemplate template) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.onRender(template);
                 } catch (RuntimeException e) {
@@ -66,7 +67,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void rendered(ITemplate template) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.rendered(template);
                 } catch (RuntimeException e) {
@@ -77,7 +80,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void enterInvokeTemplate(TemplateBase caller) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.enterInvokeTemplate(caller);
                 } catch (RuntimeException e) {
@@ -88,7 +93,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void exitInvokeTemplate(TemplateBase caller) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.exitInvokeTemplate(caller);
                 } catch (RuntimeException e) {
@@ -99,7 +106,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void onInvoke(ITag tag) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.onInvoke(tag);
                 } catch (RuntimeException e) {
@@ -110,7 +119,9 @@ public class EventBus implements IEventDispatcher {
 
         @Override
         public void invoked(ITag tag) {
-            for (IRythmListener l : listeners) {
+            int sz = listeners.size();
+            for (int i = 0; i < sz; ++i) {
+                IRythmListener l = listeners.get(i);
                 try {
                     l.invoked(tag);
                 } catch (RuntimeException e) {
@@ -147,7 +158,17 @@ public class EventBus implements IEventDispatcher {
         RETURN handleEvent(RythmEngine engine, PARAM param);
     }
 
-    private Map<IEvent<?, ?>, IEventHandler<?, ?>> dispatcher = new HashMap<IEvent<?, ?>, IEventHandler<?, ?>>();
+    private static class Dispatcher {
+        IEventHandler[] handlers = new IEventHandler[15];
+        void put(IEvent e, IEventHandler h) {
+            handlers[e.id()] = h;
+        }
+        IEventHandler get(IEvent e) {
+            return handlers[e.id()];
+        }
+    }
+
+    private Dispatcher dispatcher = new Dispatcher();
 
     @Override
     public Object accept(IEvent event, Object param) {
@@ -159,7 +180,7 @@ public class EventBus implements IEventDispatcher {
     }
 
     private void registerHandlers() {
-        Map<IEvent<?, ?>, IEventHandler<?, ?>> m = dispatcher;
+        Dispatcher m = dispatcher;
         m.put(RythmEvents.ON_PARSE, new IEventHandler<String, CodeBuilder>() {
             @Override
             public String handleEvent(RythmEngine engine, CodeBuilder c) {
@@ -235,9 +256,7 @@ public class EventBus implements IEventDispatcher {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
                 ISourceCodeEnhancer ce = engine.conf().sourceEnhancer();
-                if (null != ce) {
-                    ce.setRenderArgs(template);
-                }
+                ce.setRenderArgs(template);
                 renderListener.onRender(template);
                 return null;
             }
@@ -245,7 +264,7 @@ public class EventBus implements IEventDispatcher {
         m.put(RythmEvents.RENDERED, new IEventHandler<Void, ITemplate>() {
             @Override
             public Void handleEvent(RythmEngine engine, ITemplate template) {
-                engine.renderSettings.clear();
+                engine.renderSettings().clear();
                 Rythm.RenderTime.clear();
                 renderListener.rendered(template);
                 return null;
