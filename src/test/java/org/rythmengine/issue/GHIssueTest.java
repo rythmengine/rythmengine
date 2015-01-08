@@ -19,6 +19,9 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.*;
 
+import static org.rythmengine.conf.RythmConfigurationKey.*;
+import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
+
 /**
  * Test Github Issues
  */
@@ -362,5 +365,31 @@ public class GHIssueTest extends TestBase {
         t = "gh237/tmpl2.html";
         s = r(t);
         assertTrue(s.contains("tmpl2"));
+    }
+
+    private void setUpFor244() {
+        Rythm.shutdown();
+        Properties prop = System.getProperties();
+        prop.put(HOME_TEMPLATE.getKey(), "root/gh244");
+        prop.put(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
+        prop.put(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
+        prop.put(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        prop.put(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
+        //prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
+        prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.getDefault());
+        prop.put("line.separator", "\n");
+        prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
+        t = null;
+        s = null;
+    }
+
+    @Test
+    public void test244() {
+        setUpFor244();
+        t = "x.txt";
+        s = r(t, "foo", "bar");
+        assertEquals("foo and bar", s);
     }
 }

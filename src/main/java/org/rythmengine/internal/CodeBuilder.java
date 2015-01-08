@@ -913,7 +913,7 @@ public class CodeBuilder extends TextBuilder {
         }
  
         List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
-        Collections.sort(renderArgList);
+        // comment to fix gh244: Collections.sort(renderArgList);
         
         // -- output __renderArgName method
         pn();
