@@ -185,11 +185,22 @@ public class CodeBuilder extends TextBuilder {
     private String tagName;
 
     private String initCode = null;
+    private String finalCode = null;
 
     public void setInitCode(String code) {
-        if (null != initCode)
-            throw new ParseException(engine, templateClass, parser.currentLine(), "@init section already declared.");
-        initCode = code;
+        if (S.empty(initCode)) {
+            initCode = code;
+        } else {
+            initCode = initCode + ";\n" + code;
+        }
+    }
+
+    public void setFinalCode(String code) {
+        if (S.empty(finalCode)) {
+            finalCode = code;
+        } else {
+            finalCode = finalCode + ";\n" + code;
+        }
     }
 
     private String extended; // the cName of the extended template
@@ -289,6 +300,7 @@ public class CodeBuilder extends TextBuilder {
         this.pName = null;
         this.tagName = null;
         this.initCode = null;
+        this.finalCode = null;
         this.extended = null;
         this.extendedTemplateClass = null;
         if (null != this.extendArgs) this.extendArgs.pl.clear();
@@ -314,6 +326,7 @@ public class CodeBuilder extends TextBuilder {
     public void rewind() {
         renderArgCounter = 0;
         this.initCode = null;
+        this.finalCode = null;
         this.extended = null;
         this.extendedTemplateClass = null;
         if (null != this.extendArgs) this.extendArgs.pl.clear();
@@ -337,6 +350,7 @@ public class CodeBuilder extends TextBuilder {
             inlineTags.add(tag.clone(this));
         }
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
+        this.finalCode = new StringBuilder(S.toString(this.finalCode)).append(S.toString(codeBuilder.finalCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
         this.importLineMap.putAll(codeBuilder.importLineMap);
         renderArgCounter += codeBuilder.renderArgCounter;
@@ -380,6 +394,10 @@ public class CodeBuilder extends TextBuilder {
             this.body = body;
         }
 
+        public boolean noArgs() {
+            return S.empty(signature) || signature.matches("\\(\\s*\\)");
+        }
+
         InlineTag clone(CodeBuilder newCaller) {
             InlineTag tag = new InlineTag(tagName, retType, signature, body);
             tag.builders.clear();
@@ -408,6 +426,15 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
+
+    public boolean hasInlineTagWithoutArgument(String tagName) {
+        for (InlineTag tag : inlineTags) {
+            if (S.eq(tag.tagName, tagName) && tag.noArgs()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean needsPrint(String tagName) {
         return templateClass.returnObject(tagName);
@@ -443,16 +470,16 @@ public class CodeBuilder extends TextBuilder {
         builders = inlineTagBodies.pop();
     }
 
-    public String addIncludes(String includes, int lineNo) {
+    public String addIncludes(String includes, int lineNo, ICodeType codeType) {
         StringBuilder sb = new StringBuilder();
         for (String s : includes.split("[\\s,;:]+")) {
-            sb.append(addInclude(s, lineNo));
+            sb.append(addInclude(s, lineNo, codeType));
         }
         return sb.toString();
     }
 
-    public String addInclude(String include, int lineNo) {
-        String tmplName = engine.testTemplate(include, templateClass);
+    public String addInclude(String include, int lineNo, ICodeType codeType) {
+        String tmplName = engine.testTemplate(include, templateClass, codeType);
         if (null == tmplName) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
@@ -485,7 +512,7 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
-        String fullName = engine.testTemplate(extended, templateClass);
+        String fullName = engine.testTemplate(extended, templateClass, null);
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
@@ -743,7 +770,7 @@ public class CodeBuilder extends TextBuilder {
                     } 
                 }
                 if (enableGlobalInclude && conf.hasGlobalInclude()) {
-                    String code = addInclude("__global.rythm", -1);
+                    String code = addInclude("__global.rythm", -1, null);
                     CodeToken ck = new CodeToken(code, parser);
                     addBuilder(ck);
                 }
@@ -761,6 +788,7 @@ public class CodeBuilder extends TextBuilder {
             pRenderArgs();
             pInlineTags();
             pBuild();
+            pFinalCode();
             RythmEvents.ON_CLOSING_JAVA_CLASS.trigger(engine, this);
             pClassClose();
             if (conf.debugJavaSourceEnabled()) {
@@ -885,7 +913,7 @@ public class CodeBuilder extends TextBuilder {
         }
  
         List<RenderArgDeclaration> renderArgList = new ArrayList<RenderArgDeclaration>(renderArgs.values());
-        Collections.sort(renderArgList);
+        // comment to fix gh244: Collections.sort(renderArgList);
         
         // -- output __renderArgName method
         pn();
@@ -1080,6 +1108,12 @@ public class CodeBuilder extends TextBuilder {
         pt("@Override public void __init() {").p(initCode).p(";").pn("\n\t}");
     }
 
+    protected void pFinalCode() {
+        if (S.isEmpty(finalCode)) return;
+        pn();
+        pt("@Override public void __finally() {").p(finalCode).p(";").pn("\n\t}");
+    }
+
     protected void pTagImpl() {
         pn();
         pt("@Override public java.lang.String __getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
@@ -1154,7 +1188,7 @@ public class CodeBuilder extends TextBuilder {
                     b.build(parser);
                 }
             }
-            p("\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
+            p("\n}catch(RuntimeException __e){\n throw __e;\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
         }
     }
 

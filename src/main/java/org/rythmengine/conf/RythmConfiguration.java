@@ -27,6 +27,7 @@ import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.utils.RawData;
 
 import java.io.File;
+import java.net.URI;
 import java.util.*;
 
 import static org.rythmengine.conf.RythmConfigurationKey.*;
@@ -440,25 +441,26 @@ public class RythmConfiguration {
      */
     public File tmpDir() {
         if (null == _tmpDir) {
-            _tmpDir = get(HOME_TMP);
+            URI uri = get(HOME_TMP);
+            _tmpDir = new File(uri.getPath());
         }
         return _tmpDir;
     }
 
-    private List<File> _templateHome = null;
+    private List<URI> _templateHome = null;
 
     /**
      * Return {@link RythmConfigurationKey#HOME_TEMPLATE} without lookup
      *
      * @return template home
      */
-    public List<File> templateHome() {
+    public List<URI> templateHome() {
         if (null == _templateHome) {
             Object o = get(RythmConfigurationKey.HOME_TEMPLATE);
-            if (o instanceof File) {
-                _templateHome = Arrays.asList(new File[]{(File)o});
+            if (o instanceof URI) {
+                _templateHome = Arrays.asList(new URI[]{(URI)o});
             } else if (o instanceof List) {
-                _templateHome = (List<File>)o;
+                _templateHome = (List<URI>)o;
             }
         }
         return _templateHome;
@@ -577,6 +579,7 @@ public class RythmConfiguration {
     private Boolean _hasGlobalInclude = null;
 
     public boolean hasGlobalInclude() {
+        if (engine.insideSandbox()) return false;
         if (null == _hasGlobalInclude) {
             ITemplateResource rsrc = engine.resourceManager().getResource("__global.rythm");
             _hasGlobalInclude = rsrc.isValid();

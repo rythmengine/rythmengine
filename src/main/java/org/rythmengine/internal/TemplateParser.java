@@ -27,6 +27,7 @@ import org.rythmengine.exception.ParseException;
 import org.rythmengine.extension.ICodeType;
 import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.internal.dialect.DialectManager;
+import org.rythmengine.internal.parser.build_in.SectionParser;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.TemplateResourceManager;
@@ -204,6 +205,18 @@ public class TemplateParser implements IContext {
             throw new ParseException(getEngine(), cb.getTemplateClass(), currentLine(), "No open block found");
         IBlockHandler bh = blocks.pop();
         return null == bh ? "" : bh.closeBlock();
+    }
+
+    @Override
+    public String currentSection() {
+        int len = blocks.size();
+        for (int i = len - 1; i >= 0; --i) {
+            IBlockHandler h = blocks.get(i);
+            if (h instanceof SectionParser.SectionToken) {
+                return ((SectionParser.SectionToken)h).section();
+            }
+        }
+        return null;
     }
 
     @Override

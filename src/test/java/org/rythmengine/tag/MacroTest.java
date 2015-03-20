@@ -57,13 +57,6 @@ public class MacroTest extends TestBase {
         eq("bar");
     }
     
-    @Test
-    public void testExpand() {
-        t = "@macro(foo){bar}@expand(foo)";
-        s = r(t);
-        eq("bar");
-    }
-
     public static void main(String[] args) {
         run(MacroTest.class);
     }

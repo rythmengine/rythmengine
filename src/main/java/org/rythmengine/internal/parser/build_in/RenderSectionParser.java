@@ -44,8 +44,9 @@ public class RenderSectionParser extends KeywordParserFactory {
             super(null, context);
             if (S.isEmpty(section)) {
                 this.section = "__CONTENT__";
+            } else {
+                this.section = section;
             }
-            this.section = section;
         }
 
         @Override

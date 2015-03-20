@@ -1,0 +1,2 @@
+@args String s1, String s2
+@s1 and @s2

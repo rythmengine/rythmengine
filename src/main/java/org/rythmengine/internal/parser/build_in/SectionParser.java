@@ -38,7 +38,12 @@ public class SectionParser extends KeywordParserFactory {
 
         public SectionToken(String section, IContext context) {
             super(null, context);
+            if (null == section) throw new NullPointerException();
             this.section = section;
+        }
+
+        public String section() {
+            return section;
         }
 
         @Override
@@ -76,7 +81,6 @@ public class SectionParser extends KeywordParserFactory {
                 Regex r = reg(dialect());
                 if (!r.search(remain()))
                     raiseParseException("bad @section statement. Correct usage: @section(\"mySection\"){...}");
-                int curLine = ctx().currentLine();
                 step(r.stringMatched().length());
                 String s = r.stringMatched(1);
                 s = S.stripBraceAndQuotation(s);

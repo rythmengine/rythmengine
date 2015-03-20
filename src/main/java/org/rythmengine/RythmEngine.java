@@ -44,10 +44,7 @@ import org.rythmengine.resource.ToStringTemplateResource;
 import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.sandbox.SandboxExecutingService;
 import org.rythmengine.sandbox.SandboxThreadFactory;
-import org.rythmengine.template.ITag;
-import org.rythmengine.template.ITemplate;
-import org.rythmengine.template.JavaTagBase;
-import org.rythmengine.template.TemplateBase;
+import org.rythmengine.template.*;
 import org.rythmengine.toString.ToStringOption;
 import org.rythmengine.toString.ToStringStyle;
 import org.rythmengine.utils.F;
@@ -644,7 +641,7 @@ public class RythmEngine implements IEventDispatcher {
         // register built-in transformers if enabled
         boolean enableBuiltInJavaExtensions = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED);
         if (enableBuiltInJavaExtensions) {
-            registerTransformer("rythm", "(org.rythmengine.utils.S|s\\(\\))", S.class);
+            registerTransformer("rythm", "([^a-zA-Z0-9_]s\\(\\)|^s\\(\\))", S.class);
         }
 
         boolean enableBuiltInTemplateLang = (Boolean) _conf.get(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED);
@@ -856,7 +853,13 @@ public class RythmEngine implements IEventDispatcher {
     }
 
     public void registerResourceLoader(ITemplateResourceLoader... loaders) {
-
+        if (null == _resourceManager) {
+            throw new IllegalStateException("Engine not initialized");
+        }
+        for (int i = loaders.length - 1; i >= 0; --i) {
+            ITemplateResourceLoader loader = loaders[i];
+            _resourceManager.prependResourceLoader(loader);
+        }
     }
 
     /* -----------------------------------------------------------------------------
@@ -901,6 +904,11 @@ public class RythmEngine implements IEventDispatcher {
     //static ThreadLocal<Integer> cceCounter = new ThreadLocal<Integer>();
 
     private ITemplate getTemplate(IDialect dialect, String template, Object... args) {
+
+        if (S.empty(template)) {
+            return EmptyTemplate.INSTANCE;
+        }
+
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
@@ -1309,7 +1317,7 @@ public class RythmEngine implements IEventDispatcher {
 
     private Set<String> nonExistsTemplates = new HashSet<String>();
 
-    private class NonExistsTemplatesChecker {
+    private class NonExistsTemplatesChecker implements IShutdownListener {
         boolean started = false;
         private ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
 
@@ -1328,7 +1336,7 @@ public class RythmEngine implements IEventDispatcher {
                     toBeRemoved.clear();
                     TemplateClass tc = classes().all().get(0);
                     for (String tag : _nonExistsTags) {
-                        if (null != resourceManager().tryLoadTemplate(tag, tc)) {
+                        if (null != resourceManager().tryLoadTemplate(tag, tc, null)) {
                             toBeRemoved.add(tag);
                         }
                     }
@@ -1336,6 +1344,11 @@ public class RythmEngine implements IEventDispatcher {
                     toBeRemoved.clear();
                 }
             }, 0, 1000 * 10, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public void onShutdown() {
+            scheduler.shutdown();
         }
     }
 
@@ -1493,7 +1506,7 @@ public class RythmEngine implements IEventDispatcher {
      * @param callerClass
      * @return template name
      */
-    public String testTemplate(String name, TemplateClass callerClass) {
+    public String testTemplate(String name, TemplateClass callerClass, ICodeType codeType) {
         if (Keyword.THIS.toString().equals(name)) {
             return callerClass.getTagName();
         }
@@ -1527,7 +1540,7 @@ public class RythmEngine implements IEventDispatcher {
 
         try {
             // try to ask resource manager
-            TemplateClass tc = resourceManager().tryLoadTemplate(name, callerClass);
+            TemplateClass tc = resourceManager().tryLoadTemplate(name, callerClass, codeType);
             if (null == tc) {
                 if (mode().isProd()) _nonTmpls.add(name);
                 return null;
@@ -1654,7 +1667,7 @@ public class RythmEngine implements IEventDispatcher {
 
                 // try load the tag from resource
                 if (null == t) {
-                    tc = resourceManager().tryLoadTemplate(name, tc);
+                    tc = resourceManager().tryLoadTemplate(name, tc, caller.__curCodeType());
                     if (null != tc) t = _templates.get(tc.getTagName());
                     if (null == t) {
                         if (ignoreNonExistsTag) {
@@ -2053,21 +2066,17 @@ public class RythmEngine implements IEventDispatcher {
                 logger.error(e, "Error execute shutdown listener");
             }
         }
+        if (null != nonExistsTemplatesChecker) {
+            nonExistsTemplatesChecker.onShutdown();
+        }
         if (null != _templates) _templates.clear();
         if (null != _classes) _classes.clear();
         if (null != _nonExistsTags) _nonExistsTags.clear();
+        if (null != nonExistsTemplates) nonExistsTemplates.clear();
         if (null != _nonTmpls) _nonTmpls.clear();
         _classLoader = null;
         Rythm.RenderTime.clear();
         zombie = true;
-    }
-
-    public static void main(String[] args) {
-        Map<String, String> m = new HashMap<String, String>();
-        m.put("a", "A");
-        m.put("b", "B");
-        int i = 0;
-        System.out.println(new RythmEngine().render("@args Map<String, String> m\nhello @m.a@", m, i));
     }
 
 }

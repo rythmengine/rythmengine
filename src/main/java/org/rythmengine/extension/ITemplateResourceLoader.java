@@ -52,10 +52,10 @@ public interface ITemplateResourceLoader {
      * 
      * @param tmplName
      * @param engine
-     * @param callerTemplateClass
+     * @param caller
      * @return template class if found, or <tt>null</tt> if not found
      */
-    TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerTemplateClass);
+    TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, ICodeType codeType);
 
     /**
      * Scan the folder and try to load all template files under the folder.

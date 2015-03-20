@@ -53,7 +53,7 @@ public class SimpleRythm extends DialectBase {
     protected Class<?>[] buildInParserClasses() {
         // InvokeTagParse must be put in front of ExpressionParser as the later's matching pattern covers the former
         // BraceParser must be put in front of ElseIfParser
-        return new Class<?>[]{AssignParser.class, ArgsParser.class, BreakParser.class, ContinueParser.class, CacheParser.class, CommentParser.class, CompactParser.class, DebugParser.class, DefTagParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, ExecParser.class, ExpandParser.class, ExitIfNoClassParser.class, BraceParser.class, LogTimeParser.class, InvokeParser.class, InvokeMacroParser.class, InvokeTemplateParser.class, MacroParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, I18nParser.class, IfParser.class, ImportParser.class, LocaleParser.class, NoCompactParser.class, RawParser.class, ReturnParser.class, SimpleParser.class, TimestampParser.class, VerbatimParser.class};
+        return new Class<?>[]{AssignParser.class, ArgsParser.class, BreakParser.class, ContinueParser.class, CacheParser.class, CommentParser.class, CompactParser.class, DebugParser.class, DefTagParser.class, EscapeParser.class, ElseForParser.class, ElseIfParser.class, ExecParser.class, ExitIfNoClassParser.class, BraceParser.class, LogTimeParser.class, InvokeParser.class, InvokeMacroParser.class, InvokeTemplateParser.class, MacroParser.class, NullableExpressionParser.class, ExpressionParser.class, ForEachParser.class, I18nParser.class, IfParser.class, ImportParser.class, LocaleParser.class, NoCompactParser.class, RawParser.class, ReturnParser.class, ReturnIfParser.class, SimpleParser.class, TimestampParser.class, VerbatimParser.class};
     }
 
     @Override
@@ -62,12 +62,14 @@ public class SimpleRythm extends DialectBase {
                 "@extends",
                 "@section",
                 "@render",
+                "@inherited",
                 "@doLayout",
                 "@doBody",
                 "@include",
                 "@set",
                 "@get",
                 "@init",
+                "@finally",
                 "@nosim"
         };
         for (String s : forbidden) {
