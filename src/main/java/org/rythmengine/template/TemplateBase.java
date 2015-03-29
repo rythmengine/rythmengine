@@ -707,7 +707,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                 String key = tc.getKey().toString();
                 int i = key.indexOf('\n');
                 if (i == -1) i = key.indexOf('\r');
-                if (i > -1) {
+                if (i > 0) {
                     key = key.substring(0, i - 1) + "...";
                 }
                 if (key.length() > 80) key = key.substring(0, 80) + "...";
