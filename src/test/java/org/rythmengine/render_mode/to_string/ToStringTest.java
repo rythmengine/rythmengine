@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-package org.rythmengine.advanced.to_string;
+package org.rythmengine.render_mode.to_string;
 
 import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
