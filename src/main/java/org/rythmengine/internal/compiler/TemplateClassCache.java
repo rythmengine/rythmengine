@@ -28,6 +28,7 @@ import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.TextBuilder;
 
 import java.io.*;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.util.HashSet;
 
@@ -242,7 +243,8 @@ public class TemplateClassCache {
     private File getCacheFile(String fileName) {
         RythmConfiguration conf = engine.conf();
         if (conf.loadPrecompiled() || conf.precompileMode()) {
-            File precompileDir = conf.get(RythmConfigurationKey.HOME_PRECOMPILED);
+            URI uri = conf.get(RythmConfigurationKey.HOME_PRECOMPILED);
+            File precompileDir = new File(uri);
             return new File(precompileDir, fileName);
         } else {
             File f = new File(conf.tmpDir(), fileName);

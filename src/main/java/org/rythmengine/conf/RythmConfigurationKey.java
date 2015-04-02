@@ -35,6 +35,7 @@ import org.rythmengine.utils.S;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
@@ -344,18 +345,18 @@ public enum RythmConfigurationKey {
             Object defVal = getDefVal(configuration);
             String key = getKey();
             Object o = getValFromAliases(configuration, getKey(), "dir", defVal);
-            List<File> fl = new ArrayList<File>();
+            List<URI> fl = new ArrayList<URI>();
             if (o instanceof File) {
-                fl.add((File) o);
+                fl.add(((File) o).toURI());
             } else if (o instanceof List) {
                 for (Object el: (List)o) {
                     if (null == el) {
                         continue;
                     }
                     if (el instanceof File) {
-                        fl.add((File) el);
+                        fl.add(((File) el).toURI());
                     } else {
-                        fl.add(asFile(el.toString(), key));
+                        fl.add(asUri(el.toString(), key));
                     }
                 }
             } else if (o.getClass().isArray()) {
@@ -363,15 +364,16 @@ public enum RythmConfigurationKey {
                 for (int i = 0; i < len; ++i) {
                     Object el = Array.get(o, i);
                     if (el instanceof File) {
-                        fl.add((File) el);
+                        fl.add(((File) el).toURI());
                     } else {
-                        fl.add(asFile(el.toString(), key));
+                        URI uri = asUri(el.toString(), key);
+                        fl.add(uri);
                     }
                 }
             } else {
                 String s = o.toString();
                 for (String el: s.split("[,;]")) {
-                    fl.add(asFile(el.trim(), key));
+                    fl.add(asUri(el.trim(), key));
                 }
             }
             return (T) fl;
@@ -456,7 +458,7 @@ public enum RythmConfigurationKey {
     /**
      * "i18n.message.resolver.impl": Set i18n message resolver. Should implement {@link org.rythmengine.extension.II18nMessageResolver}
      * interface. Default value: {@link org.rythmengine.extension.II18nMessageResolver.DefaultImpl#INSTANCE}, which delegate
-     * to {@link org.rythmengine.utils.S#i18n(org.rythmengine.template.ITemplate, String, Object...)} method
+     * to {@link org.rythmengine.utils.S#i18n(org.rythmengine.template.ITemplate, Object, Object...)} method
      */
     I18N_MESSAGE_RESOLVER("i18n.message.resolver.impl", II18nMessageResolver.DefaultImpl.INSTANCE),
 
@@ -952,38 +954,49 @@ public enum RythmConfigurationKey {
         return l;
     }
     
-    private static File asFile(String s, String key) {
+    private static URI asUri(String s, String key) {
         boolean isAbsolute = false;
         if (s.startsWith("/") || s.startsWith(File.separator)) {
             isAbsolute = true;
         } else if (s.matches("^[a-zA-Z]:.*")) {
             isAbsolute = true;
         }
-        if (isAbsolute) return new File(s);
+        if (isAbsolute) {
+            File f = new File(s);
+            if (f.exists() && f.isDirectory() && f.canRead()) {
+                return f.toURI();
+            }
+            return null;
+        }
         try {
             if (s.startsWith("..")) {
                 URL url = Thread.currentThread().getContextClassLoader().getResource(".");
+                if (null == url) {
+                    // must running from inside a jar file, and it doesn't support
+                    // template root starts with ".."
+                    return null;
+                }
                 String path = url.getPath();
                 if (path.endsWith("/")) path = path + s;
                 else path = path + "/" + s;
-                return new File(path);
+                return new URI(path);
             } else {
                 URL url = Thread.currentThread().getContextClassLoader().getResource(s);
-                return new File(url.getPath());
+                return null == url ? null : url.toURI();
             }
         } catch (Exception e) {
             throw new ConfigurationException(e, "Error reading file configuration %s", key);
         }
     }
 
-    private static File getFile(String key, Map<String, ?> configuration, Object defVal) {
+    private static URI getUri(String key, Map<String, ?> configuration, Object defVal) {
         Object v = getValFromAliases(configuration, key, "dir", defVal);
         if (null == v) return null;
         if (v instanceof File) {
-            return (File) v;
+            return ((File) v).toURI();
         }
         String s = v.toString();
-        return asFile(s, key);
+        return asUri(s, key);
     }
 
     /**
@@ -1004,7 +1017,7 @@ public enum RythmConfigurationKey {
             return getImpl(key, configuration, defVal);
         }
         if (key.endsWith(".dir")) {
-            return (T) getFile(key, configuration, defVal);
+            return (T) getUri(key, configuration, defVal);
         }
         return (T) getValFromAliases(configuration, key, null, defVal);
     }

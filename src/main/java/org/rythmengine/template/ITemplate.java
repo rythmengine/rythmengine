@@ -29,9 +29,7 @@ import org.rythmengine.utils.JSONWrapper;
 
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Define a template instance API
@@ -231,18 +229,18 @@ public interface ITemplate extends ITag, Cloneable {
          * 
          * @see {@link #localeStack}
          */
-        public Stack<ICodeType> codeTypeStack = new Stack<ICodeType>();
+        private Deque<ICodeType> codeTypeStack = new ArrayDeque<ICodeType>();
 
         /**
          * template escape stack. Used to enable the
          * {@link org.rythmengine.conf.RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED}
          */
-        private Stack<Escape> escapeStack = new Stack<Escape>();
+        private Deque<Escape> escapeStack = new ArrayDeque<Escape>();
 
         /**
          * template locale stack. Used to track the locale in the current context.
          */
-        private Stack<Locale> localeStack = new Stack<Locale>();
+        private Deque<Locale> localeStack = new ArrayDeque<Locale>();
 
         private TemplateBase tmpl;
         
@@ -330,9 +328,9 @@ public interface ITemplate extends ITag, Cloneable {
         }
         
         public __Context() {
-            codeTypeStack = new Stack<ICodeType>();
-            escapeStack = new Stack<Escape>();
-            localeStack = new Stack<Locale>();
+            //codeTypeStack = new Stack<ICodeType>();
+            //escapeStack = new Stack<Escape>();
+            //localeStack = new Stack<Locale>();
 //            codeTypeStack.addAll(clone.codeTypeStack);
 //            escapeStack.addAll(clone.escapeStack);
 //            localeStack.addAll(clone.localeStack);

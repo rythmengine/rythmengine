@@ -70,6 +70,8 @@ public class ReturnParser extends KeywordParserFactory {
                 }
                 if (S.empty(condition)) {
                     condition = "true";
+                } else {
+                    logger.warn("@return(<expression>) is deprecated. Please use @returnIf(expression)");
                 }
                 return new IfThenToken(condition, "return this", ctx());
             }

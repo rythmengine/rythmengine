@@ -2,7 +2,12 @@ package org.rythmengine.issue;
 
 import models.Foo;
 import models.GH185Model;
+import models.GH227Model;
+import models.SandboxModel;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.rythmengine.Rythm;
+import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -10,9 +15,13 @@ import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static org.rythmengine.conf.RythmConfigurationKey.*;
+import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
 
 /**
  * Test Github Issues
@@ -251,24 +260,26 @@ public class GHIssueTest extends TestBase {
     }
 
     @Test
+    @Ignore
     public void test194() {
         // This is known issue.
         // The workaround could be use ESCAPED WORD
-//        t = "@verbatim{\\}";
-//        s = r(t);
-//        eq("\\");
+        t = "@verbatim{\\}";
+        s = r(t);
+        eq("\\");
     }
 
     @Test
+    @Ignore
     public void test201() {
         // Known issue
-//        t = "gh201/gh201.txt";
-//        StringWriter sw = new StringWriter();
-//        Rythm.engine().render(sw, t);
-//        s = sw.toString();
-//        contains("header");
-//        contains("inner");
-//        contains("footer");
+        t = "gh201/gh201.txt";
+        StringWriter sw = new StringWriter();
+        Rythm.engine().render(sw, t);
+        s = sw.toString();
+        contains("header");
+        contains("inner");
+        contains("footer");
     }
 
     @Test
@@ -279,12 +290,110 @@ public class GHIssueTest extends TestBase {
 
     @Test
     public void test211() {
+        // the test pass in case no exception thrown out
         t = "gh211/foo.txt";
         s = r(t);
         System.out.println(s);
     }
-    
-    public static void main(String[] args) {
-        run(GHIssueTest.class);
+
+    @Test
+    public void test222() {
+        t = "gh222/gh222.html";
+        s = r(t);
+        eq("AAA");
+    }
+
+    @Test
+    public void test223() {
+        t = "gh223/foo2.html";
+        s = r(t);
+        eq("bar2-in-root");
+
+        t = "gh223/foo.html";
+        s = r(t);
+        eq("bar-in-gh223");
+    }
+
+    @Test
+    @Ignore
+    public void test224() {
+        Map<String, Object> conf = new HashMap<String, Object>();
+        conf.put(RythmConfigurationKey.SANDBOX_TIMEOUT.getKey(), 10000);
+        RythmEngine engine = new RythmEngine(conf);
+        t = "@args models.SandboxModel model\n@model";
+        s = engine.sandbox().render(t, new SandboxModel("10", engine));
+        eq("Bar[10]");
+    }
+
+    @Test
+    public void test226() {
+        String s = "aaa\u0000bbb";
+        String s0 = S.escapeJSON(s).toString();
+        assertTrue(s0.contains("u0000"));
+    }
+
+    @Test
+    public void test227() {
+        t = "@args models.GH227Model h\n@h.getSales().format(\"###,000,000.00\")";
+        s = r(t, new GH227Model());
+        eq("000,010.30");
+    }
+
+    @Test
+    public void test227a() {
+        t = "@s().format(10.3, \"###,000,000.00\")";
+        s = r(t);
+        eq("000,010.30");
+    }
+
+    @Test
+    public void test235() {
+        t = "gh(235)/main.html";
+        s = r(t);
+        eq("hello rythm");
+    }
+
+    @Test
+    public void test236() {
+        t = "@if(false){\nfalse\n} else {\n{abc}\n}";
+        s = r(t);
+        eq("{abc}");
+    }
+
+    @Test
+    public void test237() {
+        t = "gh237/tmpl1.html";
+        s = r(t);
+        assertTrue(s.contains("tmpl1"));
+
+        t = "gh237/tmpl2.html";
+        s = r(t);
+        assertTrue(s.contains("tmpl2"));
+    }
+
+    private void setUpFor244() {
+        Rythm.shutdown();
+        Properties prop = System.getProperties();
+        prop.put(HOME_TEMPLATE.getKey(), "root/gh244");
+        prop.put(FEATURE_NATURAL_TEMPLATE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "false");
+        prop.put(FEATURE_SMART_ESCAPE_ENABLED.getKey(), "true");
+        prop.put(FEATURE_TRANSFORM_ENABLED.getKey(), "true");
+        prop.put(CODEGEN_COMPACT_ENABLED.getKey(), "false");
+        prop.put(ENGINE_OUTPUT_JAVA_SOURCE_ENABLED.getKey(), "false");
+        //prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), new Locale("en", "AU"));
+        prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.getDefault());
+        prop.put("line.separator", "\n");
+        prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
+        t = null;
+        s = null;
+    }
+
+    @Test
+    public void test244() {
+        setUpFor244();
+        t = "x.txt";
+        s = r(t, "foo", "bar");
+        assertEquals("foo and bar", s);
     }
 }

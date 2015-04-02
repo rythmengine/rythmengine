@@ -36,11 +36,11 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     private URL url;
     private String key;
 
-    public ClasspathTemplateResource(String path) {
+    ClasspathTemplateResource(String path) {
         this(path, null);
     }
 
-    public ClasspathTemplateResource(String path, ITemplateResourceLoader loader) {
+    ClasspathTemplateResource(String path, ITemplateResourceLoader loader) {
         super(loader);
         ClassLoader cl = loader.getEngine().classLoader();
 

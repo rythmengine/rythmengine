@@ -18,7 +18,7 @@ public class CacheKey {
         return i18nMsg(template, key, useFormat, null);
     }
     
-    public static String i18nMsg(ITemplate template, String key, boolean useFormat, Locale locale) {
+    public static String i18nMsg(ITemplate template, Object key, boolean useFormat, Locale locale) {
         if (null == template) return "";
         if (null == locale) {
             locale = I18N.locale();

@@ -19,6 +19,8 @@
 */
 package org.rythmengine.utils;
 
+import com.alibaba.fastjson.serializer.JSONSerializer;
+import com.alibaba.fastjson.serializer.StringCodec;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
@@ -336,6 +338,16 @@ public class S {
     }
 
     /**
+     * Alias of {@link #toString(Object)}
+     *
+     * @param o
+     * @return the string representation of object
+     */
+    public static String string(Object o) {
+        return null == o ? "" : o.toString();
+    }
+
+    /**
      * Safe convert an Object to String. if the Object
      * is <code>null</code> than <code>""</code> is
      * returned
@@ -526,7 +538,7 @@ public class S {
         if (o instanceof RawData)
             return (RawData) o;
         String s0 = o.toString();
-        s0 = s0.replace("\\", "\\\\").replaceAll("[\n\r]+", "\\\\\\n").replaceAll("[ \t]+", " ").replaceAll("\"", "\\\\\"");
+        s0 = StringEscapeUtils.escapeJson(s0);
         return new RawData(s0);
     }
 
@@ -1327,12 +1339,50 @@ public class S {
             number = Double.parseDouble(data.toString());
         }
         if (null == locale) locale = I18N.locale(template);
-        Currency currency = null == currencyCode ? Currency.getInstance(locale) : Currency.getInstance(currencyCode);
+        if (null == locale.getCountry() || locale.getCountry().length() != 2) {
+            // try best to guess
+            String lan = locale.getLanguage();
+            if (eq(lan, "en")) {
+                if (null != currencyCode) {
+                    if (eq("AUD", currencyCode)) {
+                        locale = new Locale(lan, "AU");
+                    } else if (eq("USD", currencyCode)) {
+                        locale = Locale.US;
+                    } else if (eq("GBP", currencyCode)) {
+                        locale = Locale.UK;
+                    }
+                }
+            } else if (eq(lan, "zh")) {
+                locale = Locale.SIMPLIFIED_CHINESE;
+            }
+        }
         NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
-        numberFormat.setCurrency(currency);
-        numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        Currency currency = null;
+        if (null == currencyCode) {
+            String country = locale.getCountry();
+            if (null != country && country.length() == 2) {
+                currency = Currency.getInstance(locale);
+            }
+            if (null == currency) currencyCode = "$"; // default
+        }
+
+        if (null == currency) {
+            if (currencyCode.length() != 3) {
+                // it must be something like '$' or '￥' etc
+            } else {
+                currency = Currency.getInstance(currencyCode);
+            }
+        }
+        if (null != currency) {
+            numberFormat.setCurrency(currency);
+            numberFormat.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+        } else {
+            DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+            dfs.setCurrencySymbol(currencyCode);
+            ((DecimalFormat) numberFormat).setDecimalFormatSymbols(dfs);
+        }
         String s = numberFormat.format(number);
-        s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
+        if (null != currency) s = s.replace(currency.getCurrencyCode(), currency.getSymbol(locale));
         return s;
     }
     
@@ -1372,11 +1422,12 @@ public class S {
      * the locale of the processing, and the rest elements are used as format arguments
      * @return the i18n message
      */
-    public static String i18n(ITemplate template, String key, Object... args) {
+    public static String i18n(ITemplate template, Object key, Object... args) {
+        String k = string(key);
         if (null != template) {
             II18nMessageResolver resolver = template.__engine().conf().i18nMessageResolver();
             if (null != resolver && II18nMessageResolver.DefaultImpl.INSTANCE != resolver) {
-                return resolver.getMessage(template, key, args);
+                return resolver.getMessage(template, k, args);
             }
         }
         boolean useFormat = args.length > 0;
@@ -1396,7 +1447,7 @@ public class S {
         RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
         String cacheKey = null;
         if (null != template && null != locale) {
-            cacheKey = CacheKey.i18nMsg(template, key, useFormat, locale);
+            cacheKey = CacheKey.i18nMsg(template, k, useFormat, locale);
             Object cached = engine.cached(cacheKey);
             if (S.notEmpty(cached)) return S.str(cached);
         }
@@ -1404,7 +1455,7 @@ public class S {
         for (String msgSrc: RythmConfiguration.get().messageSources()) {
             bundle = I18N.bundle(template, msgSrc, locale);
             if (null != bundle) {
-                String data = getMessage(template, bundle, key, locale, args);
+                String data = getMessage(template, bundle, k, locale, args);
                 if (null != data) {
                     if (null != engine) {
                         engine.cache(cacheKey, data, -1);
@@ -1413,7 +1464,7 @@ public class S {
                 }
             }
         }
-        return key;
+        return k;
     }
 
     /**
@@ -1424,12 +1475,12 @@ public class S {
      * @return the i18n message
      */
     @Transformer(requireTemplate = true)
-    public static String i18n(String key, Object... args) {
+    public static String i18n(Object key, Object... args) {
         return i18n(null, key, args);
     }
     
     @Transformer(requireTemplate = true)
-    public static String i18n(String key) {
+    public static String i18n(Object key) {
         return i18n(null, key, new Object[0]);
     }
 
@@ -1490,8 +1541,11 @@ public class S {
      */
     @Transformer(lastParam = true)
     public static String join(String sep, Iterable itr) {
+        return join(sep, itr.iterator());
+    }
+
+    public static String join(String sep, Iterator i) {
         StringBuilder sb = new StringBuilder();
-        Iterator i = itr.iterator();
         if (!i.hasNext()) return "";
         sb.append(i.next());
         while (i.hasNext()) {
@@ -1499,6 +1553,25 @@ public class S {
             sb.append(i.next());
         }
         return sb.toString();
+    }
+
+    public static String join(String sep, Object obj) {
+        if (null == obj) return "";
+        if (obj instanceof Iterable) {
+            return join(sep, (Iterable) obj);
+        } else if (obj instanceof Iterator) {
+            return join(sep, (Iterator) obj);
+        } else if (obj.getClass().isArray()) {
+            int n = Array.getLength(obj);
+            if (n == 0) return "";
+            StringBuilder sb = new StringBuilder(n);
+            sb.append(Array.get(obj, 0));
+            for (int i = 1; i < n; ++i) {
+                sb.append(sep).append(Array.get(obj, i));
+            }
+            return sb.toString();
+        }
+        return obj.toString();
     }
 
     /**
@@ -1515,7 +1588,7 @@ public class S {
         return join(",", a);
     }
     
-    public static String join (String sep, Character[] a) {
+    public static String join(String sep, Character[] a) {
         int len = a.length;
         if (len == 0) return "";
         StringBuilder sb = new StringBuilder(String.valueOf(a[0]));
@@ -1524,7 +1597,7 @@ public class S {
         }
         return sb.toString();
     }
-    
+
     public static String join(char sep, Character[] a) {
         return join(String.valueOf(sep), a);
     }

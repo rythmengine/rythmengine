@@ -20,6 +20,7 @@
 package org.rythmengine.internal.parser.build_in;
 
 import com.stevesoft.pat.Regex;
+import org.rythmengine.internal.CodeBuilder;
 import org.rythmengine.internal.IContext;
 import org.rythmengine.internal.IParser;
 import org.rythmengine.internal.Token;
@@ -43,7 +44,10 @@ public class InvokeMacroParser extends CaretParserFactoryBase {
                 Regex r = new Regex(String.format(patternStr(), dialect().a()));
                 if (!r.search(remain())) return null;
                 String macro = r.stringMatched(2);
-                if (!ctx().getCodeBuilder().hasMacro(macro)) return null;
+                CodeBuilder cb = ctx().getCodeBuilder();
+                // inline tag has higher priority than macro
+                if (cb.hasInlineTagWithoutArgument(macro)) return null;
+                if (!cb.hasMacro(macro)) return null;
                 int curLine = currentLine();
                 step(r.stringMatched().length());
                 return new ExecMacroToken(macro, ctx(), curLine);

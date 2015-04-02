@@ -20,6 +20,7 @@
 package org.rythmengine.resource;
 
 import org.rythmengine.RythmEngine;
+import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
@@ -32,6 +33,7 @@ import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
 import java.io.File;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
@@ -144,10 +146,10 @@ public class TemplateResourceManager {
     }
 
     public static void cleanUpTmplBlackList() {
-        Stack<Set<String>> ss = tmpBlackList.get();
-        if (null != ss) {
-            ss.clear();
-        }
+//        Stack<Set<String>> ss = tmpBlackList.get();
+//        if (null != ss) {
+//            ss.clear();
+//        }
         tmpBlackList.remove();
     }
 
@@ -157,19 +159,40 @@ public class TemplateResourceManager {
         typeInference = conf.typeInferenceEnabled();
         loaders = new ArrayList(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
         if (!loaders.isEmpty()) {
+            for (ITemplateResourceLoader loader: loaders) {
+                loader.setEngine(this.engine);
+            }
             Boolean defLoader = conf.get(RythmConfigurationKey.RESOURCE_DEF_LOADER_ENABLED);
             if (!defLoader) {
                 return;
             }
         }
-        List<File> roots = conf.templateHome();
-        for (File root : roots) {
-            FileResourceLoader frl = new FileResourceLoader(engine, root);
-            if (null == adhocFileLoader) {
-                adhocFileLoader = frl;
+        List<URI> roots = conf.templateHome();
+        for (URI root : roots) {
+            if (null == root) continue;
+            String scheme = root.getScheme();
+            if (S.eq(scheme, "jar")) {
+                String s = root.getSchemeSpecificPart();
+                int pos = s.indexOf(".jar!");
+                String home = s.substring(pos + 5);
+                ClasspathResourceLoader crl = new ClasspathResourceLoader(engine, home);
+                loaders.add(crl);
+            } else if (S.eq(scheme, "file")) {
+                FileResourceLoader frl = new FileResourceLoader(engine, new File(root.getPath()));
+                if (null == adhocFileLoader) {
+                    adhocFileLoader = frl;
+                }
+                loaders.add(frl);
             }
-            loaders.add(frl);
         }
+    }
+
+    public void addResourceLoader(ITemplateResourceLoader loader) {
+        if (!loaders.contains(loader)) loaders.add(loader);
+    }
+
+    public void prependResourceLoader(ITemplateResourceLoader loader) {
+        if (!loaders.contains(loader)) loaders.add(0, loader);
     }
 
     private ITemplateResource cache(ITemplateResource resource) {
@@ -179,7 +202,7 @@ public class TemplateResourceManager {
         return resource;
     }
 
-    public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass) {
+    public TemplateClass tryLoadTemplate(String tmplName, TemplateClass callerClass, ICodeType codeType) {
         if (blackList.contains(tmplName)) {
             //logger.info(">>> %s is in the black list", tmplName);
             return null;
@@ -187,7 +210,7 @@ public class TemplateResourceManager {
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
         for (ITemplateResourceLoader loader : loaders) {
-            tc = loader.tryLoadTemplate(tmplName, engine, callerClass);
+            tc = loader.tryLoadTemplate(tmplName, engine, callerClass, codeType);
             if (null != tc) {
                 break;
             }
@@ -214,6 +237,8 @@ public class TemplateResourceManager {
     public ITemplateResource getResource(String str) {
         ITemplateResource resource = cache.get(str);
         if (null != resource) return resource;
+
+        if (Sandbox.isRestricted()) return NULL;
 
         for (ITemplateResourceLoader loader : loaders) {
             resource = loader.load(str);

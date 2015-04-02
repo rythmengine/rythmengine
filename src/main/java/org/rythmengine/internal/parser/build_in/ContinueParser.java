@@ -45,7 +45,7 @@ public class ContinueParser extends KeywordParserFactory {
                 Regex r = reg(dialect());
                 if (r.search(remain())) {
                     step(r.stringMatched().length());
-                    String condition = r.stringMatched(2);
+                    String condition = r.stringMatched(3);
                     if (null != condition) {
                         condition = S.stripBrace(condition);
                     }

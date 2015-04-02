@@ -50,11 +50,11 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
     }
 
     @Override
-    public TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerTemplateClass) {
-        return tryLoadTemplate(tmplName, engine, callerTemplateClass, true);
+    public TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, ICodeType codeType) {
+        return tryLoadTemplate(tmplName, engine, callerClass, codeType, true);
     }
     
-    private TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, boolean processTagName) {
+    private TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, ICodeType codeType, boolean processTagName) {
         //logger.info(">>> try load %s on [%s] with processTagName: %s", tmplName, callerClass.getKey(), processTagName);
         if (null == engine) {
             engine = getDefaultEngine();
@@ -75,23 +75,30 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                 ".rythm",
                 ""
         }));
-        ICodeType codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
+        if (null == codeType) {
+            codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
+        }
         if (ICodeType.DefImpl.RAW == codeType) {
             // use caller's code type
             codeType = callerClass.codeType;
         }
         final String tagNameOrigin = tmplName;
+        boolean hasSuffix = false;
+        String suffix = "";
         if (processTagName) {
             boolean withRythmSuffix = S.notEmpty(rythmSuffix);
             for (String s : suffixes) {
                 if (tmplName.endsWith(s)) {
                     tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
+                    suffix = s;
+                    hasSuffix = true;
                     break;
                 }
                 if (withRythmSuffix) {
-                    s = s + rythmSuffix;
-                    if (tmplName.endsWith(s)) {
+                    if (tmplName.endsWith(s) || tmplName.endsWith(s + rythmSuffix)) {
                         tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
+                        suffix = s + rythmSuffix;
+                        hasSuffix = true;
                         break;
                     }
                 }
@@ -108,51 +115,52 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         final String root0 = this.getResourceLoaderRoot().replace('\\', '/');
         roots.add(root0);
 
-        // call tag with import path
-        if (null != callerClass.importPaths) {
-            for (String s: callerClass.importPaths) {
-                roots.add(root0 + "/" + s.replace('.', '/'));
-            }
-        }
-
-        String tmplName0 = tmplName;
         // call template using relative path
         String currentPath = callerClass.getKey().toString();
         int pos = currentPath.lastIndexOf("/");
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
             if (currentPath.startsWith(root0)) {
-                roots.add(currentPath);
+                roots.add(0, currentPath);
             } else {
                 if (currentPath.startsWith("/")) {
                     currentPath = currentPath.substring(1);
                 }
                 if (!currentPath.startsWith(root0)) currentPath = root0 + "/" + currentPath;
-                roots.add(currentPath);
+                roots.add(0, currentPath);
             }
         }
         
+        // call tag with import path
+        if (null != callerClass.importPaths) {
+            for (String s: callerClass.importPaths) {
+                roots.add(0, root0 + "/" + s.replace('.', '/'));
+            }
+        }
+
+        String tmplName0 = tmplName;
         for (String root : roots) {
-            tmplName = root + "/" + tmplName0;
-            for (String suffix : suffixes) {
-                String path = tmplName + suffix;
-                ITemplateResource resource = load(path);
+            tmplName = tmplName0.startsWith(root) ? tmplName0 : root + "/" + tmplName0;
+            if (hasSuffix) {
+                ITemplateResource resource = load(tmplName + suffix);
                 if (null == resource || !resource.isValid()) {
                     continue;
                 }
                 TemplateClass tc = engine.resourceManager().resourceLoaded(resource, false);
-//                TemplateClass tc = engine.classes().getByTemplate(resource.getKey(), false);
-//                if (null == tc) {
-//                    tc = new TemplateClass(resource, engine);
-//                } else if (tc.equals(callerClass)) {
-//                    // call self
-//                    return callerClass;
-//                }
-//                tc.asTemplate(engine);
                 return tc;
+            } else {
+                for (String suffix0 : suffixes) {
+                    String path = tmplName + suffix0;
+                    ITemplateResource resource = load(path);
+                    if (null == resource || !resource.isValid()) {
+                        continue;
+                    }
+                    TemplateClass tc = engine.resourceManager().resourceLoaded(resource, false);
+                    return tc;
+                }
             }
         }
-        TemplateClass tc = processTagName ? tryLoadTemplate(tagNameOrigin, engine, callerClass, false) : null; 
+        TemplateClass tc = processTagName ? tryLoadTemplate(tagNameOrigin, engine, callerClass, codeType, false) : null;
         if (null == tc) {
             TemplateResourceManager.reportNonResource(tmplName);
         }

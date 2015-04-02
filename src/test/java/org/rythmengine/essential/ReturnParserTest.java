@@ -36,7 +36,7 @@ public class ReturnParserTest extends TestBase {
     
     @Test
     public void testIf() {
-        t = "xyz@return(1 < 2) abc";
+        t = "xyz@returnIf(1 < 2) abc";
         s = r(t);
         eq("xyz");
         

@@ -14,6 +14,11 @@
   ~ License for the specific language governing permissions and limitations
   ~ under the License.
   -->
+<!--
+RELEASE HISTORY
+1.1.0-SNAPSHOT: base version where the release history start
+1.1.1-SNAPSHOT: Fix GH issue 244: Declared args in __global.rythm position might not be correct
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +26,7 @@
     <groupId>org.rythmengine</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
@@ -133,7 +138,7 @@
         <dependency>
             <groupId>org.eclipse.jdt.core.compiler</groupId>
             <artifactId>ecj</artifactId>
-            <version>4.3.1</version>
+            <version>4.4</version>
         </dependency>
 
         <dependency>
@@ -145,13 +150,13 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.1</version>
+            <version>3.3.2</version>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.1.37</version>
+            <version>1.1.39</version>
         </dependency>
 
         <dependency>

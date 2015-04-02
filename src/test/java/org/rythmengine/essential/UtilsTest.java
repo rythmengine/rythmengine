@@ -136,11 +136,18 @@ public class UtilsTest extends TestBase {
     }
     
     @Test
-    public void captializeWords() {
+    public void capitalizeWords() {
         s = S.capitalizeWords("[abc 123 xyz]");
         eq("[Abc 123 Xyz]");
         
         s = S.capitalizeWords("abc@xyz.com");
         eq("Abc@Xyz.Com");
+    }
+
+    @Test
+    public void formatCurrency() {
+        int n = 1000;
+        eqs("$1,000.00", S.formatCurrency(n));
+        eqs("$1,000.00", S.formatCurrency(null, n, "AUD", new Locale("en")));
     }
 }

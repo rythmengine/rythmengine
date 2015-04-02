@@ -31,7 +31,7 @@ public enum Keyword implements IKeyword {
     /**
      * break current loop
      */
-    BREAK,
+    BREAK("(?i)(breakIf|break)"),
     /**
      * Cache the block for a certain period
      */
@@ -44,7 +44,7 @@ public enum Keyword implements IKeyword {
     /**
      * Continue current loop
      */
-    CONTINUE,
+    CONTINUE("(?i)(continueIf|continue)"),
     /**
      * output debug message
      */
@@ -73,6 +73,11 @@ public enum Keyword implements IKeyword {
      * Declare parent template for this template
      */
     EXTENDS,
+    /**
+     * Mark a finally section. There can be at most one
+     * @finally{} section per template
+     */
+    FINALLY,
     /**
      * Fetch named content from this or sub template
      */
@@ -134,6 +139,7 @@ public enum Keyword implements IKeyword {
      * Output sub template render content in place
      */
     RENDER_BODY("(renderBody|doBody)"),
+    RENDER_INHERITED("(inherited|renderInherited)"),
     /**
      * Output sub template section content in place
      */
@@ -142,6 +148,11 @@ public enum Keyword implements IKeyword {
      * break the current template execution process and return to caller
      */
     RETURN,
+    /**
+     * break the current template execution process and return to caller
+     * if an expression evaluated to true
+     */
+    RETURN_IF("returnIf"),
     /**
      * Declare a section start
      */

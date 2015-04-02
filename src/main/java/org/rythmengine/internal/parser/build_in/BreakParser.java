@@ -47,7 +47,7 @@ public class BreakParser extends KeywordParserFactory {
                     raiseParseException("Bad @break statement. Correct usage: @break()");
                 }
                 String matched = r.stringMatched();
-                String condition = r.stringMatched(2);
+                String condition = r.stringMatched(3);
                 if (null != condition) {
                     condition = S.stripBrace(condition);
                 }

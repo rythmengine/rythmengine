@@ -55,7 +55,7 @@ public class EscapeParserTest extends TestBase {
 
         t = "@escape(\"json\"){@p}";
         s = r(t, "<h1>abc</h1>");
-        eq("<h1>abc</h1>");
+        eq("<h1>abc<\\/h1>");
 
         t = "@escape(\"json\"){@p}";
         s = r(t, "\"foo\"");

@@ -46,7 +46,7 @@ public class TemplateClassManager {
     /**
      * Reference to the eclipse compiler.
      */
-    TemplateCompiler compiler = new TemplateCompiler(this);
+    TemplateCompiler compiler = null;
     /**
      * Index template class with class name
      */
@@ -59,6 +59,7 @@ public class TemplateClassManager {
     public TemplateClassManager(RythmEngine engine) {
         if (null == engine) throw new NullPointerException();
         this.engine = engine;
+        this.compiler = new TemplateCompiler(this);
     }
 
     /**
