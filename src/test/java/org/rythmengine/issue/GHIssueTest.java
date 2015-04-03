@@ -228,6 +228,16 @@ public class GHIssueTest extends TestBase {
         t = "@args Boolean o;@if(o){yes}else{no}";
         no(null);
     }
+
+    @Test
+    public void test164() {
+        t = "@nocompact(){\nabc     ddd\n\n1}";
+        s = r(t);
+        eq("\nabc     ddd\n\n1");
+        t = "@compact(){\nabc     ddd\n\n1}";
+        s = r(t);
+        eq("\nabc ddd\n1");
+    }
     
     @Test
     public void test176() {
