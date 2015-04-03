@@ -11,6 +11,8 @@ import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.extension.ISourceCodeEnhancer;
+import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.Escape;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
@@ -401,5 +403,44 @@ public class GHIssueTest extends TestBase {
         t = "x.txt";
         s = r(t, "foo", "bar");
         assertEquals("foo and bar", s);
+    }
+
+    private void setUpFor248() {
+        ISourceCodeEnhancer se = new ISourceCodeEnhancer() {
+            @Override
+            public List<String> imports() {
+                return Collections.EMPTY_LIST;
+            }
+
+            @Override
+            public String sourceCode() {
+                return "";
+            }
+
+            @Override
+            public Map<String, ?> getRenderArgDescriptions() {
+                Map<String, Object> m = new HashMap<String, Object>();
+                m.put("_9", "String");
+                m.put("_1", "String");
+                m.put("_5", "String");
+                return m;
+            }
+
+            @Override
+            public void setRenderArgs(ITemplate template) {
+                template.__setRenderArg("_9", "_9");
+                template.__setRenderArg("_1", "_1");
+                template.__setRenderArg("_5", "_5");
+            }
+        };
+        System.getProperties().put(CODEGEN_SOURCE_CODE_ENHANCER.getKey(), se);
+    }
+
+    @Test
+    public void test248() {
+        setUpFor248();
+        t = "@args String _4, String _0\n@_0, @_1, @_4, @_5, @_9";
+        s = r(t, "_4", "_0");
+        eq("_0, _1, _4, _5, _9");
     }
 }
