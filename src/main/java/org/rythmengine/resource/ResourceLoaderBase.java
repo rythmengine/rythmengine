@@ -72,8 +72,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                 ".tag",
                 ".xml",
                 ".txt",
-                ".rythm",
-                ""
+                ".rythm"
         }));
         if (null == codeType) {
             codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
@@ -134,13 +133,22 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         // call tag with import path
         if (null != callerClass.importPaths) {
             for (String s: callerClass.importPaths) {
+                if (s.startsWith("java")) {
+                    continue;
+                }
                 roots.add(0, root0 + "/" + s.replace('.', '/'));
             }
         }
 
         String tmplName0 = tmplName;
         for (String root : roots) {
-            tmplName = tmplName0.startsWith(root) ? tmplName0 : root + "/" + tmplName0;
+            String tmplName1 = tmplName0;
+            if (root.startsWith("/")) {
+                if (!tmplName1.startsWith("/")) {
+                    tmplName1 = "/" + tmplName0;
+                }
+            }
+            tmplName = tmplName1.startsWith(root) ? tmplName1 : root + "/" + tmplName0;
             if (hasSuffix) {
                 ITemplateResource resource = load(tmplName + suffix);
                 if (null == resource || !resource.isValid()) {

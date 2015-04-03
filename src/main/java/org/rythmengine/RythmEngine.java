@@ -1515,6 +1515,9 @@ public class RythmEngine implements IEventDispatcher {
         // try imported path
         if (null != callerClass.importPaths) {
             for (String s : callerClass.importPaths) {
+                if (s.startsWith("java")) {
+                    continue;
+                }
                 String name0 = s + "." + name;
                 if (_templates.containsKey(name0)) return name0;
             }
@@ -1646,6 +1649,9 @@ public class RythmEngine implements IEventDispatcher {
                 TemplateClass tc = caller.__getTemplateClass(true);
                 if (null != tc.importPaths) {
                     for (String s : tc.importPaths) {
+                        if (s.startsWith("java")) {
+                            continue;
+                        }
                         String name0 = s + "." + name;
                         t = _tags.get(name0);
                         if (null == t) t = _templates.get(name0);
