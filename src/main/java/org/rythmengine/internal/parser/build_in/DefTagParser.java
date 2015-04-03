@@ -65,7 +65,7 @@ public class DefTagParser extends KeywordParserFactory {
             public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("Error parsing @def, correct usage: @def tagName([arguments...])");
+                    raiseParseException("Error parsing @def, correct usage: @def [type] tagName([arguments...])");
                 }
                 final String matched = r.stringMatched();
                 if (matched.startsWith("\n")) {
@@ -132,7 +132,7 @@ public class DefTagParser extends KeywordParserFactory {
 
     @Override
     protected String patternStr() {
-        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s+(([_a-zA-Z][\\w_$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{?[ \\t\\x0B\\f]*\\n?";
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s+(([_a-zA-Z][\\w_\\.$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{?[ \\t\\x0B\\f]*\\n?";
     }
 
 }

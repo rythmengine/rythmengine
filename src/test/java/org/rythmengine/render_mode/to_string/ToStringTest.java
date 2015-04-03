@@ -64,7 +64,7 @@ public class ToStringTest extends TestBase {
         Data data = new Data("bar", 5);
         String s = data.toString();
         assertContains(s, "[foo=bar,bar=5]");
-        assertContains(s, "org.rythmengine.advanced.to_string.ToStringTest$Data");
+        assertContains(s, "org.rythmengine.render_mode.to_string.ToStringTest$Data");
         
         // test with output transient and static fields
         s = Rythm.toString(data, new ToStringOption(true, true), null);

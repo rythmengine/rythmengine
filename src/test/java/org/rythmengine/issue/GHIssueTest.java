@@ -371,6 +371,12 @@ public class GHIssueTest extends TestBase {
         assertTrue(s.contains("tmpl2"));
     }
 
+    @Test
+    public void test249() {
+        t = "@def java.lang.Object foo(){return null}";
+        r(t);
+    }
+
     private void setUpFor244() {
         Rythm.shutdown();
         Properties prop = System.getProperties();
