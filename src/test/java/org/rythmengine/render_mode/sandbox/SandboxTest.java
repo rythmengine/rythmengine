@@ -74,6 +74,7 @@ public class SandboxTest extends TestBase {
     @Test(expected = SecurityException.class)
     public void testTimeout() throws Throwable {
         Rythm.debug = true;
+        //System.getProperties().put(RythmConfigurationKey.SANDBOX_TIMEOUT.getKey(), 1000 * 60 * 60);
         _run("@if (true) {@for(;;){}}");
     }
 

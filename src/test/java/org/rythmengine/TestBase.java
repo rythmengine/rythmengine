@@ -29,6 +29,7 @@ import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.TemplateBase;
+import org.rythmengine.utils.Eval;
 
 import java.util.Locale;
 import java.util.Properties;
@@ -51,7 +52,7 @@ public abstract class TestBase extends Assert {
     }
 
     @Before
-    public void initRythm() {
+    public void initRythm() throws Exception {
         Rythm.shutdown();
         Properties prop = System.getProperties();
         prop.put(HOME_TEMPLATE.getKey(), "root");
@@ -65,6 +66,8 @@ public abstract class TestBase extends Assert {
         prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.getDefault());
         prop.put("line.separator", "\n");
         prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
+        prop.put(ENGINE_CLASS_LOADER_PARENT_IMPL.getKey(), cl);
+        Class.forName("org.rythmengine.utils.Eval");
         t = null;
         s = null;
     }
