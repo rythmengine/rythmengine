@@ -66,7 +66,6 @@ public abstract class TestBase extends Assert {
         prop.put(RythmConfigurationKey.I18N_LOCALE.getKey(), Locale.getDefault());
         prop.put("line.separator", "\n");
         prop.put(DEFAULT_CODE_TYPE_IMPL.getKey(), ICodeType.DefImpl.RAW);
-        prop.put(ENGINE_CLASS_LOADER_PARENT_IMPL.getKey(), cl);
         Class.forName("org.rythmengine.utils.Eval");
         t = null;
         s = null;
