@@ -17,12 +17,8 @@ public class Gh170Helper {
     private static final String TMPL_NAME = "gh170helper.txt";
     private static File tmplHome;
 
-    private static String contentA() {
+    private static String content() {
         return "@args String who\nHello @who";
-    }
-
-    private static String contentB() {
-        return "@args String who\nBye @who";
     }
 
     private static void prepareTmplHome() throws Exception {
@@ -38,7 +34,6 @@ public class Gh170Helper {
         Map<String, Object> config = new HashMap<String, Object>();
         config.put(ENGINE_MODE.getKey(), Rythm.Mode.dev);
         config.put(HOME_TEMPLATE.getKey(), tmplHome);
-        config.put(RESOURCE_REFRESH_INTERVAL.getKey(), 1);
         config.put(CACHE_ENABLED.getKey(), true);
         return new RythmEngine(config);
     }
@@ -47,15 +42,15 @@ public class Gh170Helper {
         return new File(tmplHome, TMPL_NAME);
     }
 
-    private static void prepareTmplEdition() {
-        IO.writeContent(contentA(), tmplFile());
+    private static void prepareTmpl() {
+        IO.writeContent(content(), tmplFile());
     }
 
     public static void main(String[] args) throws Exception {
         final RythmEngine engine = prepareEngine();
         System.out.println(engine.mode());
 
-        prepareTmplEdition();
+        prepareTmpl();
         System.out.println(engine.render(TMPL_NAME, "world"));
     }
 }
