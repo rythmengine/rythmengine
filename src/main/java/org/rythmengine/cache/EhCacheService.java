@@ -21,6 +21,9 @@ package org.rythmengine.cache;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
+import net.sf.ehcache.config.PersistenceConfiguration;
 import org.rythmengine.extension.ICacheService;
 
 import java.io.Serializable;
@@ -41,9 +44,6 @@ public enum EhCacheService implements ICacheService {
     private int defaultTTL = 60;
 
     private EhCacheService() {
-        this.cacheManager = CacheManager.create();
-        this.cacheManager.addCache(cacheName);
-        this.cache = cacheManager.getCache(cacheName);
     }
 
     @Override
@@ -101,9 +101,13 @@ public enum EhCacheService implements ICacheService {
     @Override
     public void shutdown() {
         clear();
+        cacheManager.shutdown();
     }
 
     @Override
     public void startup() {
+        this.cacheManager = CacheManager.create();
+        this.cacheManager.addCache(cacheName);
+        this.cache = cacheManager.getCache(cacheName);
     }
 }

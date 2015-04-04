@@ -93,8 +93,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     protected abstract long defCheckInterval();
 
     protected Long userCheckInterval() {
-        //return engine().configuration.getAsLong(String.format("rythm.%s.interval", getClass().getSimpleName()), null);
-        return null;
+        return getEngine().conf().resourceRefreshInterval();
     }
 
     protected abstract long lastModified();

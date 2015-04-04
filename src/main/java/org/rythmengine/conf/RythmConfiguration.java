@@ -549,6 +549,19 @@ public class RythmConfiguration {
         return _suffix;
     }
 
+    private Integer _resourceRefreshInterval = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#RESOURCE_REFRESH_INTERVAL}
+     * @return
+     */
+    public long resourceRefreshInterval() {
+        if (null == _resourceRefreshInterval) {
+            _resourceRefreshInterval = get(RESOURCE_REFRESH_INTERVAL);
+        }
+        return _resourceRefreshInterval.longValue();
+    }
+
     private Boolean _autoScan = null;
 
     public boolean autoScan() {

@@ -84,7 +84,8 @@ public enum RythmConfigurationKey {
     /**
      * "cache.service.impl": Set {@link org.rythmengine.extension.ICacheService cache service} implementation
      * <p/>
-     * <p>Default value: {@link org.rythmengine.cache.SimpleCacheService}</p>
+     * <p>Default value: try {@link org.rythmengine.cache.EhCacheService} first, if
+     * cannot initialize then use {@link org.rythmengine.cache.SimpleCacheService}</p>
      * <p/>
      * <p>Note when {@link #CACHE_ENABLED} is set to <code>false</code>, then this setting
      * will be ignored, and the service impl will be set to {@link org.rythmengine.cache.NoCacheService}
@@ -525,6 +526,16 @@ public enum RythmConfigurationKey {
     RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
 
     /**
+     * "resource.refresh.interval": Set resource check refresh interval. Resource refresh is
+     * only available in the dev mode. When engine running in dev mode, the resource manager
+     * will check if a template resource has been changed before rendering the template. this
+     * configuration specifies the minimum time period resource manager should check a specific
+     * resource since the last check time.
+     * <p>Default value: <p>5000</p>, i.e 5 seconds</p>
+     */
+    RESOURCE_REFRESH_INTERVAL("resource.refresh.interval", 5000),
+
+    /**
      * "resource.loader.impls": Set one or more {@link org.rythmengine.extension.ITemplateResourceLoader resource loader}
      * implementation, should be a list of class names separated by ",", or list of resource loader instance
      * <p>Default value: <code>null</code>. If this is not configured, try templates will be loaded as
@@ -586,39 +597,13 @@ public enum RythmConfigurationKey {
      * to return. This setting prevent infinite loop in untrusted template.
      * <p>Default value: 2000</p>
      */
-    SANDBOX_TIMEOUT("sandbox.timeout") {
-        @Override
-        public <T> T getConfiguration(Map<String, ?> configuration) {
-            String k = getKey();
-            Object v = configuration.get(k);
-            if (null == v) {
-                return (T) (Integer) 2000;
-            }
-            if (v instanceof Number) {
-                return (T) v;
-            }
-            return (T) Integer.valueOf(v.toString());
-        }
-    },
+    SANDBOX_TIMEOUT("sandbox.timeout", 2000),
 
     /**
      * "sandbox.pool.size": Set the thread pool size of {@link org.rythmengine.Sandbox sandbox} executors.
      * <p>Default value: 10</p>
      */
-    SANDBOX_POOL_SIZE("sandbox.pool.size") {
-        @Override
-        public <T> T getConfiguration(Map<String, ?> configuration) {
-            String k = getKey();
-            Object v = configuration.get(k);
-            if (null == v) {
-                return (T) (Integer) 10;
-            }
-            if (v instanceof Number) {
-                return (T) v;
-            }
-            return (T) Integer.valueOf(v.toString());
-        }
-    },
+    SANDBOX_POOL_SIZE("sandbox.pool.size", 10),
 
     /**
      * "sandbox.restricted_class": Set restricted classes for {@link org.rythmengine.Sandbox sandbox} execution.
@@ -797,6 +782,20 @@ public enum RythmConfigurationKey {
             return !toBoolean(v);
         }
         return toBoolean(v);
+    }
+
+    private static Integer getInt(String key, Map<String, ?> configuration, Object defVal) {
+        Object v = getValFromAliases(configuration, key, "", defVal);
+        if (null == v) {
+            return null;
+        }
+        if (v instanceof Integer) {
+            return (Integer) v;
+        }
+        if (v instanceof Number) {
+            return ((Number) v).intValue();
+        }
+        return Integer.parseInt(v.toString());
     }
     
     private static <T> T getImpl(String key, Map<String, ?> configuration, Object defVal) {
@@ -1018,6 +1017,9 @@ public enum RythmConfigurationKey {
         }
         if (key.endsWith(".dir")) {
             return (T) getUri(key, configuration, defVal);
+        }
+        if (key.endsWith(".timeout") || key.endsWith(".interval") || key.endsWith(".size")) {
+            return (T) getInt(key, configuration, defVal);
         }
         return (T) getValFromAliases(configuration, key, null, defVal);
     }
