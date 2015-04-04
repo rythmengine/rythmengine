@@ -67,24 +67,12 @@ public class CompactParser extends KeywordParserFactory {
                 return new BlockCodeToken("", ctx()) {
                     @Override
                     public void openBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
-                            @Override
-                            protected void output() {
-                                ctx().pushCompact(true);
-                                super.output();
-                            }
-                        });
+                        ctx().getCodeBuilder().addBuilder(new PushCompactState(true, ctx));
                     }
 
                     @Override
                     public String closeBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
-                            @Override
-                            protected void output() {
-                                ctx().popCompact();
-                                super.output();
-                            }
-                        });
+                        ctx().getCodeBuilder().addBuilder(new PopCompactState(ctx));
                         return "";
                     }
                 };

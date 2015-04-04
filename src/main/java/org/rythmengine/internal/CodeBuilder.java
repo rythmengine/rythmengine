@@ -36,6 +36,8 @@ import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.NotRythmTemplateException;
 import org.rythmengine.internal.parser.build_in.BlockToken;
+import org.rythmengine.internal.parser.build_in.CompactParser;
+import org.rythmengine.internal.parser.build_in.CompactStateToken;
 import org.rythmengine.internal.parser.build_in.InvokeTemplateParser;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
@@ -1146,16 +1148,23 @@ public class CodeBuilder extends TextBuilder {
             if (tb == Token.EMPTY_TOKEN) {
                 continue;
             }
-            if (tb instanceof Token.StringToken || tb instanceof BlockToken.LiteralBlock || tb instanceof IDirective) {
-                if (tb instanceof Token.StringToken) {
-                    Token.StringToken tk = (Token.StringToken) tb;
-                    curTk = curTk.mergeWith(tk);
-                } else if (tb instanceof IDirective) {
-                    // do nothing
-                } else {
-                    BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock) tb;
-                    curTk = curTk.mergeWith(bk);
+            if (tb instanceof Token.StringToken) {
+                Token.StringToken tk = (Token.StringToken) tb;
+                curTk = curTk.mergeWith(tk);
+            } else if (tb instanceof IDirective) {
+                // do nothing
+            } else if (tb instanceof BlockToken.LiteralBlock) {
+                BlockToken.LiteralBlock bk = (BlockToken.LiteralBlock) tb;
+                curTk = curTk.mergeWith(bk);
+            } else if (tb instanceof CompactStateToken) {
+                if (null != curTk && curTk.s().length() > 0) {
+                    curTk = addConst(curTk);
+                    curTk.compact();
+                    merged.add(curTk);
                 }
+                curTk = new Token.StringToken("", parser);
+                merged.add(tb);
+                tb.build();
             } else {
                 if (null != curTk && curTk.s().length() > 0) {
                     curTk = addConst(curTk);

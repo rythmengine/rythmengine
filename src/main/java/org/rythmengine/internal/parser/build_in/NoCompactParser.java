@@ -67,24 +67,12 @@ public class NoCompactParser extends KeywordParserFactory {
                 return new BlockCodeToken("", ctx()) {
                     @Override
                     public void openBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
-                            @Override
-                            protected void output() {
-                                ctx().pushCompact(false);
-                                super.output();
-                            }
-                        });
+                        ctx().getCodeBuilder().addBuilder(new PushCompactState(false, ctx));
                     }
 
                     @Override
                     public String closeBlock() {
-                        ctx().getCodeBuilder().addBuilder(new Token("", ctx()) {
-                            @Override
-                            protected void output() {
-                                ctx().popCompact();
-                                super.output();
-                            }
-                        });
+                        ctx().getCodeBuilder().addBuilder(new PopCompactState(ctx));
                         return "";
                     }
                 };

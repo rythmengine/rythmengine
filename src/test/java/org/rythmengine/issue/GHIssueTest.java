@@ -231,6 +231,7 @@ public class GHIssueTest extends TestBase {
 
     @Test
     public void test164() {
+        System.getProperties().put(CODEGEN_COMPACT_ENABLED.getKey(), "true");
         t = "@nocompact(){\nabc     ddd\n\n1}";
         s = r(t);
         eq("\nabc     ddd\n\n1");
