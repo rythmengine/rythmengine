@@ -32,6 +32,7 @@ import com.stevesoft.pat.Regex;
 public class ForEachCodeToken extends BlockCodeToken {
 
     private String type;
+    private String iterableType = "Iterable";
     private String varname;
     private String iterable;
     private String joinSep;
@@ -61,6 +62,7 @@ public class ForEachCodeToken extends BlockCodeToken {
         this.varname = null == varname ? "_" : varname.trim();
         if (iterable.contains("..") || iterable.contains(" to ") || iterable.contains(" till ")) {
             iterable = "org.rythmengine.utils.Range.valueOf(\"" + iterable + "\")";
+            iterableType = "Range";
         }
         this.iterable = iterable;
         //openPos = context.cursor();
@@ -138,9 +140,13 @@ public class ForEachCodeToken extends BlockCodeToken {
 
         String varItr = cb.newVarName();
         if ("java.lang.Object".equals(type)) {
-            p("{\n__Itr ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+            p("{\n__Itr ").p(varItr).p(" = __Itr.of(").p(iterable).p(");");
         } else {
-            p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+            if ("Range".equals(iterableType)) {
+                p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.ofRange(").p(iterable).p(");");
+            } else {
+                p("{\n__Itr<").p(type).p("> ").p(varItr).p(" = __Itr.valueOf(").p(iterable).p(");");
+            }
         }
         pline();
         p("int ").p(varSize).p(" = ").p(varItr).p(".size();");

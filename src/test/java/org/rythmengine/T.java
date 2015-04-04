@@ -250,4 +250,8 @@ public class T extends org.rythmengine.template.TagBase {
             return this;
         }
 
+    private void foo() {
+
     }
+
+}

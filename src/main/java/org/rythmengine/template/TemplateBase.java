@@ -1805,7 +1805,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return itr;
         }
 
-        public static <T extends Comparable> __Itr<T> valueOf(Range range) {
+        public static <T extends Comparable<T>> __Itr<T> ofRange(Range range) {
             __Itr<T> itr = new __Itr<T>();
             itr._o = range;
             itr._size = range.size();
@@ -1813,15 +1813,27 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return itr;
         }
 
-        public static __Itr valueOf(final Object obj) {
+        /**
+         * This will cause the famous "The method XX is ambiguous for the type YY" issue
+         * on Java 8 compiler. So use {@link #ofRange(Range)} instead
+         */
+        @Deprecated
+        public static <T extends Comparable> __Itr<T> valueOf(Range range) {
+            return ofRange(range);
+        }
+
+        public static __Itr of(final Object obj) {
             if (null == obj) {
                 return EMPTY_ITR;
             }
             if (obj instanceof Iterable) {
-                return valueOf((Iterable) obj);
+                return ofIterable((Iterable) obj);
             }
             if (obj instanceof Enumeration) {
-                return valueOf((Enumeration) obj);
+                return ofEnumeration((Enumeration) obj);
+            }
+            if (obj instanceof Range) {
+                return ofRange((Range) obj);
             }
             Class c = obj.getClass();
             if (c.isArray()) {
@@ -1845,7 +1857,15 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return new __Itr(obj);
         }
 
-        public static <T> __Itr valueOf(Iterable<T> tc) {
+        /**
+         * Use {@link #of(Object)} instead
+         */
+        @Deprecated
+        public static __Itr valueOf(final Object obj) {
+            return of(obj);
+        }
+
+        public static <T> __Itr<T> ofIterable(Iterable<T> tc) {
             final __Itr<T> itr = new __Itr<T>();
             if (tc instanceof Collection) {
                 itr._size = ((Collection) tc).size();
@@ -1863,16 +1883,32 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return itr;
         }
 
-        public static <T> __Itr valueOf(Enumeration<T> enu) {
+        /**
+         * use {@link #ofIterable(Iterable)} instead
+         */
+        @Deprecated
+        public static <T> __Itr valueOf(Iterable<T> tc) {
+            return ofIterable(tc);
+        }
+
+        public static <T> __Itr<T> ofEnumeration(Enumeration<T> e) {
             final __Itr<T> itr = new __Itr<T>();
             List<T> l = new ArrayList<T>();
-            while (enu.hasMoreElements()) {
-                l.add(enu.nextElement());
+            while (e.hasMoreElements()) {
+                l.add(e.nextElement());
             }
             itr._size = l.size();
             itr._o = l;
             itr.iterator = l.iterator();
             return itr;
+        }
+
+        /**
+         * Use {@link #ofEnumeration(Enumeration)} instead
+         */
+        @Deprecated
+        public static <T> __Itr valueOf(Enumeration<T> enu) {
+            return ofEnumeration(enu);
         }
 
         public int size() {
