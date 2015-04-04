@@ -14,9 +14,11 @@ import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.template.ITemplate;
 import org.rythmengine.utils.Escape;
+import org.rythmengine.utils.IO;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
 
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,7 +30,7 @@ import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
 /**
  * Test Github Issues
  */
-public class GHIssueTest extends TestBase {
+public class GhIssueTest extends TestBase {
     @Test
     public void test116() {
         t = "PlayRythm Demo - @get(\"title\")";
@@ -238,6 +240,21 @@ public class GHIssueTest extends TestBase {
         t = "@compact(){\nabc     ddd\n\n1}";
         s = r(t);
         eq("\nabc ddd\n1");
+    }
+
+    @Test
+    public void test170() throws Exception {
+        String cmdLine = new StringBuilder("java -classpath ")
+                .append(System.getProperty("java.class.path"))
+                .append(" org.rythmengine.issue.Gh170Helper").toString();
+        ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
+        Process p = pb.start();
+        Thread.sleep(2000);
+        assertFalse(p.isAlive());
+        InputStream is = p.getInputStream();
+        String s = IO.readContentAsString(is);
+        assertContains(s, "Hello world");
+        assertContains(s, "dev");
     }
     
     @Test
