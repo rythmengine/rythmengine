@@ -256,7 +256,23 @@ public class GhIssueTest extends TestBase {
         assertContains(s, "Hello world");
         assertContains(s, "dev");
     }
-    
+
+    @Test
+    public void test174() throws Exception {
+        String cmdLine = new StringBuilder("java -classpath ")
+                .append(System.getProperty("java.class.path"))
+                .append(" org.rythmengine.issue.Gh174Helper").toString();
+        ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
+        Process p = pb.start();
+        Thread.sleep(3000);
+        assertFalse(p.isAlive());
+        InputStream is = p.getInputStream();
+        String s = IO.readContentAsString(is);
+        assertContains(s, "Hello world");
+        assertContains(s, "dev");
+        assertContains(s, "Bye world");
+    }
+
     @Test
     public void test176() {
         t = "@for (int i = 0; i < 10; ++i) {\n" +

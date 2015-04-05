@@ -119,6 +119,7 @@ public abstract class TemplateResourceBase implements ITemplateResource {
         long checkInterval = checkInterval();
         if (checkInterval < 0) return false; // never check
         if (0 == checkInterval) {
+//            System.out.println("always check resource as checkInterval set to zero");
             // always check
             checkModified();
             return isModified();
@@ -135,7 +136,10 @@ public abstract class TemplateResourceBase implements ITemplateResource {
     private void checkModified() {
         long modified = lastModified();
         if (timestamp < modified) {
+//            System.out.println("resource has been modified");
             cache = null;
+//        } else {
+//            System.out.println("resource is not modified");
         }
     }
 
