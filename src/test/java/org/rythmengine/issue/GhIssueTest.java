@@ -31,6 +31,17 @@ import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
  * Test Github Issues
  */
 public class GhIssueTest extends TestBase {
+
+    @Test
+    public void test70() {
+        String s = Rythm.getTemplate("Good @when, @title @name")
+                .__setRenderArg("when", "afternoon")
+                .__setRenderArg("title", "Mr")
+                .__setRenderArg("name", "Rythm")
+                .render();
+        assertEquals("Good afternoon, Mr Rythm", s);
+    }
+
     @Test
     public void test116() {
         t = "PlayRythm Demo - @get(\"title\")";

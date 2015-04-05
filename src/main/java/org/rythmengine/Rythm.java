@@ -20,6 +20,7 @@
 package org.rythmengine;
 
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.template.ITemplate;
 import org.rythmengine.toString.ToStringOption;
 import org.rythmengine.toString.ToStringStyle;
 import org.rythmengine.utils.Escape;
@@ -253,6 +254,19 @@ public class Rythm {
      */
     public final RythmEngine prepare(Map<String, Object> userContext) {
         return engine().prepare(userContext);
+    }
+
+    /**
+     * @param tmpl
+     * @param args
+     * @return
+     */
+    public static final ITemplate getTemplate(String tmpl, Object ... args) {
+        return engine().getTemplate(tmpl, args);
+    }
+
+    public static final ITemplate getTemplate(File tmpl, Object ... args) {
+        return engine().getTemplate(tmpl, args);
     }
 
     /**

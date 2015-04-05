@@ -19,10 +19,15 @@ RELEASE HISTORY
 1.1.0-SNAPSHOT: base version where the release history start
 
 1.1.1-SNAPSHOT:
-* Fix GH issue 244: Declared args in __global.rythm position might not be correct
+* Fix GH issue 251: StringIndexOutOfBoundsException in TemplateBase
 * Fix GH issue 249: @def does not support package contained in the return type name
+* Fix GH issue 244: Declared args in __global.rythm position might not be correct
+* Fix GH issue #239: Failed invocation after template reload in dev mode
+* Fix GH issue 215: Can't run on Java 8
 * Fix GH issue 170: cache service now default to SimpleCacheService to avoid non-daemon issue of ehcache service with
                     default configuration
+* Fix GH issue #164: @nocompact() doesn't work as expected
+* Add getTemplate() method to Rythm facade. See GH Issue #70
 * Add "resource.refresh.interval" configuration allow the developer to define resource refresh check period
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
