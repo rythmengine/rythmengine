@@ -26,16 +26,18 @@ enum DefaultShutdownService implements ShutdownService {
 
     @Override
     public void setShutdown(final Runnable runnable) {
-        try {
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    if (runnable != null)
-                        runnable.run();
-                }
-            });
-        } catch (Throwable t) {
-            // Nothing to do
-        }
+        // Runtime.addShutdownHook might lead to memory leak
+        // checkout https://github.com/greenlaw110/Rythm/issues/199
+//        try {
+//            Runtime.getRuntime().addShutdownHook(new Thread() {
+//                @Override
+//                public void run() {
+//                    if (runnable != null)
+//                        runnable.run();
+//                }
+//            });
+//        } catch (Throwable t) {
+//            // Nothing to do
+//        }
     }
 }
