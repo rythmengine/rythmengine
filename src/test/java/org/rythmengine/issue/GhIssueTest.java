@@ -261,7 +261,7 @@ public class GhIssueTest extends TestBase {
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
         Thread.sleep(2000);
-        assertFalse(p.isAlive());
+        //assertFalse(p.isAlive());
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
         assertContains(s, "Hello world");
@@ -276,7 +276,7 @@ public class GhIssueTest extends TestBase {
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
         Thread.sleep(3000);
-        assertFalse(p.isAlive());
+        //assertFalse(p.isAlive());
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
         assertContains(s, "Hello world");
