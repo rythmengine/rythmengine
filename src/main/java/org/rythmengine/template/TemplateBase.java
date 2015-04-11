@@ -1818,7 +1818,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
          * on Java 8 compiler. So use {@link #ofRange(Range)} instead
          */
         @Deprecated
-        public static <T extends Comparable> __Itr<T> valueOf(Range range) {
+        public static <T extends Comparable<T>> __Itr<T> valueOf(Range<T> range) {
             return ofRange(range);
         }
 
