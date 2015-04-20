@@ -312,6 +312,7 @@ public class CodeBuilder extends TextBuilder {
         this.builders.clear();
         this.parser = null;
         this.templateClass = null;
+        this.inlineClasses.clear();
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
         this.importLineMap.clear();
@@ -336,6 +337,7 @@ public class CodeBuilder extends TextBuilder {
         this.extendDeclareLineNo = 0;
         this.renderArgs.clear();
         this.builders.clear();
+        this.inlineClasses.clear();
         this.inlineTags.clear();
         this.inlineTagBodies.clear();
         this.importLineMap.clear();
@@ -350,6 +352,9 @@ public class CodeBuilder extends TextBuilder {
         this.imports.addAll(codeBuilder.imports);
         for (InlineTag tag : codeBuilder.inlineTags) {
             inlineTags.add(tag.clone(this));
+        }
+        for (InlineClass clz : codeBuilder.inlineClasses) {
+            inlineClasses.add(clz.clone(this));
         }
         this.initCode = new StringBuilder(S.toString(this.initCode)).append(S.toString(codeBuilder.initCode)).toString();
         this.finalCode = new StringBuilder(S.toString(this.finalCode)).append(S.toString(codeBuilder.finalCode)).toString();
@@ -380,6 +385,39 @@ public class CodeBuilder extends TextBuilder {
         }
         importLineMap.put(imprt, lineNo);
     }
+
+    public static class InlineClass {
+        String className;
+        String body;
+
+        InlineClass(String className, String body) {
+            this.className = className;
+            this.body = body;
+        }
+
+        InlineClass clone(CodeBuilder newCaller) {
+            InlineClass clz = new InlineClass(className, body);
+            return clz;
+        }
+
+        @Override
+        public int hashCode() {
+            return 37 + className.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (obj instanceof InlineClass) {
+                return ((InlineClass) obj).className.equals(className);
+            }
+            return false;
+        }
+    }
+
+    private Set<InlineClass> inlineClasses = new HashSet<InlineClass>();
 
     public static class InlineTag {
         String tagName;
@@ -443,6 +481,16 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Stack<List<Token>> inlineTagBodies = new Stack<List<Token>>();
+
+    public InlineClass defClass(String className, String body) {
+        className = className.trim();
+        InlineClass clz = new InlineClass(className, body);
+        if (inlineClasses.contains(clz)) {
+            throw new ParseException(engine, templateClass, parser.currentLine(), "inline class already defined: %s", className);
+        }
+        inlineClasses.add(clz);
+        return clz;
+    }
 
     public InlineTag defTag(String tagName, String retType, String signature, String body) {
         tagName = tagName.trim();
@@ -788,6 +836,7 @@ public class CodeBuilder extends TextBuilder {
             pSetup();
             if (!simpleTemplate()) pExtendInitArgCode();
             pRenderArgs();
+            pInlineClasses();
             pInlineTags();
             pBuild();
             pFinalCode();
@@ -1198,6 +1247,13 @@ public class CodeBuilder extends TextBuilder {
                 }
             }
             p("\n}catch(RuntimeException __e){\n throw __e;\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
+        }
+    }
+
+    protected void pInlineClasses() {
+        pn();
+        for (InlineClass clz : inlineClasses) {
+            p("\nprivate class ").p(clz.className).p(" {\n").p(clz.body).p("\n}\n");
         }
     }
 

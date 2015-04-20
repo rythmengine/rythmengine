@@ -53,6 +53,13 @@ public class InlineTagTest extends TestBase {
         s = r(t);
         eq("10");
     }
+
+    @Test
+    public void innerClass() {
+        t = "@def class Foo {String bar() {return \"bar\";}}@(new Foo().bar())";
+        s = r(t);
+        eq("bar");
+    }
     
     @Test
     public void testAlias() {
