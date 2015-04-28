@@ -29,6 +29,9 @@ RELEASE HISTORY
 * Fix GH issue #164: @nocompact() doesn't work as expected
 * Add getTemplate() method to Rythm facade. See GH Issue #70
 * Add "resource.refresh.interval" configuration allow the developer to define resource refresh check period
+
+1.1.1-DEF_CLASS
+* Fix GH issue #264: support define class in a template
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 

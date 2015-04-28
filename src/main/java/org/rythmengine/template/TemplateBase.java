@@ -1813,6 +1813,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             return itr;
         }
 
+        /**
+         * This will cause the famous "The method XX is ambiguous for the type YY" issue
+         * on Java 8 compiler. So use {@link #ofRange(Range)} instead
+         */
+        @Deprecated
+        public static <T extends Comparable<T>> __Itr<T> valueOf(Range<T> range) {
+            return ofRange(range);
+        }
 
         public static __Itr of(final Object obj) {
             if (null == obj) {

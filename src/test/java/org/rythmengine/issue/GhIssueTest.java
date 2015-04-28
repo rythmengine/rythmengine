@@ -40,7 +40,7 @@ public class GhIssueTest extends TestBase {
                 .__setRenderArg("name", "Rythm")
                 .render();
         assertEquals("Good afternoon, Mr Rythm", s);
-    }
+    } 
 
     @Test
     public void test116() {
@@ -253,6 +253,16 @@ public class GhIssueTest extends TestBase {
         eq("\nabc ddd\n1");
     }
 
+    private boolean isProcessAlive(Process p) {
+        try {
+            p.exitValue();
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
     @Test
     public void test170() throws Exception {
         String cmdLine = new StringBuilder("java -classpath ")
@@ -261,7 +271,7 @@ public class GhIssueTest extends TestBase {
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
         Thread.sleep(2000);
-        //assertFalse(p.isAlive());
+        assertFalse(isProcessAlive(p));
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
         assertContains(s, "Hello world");
@@ -276,7 +286,7 @@ public class GhIssueTest extends TestBase {
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
         Thread.sleep(3000);
-        //assertFalse(p.isAlive());
+        assertFalse(isProcessAlive(p));
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
         assertContains(s, "Hello world");

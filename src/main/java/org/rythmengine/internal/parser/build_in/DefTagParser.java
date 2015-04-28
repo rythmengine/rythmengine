@@ -22,13 +22,32 @@ package org.rythmengine.internal.parser.build_in;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.ParserBase;
 import org.rythmengine.utils.S;
-import org.rythmengine.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
 /**
  * Parse @tag [return-type] tagname(Type var,...) {template...}
  */
 public class DefTagParser extends KeywordParserFactory {
+
+    private static class DefClassToken extends BlockToken {
+        String className;
+        CodeBuilder.InlineClass clz;
+
+        public DefClassToken(String className, String body, IContext context) {
+            super("", context);
+            this.className = className;
+            clz = ctx.getCodeBuilder().defClass(className, body);
+        }
+
+        @Override
+        public void openBlock() {
+        }
+
+        @Override
+        public String closeBlock() {
+            return "";
+        }
+    }
 
     private static class DefTagToken extends BlockToken {
         String tagName;
@@ -62,10 +81,67 @@ public class DefTagParser extends KeywordParserFactory {
 
     public IParser create(final IContext ctx) {
         return new ParserBase(ctx) {
+
+            private Token goClass() {
+                Regex r = new Regex(String.format(classPatternStr(), dialect().a(), keyword()));
+                if (!r.search(remain())) {
+                    raiseParseException("Error parsing @def, correct usage: @def (class) [type] tagName([arguments...])");
+                }
+                final String matched = r.stringMatched();
+                if (matched.startsWith("\n")) {
+                    ctx.getCodeBuilder().addBuilder(new Token.StringToken("\n", ctx));
+                    Regex r0 = new Regex("\\n([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                } else {
+                    Regex r0 = new Regex("([ \\t\\x0B\\f]*).*");
+                    if (r0.search(matched)) {
+                        String blank = r0.stringMatched(1);
+                        if (blank.length() > 0) {
+                            ctx.getCodeBuilder().addBuilder(new Token.StringToken(blank, ctx));
+                        }
+                    }
+                }
+                step(matched.length());
+                String className = r.stringMatched(6);
+                r = new Regex("^(\\s*((?@{})))");
+                String remain = ctx.getRemain();
+                if (!r.search("{" + remain)) {
+                    // short notation?
+                    r = new Regex("^(\\s*((?@@@)))");
+                    if (!r.search("@" + remain)) {
+                        this.raiseParseException("code blocked expected after @def tag");
+                    }
+                }
+                String s = r.stringMatched(1);
+                int curLine = ctx().currentLine();
+                ctx().step(s.length() - 1);
+                if (s.startsWith("{")) {
+                    while (ctx().peek() != '}') ctx().step(-1);
+                } else {
+                    while (ctx().peek() != '@') ctx().step(-1);
+                }
+                s = r.stringMatched(2);
+                s = s.substring(1); // strip left "{"
+                s = s.substring(0, s.length() - 1); // strip right "}"
+                String[] lines = s.split("[\\n\\r]+");
+                int len = lines.length;
+                StringBuilder sb = new StringBuilder(s.length() * 2);
+                for (int i = 0; i < len; ++i) {
+                    String line = lines[i];
+                    sb.append(line).append(" //line: ").append(curLine++).append("\n");
+                }
+                return new DefClassToken(className, sb.toString(), ctx());
+            }
+
             public Token go() {
                 Regex r = reg(dialect());
                 if (!r.search(remain())) {
-                    raiseParseException("Error parsing @def, correct usage: @def [type] tagName([arguments...])");
+                    return goClass();
                 }
                 final String matched = r.stringMatched();
                 if (matched.startsWith("\n")) {
@@ -133,6 +209,10 @@ public class DefTagParser extends KeywordParserFactory {
     @Override
     protected String patternStr() {
         return "^\\n?[ \\t\\x0B\\f]*%s%s\\s+(([_a-zA-Z][\\w_\\.$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*((?@()))\\s*{?[ \\t\\x0B\\f]*\\n?";
+    }
+
+    protected String classPatternStr() {
+        return "^\\n?[ \\t\\x0B\\f]*%s%s\\s+class\\s+(([_a-zA-Z][\\w_\\.$]*(\\s*((?@<>)|(?@[])))?)\\s+)?([_a-zA-Z][\\w_$]*)\\s*{?[ \\t\\x0B\\f]*\\n?";
     }
 
 }
