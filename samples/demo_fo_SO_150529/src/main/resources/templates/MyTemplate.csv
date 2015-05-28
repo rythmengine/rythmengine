@@ -1,0 +1,3 @@
+@args String foo, String bar;
+foo,bar
+@foo,@bar

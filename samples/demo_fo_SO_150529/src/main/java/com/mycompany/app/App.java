@@ -34,14 +34,23 @@ public class App {
         echo(result);
     }
 
+    private static void renderCsvFile() {
+        echo("\nrender a csv template");
+        String result = engine.render("MyTemplate.csv", "Foo", "Bar");
+        echo(result);
+    }
+
     private static void doJob() {
         echo("start doing real job now...");
         renderWithParamByName();
         renderWithParamByPosition();
+        renderCsvFile();
     }
 
     public static void main( String[] args ) {
+        echo("\n\nDemo app started\n");
         init();
         doJob();
+        echo("\nDemo app finished\n\n");
     }
 }
