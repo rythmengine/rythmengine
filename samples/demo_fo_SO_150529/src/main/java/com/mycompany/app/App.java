@@ -3,6 +3,8 @@ import org.rythmengine.*;
 import java.util.*;
 /**
  * A simple application demonstrate basic usage of Rythm Template Engine
+ * <p>Created to help out
+ * http://stackoverflow.com/questions/30494405/where-to-place-rythm-template-files/30516728#30516728</p>
  */
 public class App {
     private static RythmEngine engine;
