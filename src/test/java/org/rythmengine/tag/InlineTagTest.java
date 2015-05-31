@@ -76,6 +76,20 @@ public class InlineTagTest extends TestBase {
         eq("abc\nfoo on bar");
     }
 
+    @Test
+    public void testDefClass() {
+        t = "@def class Foo {public String foo() {return \"hello foo\";}} @{Foo foo = new Foo()} @foo.foo()";
+        s = r(t);
+        contains("hello foo");
+    }
+
+    @Test
+    public void testDefStaticCode() {
+        t = "@def static {class Foo {public String foo() {return \"hello foo\";}}} @{Foo foo = new Foo()} @foo.foo()";
+        s = r(t);
+        contains("hello foo");
+    }
+
     public static void main(String[] args) {
         run(InlineTagTest.class);
     }

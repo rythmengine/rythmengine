@@ -32,6 +32,9 @@ RELEASE HISTORY
 
 1.1.1-DEF_CLASS
 * Fix GH issue #264: support define class in a template
+
+1.1.2-DEF_STATIC
+* Fix GH issue #271: Allow template author to add arbitrary code at class level
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -40,7 +43,7 @@ RELEASE HISTORY
     <groupId>org.rythmengine</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.2-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
