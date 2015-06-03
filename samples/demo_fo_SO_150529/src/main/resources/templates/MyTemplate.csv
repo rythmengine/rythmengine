@@ -1,3 +1,6 @@
-@args String foo, String bar;
-foo,bar
-@foo,@bar
+@import com.mycompany.app.model.*
+@args List<MyCsvModel> data
+name,email,address
+@for(data) {
+@_.getName(),@_.getEmail(),@_.getAddress()
+}

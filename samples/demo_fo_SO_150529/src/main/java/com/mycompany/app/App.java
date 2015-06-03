@@ -1,4 +1,5 @@
 package com.mycompany.app;
+import com.mycompany.app.model.MyCsvModel;
 import org.rythmengine.*;
 import java.util.*;
 /**
@@ -38,7 +39,8 @@ public class App {
 
     private static void renderCsvFile() {
         echo("\nrender a csv template");
-        String result = engine.render("MyTemplate.csv", "Foo", "Bar");
+        List<MyCsvModel> data = MyCsvModel.generateData(20);
+        String result = engine.render("MyTemplate.csv", data);
         echo(result);
     }
 
