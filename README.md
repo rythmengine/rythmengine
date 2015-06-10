@@ -5,8 +5,8 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 
 Links:
 
-* The [document](http://rythmengine.org/doc/index)
-* A [fiddle](http://fiddle.rythmengine.org/) site to help you learn Rythm by interactively creating rythm template and see the result instantly.
+* The [documentation](http://rythmengine.org/doc/index) repository
+* The [fiddle](http://fiddle.rythmengine.org/) site
 
 Integrations
 
