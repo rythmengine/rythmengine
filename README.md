@@ -5,7 +5,7 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 
 Links:
 
-* The [documentation](http://rythmengine.org/doc/index) repository
+* The [documentation](http://rythmengine.org/doc/index)
 * The [fiddle](http://fiddle.rythmengine.org/) site
 
 Integrations
