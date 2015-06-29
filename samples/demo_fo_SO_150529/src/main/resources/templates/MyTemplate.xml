@@ -1,0 +1,5 @@
+@args String foo, String bar;
+<result>
+<foo>@foo</foo>
+<bar>@bar</bar>
+</result>

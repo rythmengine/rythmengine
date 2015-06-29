@@ -173,6 +173,8 @@ public class CodeBuilder extends TextBuilder {
 
     private RythmConfiguration conf;
 
+    private TemplateParser parser;
+    private TemplateClass templateClass;
     private boolean isNotRythmTemplate = false;
     public ICodeType templateDefLang;
 
@@ -188,6 +190,9 @@ public class CodeBuilder extends TextBuilder {
 
     private String initCode = null;
     private String finalCode = null;
+
+    private Set<InlineClass> inlineClasses = new HashSet<InlineClass>();
+    private List<String> staticCodes = new ArrayList<String>();
 
     public void setInitCode(String code) {
         if (S.empty(initCode)) {
@@ -252,8 +257,6 @@ public class CodeBuilder extends TextBuilder {
         }
         return false;
     }
-    private TemplateParser parser;
-    private TemplateClass templateClass;
 
     public TemplateClass getTemplateClass() {
         return templateClass;
@@ -321,6 +324,7 @@ public class CodeBuilder extends TextBuilder {
         this.macroStack.clear();
         this.buildBody = null;
         this.templateDefLang = null;
+        this.staticCodes.clear();
     }
 
     /**
@@ -345,6 +349,7 @@ public class CodeBuilder extends TextBuilder {
         this.macros.clear();
         this.macroStack.clear();
         this.buildBody = null;
+        this.staticCodes.clear();
     }
 
     public void merge(CodeBuilder codeBuilder) {
@@ -360,6 +365,7 @@ public class CodeBuilder extends TextBuilder {
         this.finalCode = new StringBuilder(S.toString(this.finalCode)).append(S.toString(codeBuilder.finalCode)).toString();
         this.renderArgs.putAll(codeBuilder.renderArgs);
         this.importLineMap.putAll(codeBuilder.importLineMap);
+        this.staticCodes.addAll(codeBuilder.staticCodes);
         renderArgCounter += codeBuilder.renderArgCounter;
     }
 
@@ -416,8 +422,6 @@ public class CodeBuilder extends TextBuilder {
             return false;
         }
     }
-
-    private Set<InlineClass> inlineClasses = new HashSet<InlineClass>();
 
     public static class InlineTag {
         String tagName;
@@ -481,6 +485,10 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Stack<List<Token>> inlineTagBodies = new Stack<List<Token>>();
+
+    public void addStaticCode(String codeSnippet) {
+        staticCodes.add(codeSnippet);
+    }
 
     public InlineClass defClass(String className, String body) {
         className = className.trim();
@@ -836,6 +844,7 @@ public class CodeBuilder extends TextBuilder {
             pSetup();
             if (!simpleTemplate()) pExtendInitArgCode();
             pRenderArgs();
+            pStaticCodes();
             pInlineClasses();
             pInlineTags();
             pBuild();
@@ -1247,6 +1256,13 @@ public class CodeBuilder extends TextBuilder {
                 }
             }
             p("\n}catch(RuntimeException __e){\n throw __e;\n}catch(Exception __e){\nthrow new java.lang.RuntimeException(__e);\n} finally {this.__parent = oldParent;}\n}");
+        }
+    }
+
+    protected void pStaticCodes() {
+        pn();
+        for (String codeSnippet : staticCodes) {
+            p("\n").p(codeSnippet).p(";\n");
         }
     }
 
