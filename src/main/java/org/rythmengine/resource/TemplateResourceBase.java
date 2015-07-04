@@ -41,8 +41,27 @@ public abstract class TemplateResourceBase implements ITemplateResource {
      * This field should be set to null if needs to serialize the template resource to some where, e.g. Cache
      */
     protected final ITemplateResourceLoader loader;
-    
+
     protected boolean isProdMode = false;
+    
+    /**
+     * if an error happened
+     */
+    Throwable error;
+    
+    /**
+     * @return the error
+     */
+    public Throwable getError() {
+      return error;
+    }
+
+    /**
+     * @param error the error to set
+     */
+    public void setError(Throwable error) {
+      this.error = error;
+    }
 
     /**
      * There are certain cases that a type of resource does not need a specific loader. E.g the 

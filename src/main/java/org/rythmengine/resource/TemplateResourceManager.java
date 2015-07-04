@@ -82,6 +82,16 @@ public class TemplateResourceManager {
         public ITemplateResourceLoader getLoader() {
             return null;
         }
+
+        @Override
+        public Throwable getError() {
+          return null;
+        }
+
+        @Override
+        public void setError(Throwable error) {
+          
+        }
     };
 
     private RythmEngine engine;
