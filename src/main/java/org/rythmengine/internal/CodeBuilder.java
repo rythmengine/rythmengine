@@ -559,7 +559,7 @@ public class CodeBuilder extends TextBuilder {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
         if (testResult.getError()!=null) {
-          String errMsg=testResult.getError().getMessage();
+          String errMsg=testResult.getErrorMessage();
           throw new ParseException(engine, templateClass, lineNo,errMsg, include);
         }
         String tmplName=testResult.getFullName();

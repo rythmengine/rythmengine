@@ -1530,6 +1530,32 @@ public class RythmEngine implements IEventDispatcher {
           return null;
         }
       }
+      
+      /**
+       * get a stack trace for the given throwable
+       * 
+       * @param t
+       *          - the throwable to get the stack trace for
+       * @return - the stacktrace as a string
+       */
+      public String getStackTrace(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        return sw.toString();
+      }
+      
+      /**
+       * get an ErrorMessage
+       * @return
+       */
+      public String getErrorMessage() {
+        if (this.getError()!=null) {
+          return this.getError().getMessage()+"\n"+this.getStackTrace(this.getError());
+        } else {
+          return "no error";
+        }
+         
+      }
     }
     
     /**
