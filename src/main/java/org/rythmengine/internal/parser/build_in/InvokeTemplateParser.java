@@ -497,6 +497,8 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
 
             String testTag(String name) {
                 TemplateTestResult testResult=engine_.testTemplate(name, ctx().getTemplateClass(), ctx.peekCodeType());
+                if (testResult==null) 
+                  return null;
                 return testResult.getFullName();
             }
 
