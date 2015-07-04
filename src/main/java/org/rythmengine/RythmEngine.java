@@ -1524,7 +1524,7 @@ public class RythmEngine implements IEventDispatcher {
        * @return
        */
       public Throwable getError() {
-        if (tc.templateResource!=null && tc.templateResource.getError()!=null) {
+        if (tc!=null && tc.templateResource!=null && tc.templateResource.getError()!=null) {
           return tc.templateResource.getError();
         } else {
           return null;
