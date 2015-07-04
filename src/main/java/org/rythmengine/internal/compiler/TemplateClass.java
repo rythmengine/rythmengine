@@ -603,6 +603,10 @@ public class TemplateClass {
                         continue;
                     }
                     TemplateClass tc = engine().getRegisteredTemplateClass(testResult.getFullName());
+                    if (null == tc) {
+                      logger.warn("Unable to load included template class from name: %s", tcName);
+                      continue;
+                    }
                     includedTemplateClasses.add(tc);
                 }
             }
