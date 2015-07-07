@@ -24,6 +24,17 @@ import org.rythmengine.internal.RythmEvents;
 import org.rythmengine.internal.compiler.TemplateClass;
 
 public class ParseException extends RythmException {
+  
+    /**
+     * constructor to directly use a message without trying to format
+     * @param engine
+     * @param tc
+     * @param line
+     * @param message
+     */
+    public ParseException(RythmEngine engine, TemplateClass tc, int line,String message) {
+      super(engine,null,tc,-1,line,message);
+    }
 
     public ParseException(RythmEngine engine, TemplateClass tc, int line, String message, Object... args) {
         this(engine, null, tc, line, message, args);

@@ -560,7 +560,7 @@ public class CodeBuilder extends TextBuilder {
         }
         if (testResult.getError()!=null) {
           String errMsg=testResult.getErrorMessage();
-          throw new ParseException(engine, templateClass, lineNo,errMsg, include);
+          throw new ParseException(engine, templateClass, lineNo,"including "+include+"creates errror\n"+ errMsg);
         }
         String tmplName=testResult.getFullName();
         TemplateBase includeTmpl = (TemplateBase) engine.getRegisteredTemplate(tmplName);
