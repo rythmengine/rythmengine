@@ -24,7 +24,10 @@ public class ClasspathResourceLoader extends ResourceLoaderBase {
     @Override
     public ITemplateResource load(String path) {
         while (path.startsWith("/") || path.startsWith("\\")) path = path.substring(1);
-        ClasspathTemplateResource ctr = new ClasspathTemplateResource(root + path, this);
+        if (!path.startsWith(root)) {
+            path = root + path;
+        }
+        ClasspathTemplateResource ctr = new ClasspathTemplateResource(path, this);
         return ctr;
     }
 }

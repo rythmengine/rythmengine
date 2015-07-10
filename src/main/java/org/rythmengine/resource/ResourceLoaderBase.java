@@ -111,7 +111,11 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         }
 
         final List<String> roots = new ArrayList<String>();
-        final String root0 = this.getResourceLoaderRoot().replace('\\', '/');
+        String root0 = this.getResourceLoaderRoot().replace('\\', '/');
+        if (root0.endsWith("/")) {
+            root0 = root0.substring(0, root0.length() - 1);
+        }
+
         roots.add(root0);
 
         // call template using relative path
@@ -120,7 +124,9 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         if (-1 != pos) {
             currentPath = currentPath.substring(0, pos);
             if (currentPath.startsWith(root0)) {
-                roots.add(0, currentPath);
+                if (currentPath.length() > root0.length()) {
+                    roots.add(0, currentPath);
+                }
             } else {
                 if (currentPath.startsWith("/")) {
                     currentPath = currentPath.substring(1);

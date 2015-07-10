@@ -209,6 +209,12 @@ public class TemplateResourceManager {
         }
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
+        if (null != callerClass) {
+            ITemplateResourceLoader loader = whichLoader(callerClass.templateResource);
+            if (null != loader) {
+                return loader.tryLoadTemplate(tmplName, engine, callerClass, codeType);
+            }
+        }
         for (ITemplateResourceLoader loader : loaders) {
             tc = loader.tryLoadTemplate(tmplName, engine, callerClass, codeType);
             if (null != tc) {
