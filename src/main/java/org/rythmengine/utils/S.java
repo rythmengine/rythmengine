@@ -907,6 +907,25 @@ public class S {
     }
 
     /**
+     * Change space in the data string into <tt>&nbsp;</tt>
+     * @param data
+     * @return raw data of transformed result
+     */
+    @Transformer
+    public static RawData sp2nbsp(RawData data) {
+        return new RawData(data.toString().replace(" ", "&nbsp;"));
+    }
+
+    /**
+     * Change space in the data string into <tt>&nbsp</tt>
+     * @param data
+     * @return raw data of transformed result
+     */
+    public static RawData sp2nbsp(Object data) {
+        return new RawData(StringEscapeUtils.escapeHtml4(str(data)).replace(" ", "&nbsp;"));
+    }
+
+    /**
      * encode using utf-8
      * 
      * @param data
