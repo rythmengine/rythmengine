@@ -270,7 +270,7 @@ public class GhIssueTest extends TestBase {
                 .append(" org.rythmengine.issue.Gh170Helper").toString();
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
-        Thread.sleep(2000);
+        Thread.sleep(4000);
         assertFalse(isProcessAlive(p));
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
@@ -285,7 +285,7 @@ public class GhIssueTest extends TestBase {
                 .append(" org.rythmengine.issue.Gh174Helper").toString();
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         assertFalse(isProcessAlive(p));
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
