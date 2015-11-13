@@ -1304,7 +1304,8 @@ public class CodeBuilder extends TextBuilder {
         pn();
         pn();
         ptn("@Override public org.rythmengine.utils.TextBuilder build(){");
-        p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
+        if (tmpl!=null)
+          p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
         StringBuilder old = buffer();
         __setBuffer(sb);
