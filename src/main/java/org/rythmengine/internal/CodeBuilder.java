@@ -19,9 +19,20 @@
 */
 package org.rythmengine.internal;
 
-import com.stevesoft.pat.Regex;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.Stack;
+
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.RythmEngine.TemplateTestResult;
 import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
@@ -36,7 +47,6 @@ import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.NotRythmTemplateException;
 import org.rythmengine.internal.parser.build_in.BlockToken;
-import org.rythmengine.internal.parser.build_in.CompactParser;
 import org.rythmengine.internal.parser.build_in.CompactStateToken;
 import org.rythmengine.internal.parser.build_in.InvokeTemplateParser;
 import org.rythmengine.logger.ILogger;
@@ -49,7 +59,7 @@ import org.rythmengine.template.TemplateBase;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 
-import java.util.*;
+import com.stevesoft.pat.Regex;
 
 
 public class CodeBuilder extends TextBuilder {
@@ -536,14 +546,30 @@ public class CodeBuilder extends TextBuilder {
         return sb.toString();
     }
 
+    /**
+     * add the given include template at the given linenumber
+     * @param include
+     * @param lineNo
+     * @param codeType
+     * @return
+     */
     public String addInclude(String include, int lineNo, ICodeType codeType) {
-        String tmplName = engine.testTemplate(include, templateClass, codeType);
-        if (null == tmplName) {
+        TemplateTestResult testResult = engine.testTemplate(include, templateClass, codeType);
+        if (null == testResult) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
+        if (testResult.getError()!=null) {
+          String errMsg=testResult.getErrorMessage();
+          throw new ParseException(engine, templateClass, lineNo,"including "+include+" creates error\n"+ errMsg);
+        }
+        String tmplName=testResult.getFullName();
         TemplateBase includeTmpl = (TemplateBase) engine.getRegisteredTemplate(tmplName);
+   
         if (includeTmpl instanceof JavaTagBase) {
             throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
+        }
+        if (includeTmpl==null) {
+          throw new ParseException(engine, templateClass, lineNo, "include for template failed: %s ", include);
         }
         TemplateClass includeTc = includeTmpl.__getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
@@ -570,7 +596,8 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
-        String fullName = engine.testTemplate(extended, templateClass, null);
+        TemplateTestResult testResult = engine.testTemplate(extended, templateClass, null);
+        String fullName=testResult.getFullName();
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
@@ -1277,7 +1304,8 @@ public class CodeBuilder extends TextBuilder {
         pn();
         pn();
         ptn("@Override public org.rythmengine.utils.TextBuilder build(){");
-        p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
+        if (tmpl!=null)
+          p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
         StringBuilder old = buffer();
         __setBuffer(sb);

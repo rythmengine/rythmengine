@@ -149,7 +149,11 @@ public class TemplateParser implements IContext {
 
     @Override
     public String getRemain() {
-        return cursor < template.length() ? template.substring(cursor) : "";
+      String result="";
+      if (template!=null) {
+        result=cursor < template.length() ? template.substring(cursor) : "";  
+      }
+      return result;
     }
 
     @Override
@@ -159,7 +163,7 @@ public class TemplateParser implements IContext {
 
     @Override
     public boolean hasRemain() {
-        return cursor < template.length();
+        return template!=null && cursor < template.length();
     }
 
     @Override

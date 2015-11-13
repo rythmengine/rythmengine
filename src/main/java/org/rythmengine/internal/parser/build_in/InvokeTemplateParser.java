@@ -20,6 +20,8 @@
 package org.rythmengine.internal.parser.build_in;
 
 import com.stevesoft.pat.Regex;
+
+import org.rythmengine.RythmEngine.TemplateTestResult;
 import org.rythmengine.internal.*;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.ParserBase;
@@ -494,7 +496,10 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
         return new ParserBase(ctx) {
 
             String testTag(String name) {
-                return engine_.testTemplate(name, ctx().getTemplateClass(), ctx.peekCodeType());
+                TemplateTestResult testResult=engine_.testTemplate(name, ctx().getTemplateClass(), ctx.peekCodeType());
+                if (testResult==null) 
+                  return null;
+                return testResult.getFullName();
             }
 
             @Override

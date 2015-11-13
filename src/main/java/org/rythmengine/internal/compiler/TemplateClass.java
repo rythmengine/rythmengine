@@ -21,6 +21,7 @@ package org.rythmengine.internal.compiler;
 
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.RythmEngine.TemplateTestResult;
 import org.rythmengine.exception.CompileException;
 import org.rythmengine.exception.RythmException;
 import org.rythmengine.extension.IByteCodeEnhancer;
@@ -596,15 +597,15 @@ public class TemplateClass {
                 for (String tcName : includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;
                     tcName = tcName.trim();
-                    String fullName = engine().testTemplate(tcName, this, null);
-                    if (null == fullName) {
+                    TemplateTestResult testResult = engine().testTemplate(tcName, this, null);
+                    if (null == testResult) {
                         logger.warn("Unable to load included template class from name: %s", tcName);
                         continue;
                     }
-                    TemplateClass tc = engine().getRegisteredTemplateClass(fullName);
+                    TemplateClass tc = engine().getRegisteredTemplateClass(testResult.getFullName());
                     if (null == tc) {
-                        logger.warn("Unable to load included template class from name: %s", tcName);
-                        continue;
+                      logger.warn("Unable to load included template class from name: %s", tcName);
+                      continue;
                     }
                     includedTemplateClasses.add(tc);
                 }

@@ -80,5 +80,17 @@ public interface ITemplateResource extends Serializable {
      * @return
      */
     ITemplateResourceLoader getLoader();
+    
+    
+    /**
+     * @return the error if there was one
+     */
+    public Throwable getError();
+
+    /**
+     * @param error the error to set
+     */
+    public void setError(Throwable error);
+
 
 }
