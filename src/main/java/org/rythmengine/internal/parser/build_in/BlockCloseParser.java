@@ -48,7 +48,7 @@ public class BlockCloseParser extends ParserBase {
         if ("@".equals(remain)) {
             s = remain;
         } else {
-            Pattern p = Pattern.compile(String.format(PTN2, a(), a(), a()), Pattern.DOTALL);
+            Pattern p = Pattern.compile(String.format(PTN2, a(), a()), Pattern.DOTALL);
             Matcher m = p.matcher(remain);
             if (!m.matches()) {
                 p = Pattern.compile(String.format(PTN, a()), Pattern.DOTALL);

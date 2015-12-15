@@ -46,6 +46,7 @@ import org.rythmengine.resource.StringTemplateResource;
 import org.rythmengine.template.JavaTagBase;
 import org.rythmengine.template.TagBase;
 import org.rythmengine.template.TemplateBase;
+import org.rythmengine.utils.HashCode;
 import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 
@@ -78,7 +79,7 @@ public class CodeBuilder extends TextBuilder {
             byPrimitive = m;
         }
         
-        private static char DEF_CHAR;
+        private static char DEF_CHAR = ' ';
 
         public String objectType() {
             String s = byPrimitive.get(type);
@@ -156,6 +157,16 @@ public class CodeBuilder extends TextBuilder {
             else if (type.equalsIgnoreCase("double"))
                 return "0d";
             return "null";
+        }
+
+        @Override
+        public int hashCode() {
+            return HashCode.hc(no, name, type, defVal, lineNo);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return super.equals(obj);
         }
 
         @Override

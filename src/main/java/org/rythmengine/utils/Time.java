@@ -270,7 +270,7 @@ public class Time {
      * @author Contributions from Mads Henderson
      * @author Refactoring from CronTrigger to CronExpression by Aaron Craven
      */
-    public static class CronExpression implements Serializable, Cloneable {
+    public static final class CronExpression implements Serializable, Cloneable {
 
         private static final long serialVersionUID = 12423409423L;
         protected static final int SECOND = 0;

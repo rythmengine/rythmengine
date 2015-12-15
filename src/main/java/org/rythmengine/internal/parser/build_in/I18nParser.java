@@ -65,9 +65,4 @@ public class I18nParser extends KeywordParserFactory {
         };
     }
 
-    public static void main(String[] args) {
-        String s = "'sss', 1324";
-        Regex r = new Regex(String.format("^((?@\"\")|(?@''))(\\s*,\\s*(.*))?", "@", "i18n"));
-        p(s, r);
-    }
 }

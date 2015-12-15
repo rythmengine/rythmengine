@@ -76,10 +76,12 @@ public class SandboxExecutingService {
             f = exec(context, null, null, template, args);
             Object o = f.get(timeout, TimeUnit.MILLISECONDS);
             if (o instanceof RuntimeException) throw (RuntimeException) o;
-            if (o instanceof Exchanger) throw new RuntimeException((Exception) o);
+            if (o instanceof Exception) throw new RuntimeException((Exception) o);
             return (null == o) ? "" : o.toString();
         } catch (RuntimeException e) {
-            f.cancel(true);
+            if (null != f) {
+                f.cancel(true);
+            }
             throw e;
         } catch (Exception e) {
             f.cancel(true);
@@ -94,10 +96,12 @@ public class SandboxExecutingService {
             f = exec(context, null, template, null, args);
             Object o = f.get(timeout, TimeUnit.MILLISECONDS);
             if (o instanceof RuntimeException) throw (RuntimeException) o;
-            if (o instanceof Exchanger) throw new RuntimeException((Exception) o);
+            if (o instanceof Exception) throw new RuntimeException((Exception) o);
             return (null == o) ? "" : o.toString();
         } catch (RuntimeException e) {
-            f.cancel(true);
+            if (null != f) {
+                f.cancel(true);
+            }
             throw e;
         } catch (TimeoutException e) {
             f.cancel(true);

@@ -42,21 +42,18 @@ public class RythmException extends FastRuntimeException {
     public int templateLineNumber = -1;
     public String errorMessage = "";
     public String originalMessage = "";
-    private TemplateClass templateClass = null;
+    private transient TemplateClass templateClass = null;
     public String javaSource;
     public String templateSource;
     public String templateName;
     public String templateSourceInfo;
     public String javaSourceInfo;
-    private RythmEngine engine;
 
     public RythmException(RythmEngine engine, Throwable t, String templateName, String javaSource, String templateSource, int javaLineNumber, int templateLineNumber, String message) {
         super(message, t);
-        boolean isRuntime = !(this instanceof CompileException || this instanceof ParseException);
         boolean logJava = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
         boolean logTmpl = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava || (this instanceof CompileException), logTmpl || (this instanceof ParseException), javaLineNumber, templateLineNumber, javaSource, templateSource, null);
-        this.engine = engine;
         this.templateName = templateName;
         this.javaSource = javaSource;
         this.templateSource = templateSource;
@@ -81,7 +78,6 @@ public class RythmException extends FastRuntimeException {
         boolean logJava = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
         boolean logTmpl = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
         F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
-        this.engine = engine;
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
         this.javaSource = tc.javaSource;

@@ -133,6 +133,9 @@ public class TransformerTest extends TestBase {
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy hh:mm");
         eq(fmt.print(dt));
         System.out.println(s);
+
+        // toJSON
+        // TBD s = Rythm.render("@1.toJSON()", )
     }
     
     @Test

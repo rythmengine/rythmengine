@@ -33,6 +33,7 @@ import java.util.UUID;
  */
 public class ToStringTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
+    private static final long serialVersionUID = -1428821795298562604L;
     private AutoToString.AutoToStringData meta;
 
     public ToStringTemplateResource(AutoToString.AutoToStringData data) {
@@ -81,15 +82,5 @@ public class ToStringTemplateResource extends TemplateResourceBase implements IT
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj instanceof ToStringTemplateResource) {
-            ToStringTemplateResource that = (ToStringTemplateResource) obj;
-            return that.getKey().equals(getKey());
-        }
-        return false;
     }
 }

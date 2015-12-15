@@ -680,6 +680,7 @@ public class RythmEngine implements IEventDispatcher {
             extensionManager().registerFormatter(fmt);
         } catch (Exception e) {
             // ignore;
+            logger.info("joda time class not found. Formatter to joda time not registered");
         }
 
         if (conf().autoScan()) {
@@ -1699,10 +1700,7 @@ public class RythmEngine implements IEventDispatcher {
                 String cn = t.getClass().getName();
                 TemplateClass tc0 = classes().getByClassName(cn);
                 if (null == tc0) {
-                    System.out.println(t.getClass());
-                    System.out.println(name);
-                    System.out.println(cn);
-                    System.out.println(caller.getClass());
+                    throw new NullPointerException(String.format("null tc0 found. t.class: %s, name: %s, caller.class: %s", cn, name, caller.getClass()));
                 }
                 t = tc0.asTemplate(caller, this);
             } else {

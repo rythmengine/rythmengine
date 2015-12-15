@@ -1514,7 +1514,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
             @Override
             public Object next() {
-                return null;
+                throw new NoSuchElementException();
             }
 
             @Override
@@ -1551,6 +1551,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                     @Override
                     public T next() {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException();
+                        }
                         return (T) Array.get(_o, cursor++);
                     }
 
@@ -1610,6 +1613,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public T next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((T[]) itr._o)[itr.cursor++];
                 }
 
@@ -1633,6 +1639,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Integer next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((int[]) itr._o)[itr.cursor++];
                 }
 
@@ -1656,6 +1665,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Long next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((long[]) itr._o)[itr.cursor++];
                 }
 
@@ -1679,6 +1691,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Float next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((float[]) itr._o)[itr.cursor++];
                 }
 
@@ -1702,6 +1717,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Double next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((double[]) itr._o)[itr.cursor++];
                 }
 
@@ -1725,6 +1743,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Short next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((short[]) itr._o)[itr.cursor++];
                 }
 
@@ -1748,6 +1769,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Character next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((char[]) itr._o)[itr.cursor++];
                 }
 
@@ -1771,6 +1795,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Byte next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((byte[]) itr._o)[itr.cursor++];
                 }
 
@@ -1794,6 +1821,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
                 @Override
                 public Boolean next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
                     return ((boolean[]) itr._o)[itr.cursor++];
                 }
 
@@ -1918,15 +1948,6 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         @Override
         public Iterator<T> iterator() {
             return iterator;
-        }
-    }
-
-    public static void main(String[] args) {
-        Integer[] ia = new Integer[]{1, 2};
-        Object o = ia;
-        __Itr<Integer> it = __Itr.valueOf(o);
-        for (int i : it) {
-            System.out.println(i);
         }
     }
 

@@ -100,6 +100,9 @@ public abstract class DialectBase implements IDialect {
 
                     @Override
                     public IParserFactory next() {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException();
+                        }
                         return fs.get(cursor++);
                     }
 

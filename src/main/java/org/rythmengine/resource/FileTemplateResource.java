@@ -28,6 +28,7 @@ import java.io.File;
  */
 public class FileTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
+    private static final long serialVersionUID = -3059476990432671389L;
     private File file;
     private String key;
 

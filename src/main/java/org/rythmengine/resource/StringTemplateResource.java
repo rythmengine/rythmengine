@@ -31,6 +31,7 @@ import java.util.UUID;
  */
 public class StringTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
+    private static final long serialVersionUID = -4843989553317549158L;
     private String content;
 
     public StringTemplateResource(String templateContent) {
@@ -79,15 +80,5 @@ public class StringTemplateResource extends TemplateResourceBase implements ITem
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj instanceof StringTemplateResource) {
-            StringTemplateResource that = (StringTemplateResource) obj;
-            return that.getKey().equals(getKey());
-        }
-        return false;
     }
 }

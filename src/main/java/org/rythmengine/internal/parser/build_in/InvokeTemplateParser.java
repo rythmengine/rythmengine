@@ -384,23 +384,23 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             if (null != argList && !argList.isEmpty()) {
                 buildBodyArgList(argList);
             }
-            p3tline("@Override public void __setProperty(String name, Object val) {");
+            p3tline("public void __setProperty(String name, Object val) {");
             p4tline("__setRenderArg(name, val);");
             p3tline("}");
-            p3tline("@Override public Object __getProperty(String name) {");
+            p3tline("public Object __getProperty(String name) {");
             p4tline("return __getRenderArg(name); ");
             p3tline("}");
-            p3tline("@Override protected void __setBodyArgByName(String __name, Object __val) {");
+            p3tline("protected void __setBodyArgByName(String __name, Object __val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByName(argList);
             }
             p3tline("}");
-            p3tline("@Override protected void __setBodyArgByPos(int __pos, Object __val) {");
+            p3tline("protected void __setBodyArgByPos(int __pos, Object __val) {");
             if (null != argList && !argList.isEmpty()) {
                 buildSetBodyArgByPos(argList);
             }
             p3tline("}");
-            p3tline("@Override protected void __call() {");
+            p3tline("protected void __call() {");
         }
 
         private void buildBodyArgList(List<CodeBuilder.RenderArgDeclaration> al) {

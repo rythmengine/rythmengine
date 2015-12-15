@@ -2308,6 +2308,7 @@ public abstract class ToStringStyle implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
+        if (null == obj) return false;
         return getClass().equals(obj.getClass());
     }
 

@@ -33,12 +33,9 @@ import java.net.URL;
  */
 public class ClasspathTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
+    private static final long serialVersionUID = -164305020378609839L;
     private URL url;
     private String key;
-
-    ClasspathTemplateResource(String path) {
-        this(path, null);
-    }
 
     ClasspathTemplateResource(String path, ITemplateResourceLoader loader) {
         super(loader);
@@ -91,16 +88,6 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     @Override
     public boolean isValid() {
         return null != url;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj instanceof ClasspathTemplateResource) {
-            ClasspathTemplateResource that = (ClasspathTemplateResource) obj;
-            return that.getKey().equals(this.getKey());
-        }
-        return false;
     }
 
     @Override

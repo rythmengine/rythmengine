@@ -46,16 +46,16 @@ public class F {
 
         public abstract T get();
 
-        public static <T> None<T> None() {
+        public static <T> None<T> none() {
             return (None<T>) (Object) None;
         }
 
-        public static <T> Some<T> Some(T value) {
+        public static <T> Some<T> some(T value) {
             return new Some<T>(value);
         }
     }
 
-    public static <A> Some<A> Some(A a) {
+    public static <A> Some<A> some(A a) {
         return new Some(a);
     }
 
@@ -122,11 +122,11 @@ public class F {
         }
 
         public static <A, B> Either<A, B> _1(A value) {
-            return new Either(Some(value), None);
+            return new Either(some(value), None);
         }
 
         public static <A, B> Either<A, B> _2(B value) {
-            return new Either(None, Some(value));
+            return new Either(None, some(value));
         }
 
         @Override
@@ -155,15 +155,15 @@ public class F {
         }
 
         public static <A, B, C> E3<A, B, C> _1(A value) {
-            return new E3(Some(value), None, None);
+            return new E3(some(value), None, None);
         }
 
         public static <A, B, C> E3<A, B, C> _2(B value) {
-            return new E3(None, Some(value), None);
+            return new E3(None, some(value), None);
         }
 
         public static <A, B, C> E3<A, B, C> _3(C value) {
-            return new E3(None, None, Some(value));
+            return new E3(None, None, some(value));
         }
 
         @Override
@@ -187,19 +187,19 @@ public class F {
         }
 
         public static <A, B, C, D> E4<A, B, C, D> _1(A value) {
-            return new E4(Option.Some(value), None, None, None);
+            return new E4(Option.some(value), None, None, None);
         }
 
         public static <A, B, C, D> E4<A, B, C, D> _2(B value) {
-            return new E4(None, Some(value), None, None);
+            return new E4(None, some(value), None, None);
         }
 
         public static <A, B, C, D> E4<A, B, C, D> _3(C value) {
-            return new E4(None, None, Some(value), None);
+            return new E4(None, None, some(value), None);
         }
 
         public static <A, B, C, D> E4<A, B, C, D> _4(D value) {
-            return new E4(None, None, None, Some(value));
+            return new E4(None, None, None, some(value));
         }
 
         @Override
@@ -225,23 +225,23 @@ public class F {
         }
 
         public static <A, B, C, D, E> E5<A, B, C, D, E> _1(A value) {
-            return new E5(Option.Some(value), None, None, None, None);
+            return new E5(Option.some(value), None, None, None, None);
         }
 
         public static <A, B, C, D, E> E5<A, B, C, D, E> _2(B value) {
-            return new E5(None, Option.Some(value), None, None, None);
+            return new E5(None, Option.some(value), None, None, None);
         }
 
         public static <A, B, C, D, E> E5<A, B, C, D, E> _3(C value) {
-            return new E5(None, None, Option.Some(value), None, None);
+            return new E5(None, None, Option.some(value), None, None);
         }
 
         public static <A, B, C, D, E> E5<A, B, C, D, E> _4(D value) {
-            return new E5(None, None, None, Option.Some(value), None);
+            return new E5(None, None, None, Option.some(value), None);
         }
 
         public static <A, B, C, D, E> E5<A, B, C, D, E> _5(E value) {
-            return new E5(None, None, None, None, Option.Some(value));
+            return new E5(None, None, None, None, Option.some(value));
         }
 
         @Override
@@ -290,7 +290,7 @@ public class F {
         }
     }
 
-    public static <A, B> Tuple<A, B> Tuple(A a, B b) {
+    public static <A, B> Tuple<A, B> tuple(A a, B b) {
         return new Tuple(a, b);
     }
 
@@ -451,7 +451,7 @@ public class F {
             if (o.isDefined()) {
                 return match(o.get());
             }
-            return Option.None();
+            return Option.none();
         }
 
         public <NR> Matcher<T, NR> and(final Matcher<R, NR> nextMatcher) {
@@ -463,7 +463,7 @@ public class F {
                     for (R r : firstMatcher.match(o)) {
                         return nextMatcher.match(r);
                     }
-                    return Option.None();
+                    return Option.none();
                 }
             };
         }
@@ -473,13 +473,13 @@ public class F {
             @Override
             public Option<String> match(Object o) {
                 if (o instanceof String) {
-                    return Option.Some((String) o);
+                    return Option.some((String) o);
                 }
-                return Option.None();
+                return Option.none();
             }
         };
 
-        public static <K> Matcher<Object, K> ClassOf(final Class<K> clazz) {
+        public static <K> Matcher<Object, K> classOf(final Class<K> clazz) {
             return new Matcher<Object, K>() {
 
                 @Override
@@ -488,48 +488,48 @@ public class F {
                         o = ((Option) o).get();
                     }
                     if (clazz.isInstance(o)) {
-                        return Option.Some((K) o);
+                        return Option.some((K) o);
                     }
-                    return Option.None();
+                    return Option.none();
                 }
             };
         }
 
-        public static Matcher<String, String> StartsWith(final String prefix) {
+        public static Matcher<String, String> startsWith(final String prefix) {
             return new Matcher<String, String>() {
 
                 @Override
                 public Option<String> match(String o) {
                     if (o.startsWith(prefix)) {
-                        return Option.Some(o);
+                        return Option.some(o);
                     }
-                    return Option.None();
+                    return Option.none();
                 }
             };
         }
 
-        public static Matcher<String, String> Re(final String pattern) {
+        public static Matcher<String, String> re(final String pattern) {
             return new Matcher<String, String>() {
 
                 @Override
                 public Option<String> match(String o) {
                     if (o.matches(pattern)) {
-                        return Option.Some(o);
+                        return Option.some(o);
                     }
-                    return Option.None();
+                    return Option.none();
                 }
             };
         }
 
-        public static <X> Matcher<X, X> Equals(final X other) {
+        public static <X> Matcher<X, X> eq(final X other) {
             return new Matcher<X, X>() {
 
                 @Override
                 public Option<X> match(X o) {
                     if (o.equals(other)) {
-                        return Option.Some(o);
+                        return Option.some(o);
                     }
-                    return Option.None();
+                    return Option.none();
                 }
             };
         }

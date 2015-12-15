@@ -26,11 +26,11 @@ import org.rythmengine.utils.TextBuilder;
  */
 public abstract class JavaTagBase extends TagBase {
     protected __ParameterList _params;
-    protected __Body _body;
+    //protected __Body _body;
 
     public TemplateBase __setRenderArgs0(__ParameterList params) {
         _params = null == params ? new __ParameterList() : params;
-        __renderArgs.putAll(params.asMap());
+        __renderArgs.putAll(_params.asMap());
         return this;
     }
 

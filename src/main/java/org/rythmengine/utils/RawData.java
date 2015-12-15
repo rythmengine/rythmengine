@@ -25,6 +25,7 @@ import java.io.Serializable;
  * Used for escaping
  */
 public class RawData implements Serializable {
+    private static final long serialVersionUID = 1448378182708583237L;
     public String data;
 
     public RawData(Object val) {

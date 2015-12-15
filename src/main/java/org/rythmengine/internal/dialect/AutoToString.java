@@ -27,6 +27,7 @@ import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.toString.ToStringOption;
 import org.rythmengine.toString.ToStringStyle;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,7 +65,7 @@ public class AutoToString extends ToString {
         return String.format("{class: %s; toStringOption: %s; toStringStyle: %s}", null == c ? "" : c.getName(), o.toString(), s.toString());
     }
 
-    public static class AutoToStringData {
+    public static class AutoToStringData implements Serializable {
 
         public AutoToStringData(Class<?> clazz, ToStringOption option, ToStringStyle style) {
             this.clazz = clazz;

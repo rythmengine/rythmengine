@@ -48,7 +48,7 @@ public class StringTokenParser extends ParserBase {
             return Token.EMPTY_TOKEN;
         }
         String a = a();
-        Pattern p = Pattern.compile(String.format(PTN, a, a, a),
+        Pattern p = Pattern.compile(String.format(PTN, a, a),
                 Pattern.DOTALL);
         Matcher m = p.matcher(s);
         if (!m.matches()) {

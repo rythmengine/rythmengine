@@ -22,13 +22,14 @@ package org.rythmengine.toString;
 import org.rythmengine.Rythm;
 import org.rythmengine.utils.S;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Defines the options can be set when output an object into string
  */
-public class ToStringOption {
+public class ToStringOption implements Serializable {
 
     /**
      * Construct an new default option

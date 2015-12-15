@@ -102,6 +102,9 @@ public class DialectManager {
                         break;
                     }
                 }
+                if (null == d) {
+                    throw new NullPointerException("No dialect can process the template");
+                }
             }
         }
         ctx.setDialect(d);

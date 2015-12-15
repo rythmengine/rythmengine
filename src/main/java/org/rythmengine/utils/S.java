@@ -19,6 +19,7 @@
 */
 package org.rythmengine.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.StringCodec;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -1258,7 +1259,11 @@ public class S {
         if (null == data) throw new NullPointerException();
         Long bytes;
         if (data instanceof Number) {
-            bytes = (Long)data;
+            if (data instanceof Long) {
+                bytes = (Long) data;
+            } else {
+                bytes = ((Number)data).longValue();
+            }
         } else {
             bytes = Long.valueOf(data.toString());
         }
@@ -1503,6 +1508,10 @@ public class S {
         return i18n(null, key, new Object[0]);
     }
 
+    @Transformer
+    public static String toJSON(Object data) {
+        return JSON.toJSONString(data);
+    }
 
     /**
      * Generate random string.

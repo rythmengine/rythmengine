@@ -66,8 +66,8 @@ public class TemplateClassCache {
         if (!writeEnabled()) return;
         try {
             File f = getCacheFile(tc);
-            if (f.exists()) {
-                f.delete();
+            if (f.exists() && !f.delete()) {
+                f.deleteOnExit();
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -23,6 +23,8 @@ import org.rythmengine.extension.ICacheService;
 import org.rythmengine.internal.RythmThreadFactory;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
+import org.rythmengine.utils.HashCode;
+import org.rythmengine.utils.S;
 
 import java.io.Serializable;
 import java.util.*;
@@ -61,7 +63,27 @@ public class SimpleCacheService implements ICacheService {
             this.ttl = ttl;
             this.ts = System.currentTimeMillis();
         }
-        
+
+        @Override
+        public int hashCode() {
+            return HashCode.hc(ttl, key, value);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj instanceof Item) {
+                Item that = (Item) obj;
+                if (that.ttl != this.ttl) return false;
+                String thisKey = this.key, thatKey = that.key;
+                if (!S.isEqual(thisKey, thatKey)) return false;
+                Object thatVal = that.value, thisVal = this.value;
+                if (null == thatVal && null == thisVal) return true;
+                return (null != thisVal) ? thisVal.equals(thatVal) : thatVal.equals(thisVal);
+            }
+            return false;
+        }
+
         @Override
         public int compareTo(Item that) {
             return ttl - that.ttl;
@@ -85,7 +107,9 @@ public class SimpleCacheService implements ICacheService {
                 item.value = value;
                 item.ttl = ttl;
             } else {
-                items_.offer(newItem);
+                if (!items_.offer(newItem)) {
+                    throw new RuntimeException("oops, something is wrong");
+                };
             }
         } else {
             item.value = value;
@@ -123,7 +147,7 @@ public class SimpleCacheService implements ICacheService {
 
     @Override
     public boolean contains(String key) {
-        return cache_.contains(key);
+        return cache_.containsKey(key);
     }
 
     private int defaultTTL = 60;
@@ -162,7 +186,7 @@ public class SimpleCacheService implements ICacheService {
                         if (null == item) {
                             break;
                         }
-                        long ts = item.ts + item.ttl * 1000;
+                        long ts = item.ts + ((long)item.ttl) * 1000;
                         if ((ts) < now + 50) {
                             items_.poll();
                             cache_.remove(item.key);

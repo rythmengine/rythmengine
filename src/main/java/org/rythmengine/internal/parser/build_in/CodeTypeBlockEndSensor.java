@@ -71,7 +71,7 @@ public class CodeTypeBlockEndSensor extends ParserBase {
             String matched = m.group(1);
             ctx.step(matched.length());
             ctx.popCodeType();
-            String s = String.format("p(\"%s\");__ctx.popCodeType();", matched, curType);
+            String s = String.format("p(\"%s\");__ctx.popCodeType();", matched);
             return new CodeToken(s, ctx);
         }
 

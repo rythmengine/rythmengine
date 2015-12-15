@@ -48,7 +48,11 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
         // skip annotations
         skipAnnotations.addAll(Arrays.asList("org.codehaus.jackson.annotate.JsonIgnore org.rythmengine.toString.NoExpose ".split(" +")));
         transientAnnotations.addAll(Arrays.asList("javax.persistence.Transient com.google.code.morphia.annotations.Transient".split(" +")));
-        meta = ((AutoToString) dialect).meta;
+        if (dialect instanceof AutoToString) {
+            meta = ((AutoToString) dialect).meta;
+        } else {
+            throw new IllegalArgumentException("AutoToString expected, found: " + dialect.getClass());
+        }
     }
 
     @Override
