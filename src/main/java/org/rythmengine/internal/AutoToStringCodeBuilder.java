@@ -62,7 +62,7 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
 
     @Override
     protected void pSetup() {
-        ptn("@Override protected void __setup() {");
+        ptn("protected void __setup() {");
         if (logTime) {
             p2tn("__logTime = true;");
         }

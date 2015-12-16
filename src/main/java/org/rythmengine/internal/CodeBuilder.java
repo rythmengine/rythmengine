@@ -1141,7 +1141,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pExtendInitArgCode() {
         if (null == extendArgs || extendArgs.pl.size() < 1) return;
         pn();
-        ptn("@Override protected void __loadExtendingArgs() {");
+        ptn("protected void __loadExtendingArgs() {");
         for (int i = 0; i < extendArgs.pl.size(); ++i) {
             InvokeTemplateParser.ParameterDeclaration pd = extendArgs.pl.get(i);
             if (S.isEmpty(pd.nameDef)) {
@@ -1161,7 +1161,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pSetup() {
         if (!logTime && renderArgs.isEmpty()) return;
         pn();
-        ptn("@Override protected void __setup() {");
+        ptn("protected void __setup() {");
         if (logTime) {
             p2tn("__logTime = true;");
         }
@@ -1176,18 +1176,18 @@ public class CodeBuilder extends TextBuilder {
     protected void pInitCode() {
         if (S.isEmpty(initCode)) return;
         pn();
-        pt("@Override public void __init() {").p(initCode).p(";").pn("\n\t}");
+        pt("public void __init() {").p(initCode).p(";").pn("\n\t}");
     }
 
     protected void pFinalCode() {
         if (S.isEmpty(finalCode)) return;
         pn();
-        pt("@Override public void __finally() {").p(finalCode).p(";").pn("\n\t}");
+        pt("public void __finally() {").p(finalCode).p(";").pn("\n\t}");
     }
 
     protected void pTagImpl() {
         pn();
-        pt("@Override public java.lang.String __getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
+        pt("public java.lang.String __getName() {\n\t\treturn \"").p(tagName).p("\";\n\t}\n");
     }
 
     public String buildBody = null;
@@ -1287,7 +1287,7 @@ public class CodeBuilder extends TextBuilder {
     protected void pBuild() {
         pn();
         pn();
-        ptn("@Override public org.rythmengine.utils.TextBuilder build(){");
+        ptn("public org.rythmengine.utils.TextBuilder build(){");
         p2t("buffer().ensureCapacity(").p(tmpl.length()).p(");").pn();
         StringBuilder sb = new StringBuilder();
         StringBuilder old = buffer();
