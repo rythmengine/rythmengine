@@ -96,6 +96,15 @@ public class Rythm {
     public static void init(Map<String, ?> conf) {
         if (null != engine) throw new IllegalStateException("Rythm is already initialized");
         engine = new RythmEngine(conf);
+        // See #296
+        ShutdownService service = getShutdownService(engine.conf().gae());
+        service.setShutdown(new Runnable() {
+            @Override
+            public void run() {
+                engine.shutdown();
+            }
+        });
+
         engine.setShutdownListener(new RythmEngine.IShutdownListener() {
             @Override
             public void onShutdown() {
@@ -103,7 +112,24 @@ public class Rythm {
             }
         });
     }
-    
+
+    public static ShutdownService getShutdownService(boolean isGaeAvailable) {
+        if (!isGaeAvailable) {
+            return DefaultShutdownService.INSTANCE;
+        }
+
+        try {
+            String classname = "org.rythmengine.GaeShutdownService";
+            Class clazz = Class.forName(classname);
+            Object[] oa = clazz.getEnumConstants();
+            ShutdownService result = (ShutdownService) oa[0];
+            return result;
+        } catch (Throwable t) {
+            // Nothing to do
+        }
+        return DefaultShutdownService.INSTANCE;
+    }
+
     /**
      * Initialize default engine instance with specified configuration file
      * <p/>

@@ -687,40 +687,12 @@ public class RythmEngine implements IEventDispatcher {
             resourceManager().scan();
         }
 
-        // See #296
-        if (Rythm.engine == this) {
-            ShutdownService service = getShutdownService(conf().gae());
-            service.setShutdown(new Runnable() {
-                @Override
-                public void run() {
-                    RythmEngine.this.shutdown();
-                }
-            });
-        }
-
         if (conf().gae()) {
             logger.warn("Rythm engine : GAE in cloud enabled");
         }
         logger.debug("Rythm-%s started in %s mode", version, mode());
     }
 
-
-    public static ShutdownService getShutdownService(boolean isGaeAvailable) {
-        if (!isGaeAvailable) {
-            return DefaultShutdownService.INSTANCE;
-        }
-
-        try {
-            String classname = "org.rythmengine.GaeShutdownService";
-            Class clazz = Class.forName(classname);
-            Object[] oa = clazz.getEnumConstants();
-            ShutdownService result = (ShutdownService) oa[0];
-            return result;
-        } catch (Throwable t) {
-            // Nothing to do
-        }
-        return DefaultShutdownService.INSTANCE;
-    }
     /* -----------------------------------------------------------------------------
       Registrations
     -------------------------------------------------------------------------------*/
