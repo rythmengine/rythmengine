@@ -687,13 +687,17 @@ public class RythmEngine implements IEventDispatcher {
             resourceManager().scan();
         }
 
-        ShutdownService service = getShutdownService(conf().gae());
-        service.setShutdown(new Runnable() {
-            @Override
-            public void run() {
-                RythmEngine.this.shutdown();
-            }
-        });
+        // See #296
+        if (Rythm.engine == this) {
+            ShutdownService service = getShutdownService(conf().gae());
+            service.setShutdown(new Runnable() {
+                @Override
+                public void run() {
+                    RythmEngine.this.shutdown();
+                }
+            });
+        }
+
         if (conf().gae()) {
             logger.warn("Rythm engine : GAE in cloud enabled");
         }
