@@ -1418,7 +1418,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             Object retval = __engine().eval(expr, this, ctx);
             return retval;
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            __logger.warn(e, "error evaluate expression: %s", expr);
             return null;
         }
     }
