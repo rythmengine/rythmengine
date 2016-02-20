@@ -721,10 +721,8 @@ public class CodeBuilder extends TextBuilder {
             return;
         }
         Token token = builder;
-        if (removeNextLF && token != Token.EMPTY_TOKEN2) {
-            if (token.removeLeadingLineBreak()) {
-                removeNextLF = false;
-            }
+        if (removeNextLF && token != Token.EMPTY_TOKEN2 && token.removeLeadingLineBreak()) {
+            removeNextLF = false;
         }
         if (token.removeNextLineBreak) {
             removeNextLF = true;

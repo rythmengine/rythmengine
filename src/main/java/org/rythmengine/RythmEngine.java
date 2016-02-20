@@ -1616,9 +1616,9 @@ public class RythmEngine implements IEventDispatcher {
             if (null == t) {
                 t = _templates.get(name);
             }
-            if (null == t) {
+            if (null == t && S.isEqual(name, caller.__getName())) {
                 // is calling self
-                if (S.isEqual(name, caller.__getName())) t = caller;
+                t = caller;
             }
 
             if (null == t) {

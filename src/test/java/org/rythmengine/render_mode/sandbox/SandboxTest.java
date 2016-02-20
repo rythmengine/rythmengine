@@ -41,10 +41,8 @@ public class SandboxTest extends TestBase {
             Throwable t = re.getCause();
             if (t == null) {
                 t = re;
-                if (t instanceof ParseException){
-                    if (t.getMessage().contains("Access to restricted class")) {
-                        throw new SecurityException(t);
-                    }
+                if (t instanceof ParseException && t.getMessage().contains("Access to restricted class")){
+                    throw new SecurityException(t);
                 }
             }
             throw t;

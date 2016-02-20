@@ -93,13 +93,11 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
                     hasSuffix = true;
                     break;
                 }
-                if (withRythmSuffix) {
-                    if (tmplName.endsWith(s) || tmplName.endsWith(s + rythmSuffix)) {
-                        tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
-                        suffix = s + rythmSuffix;
-                        hasSuffix = true;
-                        break;
-                    }
+                if (withRythmSuffix && (tmplName.endsWith(s) || tmplName.endsWith(s + rythmSuffix))) {
+                    tmplName = tmplName.substring(0, tmplName.lastIndexOf(s));
+                    suffix = s + rythmSuffix;
+                    hasSuffix = true;
+                    break;
                 }
             }
         }
@@ -149,10 +147,8 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         String tmplName0 = tmplName;
         for (String root : roots) {
             String tmplName1 = tmplName0;
-            if (root.startsWith("/")) {
-                if (!tmplName1.startsWith("/")) {
-                    tmplName1 = "/" + tmplName0;
-                }
+            if (root.startsWith("/") && !tmplName1.startsWith("/")) {
+                tmplName1 = "/" + tmplName0;
             }
             tmplName = tmplName1.startsWith(root) ? tmplName1 : root + "/" + tmplName0;
             if (hasSuffix) {
