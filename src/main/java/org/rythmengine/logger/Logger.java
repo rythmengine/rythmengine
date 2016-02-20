@@ -34,6 +34,9 @@ import java.util.Map;
  */
 public class Logger {
 
+    private Logger() {
+    }
+
     private static class Proxy implements ILogger {
         private Class<?> c_;
         private ILogger l_;

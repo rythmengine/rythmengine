@@ -36,6 +36,9 @@ public class Time {
     static Pattern minutes = Pattern.compile("^([0-9]+)mi?n$");
     static Pattern seconds = Pattern.compile("^([0-9]+)s$");
 
+    private Time() {
+    }
+
     /**
      * Parse a duration
      *

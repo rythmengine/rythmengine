@@ -14,6 +14,9 @@ import java.util.Locale;
  * To change this template use File | Settings | File Templates.
  */
 public class CacheKey {
+    private CacheKey() {
+    }
+
     public static String i18nMsg(ITemplate template, String key, boolean useFormat) {
         return i18nMsg(template, key, useFormat, null);
     }

@@ -30,6 +30,9 @@ import java.util.Map;
 // Most of the code come from Play!Framework F.java, under Apache License 2.0
 public class F {
 
+    private F() {
+    }
+
     public static interface Action0 {
 
         void invoke();
