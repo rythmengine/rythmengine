@@ -165,10 +165,10 @@ public class TemplateClass {
         if (includeTagTypes.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         boolean empty = true;
-        for (String tagName : includeTagTypes.keySet()) {
+        for (Map.Entry<String, String> entry : includeTagTypes.entrySet()) {
             if (!empty) sb.append(";");
             else empty = false;
-            sb.append(tagName).append(":").append(includeTagTypes.get(tagName));
+            sb.append(entry.getKey()).append(":").append(entry.getValue());
         }
         return sb.toString();
     }

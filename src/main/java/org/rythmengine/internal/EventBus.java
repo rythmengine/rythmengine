@@ -188,10 +188,10 @@ public class EventBus implements IEventDispatcher {
                 }
                 // add common render args
                 Map<String, ?> defArgs = ce.getRenderArgDescriptions();
-                for (String name : defArgs.keySet()) {
-                    Object o = defArgs.get(name);
+                for (Map.Entry<String, ?> entry : defArgs.entrySet()) {
+                    Object o = entry.getValue();
                     String type = (o instanceof Class<?>) ? ((Class<?>) o).getName() : o.toString();
-                    cb.addRenderArgs(-1, type, name);
+                    cb.addRenderArgs(-1, type, entry.getKey());
                 }
                 // add common imports
                 for (String s : ce.imports()) {

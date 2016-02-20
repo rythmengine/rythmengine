@@ -67,10 +67,10 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
             p2tn("__logTime = true;");
         }
         p2t("__style = ").p(meta.style.toCode()).p(";").pn();
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (").p(argName).p(" == null) {");
-            p(argName).p("=(").p(arg.objectType()).p(")__get(\"").p(argName).p("\");}\n");
+        for (Map.Entry<String, RenderArgDeclaration> entry : renderArgs.entrySet()) {
+            RenderArgDeclaration arg = entry.getValue();
+            p2t("if (").p(entry.getKey()).p(" == null) {");
+            p(entry.getKey()).p("=(").p(arg.objectType()).p(")__get(\"").p(entry.getKey()).p("\");}\n");
         }
         ptn("}");
     }
