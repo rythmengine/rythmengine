@@ -850,7 +850,7 @@ public class Time {
         }
 
         public String getExpressionSummary() {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             buf.append("seconds: ");
             buf.append(getExpressionSetSummary(seconds));
@@ -898,7 +898,7 @@ public class Time {
                 return "*";
             }
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             Iterator<Integer> itr = set.iterator();
             boolean first = true;
@@ -924,7 +924,7 @@ public class Time {
                 return "*";
             }
 
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
 
             Iterator<Integer> itr = list.iterator();
             boolean first = true;

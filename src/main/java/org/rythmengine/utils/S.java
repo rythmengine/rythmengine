@@ -1533,7 +1533,7 @@ public class S {
 
         final int max = chars.length;
         Random r = new Random();
-        StringBuffer sb = new StringBuffer(len);
+        StringBuilder sb = new StringBuilder(len);
         while(len-- > 0) {
             int i = r.nextInt(max);
             sb.append(chars[i]);

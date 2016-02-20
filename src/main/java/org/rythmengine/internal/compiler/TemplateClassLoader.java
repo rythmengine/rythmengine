@@ -85,7 +85,7 @@ public class TemplateClassLoader extends ClassLoader {
         private final Map<File, FileWithClassDefs> classDefsInFileCache = new HashMap<File, FileWithClassDefs>();
 
         public synchronized int computePathHash(File... paths) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (File file : paths) {
                 scan(buf, file);
             }
@@ -94,7 +94,7 @@ public class TemplateClassLoader extends ClassLoader {
             return buf.toString().hashCode();
         }
 
-        private void scan(StringBuffer buf, File current) {
+        private void scan(StringBuilder buf, File current) {
             if (!current.isDirectory()) {
                 if (current.getName().endsWith(".java")) {
                     buf.append(getClassDefsForFile(current));
