@@ -271,7 +271,6 @@ public class TemplateCompiler {
             }
         };
 
-        final RythmEngine engine = engine();
 
         /**
          * Compilation result
@@ -283,7 +282,6 @@ public class TemplateCompiler {
                 if (result.hasErrors()) {
                     for (IProblem problem : result.getErrors()) {
                         int line = problem.getSourceLineNumber();
-                        int column = problem.getSourceStart();
                         String message = problem.getMessage();
                         throw CompileException.compilerException(String.valueOf(result.compilationUnit.getMainTypeName()), line, message);
                     }

@@ -42,7 +42,6 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
 
         final IDialect dialect = ctx.getDialect();
         //if (!(dialect instanceof Rythm)) throw new DialectNotSupportException(dialect.id());
-        final String caret_ = dialect.a();
 
         return new ParserBase(ctx) {
 
