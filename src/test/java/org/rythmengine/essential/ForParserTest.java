@@ -335,14 +335,14 @@ public class ForParserTest extends TestBase {
     @Test
     public void test2() {
         t = "@args Set<Map<String,String>> mset;@for(Map<String, String> m: mset){123}";
-        s = r(t, Collections.EMPTY_SET);
+        s = r(t, Collections.emptySet());
         eq("");
     }
     
     @Test
     public void test3() {
         t = "@args List items\n     @for(Object item: items) {\n@{}}";
-        s = r(t, Collections.EMPTY_LIST);
+        s = r(t, Collections.emptyList());
         eq("");
     }
     
@@ -359,7 +359,7 @@ public class ForParserTest extends TestBase {
     @Test
     public void test5() {
         t = "@for(items){@__sep}";
-        s = r(t, from(p("items", Collections.EMPTY_LIST)));
+        s = r(t, from(p("items", Collections.emptyList())));
         eq("");
     }
 

@@ -1394,7 +1394,7 @@ public class RythmEngine implements IEventDispatcher {
 //        } catch (ScriptException e) {
 //            throw new RuntimeException(e);
 //        }
-        return eval(script, Collections.EMPTY_MAP);
+        return eval(script, Collections.<String, Object>emptyMap());
     }
 
     private Map<String, Serializable> mvels = new HashMap<String, Serializable>();

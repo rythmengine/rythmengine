@@ -46,7 +46,7 @@ public class ArgsParserTest extends TestBase {
     @Test
     public void testFullFormat() {
         t = "@args() {Map<String, String> m\n, List<Integer> l,}@(m instanceof Map),@(l instanceof List)";
-        s = r(t, Collections.EMPTY_MAP, Collections.EMPTY_LIST);
+        s = r(t, Collections.emptyMap(), Collections.emptyList());
         eq("true,true");
     }
     
