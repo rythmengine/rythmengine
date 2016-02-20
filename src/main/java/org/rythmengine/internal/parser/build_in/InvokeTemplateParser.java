@@ -248,7 +248,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             }
             pline("{");
             ptline("org.rythmengine.template.ITag.__ParameterList _pl = null; ");
-            if (params.pl.size() > 0) {
+            if (!params.pl.isEmpty()) {
                 ptline("_pl = new org.rythmengine.template.ITag.__ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
@@ -357,7 +357,7 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             }
             pline("{");
             ptline("org.rythmengine.template.ITag.__ParameterList _pl = null; ");
-            if (params.pl.size() > 0) {
+            if (!params.pl.isEmpty()) {
                 ptline("_pl = new org.rythmengine.template.ITag.__ParameterList();");
                 for (int i = 0; i < params.pl.size(); ++i) {
                     ParameterDeclaration pd = params.pl.get(i);
