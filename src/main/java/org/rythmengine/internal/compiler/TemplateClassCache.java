@@ -90,7 +90,7 @@ public class TemplateClassCache {
 
             // --- check hash
             int offset = 0;
-            int read = -1;
+            int read;
             StringBuilder hash = new StringBuilder();
             while ((read = is.read()) != 0) {
                 if (read == -1) {

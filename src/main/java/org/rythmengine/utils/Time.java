@@ -395,7 +395,7 @@ public class Time {
             adjustCal.set(Calendar.MILLISECOND, 0);
             Date lastDate = adjustCal.getTime();
 
-            Date newDate = null;
+            Date newDate;
 
             //keep getting the next included time until it's farther than one second
             // apart. At that point, lastDate is the last valid fire time. We return
@@ -1142,8 +1142,8 @@ public class Time {
 
                 //if (endTime != null && cl.getTime().after(endTime)) return null;
 
-                SortedSet<Integer> st = null;
-                int t = 0;
+                SortedSet<Integer> st;
+                int t;
 
                 int sec = cl.get(Calendar.SECOND);
                 int min = cl.get(Calendar.MINUTE);
@@ -1584,7 +1584,7 @@ public class Time {
 
         @Override
         public Object clone() {
-            CronExpression copy = null;
+            CronExpression copy;
             try {
                 copy = new CronExpression(getCronExpression());
                 copy.setTimeZone(getTimeZone());

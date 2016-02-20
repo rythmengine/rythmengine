@@ -192,7 +192,7 @@ public class ToStringOption implements Serializable {
         boolean appendStatic = Boolean.valueOf(m.group(1));
         boolean appendTransient = Boolean.valueOf(m.group(2));
         String upToClassStr = m.group(3);
-        Class<?> upToClass = null;
+        Class<?> upToClass;
         if (S.isEmpty(upToClassStr)) upToClass = null;
         else try {
             upToClass = Class.forName(upToClassStr);
