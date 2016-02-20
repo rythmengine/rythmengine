@@ -83,10 +83,11 @@ public class TemplateClassCache {
         if (!readEnabled()) {
             return;
         }
+        InputStream is = null;
         try {
             File f = getCacheFile(tc);
             if (!f.exists() || !f.canRead()) return;
-            InputStream is = new BufferedInputStream(new FileInputStream(f));
+            is = new BufferedInputStream(new FileInputStream(f));
 
             // --- check hash
             int offset = 0;
@@ -143,9 +144,15 @@ public class TemplateClassCache {
             is.read(byteCode);
             tc.loadCachedByteCode(byteCode);
 
-            is.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            if(is != null)
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
         }
     }
 
