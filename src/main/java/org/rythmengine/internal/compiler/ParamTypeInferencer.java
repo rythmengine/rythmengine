@@ -126,11 +126,11 @@ public class ParamTypeInferencer {
         long id = 0;
         if (args.length == 1 && args[0] instanceof Map) {
             Map<String, Object> params = (Map) args[0];
-            for (String name : params.keySet()) {
-                Object val = params.get(name);
+            for (Map.Entry<String, Object> entry : params.entrySet()) {
+                Object val = entry.getValue();
                 String typeName = getTypeName(val);
-                tMap.put(name, typeName);
-                id += typeName.hashCode() * name.hashCode();
+                tMap.put(entry.getKey(), typeName);
+                id += typeName.hashCode() * entry.getKey().hashCode();
             }
         } else {
             // suppose template variable is denoted with @1, @2 ...

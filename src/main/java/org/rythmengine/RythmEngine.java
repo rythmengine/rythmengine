@@ -1987,10 +1987,10 @@ public class RythmEngine implements IEventDispatcher {
 
         // clear all template tags which is managed by TemplateClassManager
         List<String> templateTags = new ArrayList<String>();
-        for (String name : _templates.keySet()) {
-            ITag tag = _templates.get(name);
+        for (Map.Entry<String, ITemplate> entry : _templates.entrySet()) {
+            ITag tag = entry.getValue();
             if (!(tag instanceof JavaTagBase)) {
-                templateTags.add(name);
+                templateTags.add(entry.getKey());
             }
         }
         for (String name : templateTags) {

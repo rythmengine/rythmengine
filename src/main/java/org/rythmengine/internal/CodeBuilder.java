@@ -969,9 +969,9 @@ public class CodeBuilder extends TextBuilder {
         pn();
         addInferencedRenderArgs();
         // -- output private members
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            pt("protected ").p(arg.type).p(" ").p(argName);
+        for (Map.Entry<String, RenderArgDeclaration> entry : renderArgs.entrySet()) {
+            RenderArgDeclaration arg = entry.getValue();
+            pt("protected ").p(arg.type).p(" ").p(entry.getKey());
             if (null != arg.defVal) {
                 p("=").p(arg.defVal).p(";");
             } else {
@@ -1008,12 +1008,12 @@ public class CodeBuilder extends TextBuilder {
         pn();
         ptn("protected java.util.Map<java.lang.String, java.lang.Class> __renderArgTypeMap() {");
         p2tn("java.util.Map<java.lang.String, java.lang.Class> __m = new java.util.HashMap<String, Class>();");
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
+        for (Map.Entry<String, RenderArgDeclaration> entry : renderArgs.entrySet()) {
+            RenderArgDeclaration arg = entry.getValue();
             String argType = arg.type;
             boolean isGeneric = isGeneric(argType);
             if (isGeneric) {
-                p2t("__m.put(\"").p(argName).p("\", ").p(toNonGeneric(argType)).pn(".class);");
+                p2t("__m.put(\"").p(entry.getKey()).p("\", ").p(toNonGeneric(argType)).pn(".class);");
                 Regex regex = new Regex(".*((?@<>))");
                 regex.search(argType);
                 String s = regex.stringMatched(1);
@@ -1027,7 +1027,7 @@ public class CodeBuilder extends TextBuilder {
                         if ("?".equals(type)) {
                             type = "Object";
                         }
-                        p2t("__m.put(\"").p(argName).p("__").p(i).p("\", ").p(type).pn(".class);");
+                        p2t("__m.put(\"").p(entry.getKey()).p("__").p(i).p("\", ").p(type).pn(".class);");
                     }
                 }
             } else {
@@ -1035,7 +1035,7 @@ public class CodeBuilder extends TextBuilder {
                 if ("?".equals(type)) {
                     type = "Object";
                 }
-                p2t("__m.put(\"").p(argName).p("\", ").p(type).pn(".class);");
+                p2t("__m.put(\"").p(entry.getKey()).p("\", ").p(type).pn(".class);");
 //                int lvl = 0;
 //                if (isArray(type)) {
 //                    int pos = type.lastIndexOf("[");
@@ -1054,9 +1054,9 @@ public class CodeBuilder extends TextBuilder {
         p2tn("if (null == __args) throw new NullPointerException();\n\t\tif (__args.isEmpty()) return this;");
         p2tn("super.__setRenderArgs(__args);");
         first = true;
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (__args.containsKey(\"").p(argName).p("\")) this.").p(argName).p(" = __get(__args,\"").p(argName).p("\",").p(arg.objectType()).pn(".class);");
+        for (Map.Entry<String, RenderArgDeclaration> entry : renderArgs.entrySet()) {
+            RenderArgDeclaration arg = entry.getValue();
+            p2t("if (__args.containsKey(\"").p(entry.getKey()).p("\")) this.").p(entry.getKey()).p(" = __get(__args,\"").p(entry.getKey()).p("\",").p(arg.objectType()).pn(".class);");
         }
         p2tn("return this;");
 //        for (String argName : renderArgs.keySet()) {
@@ -1163,10 +1163,10 @@ public class CodeBuilder extends TextBuilder {
         if (logTime) {
             p2tn("__logTime = true;");
         }
-        for (String argName : renderArgs.keySet()) {
-            RenderArgDeclaration arg = renderArgs.get(argName);
-            p2t("if (__isDefVal(").p(argName).p(")) {");
-            p(argName).p(" = __get(\"").p(argName).p("\",").p(arg.objectType()).p(".class) ;}\n");
+        for (Map.Entry<String, RenderArgDeclaration> entry : renderArgs.entrySet()) {
+            RenderArgDeclaration arg = entry.getValue();
+            p2t("if (__isDefVal(").p(entry.getKey()).p(")) {");
+            p(entry.getKey()).p(" = __get(\"").p(entry.getKey()).p("\",").p(arg.objectType()).p(".class) ;}\n");
         }
         ptn("}");
     }

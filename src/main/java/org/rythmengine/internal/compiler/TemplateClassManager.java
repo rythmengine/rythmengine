@@ -125,9 +125,9 @@ public class TemplateClassManager {
 
     List<TemplateClass> getEmbeddedClasses(String name) {
         List<TemplateClass> l = new ArrayList<TemplateClass>();
-        for (String cn : clsNameIdx.keySet()) {
-            if (cn.startsWith(name + "$")) {
-                l.add(clsNameIdx.get(cn));
+        for (Map.Entry<String, TemplateClass> entry : clsNameIdx.entrySet()) {
+            if (entry.getKey().startsWith(name + "$")) {
+                l.add(entry.getValue());
             }
         }
         return l;

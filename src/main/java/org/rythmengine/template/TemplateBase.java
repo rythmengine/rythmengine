@@ -478,14 +478,14 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             tmpl.__caller = (TextBuilder) caller;
             Map<String, Object> callerRenderArgs = new HashMap<String, Object>(((TemplateBase) caller).__renderArgs);
             Map<String, Class> types = tmpl.__renderArgTypeMap();
-            for (String s : callerRenderArgs.keySet()) {
-                if (tmpl.__renderArgs.containsKey(s)) continue;
-                Object o = callerRenderArgs.get(s);
+            for (Map.Entry<String, Object> entry : callerRenderArgs.entrySet()) {
+                if (tmpl.__renderArgs.containsKey(entry.getKey())) continue;
+                Object o = entry.getValue();
                 if (null == o || __isDefVal(o)) continue;
-                Class<?> c = types.get(s);
+                Class<?> c = types.get(entry.getKey());
 
                 if (null == c || c.isAssignableFrom(o.getClass())) {
-                    tmpl.__setRenderArg(s, o);
+                    tmpl.__setRenderArg(entry.getKey(), o);
                 }
             }
         }
@@ -898,20 +898,20 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     private void setJSONObject(Map<String, Object> jsonObject) {
         Map<String, Class> types = __renderArgTypeMap();
-        for (String nm : jsonObject.keySet()) {
-            if (types.containsKey(nm)) {
-                Class c = types.get(nm);
-                Object o = jsonObject.get(nm);
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            if (types.containsKey(entry.getKey())) {
+                Class c = types.get(entry.getKey());
+                Object o = entry.getValue();
                 Object p;
                 if (o instanceof List) {
                     Map<String, Class> typeMap = __renderArgTypeMap();
                     //String vn = nm;
-                    Class c0 = typeMap.get(nm + "__0");
+                    Class c0 = typeMap.get(entry.getKey() + "__0");
                     boolean isArray = false;
                     if (null == c0) {
                         // an array type
                         isArray = true;
-                        c0 = typeMap.get(nm);
+                        c0 = typeMap.get(entry.getKey());
                     }
                     if (isArray) {
                         JSONArray l = (JSONArray) o;
@@ -937,7 +937,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                         p = JSON.parseObject(s, c);
                     }
                 }
-                __setRenderArg(nm, p);
+                __setRenderArg(entry.getKey(), p);
             }
         }
     }

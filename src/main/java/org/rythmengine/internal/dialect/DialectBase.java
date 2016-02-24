@@ -73,9 +73,9 @@ public abstract class DialectBase implements IDialect {
     public IParser createBuildInParser(String keyword, IContext context) {
         KeywordParserFactory f = keywords.get(keyword.toLowerCase());
         if (null == f) {
-            for (String r : keywords2.keySet()) {
-                if (keyword.matches(r)) {
-                    f = keywords2.get(r);
+            for (Map.Entry<String, KeywordParserFactory> entry : keywords2.entrySet()) {
+                if (keyword.matches(entry.getKey())) {
+                    f = entry.getValue();
                     break;
                 }
             }
