@@ -147,7 +147,6 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     private List<String> tokenList = new ArrayList<String>();
 
     private void appendFieldsIn(Class<?> c) {
-        ToStringOption o = meta.option;
         Field[] fa = c.getDeclaredFields();
         for (Field f : fa) {
             String fn = f.getName();
@@ -160,7 +159,6 @@ public class AutoToStringCodeBuilder extends CodeBuilder {
     }
 
     private void appendMethodsIn(Class<?> c) {
-        ToStringOption o = meta.option;
         Method[] ma = c.getDeclaredMethods();
         for (Method m : ma) {
             String mn = m.getName();

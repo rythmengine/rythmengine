@@ -141,7 +141,6 @@ public class InvokeTemplateParser extends CaretParserFactoryBase {
             }
             Regex r = new Regex("\\G(\\.)([_a-zA-Z][_a-zA-Z0-9]*)((?@()))");
             while (r.search(line)) {
-                String group = r.stringMatched();
                 String extension = r.stringMatched(2);
                 String param = S.stripBrace(r.stringMatched(3));
                 if ("cache".equals(extension)) {
