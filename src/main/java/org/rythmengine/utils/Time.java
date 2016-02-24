@@ -1150,7 +1150,7 @@ public class Time {
 
                 // get second.................................................
                 st = seconds.tailSet(new Integer(sec));
-                if (st != null && st.size() != 0) {
+                if (st != null && !st.isEmpty()) {
                     sec = st.first().intValue();
                 } else {
                     sec = seconds.first().intValue();
@@ -1165,7 +1165,7 @@ public class Time {
 
                 // get minute.................................................
                 st = minutes.tailSet(new Integer(min));
-                if (st != null && st.size() != 0) {
+                if (st != null && !st.isEmpty()) {
                     t = min;
                     min = st.first().intValue();
                 } else {
@@ -1186,7 +1186,7 @@ public class Time {
 
                 // get hour...................................................
                 st = hours.tailSet(new Integer(hr));
-                if (st != null && st.size() != 0) {
+                if (st != null && !st.isEmpty()) {
                     t = hr;
                     hr = st.first().intValue();
                 } else {
@@ -1290,7 +1290,7 @@ public class Time {
                             day = daysOfMonth.first().intValue();
                             mon++;
                         }
-                    } else if (st != null && st.size() != 0) {
+                    } else if (st != null && !st.isEmpty()) {
                         t = day;
                         day = st.first().intValue();
                     } else {
@@ -1399,7 +1399,7 @@ public class Time {
                         int dow = daysOfWeek.first().intValue(); // desired
                         // d-o-w
                         st = daysOfWeek.tailSet(new Integer(cDow));
-                        if (st != null && st.size() > 0) {
+                        if (st != null && !st.isEmpty()) {
                             dow = st.first().intValue();
                         }
 
@@ -1453,7 +1453,7 @@ public class Time {
 
                 // get month...................................................
                 st = months.tailSet(new Integer(mon));
-                if (st != null && st.size() != 0) {
+                if (st != null && !st.isEmpty()) {
                     t = mon;
                     mon = st.first().intValue();
                 } else {
@@ -1480,7 +1480,7 @@ public class Time {
 
                 // get year...................................................
                 st = years.tailSet(new Integer(year));
-                if (st != null && st.size() != 0) {
+                if (st != null && !st.isEmpty()) {
                     t = year;
                     year = st.first().intValue();
                 } else {

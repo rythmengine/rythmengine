@@ -174,7 +174,7 @@ public class SimpleCacheService implements ICacheService {
             scheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    if (items_.size() == 0) {
+                    if (items_.isEmpty()) {
                         return;
                     }
                     long now = System.currentTimeMillis();

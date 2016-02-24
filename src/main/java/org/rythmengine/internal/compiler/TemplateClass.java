@@ -110,7 +110,7 @@ public class TemplateClass {
     private static final String NO_INCLUDE_CLASS = "NO_INCLUDE_CLASS";
 
     public String refreshIncludeTemplateClassNames() {
-        if (includedTemplateClasses.size() == 0) {
+        if (includedTemplateClasses.isEmpty()) {
             includeTemplateClassNames = NO_INCLUDE_CLASS;
             return NO_INCLUDE_CLASS;
         }
@@ -590,7 +590,7 @@ public class TemplateClass {
             boolean extendedTemplateChanged = false;
             if (extendedTemplateClass != null) extendedTemplateChanged = extendedTemplateClass.refresh(forceRefresh);
             boolean includedTemplateChanged = false;
-            if (includedTemplateClasses.size() == 0 && !S.isEmpty(includeTemplateClassNames) && !NO_INCLUDE_CLASS.equals(includeTemplateClassNames)) {
+            if (includedTemplateClasses.isEmpty() && !S.isEmpty(includeTemplateClassNames) && !NO_INCLUDE_CLASS.equals(includeTemplateClassNames)) {
                 // just loaded from persistent store
                 for (String tcName : includeTemplateClassNames.split(",")) {
                     if (S.isEmpty(tcName)) continue;

@@ -480,7 +480,7 @@ public class TemplateClassLoader extends ClassLoader {
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             }
         }
-        if (newDefinitions.size() > 0) {
+        if (!newDefinitions.isEmpty()) {
             throw new ClassReloadException("Need Reload");
         }
         // Check signature (variable name & annotations aware !)
