@@ -600,7 +600,7 @@ public class RythmConfiguration {
         return _hasGlobalInclude;
     }
 
-    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.EMPTY_MAP, null);
+    public static final RythmConfiguration EMPTY_CONF = new RythmConfiguration(Collections.<String, Object>emptyMap(), null);
 
     /**
      * Return <tt>RythmConfiguration</tt> instance of current RythmEngine, or

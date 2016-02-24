@@ -171,9 +171,9 @@ public class IfParserTest extends TestBase {
         no("NO");
         yes("yes");
         no("  ");
-        no(Collections.EMPTY_LIST);
-        no(Collections.EMPTY_MAP);
-        no(Collections.EMPTY_SET);
+        no(Collections.emptyList());
+        no(Collections.emptyMap());
+        no(Collections.emptySet());
         yes(Arrays.asList("1,2".split(",")));
         yes(1);
         no(0L);

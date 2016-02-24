@@ -474,7 +474,7 @@ public class GhIssueTest extends TestBase {
         ISourceCodeEnhancer se = new ISourceCodeEnhancer() {
             @Override
             public List<String> imports() {
-                return Collections.EMPTY_LIST;
+                return Collections.emptyList();
             }
 
             @Override

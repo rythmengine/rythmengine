@@ -842,7 +842,7 @@ public enum RythmConfigurationKey {
 
     public static <T> List<T> getImplList(String key, Map<String, ?> configuration, Class<T> c) {
         final Object v = getValFromAliases(configuration, key, "impls", null);
-        if (null == v) return Collections.EMPTY_LIST;
+        if (null == v) return Collections.emptyList();
         final boolean needClass = (Class.class.isAssignableFrom(c));
         final List<T> l = new ArrayList<T>();
         final Class vc = v.getClass();

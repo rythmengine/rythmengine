@@ -246,7 +246,7 @@ public interface ICodeType {
 
         @Override
         public Set<ICodeType> allowedExternalTypes() {
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
         }
 
         @Override
