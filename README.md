@@ -1,7 +1,9 @@
-Rythm
-=====
+Rythm Template Engine
+======================
 
 [![Join the chat at https://gitter.im/greenlaw110/Rythm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/greenlaw110/Rythm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+**I am looking for people to join me on this project. Please contact me at greenlaw110@gmail.com**
 
 A "Razor" like, rich featured, high performance and easy to use Java template engine
 
