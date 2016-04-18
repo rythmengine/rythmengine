@@ -230,7 +230,7 @@ public class CodeBuilder extends TextBuilder {
 
     private String extendedResourceMark() {
         TemplateClass tc = extendedTemplateClass;
-        return (null == tc) ? "" : String.format("//<extended_resource_key>%s</extended_resource_key>", tc.templateResource.getKey());
+        return (null == tc) ? "" : String.format("//<extended_resource_key>%s</extended_resource_key>", tc.getTemplateResource().getKey());
     }
 
     private TemplateClass extendedTemplateClass;
@@ -298,7 +298,7 @@ public class CodeBuilder extends TextBuilder {
         this.conf = this.engine.conf();
         this.requiredDialect = requiredDialect;
         this.templateClass = templateClass;
-        ICodeType type = templateClass.codeType;
+        ICodeType type = templateClass.getCodeType();
         this.templateDefLang = type;
         String tmpl = RythmEvents.ON_PARSE.trigger(this.engine, this);
         this.tmpl = tmpl;
@@ -398,7 +398,7 @@ public class CodeBuilder extends TextBuilder {
         imports.add(imprt);
         if (imprt.endsWith(".*")) {
             imprt = imprt.substring(0, imprt.lastIndexOf(".*"));
-            templateClass.importPaths.add(imprt);
+            templateClass.addImportPath(imprt);
         }
         importLineMap.put(imprt, lineNo);
     }
@@ -558,16 +558,16 @@ public class CodeBuilder extends TextBuilder {
         }
         TemplateClass includeTc = includeTmpl.__getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
-        merge(includeTc.codeBuilder);
+        merge(includeTc.getCodeBuilder());
         templateClass.addIncludeTemplateClass(includeTc);
-        return includeTc.codeBuilder.buildBody;
+        return includeTc.getCodeBuilder().buildBody;
     }
     
     public String addInlineInclude(String inlineTemplate, int lineNo) {
         TemplateClass includeTc = new TemplateClass(new StringTemplateResource(inlineTemplate), engine, false);
         includeTc.buildSourceCode(includingClassName());
-        merge(includeTc.codeBuilder);
-        return includeTc.codeBuilder.buildBody;
+        merge(includeTc.getCodeBuilder());
+        return includeTc.getCodeBuilder().buildBody;
     }
 
     public void setExtended(Class<? extends TemplateBase> c) {
@@ -591,7 +591,7 @@ public class CodeBuilder extends TextBuilder {
             TemplateClass tc = tb.__getTemplateClass(false);
             this.extended = tc.name();
             this.extendedTemplateClass = tc;
-            this.templateClass.extendedTemplateClass = tc;
+            this.templateClass.setExtendedTemplateClass(tc);
             this.engine.addExtendRelationship(tc, this.templateClass);
             this.extendArgs = args;
             this.extendDeclareLineNo = lineNo;
@@ -634,7 +634,7 @@ public class CodeBuilder extends TextBuilder {
         }
         this.extended = tc.name();
         this.extendedTemplateClass = tc;
-        this.templateClass.extendedTemplateClass = tc;
+        this.templateClass.setExtendedTemplateClass(tc);
         this.engine.addExtendRelationship(tc, this.templateClass);
         this.extendArgs = args;
         this.extendDeclareLineNo = lineNo;

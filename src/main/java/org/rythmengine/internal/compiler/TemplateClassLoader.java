@@ -284,38 +284,39 @@ public class TemplateClassLoader extends ClassLoader {
         TemplateClass templateClass = engine.classes().getByClassName(name);
         if (templateClass != null) {
             if (templateClass.isDefinable()) {
-                return templateClass.javaClass;
+                return templateClass.getJavaClass();
             }
-            byte[] bc = templateClass.enhancedByteCode;//bCache.getBytecode(name, templateClass.javaSource);
+            byte[] bc = templateClass.getEnhancedByteCode();//bCache.getBytecode(name, templateClass.javaSource);
             if (!templateClass.isClass()) {
                 definePackage(templateClass.getPackage(), null, null, null, null, null, null, null);
             } else {
                 loadPackage(name);
             }
             if (bc != null) {
+                // FIXME : Move this over to TemplateClass
                 //templateClass.enhancedByteCode = bc;
-                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
-                resolveClass(templateClass.javaClass);
+                templateClass.setJavaClass((Class<ITemplate>) defineClass(templateClass.name(), templateClass.getEnhancedByteCode(), 0, templateClass.getEnhancedByteCode().length, protectionDomain));
+                resolveClass(templateClass.getJavaClass());
                 if (!templateClass.isClass()) {
-                    templateClass.javaPackage = templateClass.javaClass.getPackage();
+                    templateClass.setJavaPackage(templateClass.getJavaClass().getPackage());
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to load class %s from clsNameIdx", System.currentTimeMillis() - start, name);
                 }
-                return templateClass.javaClass;
+                return templateClass.getJavaClass();
             }
 
-            if (templateClass.javaByteCode != null || templateClass.compile() != null) {
+            if (templateClass.getJavaByteCode() != null || templateClass.compile() != null) {
                 templateClass.enhance();
-                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
-                resolveClass(templateClass.javaClass);
+                templateClass.setJavaClass((Class<ITemplate>) defineClass(templateClass.name(), templateClass.getEnhancedByteCode(), 0, templateClass.getEnhancedByteCode().length, protectionDomain));
+                resolveClass(templateClass.getJavaClass());
                 if (!templateClass.isClass()) {
-                    templateClass.javaPackage = templateClass.javaClass.getPackage();
+                    templateClass.setJavaPackage(templateClass.getJavaClass().getPackage());
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to load class %s", System.currentTimeMillis() - start, name);
                 }
-                return templateClass.javaClass;
+                return templateClass.getJavaClass();
             }
             engine.classes().remove(name);
         } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
@@ -332,7 +333,7 @@ public class TemplateClassLoader extends ClassLoader {
                 }
                 TemplateClass tc = TemplateClass.createInnerClass(name, null, parent);
                 engine.classCache().loadTemplateClass(tc);
-                byte[] bc = tc.enhancedByteCode;
+                byte[] bc = tc.getEnhancedByteCode();
                 if (null == bc) {
                     // inner class byte code cache missed some how, let's try to recover it
                     while ((null != parent) && parent.isInner()) {
@@ -346,15 +347,15 @@ public class TemplateClassLoader extends ClassLoader {
                     parent.compile();
                     // now try again and see if we can find the class definition
                     tc = engine.classes().getByClassName(name);
-                    Class<?> c = tc.javaClass;
+                    Class<?> c = tc.getJavaClass();
                     if (null != c) return c;
-                    bc = tc.enhancedByteCode;
+                    bc = tc.getEnhancedByteCode();
                     if (null == bc) {
                         throw new RuntimeException("Cannot find bytecode cache for inner class: " + name);
                     }
                 }
-                tc.javaClass = (Class<ITemplate>) defineClass(tc.name(), bc, 0, bc.length, protectionDomain);
-                return tc.javaClass;
+                tc.setJavaClass((Class<ITemplate>) defineClass(tc.name(), bc, 0, bc.length, protectionDomain));
+                return tc.getJavaClass();
             }
         }
         return null;
@@ -471,12 +472,12 @@ public class TemplateClassLoader extends ClassLoader {
                 engine.classes().remove(tc);
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             } else {
-                int sigChecksum = tc.sigChecksum;
+                int sigChecksum = tc.getSigChecksum();
                 tc.enhance();
-                if (sigChecksum != tc.sigChecksum) {
+                if (sigChecksum != tc.getSigChecksum()) {
                     dirtySig = true;
                 }
-                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
+                newDefinitions.add(new ClassDefinition(tc.getJavaClass(), tc.getEnhancedByteCode()));
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             }
         }
@@ -493,7 +494,7 @@ public class TemplateClassLoader extends ClassLoader {
         if (hash != this.pathHash) {
             // Remove class for deleted files !!
             for (TemplateClass tc : engine.classes().all()) {
-                if (!tc.templateResource.isValid()) {
+                if (!tc.getTemplateResource().isValid()) {
                     engine.classes().remove(tc);
                     currentState = new TemplateClassloaderState();//show others that we have changed..
                 }

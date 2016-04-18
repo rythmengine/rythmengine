@@ -41,7 +41,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         int pos = key.lastIndexOf(".");
         if (-1 != pos) key = key.substring(0, pos);
         key = key.replace('/', '.').replace('\\', '.');
-        key += tc.codeType.resourceNameSuffix();
+        key += tc.getCodeType().resourceNameSuffix();
         return key;
     }
 
@@ -79,7 +79,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         }
         if (ICodeType.DefImpl.RAW == codeType) {
             // use caller's code type
-            codeType = callerClass.codeType;
+            codeType = callerClass.getCodeType();
         }
         final String tagNameOrigin = tmplName;
         boolean hasSuffix = false;
@@ -135,8 +135,8 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         }
         
         // call tag with import path
-        if (null != callerClass.importPaths) {
-            for (String s: callerClass.importPaths) {
+        if (null != callerClass.getImportPaths()) {
+            for (String s: callerClass.getImportPaths()) {
                 if (s.startsWith("java")) {
                     continue;
                 }

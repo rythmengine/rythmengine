@@ -111,7 +111,7 @@ public abstract class TestBase extends Assert {
     protected void getSource() {
         TemplateBase tb = (TemplateBase) Rythm.engine().getTemplate(t);
         TemplateClass tc = tb.__getTemplateClass(false);
-        s = tc.javaSource;
+        s = tc.getJavaSource();
     }
     
     protected static void run(Class<? extends TestBase> cls) {
