@@ -36,6 +36,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -86,14 +87,14 @@ public class TemplateResourceManager {
 
     private RythmEngine engine;
 
-    private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
+    private Map<Object, ITemplateResource> cache = new ConcurrentHashMap<Object, ITemplateResource>();
 
     private List<ITemplateResourceLoader> loaders;
     
     private FileResourceLoader adhocFileLoader = null;
 
     // the <key, loader> map allows 
-    private Map<Object, ITemplateResourceLoader> whichLoader = new HashMap<Object, ITemplateResourceLoader>();
+    private Map<Object, ITemplateResourceLoader> whichLoader = new ConcurrentHashMap<Object, ITemplateResourceLoader>();
     
     private boolean typeInference;
 
@@ -210,7 +211,7 @@ public class TemplateResourceManager {
         TemplateClass tc = null;
         RythmEngine engine = this.engine;
         if (null != callerClass) {
-            ITemplateResourceLoader loader = whichLoader(callerClass.templateResource);
+            ITemplateResourceLoader loader = whichLoader(callerClass.getTemplateResource());
             if (null != loader) {
                 return loader.tryLoadTemplate(tmplName, engine, callerClass, codeType);
             }

@@ -1490,8 +1490,8 @@ public class RythmEngine implements IEventDispatcher {
         if (mode().isProd() && _nonTmpls.contains(name)) return null;
         if (templateRegistered(name)) return name;
         // try imported path
-        if (null != callerClass.importPaths) {
-            for (String s : callerClass.importPaths) {
+        if (null != callerClass.getImportPaths()) {
+            for (String s : callerClass.getImportPaths()) {
                 if (s.startsWith("java")) {
                     continue;
                 }
@@ -1624,8 +1624,8 @@ public class RythmEngine implements IEventDispatcher {
             if (null == t) {
                 // try imported path
                 TemplateClass tc = caller.__getTemplateClass(true);
-                if (null != tc.importPaths) {
-                    for (String s : tc.importPaths) {
+                if (null != tc.getImportPaths()) {
+                    for (String s : tc.getImportPaths()) {
                         if (s.startsWith("java")) {
                             continue;
                         }
