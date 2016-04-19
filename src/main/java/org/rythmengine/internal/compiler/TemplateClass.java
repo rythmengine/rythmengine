@@ -785,6 +785,7 @@ public class TemplateClass {
     public byte[] compile() {
         Lock lock = mutationLock.writeLock();
         lock.lock();
+        final long start = System.currentTimeMillis();
         try {
             if (null != javaByteCode) {
                 return javaByteCode;
@@ -792,40 +793,34 @@ public class TemplateClass {
             if (null == javaSource) {
                 throw new IllegalStateException("Cannot find java source when compiling " + getKey());
             }
-            long start = System.currentTimeMillis();
-            try {
-                engine().classes().compiler.compile(new String[]{name()});
-                if (logger.isTraceEnabled()) {
-                    logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey());
-                }
-            } catch (CompileException.CompilerException e) {
-                String cn = e.className;
-                TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes().getByClassName(cn);
-                if (null == tc) tc = this;
-                CompileException ce = new CompileException(engine(), tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
-                javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
-                throw ce;
-            } catch (NullPointerException e) {
-                String clazzName = name();
-                TemplateClass tc = engine().classes().getByClassName(clazzName);
-                if (this != tc) {
-                    logger.error("tc is not this");
-                }
-                if (!this.equals(tc)) {
-                    logger.error("tc not match this");
-                }
-                logger.error("NPE encountered when compiling template class:" + name());
-                throw e;
-            } finally {
+            engine().classes().compiler.compile(new String[]{name()});
+            if (logger.isTraceEnabled()) {
+                logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey());
             }
-
+        } catch (CompileException.CompilerException e) {
+            String cn = e.className;
+            TemplateClass tc = S.isEqual(cn, name()) ? this : engine().classes().getByClassName(cn);
+            if (null == tc) tc = this;
+            CompileException ce = new CompileException(engine(), tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
+            javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
+            throw ce;
+        } catch (NullPointerException e) {
+            String clazzName = name();
+            TemplateClass tc = engine().classes().getByClassName(clazzName);
+            if (this != tc) {
+                logger.error("tc is not this");
+            }
+            if (!this.equals(tc)) {
+                logger.error("tc not match this");
+            }
+            logger.error("NPE encountered when compiling template class:" + name());
+            throw e;
+        } finally {
+            lock.unlock();
             if (logger.isTraceEnabled()) {
                 logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey());
             }
-
             return javaByteCode;
-        } finally {
-            lock.unlock();
         }
     }
 
