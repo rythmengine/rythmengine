@@ -84,7 +84,7 @@ public class TemplateClassLoader extends ClassLoader {
 
         private final Map<File, FileWithClassDefs> classDefsInFileCache = new HashMap<File, FileWithClassDefs>();
 
-        public synchronized int computePathHash(File... paths) {
+        public int computePathHash(File... paths) {
             StringBuilder buf = new StringBuilder();
             for (File file : paths) {
                 scan(buf, file);
@@ -221,7 +221,7 @@ public class TemplateClassLoader extends ClassLoader {
     }
 
     @Override
-    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (name.contains("UrlResolver")) {
             logger.info("loading UrlResovler...");
         }
