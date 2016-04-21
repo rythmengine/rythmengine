@@ -1845,7 +1845,7 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @return an new sandbox instance
      */
-    public synchronized Sandbox sandbox() {
+    public Sandbox sandbox() {
         if (null != _secureExecutor) {
             return new Sandbox(this, _secureExecutor);
         }
