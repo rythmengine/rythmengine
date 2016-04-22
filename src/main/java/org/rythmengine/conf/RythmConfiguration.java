@@ -461,6 +461,9 @@ public class RythmConfiguration {
                 _templateHome = Arrays.asList(new URI[]{(URI)o});
             } else if (o instanceof List) {
                 _templateHome = (List<URI>)o;
+            } else if (o instanceof File) {
+                File root = (File) o;
+                _templateHome = Arrays.asList(new URI[]{root.toURI()});
             }
         }
         return _templateHome;

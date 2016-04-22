@@ -35,6 +35,7 @@ public class Gh170Helper {
         config.put(ENGINE_MODE.getKey(), Rythm.Mode.dev);
         config.put(HOME_TEMPLATE.getKey(), tmplHome);
         config.put(CACHE_ENABLED.getKey(), true);
+        config.put(HOME_TMP.getKey(), tmplHome);
         return new RythmEngine(config);
     }
 

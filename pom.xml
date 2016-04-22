@@ -45,6 +45,10 @@ RELEASE HISTORY
 1.1.4-SNAPSHOT
 * Add toJSON() to S class (and as built-in extension)
 * Fix FindBug reported issues
+
+1.1.5-SNAPSHOT
+* Implement ReadWrite lock in TemplateClass - Remove public variables from TemplateClass
+* #316 Allow passing key into StringTemplateResource
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -53,7 +57,7 @@ RELEASE HISTORY
     <groupId>org.rythmengine</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.4-SNAPSHOT</version>
+    <version>1.1.5-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>

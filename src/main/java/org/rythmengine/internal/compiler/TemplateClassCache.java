@@ -131,14 +131,16 @@ public class TemplateClassCache {
                 s = sa[1];
                 sa = s.split("__IMPORT_PATH_LIST__");
                 tc.setIncludeTemplateClassNames(sa[0]);
-                s = sa[1];
-                sa = s.split(";");
-                Set<String> importPaths = new HashSet<String>();
-                for (String path : sa) {
-                    if ("java.lang".equals(path)) continue;
-                    importPaths.add(path);
+                if (sa.length > 1) {
+                    s = sa[1];
+                    sa = s.split(";");
+                    Set<String> importPaths = new HashSet<String>();
+                    for (String path : sa) {
+                        if ("java.lang".equals(path)) continue;
+                        importPaths.add(path);
+                    }
+                    tc.replaceImportPath(importPaths);
                 }
-                tc.replaceImportPath(importPaths);
             } // else it must be an inner class
 
             // --- load byte code

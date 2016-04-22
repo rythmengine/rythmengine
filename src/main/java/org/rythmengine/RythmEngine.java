@@ -1125,12 +1125,13 @@ public class RythmEngine implements IEventDispatcher {
      * @param args     the render args array
      * @return render result
      */
-    public String renderStr(String template, Object... args) {
-        return renderString(template, args);
+    public String renderStr(String key, String template, Object... args) {
+        return renderString(key, template, args);
     }
 
     /**
-     * Alias of {@link #renderString(String, Object...)}
+     * Render template by string typed inline template content and an array of
+     * template args. The render result is returned as a String
      * <p/>
      * <p>See {@link #getTemplate(java.io.File, Object...)} for note on
      * render args</p>
@@ -1139,21 +1140,48 @@ public class RythmEngine implements IEventDispatcher {
      * @param args     the render args array
      * @return render result
      */
-    @SuppressWarnings("unchecked")
+    public String renderStr(String template, Object... args) {
+        return renderString(template, args);
+    }
+
+    /**
+     * Render result from a direct template content. The content
+     * will also be used as the template key to generate the recommended
+     * class name
+     * @param template the template content
+     * @param args the render args
+     * @return render result
+     */
     public String renderString(String template, Object... args) {
+        return renderString(template, template, args);
+    }
+
+    /**
+     * Render result from a direct template content. The template key
+     * has been provided as well
+     *
+     * <p>See {@link #getTemplate(java.io.File, Object...)} for note on
+     * render args</p>
+     *
+     * @param key the template key which will be used to generate
+     * @param template the inline template content
+     * @param args     the render args array
+     * @return render result
+     */
+    @SuppressWarnings("unchecked")
+    public String renderString(String key, String template, Object... args) {
         boolean typeInferenceEnabled = conf().typeInferenceEnabled();
         if (typeInferenceEnabled) {
             ParamTypeInferencer.registerParams(this, args);
         }
 
-        String key = template;
         if (typeInferenceEnabled) {
             key += ParamTypeInferencer.uuid();
         }
         try {
             TemplateClass tc = classes().getByTemplate(key, false);
             if (null == tc) {
-                tc = new TemplateClass(new StringTemplateResource(template), this);
+                tc = new TemplateClass(new StringTemplateResource(key, template), this);
                 //classes().add(key, tc);
             }
             ITemplate t = tc.asTemplate(this);

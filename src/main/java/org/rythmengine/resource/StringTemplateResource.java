@@ -22,25 +22,24 @@ package org.rythmengine.resource;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
-/**
- * Created by IntelliJ IDEA.
- * User: luog
- * Date: 20/01/12
- * Time: 10:55 PM
- * To change this template use File | Settings | File Templates.
- */
 public class StringTemplateResource extends TemplateResourceBase implements ITemplateResource {
 
     private static final long serialVersionUID = -4843989553317549158L;
     private String content;
+    private String key;
 
     public StringTemplateResource(String templateContent) {
-        content = templateContent;
+        this(templateContent, templateContent);
+    }
+
+    public StringTemplateResource(String key, String templateContent) {
+        this.key = key;
+        this.content = templateContent;
     }
 
     @Override
     public String getKey() {
-        return content;
+        return key;
     }
 
     @Override
@@ -76,7 +75,7 @@ public class StringTemplateResource extends TemplateResourceBase implements ITem
     @Override
     public String getSuggestedClassName() {
         try {
-            return "C" + UUID.nameUUIDFromBytes(content.getBytes("utf-8")).toString().replace('-', '_');
+            return "C" + UUID.nameUUIDFromBytes(getKey().getBytes("utf-8")).toString().replace('-', '_');
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
