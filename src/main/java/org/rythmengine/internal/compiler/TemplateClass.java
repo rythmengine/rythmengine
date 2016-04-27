@@ -1074,6 +1074,9 @@ public class TemplateClass {
         Lock lock = mutationLock.readLock();
         lock.lock();
         try {
+            if (null == importPaths) {
+                return Collections.emptySet();
+            }
             return Collections.unmodifiableSet(importPaths);
         } finally {
             lock.unlock();
