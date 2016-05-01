@@ -986,7 +986,7 @@ public class CodeBuilder extends TextBuilder {
         
         // -- output __renderArgName method
         pn();
-        boolean first = true; 
+        boolean first; 
         ptn("protected java.lang.String __renderArgName(int __pos) {");
         p2tn("int __p = 0;");
         if (true) {
@@ -1308,7 +1308,7 @@ public class CodeBuilder extends TextBuilder {
 
     private void pConst(Token.StringToken st) {
         String constId = st.constId;
-        String s = st.s(), s0 = s;
+        String s = st.s(), s0;
         if (st.compactMode()) {
             s0 = s.replaceAll("(\\r?\\n)+", "\\\\n").replaceAll("\"", "\\\\\"");
         } else {

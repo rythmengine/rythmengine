@@ -55,7 +55,7 @@ public class NullableExpressionParser extends CaretParserFactoryBase {
 
                 String s = remain();
                 String exp;
-                int step = 0;
+                int step;
                 if (r1.search(s)) {
                     exp = r1.stringMatched(2);
                     step = r1.stringMatched(1).length();

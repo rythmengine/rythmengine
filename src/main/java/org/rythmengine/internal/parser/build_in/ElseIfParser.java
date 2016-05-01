@@ -57,7 +57,7 @@ public class ElseIfParser extends CaretParserFactoryBase {
                 int line = ctx.currentLine();
                 String s1;
                 boolean expression = false;
-                boolean needsToProcessFollowingOpenBrace = false;
+                boolean needsToProcessFollowingOpenBrace;
                 final String matched;
                 if (r1.search(s)) {
                     s1 = r1.stringMatched(1);
