@@ -46,9 +46,21 @@ RELEASE HISTORY
 * Add toJSON() to S class (and as built-in extension)
 * Fix FindBug reported issues
 
-1.1.5-SNAPSHOT
+1.1.5
 * Implement ReadWrite lock in TemplateClass - Remove public variables from TemplateClass
 * #316 Allow passing key into StringTemplateResource
+
+1.1.6-SNAPSHOT
+* Update dependency versions:
+** ecj to 4.5.1
+** commons-lang3 to 3.4
+** fastjson to 1.2.11
+** mvel2 to 2.2.8.Final
+** joda-time to 2.9.3 (provided)
+** gson to 2.6.2 (provided)
+** appengine-api-1.0-sdk to 1.9.37 (provided)
+** ehcache to 2.10.2 (provided)
+** spymemcached to 2.12.1 (provided)
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -57,7 +69,7 @@ RELEASE HISTORY
     <groupId>org.rythmengine</groupId>
     <artifactId>rythm-engine</artifactId>
     <packaging>jar</packaging>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.1.6-SNAPSHOT</version>
 
     <name>Rythm Template Engine</name>
     <description>A strong typed high performance Java Template engine with .Net Razor like syntax</description>
@@ -169,7 +181,7 @@ RELEASE HISTORY
         <dependency>
             <groupId>org.eclipse.jdt.core.compiler</groupId>
             <artifactId>ecj</artifactId>
-            <version>4.4.2</version>
+            <version>4.5.1</version>
         </dependency>
 
         <dependency>
@@ -181,25 +193,25 @@ RELEASE HISTORY
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
+            <version>3.4</version>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.1.39</version>
+            <version>1.2.11</version>
         </dependency>
 
         <dependency>
             <groupId>org.mvel</groupId>
             <artifactId>mvel2</artifactId>
-            <version>2.1.5.Final</version>
+            <version>2.2.8.Final</version>
         </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.3</version>
+            <version>2.9.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -214,14 +226,14 @@ RELEASE HISTORY
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.2</version>
+            <version>2.6.2</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
-            <version>1.8.1</version>
+            <version>1.9.37</version>
             <scope>provided</scope>
         </dependency>
 
@@ -249,14 +261,14 @@ RELEASE HISTORY
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>2.7.0</version>
+            <version>2.10.2</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>net.spy</groupId>
             <artifactId>spymemcached</artifactId>
-            <version>2.10.3</version>
+            <version>2.12.1</version>
             <scope>provided</scope>
         </dependency>
 
