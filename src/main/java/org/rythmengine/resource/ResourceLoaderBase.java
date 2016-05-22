@@ -63,17 +63,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
             return null;
         }
         String rythmSuffix = engine.conf().resourceNameSuffix();
-        final List<String> suffixes = new ArrayList(Arrays.asList(new String[]{
-                ".html",
-                ".json",
-                ".js",
-                ".css",
-                ".csv",
-                ".tag",
-                ".xml",
-                ".txt",
-                ".rythm"
-        }));
+        final List<String> suffixes = new ArrayList(Arrays.asList(RythmEngine.VALID_SUFFIXES));
         if (null == codeType) {
             codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
         }

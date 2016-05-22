@@ -1,9 +1,15 @@
+/* 
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.issue;
 
 import models.Foo;
 import models.GH185Model;
 import models.GH227Model;
 import models.SandboxModel;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rythmengine.Rythm;
@@ -21,17 +27,19 @@ import org.rythmengine.utils.S;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.rythmengine.conf.RythmConfigurationKey.*;
-import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
 
 /**
  * Test Github Issues
  */
 public class GhIssueTest extends TestBase {
-
+    boolean debug=false;
+    
     @Test
     public void test70() {
         String s = Rythm.getTemplate("Good @when, @title @name")
@@ -264,6 +272,10 @@ public class GhIssueTest extends TestBase {
     }
 
     @Test
+    /**
+     * https://github.com/rythmengine/rythmengine/issues/282
+     * @throws Exception
+     */
     public void test170() throws Exception {
         String cmdLine = new StringBuilder("java -classpath ")
                 .append(System.getProperty("java.class.path"))
@@ -360,7 +372,8 @@ public class GhIssueTest extends TestBase {
         // the test pass in case no exception thrown out
         t = "gh211/foo.txt";
         s = r(t);
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
     }
 
     @Test
@@ -401,16 +414,33 @@ public class GhIssueTest extends TestBase {
 
     @Test
     public void test227() {
-        t = "@args models.GH227Model h\n@h.getSales().format(\"###,000,000.00\")";
-        s = r(t, new GH227Model());
-        eq("000,010.30");
+        String format="###,000,000.00";
+        GH227Model model = new GH227Model();
+        float h = model.getSales();
+        NumberFormat nf=new DecimalFormat(format);
+        String expected=nf.format(h);
+        t = "@args models.GH227Model h\n@h.getSales().format(\""+format+"\")";
+        s = r(t, model);
+        // debug=true;
+        if (debug)
+          System.out.println(expected);
+        // US locale: "000,010.30"
+        eq(expected);
     }
 
     @Test
     public void test227a() {
-        t = "@s().format(10.3, \"###,000,000.00\")";
+        String format="###,000,000.00";
+        double number=27.35;
+        t = "@s().format("+number+", \""+format+"\")";
         s = r(t);
-        eq("000,010.30");
+        NumberFormat nf=new DecimalFormat(format);
+        String expected=nf.format(number);
+        // debug=true;
+        if (debug)
+          System.out.println(expected);
+        // US locale: "000.027,35"
+        eq(expected);
     }
 
     @Test

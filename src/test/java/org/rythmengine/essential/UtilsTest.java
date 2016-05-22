@@ -1,28 +1,15 @@
 /* 
- * Copyright (C) 2013 The Rythm Engine project
- * Gelin Luo <greenlaw110(at)gmail.com>
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.essential;
 
 import org.rythmengine.TestBase;
 import org.rythmengine.utils.S;
 import org.junit.Test;
 
+import java.text.NumberFormat;
 import java.util.*;
 
 import static org.rythmengine.utils.Eval.eval;
@@ -31,6 +18,7 @@ import static org.rythmengine.utils.Eval.eval;
  * Test utilities
  */
 public class UtilsTest extends TestBase {
+    boolean debug=false;
     @Test
     public void testTS() {
         long now = System.currentTimeMillis();
@@ -38,7 +26,8 @@ public class UtilsTest extends TestBase {
         s = r(t);
         long l = Long.valueOf(s);
         assertTrue(l > now);
-        System.out.println(l - now);
+        if (debug)
+          System.out.println(l - now);
         assertTrue((l - now) < 4000);
     }
     
@@ -54,6 +43,7 @@ public class UtilsTest extends TestBase {
         return o;
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testEval() {
         String s = "";
@@ -129,14 +119,14 @@ public class UtilsTest extends TestBase {
     }
     
     @Test
-    public void logTime() {
+    public void testLogTime() {
         t = "@__log_time__";
         s = r(t);
         // TODO how to test this?
     }
     
     @Test
-    public void capitalizeWords() {
+    public void testCapitalizeWords() {
         s = S.capitalizeWords("[abc 123 xyz]");
         eq("[Abc 123 Xyz]");
         
@@ -145,9 +135,15 @@ public class UtilsTest extends TestBase {
     }
 
     @Test
-    public void formatCurrency() {
+    public void testFormatCurrency() {
         int n = 1000;
-        eqs("$1,000.00", S.formatCurrency(n));
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
+        String expected=currencyFormatter.format(n);
+        // "$1,000.00" is the expected result for the US locale
+        // debug=true;
+        if (debug)
+          System.out.println(expected);
+        eqs(expected, S.formatCurrency(n));
         eqs("$1,000.00", S.formatCurrency(null, n, "AUD", new Locale("en")));
     }
 }

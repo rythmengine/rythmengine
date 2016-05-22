@@ -1972,6 +1972,21 @@ public class RythmEngine implements IEventDispatcher {
     };
 
     /**
+     * Valid Suffixes
+     */
+    public static final String[] VALID_SUFFIXES = {
+                ".html",
+                ".json",
+                ".js",
+                ".css",
+                ".csv",
+                ".tag",
+                ".xml",
+                ".txt",
+                ".rythm"
+    };
+
+    /**
      * Not an API.
      *
      * @return output mode

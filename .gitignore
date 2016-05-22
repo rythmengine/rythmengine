@@ -9,3 +9,4 @@ target
 lib
 out
 .idea
+.DS_Store
