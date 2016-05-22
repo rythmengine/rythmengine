@@ -101,6 +101,7 @@ public class Rythm {
         service.setShutdown(new Runnable() {
             @Override
             public void run() {
+              if (engine!=null)
                 engine.shutdown();
             }
         });

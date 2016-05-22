@@ -1,22 +1,8 @@
 /* 
- * Copyright (C) 2013 The Rythm Engine project
- * Gelin Luo <greenlaw110(at)gmail.com>
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.advanced;
 
 import org.joda.time.DateTime;
@@ -33,7 +19,8 @@ import java.util.*;
 
 @Transformer
 public class TransformerTest extends TestBase {
-
+    boolean debug=false;
+    
     public static Integer dbl(Integer i) {
         return i * 2;
     }
@@ -65,7 +52,8 @@ public class TransformerTest extends TestBase {
 
         String[] sa = "json,xml,javascript,html,csv,raw".split(",");
         for (String escape : sa) {
-            System.err.println(escape);
+            if (debug)
+              System.err.println(escape);
             s = Rythm.render(String.format("@1.escape(\"%s\")", escape), p);
             assertEquals(S.escape(p, escape).toString(), s);
         }
@@ -96,12 +84,14 @@ public class TransformerTest extends TestBase {
         Number n = 113432.33;
         s = r("@1.format()", n);
         eq(S.format(n));
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
         n = .03;
         String np = "#,###,###,000.00";
         s = r("@1.format(@2)", n, np);
         eq(S.format(n, np));
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
         
         // format currency
         s = Rythm.render("@1.formatCurrency()", 100000/100);
@@ -132,12 +122,14 @@ public class TransformerTest extends TestBase {
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy hh:mm");
         eq(fmt.print(dt));
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
 
         // toJSON
         // TBD s = Rythm.render("@1.toJSON()", )
     }
     
+    @SuppressWarnings("rawtypes")
     @Test
     public void testJoin() {
         System.setProperty("feature.type_inference.enabled", "true");
@@ -191,6 +183,10 @@ public class TransformerTest extends TestBase {
         assertContains(s, "double of [99] is [" + S.format(dbl(99), "0000.00") + "]");
     }
 
+    /**
+     * main routine
+     * @param args
+     */
     public static void main(String[] args) {
         run(TransformerTest.class);
     }
