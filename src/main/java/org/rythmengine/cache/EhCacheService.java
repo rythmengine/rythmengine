@@ -21,9 +21,6 @@ package org.rythmengine.cache;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.PersistenceConfiguration;
 import org.rythmengine.extension.ICacheService;
 
 import java.io.Serializable;

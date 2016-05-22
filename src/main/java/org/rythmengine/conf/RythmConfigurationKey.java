@@ -374,7 +374,13 @@ public enum RythmConfigurationKey {
             } else {
                 String s = o.toString();
                 for (String el: s.split("[,;]")) {
-                    fl.add(asUri(el.trim(), key));
+                    URI uri = asUri(el.trim(), key);
+                    if (null != uri) {
+                        fl.add(uri);
+                    }
+                }
+                if (fl.isEmpty()) {
+                    throw new ConfigurationException("Template home not found: %s", s);
                 }
             }
             return (T) fl;
