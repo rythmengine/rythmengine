@@ -25,7 +25,7 @@ public class GithubIssue321Test extends TestBase {
 
   @Test
   public void testHomeTemplate() throws Exception {
-    // debug=true;
+    debug = true;
     // http://rythmengine.org/doc/template_guide.md#invoke_template
     // first create some arbitrary temporary file
     File tmpFile = File.createTempFile("Home", "Template");
@@ -36,30 +36,39 @@ public class GithubIssue321Test extends TestBase {
       templateDir.mkdir();
     if (debug)
       System.out.println(templateDir.getAbsolutePath());
-    File template = new File(templateDir, "test.html");
-    String test = "@include(\"common.html\")\n" + "@show(\"test\")";
-    FileUtils.writeStringToFile(template, test);
-    if (debug)
-      System.out.println(template.getAbsolutePath());
-    String common = "@def show(String param) {\n" + "common @param\n" + "}";
-    File commonTemplate = new File(templateDir, "common.html");
-    FileUtils.writeStringToFile(commonTemplate, common);
-    if (debug)
-      System.out.println(commonTemplate.getAbsolutePath());
-    Map<String, Object> conf = new HashMap<String, Object>();
-    String keys[] = { "home.template",
-        RythmConfigurationKey.HOME_TEMPLATE.getKey() };
-    // "home.template.dir" works
-    for (String key : keys) {
-      conf.put(key, templateDir.getAbsolutePath());
+    // try extensions e.g. macro - this will make this test fail
+    String extensions[] = { "html", "js", "txt" };
+    for (String extension : extensions) {
+      File template = new File(templateDir, "test." + extension);
+      String test = "@include(\"common." + extension + "\")\n"
+          + "@show(\"test <>\")";
+      FileUtils.writeStringToFile(template, test);
       if (debug)
-        System.out.println(RythmConfigurationKey.HOME_TEMPLATE.getKey());
-      RythmEngine engine = new RythmEngine(conf);
-      Map<String, Object> rootMap = new HashMap<String, Object>();
-      String result = engine.render(template, rootMap);
+        System.out.println(template.getAbsolutePath());
+      String common = "@def show(String param) {\n" + "common @param\n" + "}";
+      File commonTemplate = new File(templateDir, "common." + extension);
+      FileUtils.writeStringToFile(commonTemplate, common);
       if (debug)
-        System.out.println(result);
-      assertTrue(result.contains("common test"));
+        System.out.println(commonTemplate.getAbsolutePath());
+      Map<String, Object> conf = new HashMap<String, Object>();
+      String keys[] = { RythmConfigurationKey.HOME_TEMPLATE.getKey(),
+          "home.template" };
+      // "home.template.dir" works
+      for (String key : keys) {
+        conf.put(key, templateDir.getAbsolutePath());
+        conf.put(RythmConfigurationKey.FEATURE_SMART_ESCAPE_ENABLED.getKey(), false);
+        conf.put(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED.getKey(), false);
+        conf.put(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED.getKey(), false);
+        conf.put(RythmConfigurationKey.FEATURE_TRANSFORM_ENABLED.getKey(),false);
+        if (debug)
+          System.out.println(RythmConfigurationKey.HOME_TEMPLATE.getKey());
+        RythmEngine engine = new RythmEngine(conf);
+        Map<String, Object> rootMap = new HashMap<String, Object>();
+        String result = engine.render(template, rootMap);
+        if (debug)
+          System.out.println(result);
+        assertTrue(result.contains("common test <>"));
+      }
     }
   }
 
