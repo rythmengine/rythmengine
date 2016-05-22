@@ -37,7 +37,7 @@ public class GithubIssue321Test extends TestBase {
     if (debug)
       System.out.println(templateDir.getAbsolutePath());
     // try extensions e.g. macro - this will make this test fail
-    String extensions[] = { "html", "js", "txt" };
+    String extensions[] = { "html", "xml", "js","csv", "txt" };
     for (String extension : extensions) {
       File template = new File(templateDir, "test." + extension);
       String test = "@include(\"common." + extension + "\")\n"
@@ -50,18 +50,20 @@ public class GithubIssue321Test extends TestBase {
       FileUtils.writeStringToFile(commonTemplate, common);
       if (debug)
         System.out.println(commonTemplate.getAbsolutePath());
-      Map<String, Object> conf = new HashMap<String, Object>();
       String keys[] = { RythmConfigurationKey.HOME_TEMPLATE.getKey(),
-          "home.template" };
+          // Aliases (which don't work ...)
+          "home.template", "rythm.home.template.dir","rythm.home.template"
+          };
       // "home.template.dir" works
       for (String key : keys) {
-        conf.put(key, templateDir.getAbsolutePath());
+        Map<String, Object> conf = new HashMap<String, Object>();
+              conf.put(key, templateDir.getAbsolutePath());
         conf.put(RythmConfigurationKey.FEATURE_SMART_ESCAPE_ENABLED.getKey(), false);
         conf.put(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED.getKey(), false);
         conf.put(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED.getKey(), false);
         conf.put(RythmConfigurationKey.FEATURE_TRANSFORM_ENABLED.getKey(),false);
         if (debug)
-          System.out.println(RythmConfigurationKey.HOME_TEMPLATE.getKey());
+          System.out.println("Trying home key: "+key);
         RythmEngine engine = new RythmEngine(conf);
         Map<String, Object> rootMap = new HashMap<String, Object>();
         String result = engine.render(template, rootMap);
