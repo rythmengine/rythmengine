@@ -27,6 +27,7 @@ import static org.rythmengine.conf.RythmConfigurationKey.*;
  * The Test base class
  */
 public abstract class TestBase extends Assert {
+    protected boolean debug=false;
     protected static ILogger logger = Logger.get(TestBase.class);
     
     protected String t;
