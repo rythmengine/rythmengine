@@ -1,5 +1,5 @@
 Rythm Engine
-Copyright 2011-2021 Gelin Luo (greenlaw110(at)gmail.com)
+Copyright 2011-2016 Gelin Luo (greenlaw110(at)gmail.com)
 
 This product includes software developed by
 Gelin Luo (http://www.linkedin.com/in/greenlaw110)
