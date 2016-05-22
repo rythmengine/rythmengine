@@ -368,7 +368,8 @@ public class GhIssueTest extends TestBase {
         // the test pass in case no exception thrown out
         t = "gh211/foo.txt";
         s = r(t);
-        System.out.println(s);
+        if (debug)
+          System.out.println(s);
     }
 
     @Test
