@@ -37,8 +37,12 @@ public class GithubIssue321Test extends TestBase {
     if (debug)
       System.out.println(templateDir.getAbsolutePath());
     // try extensions e.g. macro - this will make this test fail
-    String extensions[] = { "html", "xml", "js","csv", "txt" };
+    String extensions[] = { 
+        "html","xml", "js","csv", "txt", "macro"};
     for (String extension : extensions) {
+      if (debug) {
+        System.out.println("Trying extension: "+extension);
+      }
       File template = new File(templateDir, "test." + extension);
       String test = "@include(\"common." + extension + "\")\n"
           + "@show(\"test <>\")";
@@ -62,8 +66,9 @@ public class GithubIssue321Test extends TestBase {
         conf.put(RythmConfigurationKey.BUILT_IN_CODE_TYPE_ENABLED.getKey(), false);
         conf.put(RythmConfigurationKey.BUILT_IN_TRANSFORMER_ENABLED.getKey(), false);
         conf.put(RythmConfigurationKey.FEATURE_TRANSFORM_ENABLED.getKey(),false);
-        if (debug)
+        if (debug) {
           System.out.println("Trying home key: "+key);
+        }
         RythmEngine engine = new RythmEngine(conf);
         Map<String, Object> rootMap = new HashMap<String, Object>();
         String result = engine.render(template, rootMap);
