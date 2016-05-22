@@ -18,3 +18,4 @@ Integrations
 * [spring-rythm](https://github.com/greenlaw110/spring-rythm) for Spring 3.x, and the [samples](https://github.com/greenlaw110/spring-rythm-samples) for learning how to use spring-rythm
 * [jfinal-rythm](https://github.com/greenlaw110/jfinal-rythm) for [JFinal](http://www.jfinal.com/) and the [sample](https://github.com/greenlaw110/jfinal-bbs) to learn how to use jfinal-rythm
 * [ninja-rythm](https://github.com/ninjaframework/ninja-rythm) for [NinjaFramework](http://www.ninjaframework.org/)
+* [Profiwki](http://profiwiki.de) 
