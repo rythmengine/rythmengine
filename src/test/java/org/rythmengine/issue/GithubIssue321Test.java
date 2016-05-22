@@ -37,20 +37,19 @@ public class GithubIssue321Test extends TestBase {
     if (debug)
       System.out.println(templateDir.getAbsolutePath());
     // try extensions e.g. macro - this will make this test fail
-    String extensions[] = { 
-        "html","xml", "js","csv", "txt", "macro"};
+    String extensions[] =RythmEngine.VALID_SUFFIXES;
     for (String extension : extensions) {
       if (debug) {
         System.out.println("Trying extension: "+extension);
       }
-      File template = new File(templateDir, "test." + extension);
-      String test = "@include(\"common." + extension + "\")\n"
+      File template = new File(templateDir, "test" + extension);
+      String test = "@include(\"common" + extension + "\")\n"
           + "@show(\"test <>\")";
       FileUtils.writeStringToFile(template, test);
       if (debug)
         System.out.println(template.getAbsolutePath());
       String common = "@def show(String param) {\n" + "common @param\n" + "}";
-      File commonTemplate = new File(templateDir, "common." + extension);
+      File commonTemplate = new File(templateDir, "common" + extension);
       FileUtils.writeStringToFile(commonTemplate, common);
       if (debug)
         System.out.println(commonTemplate.getAbsolutePath());

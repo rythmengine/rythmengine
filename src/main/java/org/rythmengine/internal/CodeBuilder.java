@@ -547,6 +547,13 @@ public class CodeBuilder extends TextBuilder {
         return sb.toString();
     }
 
+    /**
+     * add include 
+     * @param include
+     * @param lineNo
+     * @param codeType
+     * @return the string
+     */
     public String addInclude(String include, int lineNo, ICodeType codeType) {
         String tmplName = engine.testTemplate(include, templateClass, codeType);
         if (null == tmplName) {
