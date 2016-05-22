@@ -272,6 +272,10 @@ public class GhIssueTest extends TestBase {
     }
 
     @Test
+    /**
+     * https://github.com/rythmengine/rythmengine/issues/282
+     * @throws Exception
+     */
     public void test170() throws Exception {
         String cmdLine = new StringBuilder("java -classpath ")
                 .append(System.getProperty("java.class.path"))
