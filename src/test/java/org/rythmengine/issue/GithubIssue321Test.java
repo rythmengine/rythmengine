@@ -6,7 +6,6 @@
 package org.rythmengine.issue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,8 @@ public class GithubIssue321Test extends TestBase {
     RythmEngine engine = new RythmEngine(conf);
     Map<String,Object> rootMap = new HashMap<String,Object>();
     String result = engine.render(template, rootMap);
-    System.out.println(result);
+    if (debug)
+      System.out.println(result);
   }
 
 }
