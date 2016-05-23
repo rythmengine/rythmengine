@@ -9,7 +9,6 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 
 **We are looking for people to join us on this project. Please contact Green Luo via greenlaw110@gmail.com**
 
-
 ## Links ##
 
 * The [documentation](http://rythmengine.org/doc/index)
@@ -22,6 +21,9 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 * [jfinal-rythm](https://github.com/greenlaw110/jfinal-rythm) for [JFinal](http://www.jfinal.com/) and the [sample](https://github.com/greenlaw110/jfinal-bbs) to learn how to use jfinal-rythm
 * [ninja-rythm](https://github.com/ninjaframework/ninja-rythm) for [NinjaFramework](http://www.ninjaframework.org/)
 * [Profiwiki](http://www.profiwiki.de) - allows Rythm templates to be integrated in MediaWiki pages 
+
+## Prerequisites ##
+Java >= 7
 
 ## Distribution ##
 Available at Maven Central see 
@@ -49,5 +51,26 @@ mvn install -DskipTests=true
 ### Testing
 ```
 mvn test
+...
+Tests run: 248, Failures: 1, Errors: 0, Skipped: 3
 ```
+
+## Development ##
+There are several options for development environments you can use to contribute to the development of
+the Rythm Engine Project:
+* Pure Maven command line https://maven.apache.org/
+* Eclipse https://eclipse.org/
+* IntelliJ IDEA https://www.jetbrains.com/idea/
+
+## Version history
+|  Version     | Date    | Comment
+| ------------ | ------- | -------------------------
+| 1.6-SNAPSHOT | 2016-05 | current development state
+| 1.5          | 2016-05 | latest stable release
+| 1.0.1        | 2014-08 |
+| 1.0          | 2014-02 |
+| 1.0-b10      | 2013-12 |
+| 1.0-b9       | 2013-05 |
+| 1.0-b8       | 2013-05 |
+
 
