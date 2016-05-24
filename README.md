@@ -23,7 +23,7 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 * [Profiwiki](http://www.profiwiki.de) - allows Rythm templates to be integrated in MediaWiki pages 
 
 ## Prerequisites ##
-Java >= 7
+Java JDK >= Version 7
 
 ## Distribution ##
 Available at Maven Central see 
@@ -45,6 +45,11 @@ Maven dependency:
 ```
 git clone https://github.com/rythmengine/rythmengine
 cd rythmengine
+mvn install
+```
+
+if some of the tests should fail you might want to file an issue and try
+```
 mvn install -DskipTests=true
 ```
 
@@ -52,7 +57,7 @@ mvn install -DskipTests=true
 ```
 mvn test
 ...
-Tests run: 248, Failures: 1, Errors: 0, Skipped: 3
+Tests run: 248, Failures: 0, Errors: 0, Skipped: 3
 ```
 
 ## Development ##
