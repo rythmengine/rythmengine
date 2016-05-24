@@ -13,32 +13,44 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.rythmengine.conf.RythmConfigurationKey.HOME_TEMPLATE;
 
 /**
- * Test for https://github.com/rythmengine/rythmengine/issues/321
+ * https://github.com/rythmengine/rythmengine/issues/321
  *
  * @author wf
  */
 public class GithubIssue321Test extends TestBase {
+  
+    /**
+     * get a temporary Template Directory
+     * @return
+     * @throws IOException
+     */
+    public static File getTemplateDir() throws IOException {
+      System.getProperties().remove(HOME_TEMPLATE.getKey());
+      // debug = true;
+      // http://rythmengine.org/doc/template_guide.md#invoke_template
+      // first create some arbitrary temporary file
+      File tmpFile = File.createTempFile("Home", "Template");
+      // now get the parent directory of it and create a subdirectory for it
+      // - this shall be our root directory for templates
+      File templateDir = new File(tmpFile.getParentFile(), "templates");
+      if (!templateDir.isDirectory())
+          templateDir.mkdir();
+      return templateDir;
+    }
 
     @Test
     public void testHomeTemplate() throws Exception {
-        System.getProperties().remove(HOME_TEMPLATE.getKey());
-        // debug = true;
-        // http://rythmengine.org/doc/template_guide.md#invoke_template
-        // first create some arbitrary temporary file
-        File tmpFile = File.createTempFile("Home", "Template");
-        // now get the parent directory of it and create a subdirectory for it
-        // - this shall be our root directory for templates
-        File templateDir = new File(tmpFile.getParentFile(), "templates");
-        if (!templateDir.isDirectory())
-            templateDir.mkdir();
+        File templateDir=getTemplateDir();
         if (debug)
-            System.out.println(templateDir.getAbsolutePath());
+          System.out.println(templateDir.getAbsolutePath());
+      
         // try extensions e.g. macro - this will make this test fail
         String extensions[] = RythmEngine.VALID_SUFFIXES;
         for (String extension : extensions) {

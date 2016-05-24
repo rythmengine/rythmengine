@@ -1063,7 +1063,13 @@ public class RythmEngine implements IEventDispatcher {
      */
     public String render(File file, Object... args) {
         try {
+            if (!file.canRead())
+              throw new RuntimeException("template '"+file.getName()+"' does not exist!");
+            if (!file.canRead())
+              throw new RuntimeException("template '"+file.getName()+"' not readable!");
             ITemplate t = getTemplate(file, args);
+            if (t==null)
+              throw new RuntimeException("template '"+file.getName()+"' load failed!");
             return t.render();
         } finally {
             renderCleanUp();

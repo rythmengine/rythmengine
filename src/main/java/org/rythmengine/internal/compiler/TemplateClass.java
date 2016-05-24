@@ -518,7 +518,8 @@ public class TemplateClass {
             refresh_(false);
         }
         TemplateBase tmpl = (TemplateBase) templateInstance_(engine).__cloneMe(engine(), null);
-        tmpl.__prepareRender(type, locale, engine);
+        if (tmpl!=null)
+          tmpl.__prepareRender(type, locale, engine);
         return tmpl;
     }
 
