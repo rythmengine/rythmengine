@@ -9,6 +9,9 @@ public class HashCode {
     private static final int HC_INIT = 17;
     private static final int HC_FACT = 37;
 
+    private HashCode() {
+    }
+
     public final static int iterableHashCode(Iterable<?> it) {
         int ret = HC_INIT;
         for (Object o : it) {

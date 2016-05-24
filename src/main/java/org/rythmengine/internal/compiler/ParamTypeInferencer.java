@@ -31,6 +31,9 @@ import java.util.Map;
  */
 public class ParamTypeInferencer {
 
+    private ParamTypeInferencer() {
+    }
+
     public static String typeTransform(String type) {
         type = type.trim();
         if (type.contains("Boolean") && type.matches("(.*[^a-zA-Z0-9_]+)?boolean([^a-zA-Z0-9_].*|$)")) return type.replace("Boolean","boolean");

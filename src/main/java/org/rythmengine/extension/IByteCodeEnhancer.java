@@ -49,5 +49,8 @@ public interface IByteCodeEnhancer {
                 return new byte[0];
             }
         };
+
+        private INSTS() {
+        }
     }
 }

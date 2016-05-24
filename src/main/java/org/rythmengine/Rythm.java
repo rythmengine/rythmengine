@@ -429,6 +429,10 @@ public class Rythm {
     
     public static final class RenderTime {
         private static final ThreadLocal<Escape> escape_ = new ThreadLocal<Escape>();
+
+        private RenderTime() {
+        }
+
         public static void setEscape(Escape e) {
             escape_.set(e);
         }

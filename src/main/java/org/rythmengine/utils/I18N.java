@@ -39,6 +39,9 @@ public class I18N {
 
     private static final ILogger logger = Logger.get(I18N.class);
 
+    private I18N() {
+    }
+
     /**
      * Return a {@link org.rythmengine.template.ITemplate template}'s current locale, or
      * the the {@link org.rythmengine.RythmEngine#get() current engine}'s 

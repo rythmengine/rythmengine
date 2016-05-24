@@ -50,6 +50,9 @@ class Base64 {
         for (int i = 0; i < 64; i++) map2[map1[i]] = (byte) i;
     }
 
+    private Base64() {
+    }
+
     /**
      * Encodes a byte array into Base64 format.
      * No blanks or line breaks are inserted in the output.
