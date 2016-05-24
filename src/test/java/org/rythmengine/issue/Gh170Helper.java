@@ -17,6 +17,9 @@ public class Gh170Helper {
     private static final String TMPL_NAME = "gh170helper.txt";
     private static File tmplHome;
 
+    private Gh170Helper() {
+    }
+
     private static String content() {
         return "@args String who\nHello @who";
     }

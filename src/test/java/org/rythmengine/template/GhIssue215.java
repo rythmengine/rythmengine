@@ -14,6 +14,10 @@ import org.rythmengine.utils.Range;
  *
  */
 public class GhIssue215 {
+
+    private GhIssue215() {
+    }
+
     @SuppressWarnings("rawtypes")
     public static void foo() {
         TemplateBase.__Itr itr = TemplateBase.__Itr.ofRange(Range.valueOf("1.. 5"));

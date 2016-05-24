@@ -121,5 +121,8 @@ public interface ISourceCodeEnhancer {
                 return null;
             }
         };
+
+        private INSTS() {
+        }
     }
 }

@@ -28,6 +28,9 @@ import java.util.Map;
  * Evaluate an object and return boolean value by convention
  */
 public class Eval {
+    private Eval() {
+    }
+
     /**
      * return <code>true</code> if the specified byte <code>b != 0</code>
      * @param b

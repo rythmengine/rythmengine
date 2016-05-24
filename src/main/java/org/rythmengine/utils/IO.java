@@ -28,6 +28,9 @@ import java.net.URL;
 // Most of the code come from Play!Framework IO.java, under Apache License 2.0
 public class IO {
 
+    private IO() {
+    }
+
     /**
      * Read file content to a String (always use utf-8)
      *
