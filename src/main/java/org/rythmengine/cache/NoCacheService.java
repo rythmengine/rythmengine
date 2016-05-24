@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class NoCacheService implements ICacheService {
 
-    public static NoCacheService INSTANCE = new NoCacheService();
+    public static final NoCacheService INSTANCE = new NoCacheService();
 
     private NoCacheService() {
     }

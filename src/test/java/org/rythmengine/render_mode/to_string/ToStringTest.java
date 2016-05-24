@@ -37,7 +37,7 @@ public class ToStringTest extends TestBase {
         private String foo;
         public int bar;
         public transient String tFoo;
-        public static int sBar = 0;
+        public static final int sBar = 0;
         
         public String getFoo() {
             return foo;

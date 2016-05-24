@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class EmptyTemplate extends TagBase {
 
-    public static EmptyTemplate INSTANCE = new EmptyTemplate();
+    public static final EmptyTemplate INSTANCE = new EmptyTemplate();
 
     private EmptyTemplate() {}
 

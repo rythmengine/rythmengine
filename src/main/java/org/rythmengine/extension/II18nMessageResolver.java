@@ -43,7 +43,7 @@ public interface II18nMessageResolver {
     
     public static class DefaultImpl implements II18nMessageResolver {
 
-        public static II18nMessageResolver INSTANCE = new DefaultImpl();
+        public static final II18nMessageResolver INSTANCE = new DefaultImpl();
     
         private DefaultImpl() {}
     

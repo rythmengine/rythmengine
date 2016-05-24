@@ -81,7 +81,7 @@ public class F {
         }
     }
 
-    public static None<Object> None = new None<Object>();
+    public static final None<Object> None = new None<Object>();
 
     public static class Some<T> extends Option<T> {
 
@@ -468,7 +468,7 @@ public class F {
             };
         }
 
-        public static Matcher<Object, String> String = new Matcher<Object, String>() {
+        public static final Matcher<Object, String> String = new Matcher<Object, String>() {
 
             @Override
             public Option<String> match(Object o) {
