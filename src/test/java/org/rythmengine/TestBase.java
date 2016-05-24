@@ -5,6 +5,20 @@
  */
 package org.rythmengine;
 
+import static org.rythmengine.conf.RythmConfigurationKey.CODEGEN_COMPACT_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
+import static org.rythmengine.conf.RythmConfigurationKey.ENGINE_OUTPUT_JAVA_SOURCE_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_NATURAL_TEMPLATE_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_SMART_ESCAPE_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TRANSFORM_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
+import static org.rythmengine.conf.RythmConfigurationKey.HOME_TEMPLATE;
+
+import java.util.Locale;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.internal.RealSystem;
@@ -15,13 +29,6 @@ import org.rythmengine.internal.compiler.TemplateClass;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.TemplateBase;
-
-import java.util.Locale;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.rythmengine.conf.RythmConfigurationKey.*;
 
 /**
  * The Test base class

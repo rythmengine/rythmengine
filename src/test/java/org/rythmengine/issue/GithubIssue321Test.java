@@ -28,7 +28,7 @@ public class GithubIssue321Test extends TestBase {
     @Test
     public void testHomeTemplate() throws Exception {
         System.getProperties().remove(HOME_TEMPLATE.getKey());
-        debug = true;
+        // debug = true;
         // http://rythmengine.org/doc/template_guide.md#invoke_template
         // first create some arbitrary temporary file
         File tmpFile = File.createTempFile("Home", "Template");

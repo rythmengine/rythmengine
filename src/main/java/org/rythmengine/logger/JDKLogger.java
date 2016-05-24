@@ -19,6 +19,7 @@
 */
 package org.rythmengine.logger;
 
+import org.apache.log4j.BasicConfigurator;
 import org.rythmengine.extension.ILoggerFactory;
 
 import java.util.logging.Level;
@@ -134,6 +135,7 @@ public class JDKLogger implements ILogger {
         }
     }
 
+    public static boolean firstCall=true;
     public static class Factory implements ILoggerFactory {
         @Override
         public ILogger getLogger(Class<?> clazz) {

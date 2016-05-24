@@ -1,31 +1,19 @@
 /* 
- * Copyright (C) 2013 The Rythm Engine project
- * Gelin Luo <greenlaw110(at)gmail.com>
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.cache;
 
-import org.rythmengine.TestBase;
 import org.junit.Before;
 import org.junit.Test;
+import org.rythmengine.TestBase;
 import org.rythmengine.extension.ICacheService;
 
-import java.util.concurrent.CountDownLatch;
-
+/**
+ * base test class for testing the SimpleCacheService
+ *
+ */
 public abstract class CacheServiceTestBase extends TestBase {
     protected ICacheService cache = SimpleCacheService.INSTANCE;
     @Before
@@ -35,9 +23,13 @@ public abstract class CacheServiceTestBase extends TestBase {
         cache.startup();
     }
 
+    /**
+     * a concrete implementation needs to provide the cacheService implementation 
+     * @return - the implementation of the ICacheService
+     */
     protected abstract ICacheService cacheService();
 
-    private CountDownLatch lock = new CountDownLatch(1);
+    // private CountDownLatch lock = new CountDownLatch(1);
 
     @Test
     public void testPutGet() throws Exception {
@@ -49,6 +41,7 @@ public abstract class CacheServiceTestBase extends TestBase {
         assertEquals(null, cache.get("key1"));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testRemove() throws Exception {
         cache.put("key1", "val1", 10);

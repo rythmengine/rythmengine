@@ -41,7 +41,8 @@ public class JSONParameterTest extends TestBase {
   @Test
   public void testArray2() {
     t = "@args List<org.rythmengine.advanced.JSONParameterTest.User> users\n<ul>@for(users){\n@_.name: @_.age\n}</ul>";
-    System.out.println(t);
+    if (debug)
+      System.out.println(t);
     String params = "[{\"name\":\"Tom\", \"age\": 12}, {\"name\":\"Peter\", \"age\": 11}]";
     s = r(t, JSONWrapper.wrap(params));
     eq("<ul>\nTom: 12\nPeter: 11\n</ul>");
