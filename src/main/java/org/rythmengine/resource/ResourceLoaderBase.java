@@ -54,6 +54,15 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
         return tryLoadTemplate(tmplName, engine, callerClass, codeType, true);
     }
     
+    /**
+     * try loading the given template
+     * @param tmplName
+     * @param engine
+     * @param callerClass
+     * @param codeType
+     * @param processTagName
+     * @return
+     */
     private TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, ICodeType codeType, boolean processTagName) {
         //logger.info(">>> try load %s on [%s] with processTagName: %s", tmplName, callerClass.getKey(), processTagName);
         if (null == engine) {
@@ -63,7 +72,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
             return null;
         }
         String rythmSuffix = engine.conf().resourceNameSuffix();
-        final List<String> suffixes = new ArrayList(Arrays.asList(RythmEngine.VALID_SUFFIXES));
+        final List<String> suffixes = new ArrayList<String>(Arrays.asList(RythmEngine.VALID_SUFFIXES));
         if (null == codeType) {
             codeType = TemplateResourceBase.getTypeOfPath(engine, tmplName);
         }
