@@ -61,7 +61,7 @@ public abstract class ResourceLoaderBase implements ITemplateResourceLoader {
      * @param callerClass
      * @param codeType
      * @param processTagName
-     * @return
+     * @return the template Class
      */
     private TemplateClass tryLoadTemplate(String tmplName, RythmEngine engine, TemplateClass callerClass, ICodeType codeType, boolean processTagName) {
         //logger.info(">>> try load %s on [%s] with processTagName: %s", tmplName, callerClass.getKey(), processTagName);

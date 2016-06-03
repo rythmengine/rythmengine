@@ -44,10 +44,10 @@ public class ForEachCodeToken extends BlockCodeToken {
      * @param varname
      * @param iterable
      * @param context
-     * @each String [str]: myStrList @
-     * ^     ^       ^        ^
-     * |     |       |        |
-     * type varname  iterable endloop
+     * "@each String [str]: myStrList @"
+     *  ^     ^       ^        ^
+     *  |     |       |        |
+     *  type varname  iterable endloop
      */
     public ForEachCodeToken(String type, String varname, String iterable, IContext context, int lineNo, String joinSep) {
         super(null, context);

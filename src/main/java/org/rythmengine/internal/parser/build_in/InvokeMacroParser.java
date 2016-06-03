@@ -30,7 +30,7 @@ import org.rythmengine.internal.parser.ParserBase;
 /**
  * Parse invocation:
  *
- * @myMacro() Note since this is also a pattern for expression parser, InvokeMacroParser must
+ * "@myMacro()" Note since this is also a pattern for expression parser, InvokeMacroParser must
  * be put in front of InvokeTagParser and expression parser
  */
 public class InvokeMacroParser extends CaretParserFactoryBase {

@@ -33,8 +33,8 @@ import com.stevesoft.pat.Regex;
 /**
  * assign enclosed part into a variable
  *
- * @assign("xx") {...} create a variable
- * @assign("xxx", true) {...} // create a final variable
+ * "@assign("xx") {...}" create a variable
+ * "@assign("xxx", true) {...}" // create a final variable
  */
 public class AssignParser extends KeywordParserFactory {
 

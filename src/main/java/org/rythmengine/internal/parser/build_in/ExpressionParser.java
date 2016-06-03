@@ -42,7 +42,7 @@ public class ExpressionParser extends CaretParserFactoryBase {
      * 
      * @param symbol
      * @param context
-     * @return
+     * @return the symbol
      */
     public static String assertBasic(String symbol, IContext context) {
         if (symbol.contains("_utils.sep(\"")) return symbol;// Rythm builtin expression TODO: generalize
