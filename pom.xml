@@ -183,6 +183,15 @@
 				</plugin>
 			-->
 		</plugins>
+		<extensions>
+			<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.10</version>
+			</extension>
+		</extensions>
+
 	</build>
 
 	<dependencies>
@@ -346,14 +355,6 @@
 						</configuration>
 					</plugin>
 				</plugins>
-				<extensions>
-					<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
-					<extension>
-						<groupId>org.apache.maven.wagon</groupId>
-						<artifactId>wagon-ssh</artifactId>
-						<version>2.10</version>
-					</extension>
-				</extensions>
 			</build>
 		</profile>
 	</profiles>
