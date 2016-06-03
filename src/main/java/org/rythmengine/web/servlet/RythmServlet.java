@@ -1,22 +1,8 @@
 /* 
- * Copyright (C) 2013 The Rythm Engine project
- * Gelin Luo <greenlaw110(at)gmail.com>
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.web.servlet;
 
 import javax.servlet.http.HttpServlet;
@@ -65,7 +51,7 @@ import javax.servlet.http.HttpServlet;
  *     {@link org.rythmengine.tools.config.ConfigurationCleaner}</dd>
  *   <dt>org.rythmengine.tools.bufferOutput</dt>
  *   <dd>By default, the processed templates are merged directly into
- *     the {@link HttpServletResponse}'s writer.  If this parameter is
+ *     the {@link javax.servlet.http.HttpServletResponse}'s writer.  If this parameter is
  *     set to {@code true}, then the output of the merge process will be
  *     buffered before being fed to the response. This allows the {@link #error}
  *     method to be overridden to return a "500 Internal Server Error" or
@@ -77,5 +63,10 @@ import javax.servlet.http.HttpServlet;
  *
  */
 public class RythmServlet extends HttpServlet {
+
+  /**
+   * default serialVersion UID
+   */
+  private static final long serialVersionUID = 1L;
     
 }

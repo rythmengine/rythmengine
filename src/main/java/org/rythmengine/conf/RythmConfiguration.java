@@ -556,7 +556,7 @@ public class RythmConfiguration {
 
     /**
      * Get {@link RythmConfigurationKey#RESOURCE_REFRESH_INTERVAL}
-     * @return
+     * @return the key for the resourceRefreshInterval
      */
     public long resourceRefreshInterval() {
         if (null == _resourceRefreshInterval) {
