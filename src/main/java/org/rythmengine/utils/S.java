@@ -1,27 +1,30 @@
 /* 
- * Copyright (C) 2013 The Rythm Engine project
- * Gelin Luo <greenlaw110(at)gmail.com>
- *
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
-*/
+ * Copyright (C) 2013-2016 The Rythm Engine project
+ * for LICENSE and other details see:
+ * https://github.com/rythmengine/rythmengine
+ */
 package org.rythmengine.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.StringCodec;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.MessageFormat;
+import java.text.Normalizer;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.ResourceBundle;
+import java.util.TimeZone;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
@@ -33,11 +36,7 @@ import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.ITemplate;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.net.URLEncoder;
-import java.text.*;
-import java.util.*;
+import com.alibaba.fastjson.JSON;
 
 /**
  * A utility class providing String manipulation methods. Commonly used in template engine process.
@@ -58,6 +57,7 @@ import java.util.*;
 public class S {
     public static final S INSTANCE = new S();
     public static final String EMPTY_STR = "";
+    @SuppressWarnings("unused")
     private static final ILogger logger = Logger.get(S.class);
 
     /**
@@ -733,6 +733,11 @@ public class S {
     private static final Range<Integer> uppers = F.R(0x41, 0x5b); 
     private static final Range<Integer> lowers = F.R(0x61, 0x7b);
     
+    /**
+     * check the given char to be a digit or alphabetic
+     * @param c
+     * @return true if this is a digit an upper case char or a lowercase char
+     */
     public static boolean isDigitsOrAlphabetic(char c) {
         int i = (int)c;
         return digits.include(i) || uppers.include(i) || lowers.include(i);
@@ -1026,8 +1031,8 @@ public class S {
 
     /**
      * Format general object: for the sake of dynamic expr evaluation
-     * @param o
-     * @return
+     * @param o - the object to format
+     * @return a formatted string representation of the object
      */
     public static String format(Object o) {
         if (null == o) return "";
@@ -1050,7 +1055,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic expr evaluation
      * @param template
      * @param o
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(ITemplate template, Object o) {
         if (null == o) return "";
@@ -1084,7 +1089,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(Object o, String pattern) {
         if (null == o) return "";
@@ -1107,7 +1112,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(ITemplate template, Object o, String pattern) {
         if (null == o) return "";
@@ -1130,7 +1135,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(Object o, String pattern, Locale locale) {
         if (null == o) return "";
@@ -1153,7 +1158,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(ITemplate template, Object o, String pattern, Locale locale) {
         if (null == o) return "";
@@ -1179,7 +1184,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(Object o, String pattern, Locale locale, String timezone) {
         if (null == o) return "";
@@ -1216,7 +1221,7 @@ public class S {
      * Generalize format parameter for the sake of dynamic evaluation
      * @param o
      * @param pattern
-     * @return
+     * @return a formatted string representation of the object
      */
     public static String format(ITemplate template, Object o, String pattern, Locale locale, String timezone) {
         if (null == o) return "";
@@ -1280,11 +1285,11 @@ public class S {
     }
     
     /**
-     * Transformer method. Format give data into currency
+     * Transformer method. Format given data into currency
      * 
      * @param data
      * @return the currency
-     * @see {@link #formatCurrency(org.rythmengine.template.ITemplate, Object, String, java.util.Locale)}
+     * See {@link #formatCurrency(org.rythmengine.template.ITemplate,Object,String,java.util.Locale)}
      */
     @Transformer(requireTemplate = true)
     public static String formatCurrency(Object data) {
@@ -1308,7 +1313,7 @@ public class S {
      * @param data
      * @param currencyCode
      * @return the currency
-     * @see {@link #formatCurrency(org.rythmengine.template.ITemplate, Object, String, java.util.Locale)}
+     * See {@link #formatCurrency(org.rythmengine.template.ITemplate, Object, String, java.util.Locale)}
      */
     @Transformer(requireTemplate = true)
     public static String formatCurrency(Object data, String currencyCode) {
@@ -1316,12 +1321,12 @@ public class S {
     }
 
     /**
-     * See {@link #formatCurrency(org.rythmengine.template.ITemplate, Object, String, java.util.Locale)}
-     * 
+     * Transformer method. Format currency using specified parameters
      * @param template
      * @param data
      * @param currencyCode
      * @return the currency string
+     * See {@link #formatCurrency(org.rythmengine.template.ITemplate, Object, String, java.util.Locale)}
      */
     public static String formatCurrency(ITemplate template, Object data, String currencyCode) {
         return formatCurrency(template, data, currencyCode, null);
