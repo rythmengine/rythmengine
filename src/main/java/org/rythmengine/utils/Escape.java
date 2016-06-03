@@ -117,7 +117,7 @@ public enum Escape {
         return sa_.clone();
     }
     
-    public static Escape valueOfIngoreCase(Object o) {
+    public static Escape valueOfIgnoreCase(Object o) {
         String escape = S.str(o);
         if (S.empty(escape)) {
             return RythmEngine.get().conf().defaultCodeType().escape();
@@ -127,7 +127,7 @@ public enum Escape {
         return valueOf(escape);
     }
 
-    public static Escape valueOfIngoreCase(ITemplate template, Object o) {
+    public static Escape valueOfIgnoreCase(ITemplate template, Object o) {
         String escape = S.str(o);
         if (S.empty(escape)) {
             if (null != template) {
