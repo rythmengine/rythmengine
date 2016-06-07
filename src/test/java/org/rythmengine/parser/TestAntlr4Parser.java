@@ -10,7 +10,6 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -38,7 +37,7 @@ public class TestAntlr4Parser {
    */
   public static ANTLRInputStream streamForText(String text) throws IOException {
     InputStream stream = new ByteArrayInputStream(
-        text.getBytes(StandardCharsets.UTF_8));
+        text.getBytes());
     ANTLRInputStream in = new ANTLRInputStream(stream);
     return in;
   }
