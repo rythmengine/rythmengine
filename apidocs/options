@@ -1,0 +1,26 @@
+-classpath
+'/Volumes/HD2014-02/Users/wf/Documents/workspace/rythmengine/target/classes:/Volumes/HD2014-02/Users/wf/.m2/repository/log4j/log4j/1.2.12/log4j-1.2.12.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/net/sf/ehcache/ehcache/2.10.2/ehcache-2.10.2.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/net/spy/spymemcached/2.12.1/spymemcached-2.12.1.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/com/google/code/gson/gson/2.6.2/gson-2.6.2.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/com/alibaba/fastjson/1.2.11/fastjson-1.2.11.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/org/antlr/antlr4-runtime/4.5.2-1/antlr4-runtime-4.5.2-1.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/com/stevesoft/pat/pat/1.5.3/pat-1.5.3.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/javax/servlet/servlet-api/2.3/servlet-api-2.3.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/avalon-framework/avalon-framework/4.1.3/avalon-framework-4.1.3.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/org/mvel/mvel2/2.2.8.Final/mvel2-2.2.8.Final.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/commons-io/commons-io/2.4/commons-io-2.4.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/org/eclipse/jdt/core/compiler/ecj/4.5.1/ecj-4.5.1.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/joda-time/joda-time/2.9.3/joda-time-2.9.3.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/commons-logging/commons-logging/1.1/commons-logging-1.1.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/logkit/logkit/1.0.1/logkit-1.0.1.jar:/Volumes/HD2014-02/Users/wf/.m2/repository/com/google/appengine/appengine-api-1.0-sdk/1.9.37/appengine-api-1.0-sdk-1.9.37.jar'
+-encoding
+'UTF-8'
+-overview
+'/Volumes/HD2014-02/Users/wf/Documents/workspace/rythmengine/src/main/javadoc/overview.html'
+-protected
+-sourcepath
+'/Volumes/HD2014-02/Users/wf/Documents/workspace/rythmengine/src/main/java:/Volumes/HD2014-02/Users/wf/Documents/workspace/rythmengine/src/main/javadoc'
+-author
+-bottom
+'Copyright &#169; 2016. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Volumes/HD2014-02/Users/wf/Documents/workspace/rythmengine/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'Rythm Template Engine 1.1.6-SNAPSHOT API'
+-link
+'http://java.sun.com/javase/6/docs/api'
+-use
+-version
+-windowtitle
+'Rythm Template Engine 1.1.6-SNAPSHOT API'
