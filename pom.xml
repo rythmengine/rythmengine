@@ -114,128 +114,6 @@
 		</license>
 	</licenses>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<encoding>UTF-8</encoding>
-					<debuglevel>lines,vars,source</debuglevel>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
-				<configuration>
-					<includePom>true</includePom>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!--
-				<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-				<execution>
-				<id>copy-to-lib</id>
-				<phase>package</phase>
-				<goals>
-				<goal>run</goal>
-				</goals>
-				<configuration>
-				<target>
-				<copy file="${project.build.directory}/${project.build.finalName}.jar"
-				todir="${basedir}/lib" />
-				</target>
-				</configuration>
-				</execution>
-				</executions>
-				</plugin>
-				<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-				<execution>
-				<phase>package</phase>
-				<goals>
-				<goal>copy-dependencies</goal>
-				</goals>
-				<configuration>
-				<outputDirectory>${basedir}/lib</outputDirectory>
-				</configuration>
-				</execution>
-				</executions>
-				</plugin>
-			-->
-			<plugin>
-				<groupId>org.antlr</groupId>
-				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.5.3</version>
-				<configuration>
-					<!-- basically this is the default setting -->
-					<sourceDirectory>src/main/antlr4</sourceDirectory>
-					<libDirectory>target/generated-sources/antlr4</libDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>antlr</id>
-						<goals>
-							<goal>antlr4</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- http://stackoverflow.com/questions/1192596/how-do-i-get-eclipse-to-resolve-classes-generated-with-maven-2 -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.10</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/generated-sources/antlr4</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<extensions>
-			<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
-			</extension>
-		</extensions>
-
-	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.jdt.core.compiler</groupId>
@@ -281,13 +159,8 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!--
-			<dependency>
-			<groupId>org.eweb4j</groupId>
-			<artifactId>fel</artifactId>
-			<version>0.8</version>
-			</dependency>
-		-->
+		<!-- <dependency> <groupId>org.eweb4j</groupId> <artifactId>fel</artifactId> 
+			<version>0.8</version> </dependency> -->
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -345,6 +218,99 @@
 			<version>4.5.2-1</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+					<debuglevel>lines,vars,source</debuglevel>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<configuration>
+					<includePom>true</includePom>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-antrun-plugin</artifactId> 
+				<version>1.7</version> <executions> <execution> <id>copy-to-lib</id> <phase>package</phase> 
+				<goals> <goal>run</goal> </goals> <configuration> <target> <copy file="${project.build.directory}/${project.build.finalName}.jar" 
+				todir="${basedir}/lib" /> </target> </configuration> </execution> </executions> 
+				</plugin> <plugin> <artifactId>maven-dependency-plugin</artifactId> <executions> 
+				<execution> <phase>package</phase> <goals> <goal>copy-dependencies</goal> 
+				</goals> <configuration> <outputDirectory>${basedir}/lib</outputDirectory> 
+				</configuration> </execution> </executions> </plugin> -->
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>4.5.3</version>
+				<configuration>
+					<!-- basically this is the default setting -->
+					<sourceDirectory>src/main/antlr4</sourceDirectory>
+					<libDirectory>target/generated-sources/antlr4</libDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>antlr</id>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- http://stackoverflow.com/questions/1192596/how-do-i-get-eclipse-to-resolve-classes-generated-with-maven-2 -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.10</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${basedir}/target/generated-sources/antlr4</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<extensions>
+			<!-- support local releases see http://stackoverflow.com/questions/33318793/how-to-fix-or-workaround-wagon-bug -->
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.10</version>
+			</extension>
+		</extensions>
+
+	</build>
 
 	<profiles>
 		<profile>
@@ -397,10 +363,15 @@
 						</executions>
 					</plugin>
 					<plugin>
+					  <!-- http://code.mycila.com/license-maven-plugin/ -->
 						<groupId>com.mycila.maven-license-plugin</groupId>
 						<artifactId>maven-license-plugin</artifactId>
+						<version>1.9.0</version>
 						<configuration>
 							<header>src/etc/header.txt</header>
+							<includes>
+							  <include>src/**/*.java</include>
+							</includes>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -423,10 +394,12 @@
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-javadoc-plugin</artifactId>
 									<version>${javadoc.version}</version>
-							    <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
-							    <excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
-							    <quiet />
-							    <bottom><![CDATA[Copyright 2013-2016, <a href="https://github.com/rythmengine/rythmengine">The Rythm Engine project<a>]]></bottom>
+									<configuration>
+										<stylesheetfile>src/etc/javadoc.css</stylesheetfile>
+										<excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
+										<quiet />
+										<bottom><![CDATA[Copyright 2013-2016, <a href="https://github.com/rythmengine/rythmengine">The Rythm Engine project<a>]]></bottom>
+									</configuration>
 								</plugin>
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
@@ -462,7 +435,7 @@
 							</execution>
 						</executions>
 					</plugin>
-			</plugins>
+				</plugins>
 			</build>
 		</profile>
 		<!-- http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html -->
@@ -480,7 +453,7 @@
 						<version>${javadoc.version}</version>
 						<configuration>
 							<additionalparam>-Xdoclint:none</additionalparam>
-							<!--  <stylesheetfile>src/etc/javadoc.css</stylesheetfile>-->
+							<!-- <stylesheetfile>src/etc/javadoc.css</stylesheetfile> -->
 							<excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
 							<quiet />
 							<bottom><![CDATA[Copyright 2013-2016, <a href="https://github.com/rythmengine/rythmengine">The Rythm Engine project<a>]]></bottom>
@@ -491,19 +464,12 @@
 		</profile>
 	</profiles>
 	<distributionManagement>
-	<!--
-		<repository>
-		<id>sonatype-nexus-staging</id>
-		<name>Nexus Staging Repository</name>
-		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-		<repository>
-		<id>sonatype-nexus-snapshots</id>
-		<name>Nexus Snapshots Repository</name>
-		<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-		</repository>
-	-->
-	<!--  site pages -->
+		<!-- <repository> <id>sonatype-nexus-staging</id> <name>Nexus Staging Repository</name> 
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url> 
+			</repository> <repository> <id>sonatype-nexus-snapshots</id> <name>Nexus 
+			Snapshots Repository</name> <url>https://oss.sonatype.org/content/repositories/snapshots/</url> 
+			</repository> -->
+		<!-- site pages -->
 	</distributionManagement>
 
 </project>
