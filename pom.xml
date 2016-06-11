@@ -422,7 +422,11 @@
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-javadoc-plugin</artifactId>
-									<version>2.7</version>
+									<version>${javadoc.version}</version>
+							    <stylesheetfile>src/etc/javadoc.css</stylesheetfile>
+							    <excludePackageNames>org.rythmengine.internal.*</excludePackageNames>
+							    <quiet />
+							    <bottom><![CDATA[Copyright 2013-2016, <a href="https://github.com/rythmengine/rythmengine">The Rythm Engine project<a>]]></bottom>
 								</plugin>
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
