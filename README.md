@@ -13,6 +13,8 @@ A "Razor" like, rich featured, high performance and easy to use Java template en
 
 * The [documentation](http://rythmengine.org/doc/index)
 * The [fiddle](http://fiddle.rythmengine.org/) site
+* The [project info](https://rythmengine.github.io/rythmengine/project-info.html)
+* The [JavaDocs](https://rythmengine.github.io/rythmengine/apidocs/index.html)
 
 ## Integrations ##
 
@@ -70,7 +72,7 @@ the Rythm Engine Project:
 ## Version history
 |  Version     | Date    | Comment
 | ------------ | ------- | -------------------------
-| 1.6-SNAPSHOT | 2016-05 | current development state
+| 1.6-SNAPSHOT | 2016-06 | current development state
 | 1.5          | 2016-05 | latest stable release
 | 1.0.1        | 2014-08 |
 | 1.0          | 2014-02 |
