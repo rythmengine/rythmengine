@@ -37,9 +37,15 @@ public abstract class TestBase extends Assert {
     protected boolean debug=false;
     protected static ILogger logger = Logger.get(TestBase.class);
     
-    protected String t;
+    protected String t; // the rythm template code
     protected String s;
     
+    /**
+     * run the given template with the given arguments
+     * @param template
+     * @param args
+     * @return the resulting rendered string
+     */
     protected String r(String template, Object... args) {
         return Rythm.render(template, args);
     }

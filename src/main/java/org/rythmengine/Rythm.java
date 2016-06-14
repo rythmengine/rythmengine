@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * Rythm is a service wrapper of the {@link RythmEngine}.
  * <p/>
- * <p>For most cases you can play with <cod>Rythm</cod> instead of an individual
+ * <p>For most cases you can play with <code>Rythm</code> instead of an individual
  * <code>RythmEngine</code> instance</p>
  * <p/>
  * <p>Since <code>Rythm</code> is a wrapper class, all services are provided via
