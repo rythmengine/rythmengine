@@ -13,33 +13,53 @@ import java.util.Map;
  */
 public class NamedParams {
 
+	  /**
+	   * force static usage only
+	   */
     private NamedParams() {
     }
 
-    public static final NamedParams instance = new NamedParams();
+    // could be a singleton but isn't at this time
+    // public static final NamedParams instance = new NamedParams();
 
+    /** 
+     * Helper class that holds name/value pairs to be used
+     * for a template rootmap
+     */
     public static class Pair {
-        public String k;
-        public Object v;
+        String key;
+        Object value;
 
-        public Pair(String key, Object val) {
-            k = key;
-            v = val;
+        /**
+         * construct me from a key value pair
+         * @param pKey
+         * @param pValue
+         */
+        public Pair(String pKey, Object pValue) {
+            key = pKey;
+            value = pValue;
         }
     }
 
-    public static Pair pair(String k, Object v) {
-        return new Pair(k, v);
+    /**
+     * create a pair from the given key and value
+     * @param key
+     * @param value
+     * @return
+     */
+    public static Pair p(String key, Object value) {
+        return new Pair(key, value);
     }
 
-    public static Pair p(String k, Object v) {
-        return new Pair(k, v);
-    }
-
+    /**
+     * construct me from the given pairs
+     * @param pairs
+     * @return the map
+     */
     public static Map<String, Object> from(Pair... pairs) {
         Map<String, Object> map = new HashMap<String, Object>(pairs.length);
         for (Pair p : pairs) {
-            map.put(p.k, p.v);
+            map.put(p.key, p.value);
         }
         return map;
     }
