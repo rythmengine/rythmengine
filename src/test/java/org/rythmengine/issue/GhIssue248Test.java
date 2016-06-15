@@ -6,7 +6,6 @@
 package org.rythmengine.issue;
 
 import static org.rythmengine.conf.RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER;
-import static org.rythmengine.conf.RythmConfigurationKey.HOME_TEMPLATE;
 
 import java.util.Collections;
 import java.util.HashMap;

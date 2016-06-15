@@ -117,6 +117,7 @@ public class GhIssueTest141_176 extends TestBase {
         eq(x);
     }
     
+    @SuppressWarnings("unused")
     private void yes(Object p) {
         assertEquals("yes", r(t, p, null));
     }

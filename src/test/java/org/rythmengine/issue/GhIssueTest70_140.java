@@ -5,34 +5,17 @@
  */
 package org.rythmengine.issue;
 
-import models.Foo;
-import models.GH185Model;
-import models.GH227Model;
-import models.SandboxModel;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
-import org.junit.Ignore;
+import models.Foo;
+
 import org.junit.Test;
 import org.rythmengine.Rythm;
-import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
-import org.rythmengine.extension.ISourceCodeEnhancer;
-import org.rythmengine.template.ITemplate;
-import org.rythmengine.utils.Escape;
-import org.rythmengine.utils.IO;
-import org.rythmengine.utils.JSONWrapper;
-import org.rythmengine.utils.S;
-
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.rythmengine.conf.RythmConfigurationKey.*;
 
 /**
  * Test Github Issues
@@ -94,7 +77,8 @@ public class GhIssueTest70_140 extends TestBase {
     @Test
     public void test132() {
         t = "@args String s;@s.length()";
-        s = r(t, null);
+        Object nullObject=null;
+        s = r(t, nullObject);
         eq("0");
         
         s = r(t);
