@@ -16,7 +16,7 @@ import org.junit.runners.Suite;
  *
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ org.rythmengine.advanced.JSONParameterTest.class,
+@Suite.SuiteClasses({ /* org.rythmengine.advanced.JSONParameterTest.class,
     org.rythmengine.advanced.NaturalTemplateTest.class,
     org.rythmengine.advanced.SmartEscapeTest.class,
     org.rythmengine.advanced.TransformerTest.class,
@@ -33,20 +33,26 @@ import org.junit.runners.Suite;
     org.rythmengine.essential.DebugParserTest.class,
     org.rythmengine.essential.EscapeParserTest.class,
     org.rythmengine.essential.ExpressionTest.class,
-    org.rythmengine.essential.FinallyParserTest.class,
+    org.rythmengine.essential.FinallyParserTest.class,*/
     org.rythmengine.essential.ForParserTest.class,
+    /*
     org.rythmengine.essential.I18nTest.class,
     org.rythmengine.essential.IfParserTest.class,
     org.rythmengine.essential.ImportParserTest.class,
     org.rythmengine.essential.IncludeParserTest.class,
-    org.rythmengine.essential.NoCompactParserTest.class,
+    org.rythmengine.essential.NoCompactParserTest.class, 
     org.rythmengine.essential.RawParserTest.class,
     org.rythmengine.essential.ReturnParserTest.class,
     org.rythmengine.essential.UtilsTest.class,
     org.rythmengine.essential.VerbatimParserTest.class,
-    org.rythmengine.issue.GhIssueTest.class,
-    org.rythmengine.issue.GithubIssue321Test.class,
-    org.rythmengine.issue.GithubIssue325Test.class,
+    org.rythmengine.issue.GhIssueTest70_140.class,
+    org.rythmengine.issue.GhIssueTest141_176.class,
+    org.rythmengine.issue.GhIssueTest185_202.class,
+    org.rythmengine.issue.GhIssueTest211_249.class,
+     */
+    org.rythmengine.issue.GhIssue248Test.class,
+    /* org.rythmengine.issue.GithubIssue321Test.class, 
+    org.rythmengine.issue.GithubIssue325Test.class, 
     org.rythmengine.layout.LayoutTest.class,
     org.rythmengine.parser.TestAntlr4Parser.class,
     org.rythmengine.render_mode.sandbox.SandboxTest.class,
@@ -56,7 +62,8 @@ import org.junit.runners.Suite;
     org.rythmengine.tag.InvokeParserTest.class,
     org.rythmengine.tag.InvokeTemplateTest.class,
     org.rythmengine.tag.MacroTest.class,
-    org.rythmengine.tag.tagPriorityTest.class })
+    org.rythmengine.tag.tagPriorityTest.class, */
+    org.rythmengine.essential.ForParserTest.class})
 public class TestSuite {
 
 }

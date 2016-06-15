@@ -263,6 +263,19 @@
 				</goals> <configuration> <outputDirectory>${basedir}/lib</outputDirectory> 
 				</configuration> </execution> </executions> </plugin> -->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+				  <includes>
+				    <include>**/*Test*.java</include>
+				  </includes>
+					<excludes>
+						<exclude>**/*TestSuite.java</exclude> 
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
 				<version>4.5.3</version>
@@ -404,7 +417,7 @@
 								<plugin>
 									<groupId>org.apache.maven.plugins</groupId>
 									<artifactId>maven-surefire-report-plugin</artifactId>
-									<version>2.6</version>
+									<version>2.19.1</version>
 									<configuration>
 									  <excludes>
 									    <exclude>**/*TestSuite.java</exclude>
