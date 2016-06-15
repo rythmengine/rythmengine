@@ -5,38 +5,19 @@
  */
 package org.rythmengine.issue;
 
-import static org.rythmengine.conf.RythmConfigurationKey.CODEGEN_COMPACT_ENABLED;
 import static org.rythmengine.conf.RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER;
-import static org.rythmengine.conf.RythmConfigurationKey.DEFAULT_CODE_TYPE_IMPL;
-import static org.rythmengine.conf.RythmConfigurationKey.ENGINE_OUTPUT_JAVA_SOURCE_ENABLED;
-import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_NATURAL_TEMPLATE_ENABLED;
-import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_SMART_ESCAPE_ENABLED;
-import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TRANSFORM_ENABLED;
-import static org.rythmengine.conf.RythmConfigurationKey.FEATURE_TYPE_INFERENCE_ENABLED;
 import static org.rythmengine.conf.RythmConfigurationKey.HOME_TEMPLATE;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
-import models.GH227Model;
-import models.SandboxModel;
-
-import org.junit.Ignore;
+import org.junit.After;
 import org.junit.Test;
-import org.rythmengine.Rythm;
-import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
-import org.rythmengine.conf.RythmConfigurationKey;
-import org.rythmengine.extension.ICodeType;
 import org.rythmengine.extension.ISourceCodeEnhancer;
 import org.rythmengine.template.ITemplate;
-import org.rythmengine.utils.S;
 
 /**
  * Test Github Issues
@@ -75,6 +56,11 @@ public class GhIssue248Test extends TestBase {
         System.getProperties().put(CODEGEN_SOURCE_CODE_ENHANCER.getKey(), se);
     }
 
+    @After
+    public void cleanup() {
+      System.getProperties().remove(CODEGEN_SOURCE_CODE_ENHANCER.getKey());
+    }
+    
     @Test
     public void test248() {
         setUpFor248();
