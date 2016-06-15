@@ -49,6 +49,7 @@ public class ForParserTest extends TestBase {
      */
     @Test
     public void testForLoop2() {
+    	  System.setProperty(FEATURE_TYPE_INFERENCE_ENABLED.getKey(), "true");
         t = "@for (String item: items) {@(item)@item_sep}";
         s = r(t, from(p("items", "a,b,c".split(","))));
         assertEquals("a,b,c", s);
