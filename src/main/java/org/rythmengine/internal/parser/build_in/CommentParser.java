@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
  * Time: 3:04 PM
  */
 public class CommentParser extends CaretParserFactoryBase {
+	public static final String COMMENT_FORMAT="^(%s/.*?)(\n.*|$)";
     public IParser create(final IContext ctx) {
         return new RemoveLeadingLineBreakAndSpacesParser(ctx) {
             public Token go() {
@@ -43,7 +44,9 @@ public class CommentParser extends CaretParserFactoryBase {
             }
 
             private Pattern inlineComment() {
-                return Pattern.compile(String.format("^(%s/.*?)(%n.*|$)", a()), Pattern.DOTALL);
+            	String a=a();
+            	Pattern result = Pattern.compile(String.format(COMMENT_FORMAT, a), Pattern.DOTALL);
+                return result;
 //                IContext ctx = ctx();
 //                if (ctx.insideDirectiveComment()) {
 //                    return Pattern.compile(String.format("^(%s//.*?)(%s|\n).*", a(), S.escapeRegex(ctx.peekCodeType().commentEnd())), Pattern.DOTALL);

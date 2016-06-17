@@ -8,6 +8,7 @@ package org.rythmengine.essential;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+import org.rythmengine.internal.parser.build_in.CommentParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +24,9 @@ public class CommentTest extends TestBase {
 
     @Test
     public void testInlineComment() {
+    	String commentPattern=String.format(CommentParser.COMMENT_FORMAT, "@");
+    	// System.out.println(commentPattern);
+    	assertFalse("comment Pattern should not be platform dependend",commentPattern.contains("\r"));
         t = "abc@/adfiauoprquwreqw\nxyz";
         s = r(t);
         assertEquals("abc\nxyz", s);
