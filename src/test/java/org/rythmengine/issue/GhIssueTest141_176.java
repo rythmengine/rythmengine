@@ -176,7 +176,8 @@ public class GhIssueTest141_176 extends TestBase {
                 .append(" org.rythmengine.issue.Gh170Helper").toString();
         ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
         Process p = pb.start();
-        Thread.sleep(4000);
+        p.waitFor();
+        // Thread.sleep(4000);
         assertFalse(isProcessAlive(p));
         InputStream is = p.getInputStream();
         String s = IO.readContentAsString(is);
