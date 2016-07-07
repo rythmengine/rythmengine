@@ -7,6 +7,7 @@ package org.rythmengine.issue;
 
 import static org.rythmengine.conf.RythmConfigurationKey.CODEGEN_COMPACT_ENABLED;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Date;
@@ -165,37 +166,41 @@ public class GhIssueTest141_176 extends TestBase {
         }
     }
 
+    /**
+     * get the result of running the given template via Java command line
+     * @param clazz - the template class
+     * @return the string created by the template engine
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public String getJavaCmdLineResult(String clazz) throws IOException, InterruptedException {
+    	 	String cmdLine = new StringBuilder("java -classpath ")
+       .append(System.getProperty("java.class.path"))
+       .append(" "+clazz).toString();
+    	 	ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
+    	 	Process p = pb.start();
+    	 	p.waitFor();
+    	 	// Thread.sleep(4000);
+    	 	assertFalse(isProcessAlive(p));
+    	 	InputStream is = p.getInputStream();
+    	 	String s = IO.readContentAsString(is);
+    	 	return s;
+    }
+    
     @Test
     /**
      * https://github.com/rythmengine/rythmengine/issues/282
      * @throws Exception
      */
     public void test170() throws Exception {
-        String cmdLine = new StringBuilder("java -classpath ")
-                .append(System.getProperty("java.class.path"))
-                .append(" org.rythmengine.issue.Gh170Helper").toString();
-        ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
-        Process p = pb.start();
-        p.waitFor();
-        // Thread.sleep(4000);
-        assertFalse(isProcessAlive(p));
-        InputStream is = p.getInputStream();
-        String s = IO.readContentAsString(is);
+    			String s=this.getJavaCmdLineResult("org.rythmengine.issue.Gh170Helper");
         assertContains(s, "Hello world");
         assertContains(s, "dev");
     }
 
     @Test
     public void test174() throws Exception {
-        String cmdLine = new StringBuilder("java -classpath ")
-                .append(System.getProperty("java.class.path"))
-                .append(" org.rythmengine.issue.Gh174Helper").toString();
-        ProcessBuilder pb = new ProcessBuilder(cmdLine.split("[\\s]+"));
-        Process p = pb.start();
-        Thread.sleep(5000);
-        assertFalse(isProcessAlive(p));
-        InputStream is = p.getInputStream();
-        String s = IO.readContentAsString(is);
+    			String s=getJavaCmdLineResult("org.rythmengine.issue.Gh174Helper");
         assertContains(s, "Hello world");
         assertContains(s, "dev");
         assertContains(s, "Bye world");
