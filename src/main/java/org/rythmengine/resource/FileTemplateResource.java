@@ -26,9 +26,12 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     public FileTemplateResource(String path, FileResourceLoader loader) {
         super(loader);
         File f = new File(path);
+        File home = loader.getRoot();
+        String homePath = home.getPath();
         if (!isValid(f)) {
-            File home = loader.getRoot();
             f = new File(home, path);
+        } else if (path.startsWith(homePath)) {
+            path = path.substring(homePath.length());
         }
         file = f;
         key = path.replace('\\', '/');
@@ -37,7 +40,12 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
     FileTemplateResource(File file, FileResourceLoader loader) {
         super(loader);
         this.file = file;
-        this.key = file.getPath().replace('\\', '/');
+        String path = file.getPath();
+        String homePath = loader.getRoot().getPath();
+        if (path.startsWith(homePath)) {
+            path = path.substring(homePath.length());
+        }
+        this.key = path.replace('\\', '/');
     }
 
     @Override
