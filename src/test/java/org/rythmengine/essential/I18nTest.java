@@ -12,6 +12,7 @@ import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.utils.S;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -43,7 +44,7 @@ public class I18nTest extends TestBase {
         t = "@i18n('template', \"planet\", 7, new Date())";
         s = r(t);
         assertContains(s, "we detected 7 spaceships on the planet Mars.");
-        assertContains(s, DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+        assertContains(s, new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
     }
 
     @Test
