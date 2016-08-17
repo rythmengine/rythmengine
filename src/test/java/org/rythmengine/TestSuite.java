@@ -52,7 +52,6 @@ import org.junit.runners.Suite;
     org.rythmengine.issue.GithubIssue321Test.class, 
     org.rythmengine.issue.GithubIssue325Test.class, 
     org.rythmengine.layout.LayoutTest.class,
-    org.rythmengine.parser.TestAntlr4Parser.class,
     org.rythmengine.render_mode.sandbox.SandboxTest.class,
     org.rythmengine.render_mode.substitute.SubstituteTest.class,
     org.rythmengine.render_mode.to_string.ToStringTest.class,
