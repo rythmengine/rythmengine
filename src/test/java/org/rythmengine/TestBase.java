@@ -110,7 +110,7 @@ public abstract class TestBase extends Assert {
     protected void getSource() {
         TemplateBase tb = (TemplateBase) Rythm.engine().getTemplate(t);
         TemplateClass tc = tb.__getTemplateClass(false);
-        s = tc.getJavaSource();
+        s = tc.javaSource;
     }
     
     protected static void run(Class<? extends TestBase> cls) {

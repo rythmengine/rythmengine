@@ -69,7 +69,7 @@ public class TemplateClass {
      * The fully qualified class name
      */
     private String name;
-    private TemplateClass extendedTemplateClass;
+    public TemplateClass extendedTemplateClass;
     private Set<TemplateClass> includedTemplateClasses = new HashSet<TemplateClass>();
     private String includeTemplateClassNames = null;
     private Map<String, String> includeTagTypes = new HashMap<String, String>();
@@ -78,31 +78,31 @@ public class TemplateClass {
     /**
      * The Java source
      */
-    private String javaSource;
+    public String javaSource;
     /**
      * The compiled byteCode
      */
-    private byte[] javaByteCode;
+    public byte[] javaByteCode;
     /**
      * The enhanced byteCode
      */
-    private byte[] enhancedByteCode;
+    public byte[] enhancedByteCode;
     /**
      * Store a list of import path, i.e. those imports ends with ".*"
      */
-    private Set<String> importPaths;
+    public Set<String> importPaths;
     /**
      * The in JVM loaded class
      */
-    private Class<ITemplate> javaClass;
+    public Class<ITemplate> javaClass;
     /**
      * The in JVM loaded package
      */
-    private Package javaPackage;
+    public Package javaPackage;
     /**
      * The code type could be HTML, JS, JSON etc
      */
-    private ICodeType codeType;
+    public ICodeType codeType;
     /**
      * Is this class compiled
      */
@@ -110,7 +110,7 @@ public class TemplateClass {
     /**
      * Signatures checksum
      */
-    private int sigChecksum;
+    public int sigChecksum;
 
     /**
      * Mark if this is a valid Rythm Template
@@ -122,7 +122,7 @@ public class TemplateClass {
      * <p/>
      * Could be used to merge state into including template class codeBuilder
      */
-    private CodeBuilder codeBuilder;
+    public CodeBuilder codeBuilder;
 
     /**
      * The ITemplate instance
@@ -137,10 +137,7 @@ public class TemplateClass {
     /**
      * the template resource
      */
-    private ITemplateResource templateResource;
-
-    /* Locks */
-    private final ReadWriteLock mutationLock = new ReentrantReadWriteLock();
+    public ITemplateResource templateResource;
 
     /**
      * specify the dialect for the template
@@ -150,26 +147,14 @@ public class TemplateClass {
     private String magic = S.random(4);
 
     public TemplateClass root() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return root;
-        } finally {
-            lock.unlock();
-        }
+        return root;
     }
 
     private TemplateClass() {
     }
 
     public boolean isInner() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return inner;
-        } finally {
-            lock.unlock();
-        }
+        return inner;
     }
 
     private RythmEngine engine() {
@@ -181,57 +166,38 @@ public class TemplateClass {
     }
 
     public String name() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return name;
-        } finally {
-            lock.unlock();
-        }
+        return name;
     }
 
     /*
      * WRITE : includedTemplateClasses, includeTagTypes
      */
     public void addIncludeTemplateClass(TemplateClass tc) {
-        final Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            includedTemplateClasses.add(tc);
-            includeTagTypes.putAll(tc.includeTagTypes);
-        } finally {
-            lock.unlock();
-        }
+        includedTemplateClasses.add(tc);
+        includeTagTypes.putAll(tc.includeTagTypes);
     }
 
     /*
      * WRITE : includeTemplateClassNames
      */
     public String refreshIncludeTemplateClassNames() {
-        final Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            if (includedTemplateClasses.isEmpty()) {
-                includeTemplateClassNames = NO_INCLUDE_CLASS;
-                return NO_INCLUDE_CLASS;
-            }
-            StringBuilder sb = new StringBuilder();
-            boolean first = true;
-
-            for (TemplateClass tc : includedTemplateClasses) {
-                if (!first) {
-                    sb.append(",");
-                }
-                else {
-                    first = false;
-                }
-                sb.append(tc.tagName);
-            }
-            includeTemplateClassNames = sb.toString();
-            return sb.toString();
-        } finally {
-            lock.unlock();
+        if (includedTemplateClasses.isEmpty()) {
+            includeTemplateClassNames = NO_INCLUDE_CLASS;
+            return NO_INCLUDE_CLASS;
         }
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+
+        for (TemplateClass tc : includedTemplateClasses) {
+            if (!first) {
+                sb.append(",");
+            } else {
+                first = false;
+            }
+            sb.append(tc.tagName);
+        }
+        includeTemplateClassNames = sb.toString();
+        return sb.toString();
     }
 
 
@@ -239,78 +205,52 @@ public class TemplateClass {
      *  WRITE : includeTagTypes
      */
     public void setTagType(String tagName, String type) {
-        final Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            includeTagTypes.put(tagName, type);
-        } finally {
-            lock.unlock();
-        }
+        includeTagTypes.put(tagName, type);
     }
 
     public boolean returnObject(String tagName) {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-
-        try {
-            String retType = includeTagTypes.get(tagName);
-            if (null != retType) {
-                return !"void".equals(retType);
-            }
-            if (null != extendedTemplateClass) {
-                return extendedTemplateClass.returnObject(tagName);
-            }
-            return true;
-        } finally {
-            lock.unlock();
+        String retType = includeTagTypes.get(tagName);
+        if (null != retType) {
+            return !"void".equals(retType);
         }
+        if (null != extendedTemplateClass) {
+            return extendedTemplateClass.returnObject(tagName);
+        }
+        return true;
     }
 
     public String serializeIncludeTagTypes() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            if (includeTagTypes.isEmpty()) {
-                return "";
-            }
-            StringBuilder sb = new StringBuilder();
-            boolean empty = true;
-            for (Map.Entry<String, String> entry : includeTagTypes.entrySet()) {
-                if (!empty) {
-                    sb.append(";");
-                }
-                else {
-                    empty = false;
-                }
-                sb.append(entry.getKey()).append(":").append(entry.getValue());
-            }
-            return sb.toString();
-        } finally {
-            lock.unlock();
+        if (includeTagTypes.isEmpty()) {
+            return "";
         }
+        StringBuilder sb = new StringBuilder();
+        boolean empty = true;
+        for (Map.Entry<String, String> entry : includeTagTypes.entrySet()) {
+            if (!empty) {
+                sb.append(";");
+            } else {
+                empty = false;
+            }
+            sb.append(entry.getKey()).append(":").append(entry.getValue());
+        }
+        return sb.toString();
     }
 
     /*
      * WRITE : includeTagTypes
      */
     public void deserializeIncludeTagTypes(String s) {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            includeTagTypes = new HashMap<String, String>();
-            if (S.isEmpty(s)) {
-                return;
+        includeTagTypes = new HashMap<String, String>();
+        if (S.isEmpty(s)) {
+            return;
+        }
+        String[] sa = s.split(";");
+        for (String s0 : sa) {
+            String[] sa0 = s0.split(":");
+            if (sa0.length != 2) {
+                throw new IllegalArgumentException("Unknown include tag types string: " + s);
             }
-            String[] sa = s.split(";");
-            for (String s0 : sa) {
-                String[] sa0 = s0.split(":");
-                if (sa0.length != 2) {
-                    throw new IllegalArgumentException("Unknown include tag types string: " + s);
-                }
-                includeTagTypes.put(sa0[0], sa0[1]);
-            }
-        } finally {
-            lock.unlock();
+            includeTagTypes.put(sa0[0], sa0[1]);
         }
     }
 
@@ -318,13 +258,7 @@ public class TemplateClass {
      * If not null then this template is a tag
      */
     public String getTagName() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return tagName;
-        } finally {
-            lock.unlock();
-        }
+        return tagName;
     }
 
 
@@ -336,23 +270,17 @@ public class TemplateClass {
     }
 
     public String getTemplateSource(boolean includeRoot) {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            if (null != templateResource) {
-                return templateResource.asTemplateContent();
-            }
-            if (!includeRoot) {
-                return "";
-            }
-            TemplateClass parent = root;
-            while ((null != parent) && parent.isInner()) {
-                parent = parent.root;
-            }
-            return null == parent ? "" : parent.getTemplateSource();
-        } finally {
-            lock.unlock();
+        if (null != templateResource) {
+            return templateResource.asTemplateContent();
         }
+        if (!includeRoot) {
+            return "";
+        }
+        TemplateClass parent = root;
+        while ((null != parent) && parent.isInner()) {
+            parent = parent.root;
+        }
+        return null == parent ? "" : parent.getTemplateSource();
     }
 
     /**
@@ -417,7 +345,7 @@ public class TemplateClass {
         //resource.setEngine(engine());
         templateResource = resource;
         if (!noRefresh) {
-            refresh_(false);
+            refresh(false);
         }
     }
 
@@ -433,7 +361,7 @@ public class TemplateClass {
         templateResource = resource;
         this.dialect = dialect;
         if (!noRefresh) {
-            refresh_(false);
+            refresh(false);
         }
     }
 
@@ -443,16 +371,6 @@ public class TemplateClass {
      * @return the key 
      */
     public String getKey() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return null == templateResource ? name : templateResource.getKey().toString();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private String getKey_() {
         return null == templateResource ? name : templateResource.getKey().toString();
     }
 
@@ -460,7 +378,7 @@ public class TemplateClass {
     private Class<?> loadJavaClass() throws Exception {
         if (null == javaSource) {
             if (null == javaSource) {
-                refresh_(false);
+                refresh(false);
             }
         }
         RythmEngine engine = engine();
@@ -490,7 +408,7 @@ public class TemplateClass {
             } catch (RythmException e) {
                 throw e;
             } catch (Exception e) {
-                throw new RuntimeException("Error load template instance for " + getKey_(), e);
+                throw new RuntimeException("Error load template instance for " + getKey(), e);
             }
         }
         if (!engine.isProdMode()) {
@@ -505,13 +423,14 @@ public class TemplateClass {
         return templateInstance;
     }
 
-    private ITemplate asTemplate(ICodeType type, Locale locale, RythmEngine engine) {
+    public ITemplate asTemplate(ICodeType type, Locale locale, RythmEngine engine) {
         if (null == name || engine.isDevMode()) {
-            refresh_(false);
+            refresh(false);
         }
         TemplateBase tmpl = (TemplateBase) templateInstance_(engine).__cloneMe(engine(), null);
-        if (tmpl!=null)
-          tmpl.__prepareRender(type, locale, engine);
+        if (tmpl!=null) {
+            tmpl.__prepareRender(type, locale, engine);
+        }
         return tmpl;
     }
 
@@ -520,16 +439,6 @@ public class TemplateClass {
     }
 
     public ITemplate asTemplate(ITemplate caller, RythmEngine engine) {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return asTemplate_(caller, engine);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private ITemplate asTemplate_(ITemplate caller, RythmEngine engine) {
         TemplateBase tb = (TemplateBase) caller;
         TemplateBase tmpl = (TemplateBase) templateInstance_(engine).__cloneMe(engine, caller);
         tmpl.__prepareRender(tb.__curCodeType(), tb.__curLocale(), engine);
@@ -541,29 +450,21 @@ public class TemplateClass {
     }
 
     public void buildSourceCode(String includingClassName) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            long start = System.currentTimeMillis();
-            importPaths = new HashSet<String>();
-            // Possible bug here?
-            if (null != codeBuilder) {
-                codeBuilder.clear();
-            }
-            codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name, tagName, this, engine, dialect);
-            codeBuilder.includingCName = includingClassName;
-            codeBuilder.build();
-            extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
-            javaSource = codeBuilder.toString();
-            if (logger.isTraceEnabled()) {
-                logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey_());
-            }
-        } finally {
-            lock.unlock();
+        long start = System.currentTimeMillis();
+        importPaths = new HashSet<String>();
+        // Possible bug here?
+        if (null != codeBuilder) codeBuilder.clear();
+        codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, this, engine, dialect);
+        codeBuilder.includingCName = includingClassName;
+        codeBuilder.build();
+        extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
+        javaSource = codeBuilder.toString();
+        if (logger.isTraceEnabled()) {
+            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
         }
     }
 
-    private void buildSourceCode_() {
+    public void buildSourceCode() {
         long start = System.currentTimeMillis();
         importPaths = new HashSet<String>();
         // Possible bug here?
@@ -583,45 +484,25 @@ public class TemplateClass {
             javaSource = CodeBuilder.preventInfiniteLoop(javaSource);
         }
         if (logger.isTraceEnabled()) {
-            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey_());
-        }
-    }
-
-
-    public void buildSourceCode() {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            buildSourceCode_();
-        } finally {
-            lock.unlock();
+            logger.trace("%s ms to generate java source for template: %s", System.currentTimeMillis() - start, getKey());
         }
     }
 
     public void addImportPath(String path) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            if (path == null || path.isEmpty()) {
-                return;
-            }
-            this.importPaths.add(path);
-        } finally {
-            lock.unlock();
+        if (path == null || path.isEmpty()) {
+            return;
         }
+        this.importPaths.add(path);
     }
 
     public void replaceImportPath(Set<String> paths) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.importPaths = paths;
-        } finally {
-            lock.unlock();
-        }
+        this.importPaths = paths;
     }
 
-    private boolean refresh_(boolean forceRefresh) {
+    /**
+     * @return true if this class has changes refreshed, otherwise this class has not been changed yet
+     */
+    public synchronized boolean refresh(boolean forceRefresh) {
         if (inner) {
             return false;
         }
@@ -715,10 +596,10 @@ public class TemplateClass {
         }
 
         if (extendedTemplateChanged && !forceRefresh) {
-            reset_();
+            reset();
             compiled = false;
             engine().restart(new ClassReloadException("extended class changed"));
-            refresh_(forceRefresh);
+            refresh(forceRefresh);
             return true; // pass refresh state to sub template
         }
         // templateResource.refresh() must be put at first so we make sure resource get refreshed
@@ -730,8 +611,8 @@ public class TemplateClass {
         }
 
         // now start generate source and compile source to byte code
-        reset_();
-        buildSourceCode_();
+        reset();
+        buildSourceCode();
         engine().classCache().cacheTemplateClassSource(this); // cache source code for debugging purpose
         if (!codeBuilder.isRythmTemplate()) {
             isValid = false;
@@ -745,48 +626,18 @@ public class TemplateClass {
     }
 
     /**
-     * @return true if this class has changes refreshed, otherwise this class has not been changed yet
-     */
-    public boolean refresh(boolean forceRefresh) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-
-        try {
-            return refresh_(forceRefresh);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
      * Is this class already compiled but not defined ?
      *
      * @return if the class is compiled but not defined
      */
     public boolean isDefinable() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return compiled && javaClass != null;
-        } finally {
-            lock.unlock();
-        }
+        return compiled && javaClass != null;
     }
 
     /**
      * Remove all java source/ byte code and cache
      */
     public void reset() {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            reset_();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private void reset_() {
         javaByteCode = null;
         enhancedByteCode = null;
         javaSource = null;
@@ -805,18 +656,23 @@ public class TemplateClass {
         return name + magic;
     }
 
-    private byte[] compile_() {
+    /**
+     * Compile the class from Java source
+     *
+     * @return the bytes that comprise the class file
+     */
+    public synchronized byte[] compile() {
         long start = System.currentTimeMillis();
         try {
             if (null != javaByteCode) {
                 return javaByteCode;
             }
             if (null == javaSource) {
-                throw new IllegalStateException("Cannot find java source when compiling " + getKey_());
+                throw new IllegalStateException("Cannot find java source when compiling " + getKey());
             }
             engine().classes().compiler.compile(new String[]{name});
             if (logger.isTraceEnabled()) {
-                logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey_());
+                logger.trace("%sms to compile template: %s", System.currentTimeMillis() - start, getKey());
             }
             return javaByteCode;
         } catch (CompileException.CompilerException e) {
@@ -841,84 +697,54 @@ public class TemplateClass {
             throw e;
         } finally {
             if (logger.isTraceEnabled()) {
-                logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey_());
+                logger.trace("%sms to compile template class %s", System.currentTimeMillis() - start, getKey());
             }
         }
     }
-
-    /**
-     * Compile the class from Java source
-     *
-     * @return the bytes that comprise the class file
-     */
-    public byte[] compile() {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-
-        try {
-            return compile_();
-        } finally {
-            lock.unlock();
-        }
-    }
-
 
     /**
      * Used to instruct embedded class byte code needs to be enhanced, but for now
      * let's just use the java byte code as the enhanced bytecode
      */
     public void delayedEnhance(TemplateClass root) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-
-        try {
-            enhancedByteCode = javaByteCode;
-            root.embeddedClasses.add(this);
-        } finally {
-            lock.unlock();
-        }
+        enhancedByteCode = javaByteCode;
+        root.embeddedClasses.add(this);
     }
 
     public byte[] enhance() {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
+        if (enhancing) {
+            throw new IllegalStateException("reenter enhance() call");
+        }
+        enhancing = true;
         try {
-            if (enhancing) {
-                throw new IllegalStateException("reenter enhance() call");
-            }
-            enhancing = true;
-            try {
-                byte[] bytes = enhancedByteCode;
+            byte[] bytes = enhancedByteCode;
+            if (null == bytes) {
+                bytes = javaByteCode;
                 if (null == bytes) {
-                    bytes = javaByteCode;
-                    if (null == bytes) {
-                        bytes = compile_();
-                    }
-                    long start = System.currentTimeMillis();
-                    IByteCodeEnhancer en = engine().conf().byteCodeEnhancer();
-                    if (null != en) {
-                        try {
-                            bytes = en.enhance(name, bytes);
-                        } catch (Exception e) {
-                            logger.warn(e, "Error enhancing template class: %s", getKey_());
-                        }
-                        if (logger.isTraceEnabled()) {
-                            logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey_());
-                        }
-                    }
-                    enhancedByteCode = bytes;
-                    engine().classCache().cacheTemplateClass(this);
+                    bytes = compile();
                 }
-                for (TemplateClass embedded : embeddedClasses) {
-                    embedded.enhancedByteCode = null;
-                    embedded.enhance();
+                long start = System.currentTimeMillis();
+                IByteCodeEnhancer en = engine().conf().byteCodeEnhancer();
+                if (null != en) {
+                    try {
+                        bytes = en.enhance(name, bytes);
+                    } catch (Exception e) {
+                        logger.warn(e, "Error enhancing template class: %s", getKey());
+                    }
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("%sms to enhance template class %s", System.currentTimeMillis() - start, getKey());
+                    }
                 }
-                return bytes;
-            } finally {
-                enhancing = false;
+                enhancedByteCode = bytes;
+                engine().classCache().cacheTemplateClass(this);
             }
+            for (TemplateClass embedded : embeddedClasses) {
+                embedded.enhancedByteCode = null;
+                embedded.enhance();
+            }
+            return bytes;
         } finally {
-            lock.unlock();
+            enhancing = false;
         }
     }
 
@@ -926,13 +752,7 @@ public class TemplateClass {
      * Unload the class
      */
     public void uncompile() {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            javaClass = null;
-        } finally {
-            lock.unlock();
-        }
+        javaClass = null;
     }
 
     public boolean isClass() {
@@ -945,13 +765,7 @@ public class TemplateClass {
     }
 
     public void loadCachedByteCode(byte[] code) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            enhancedByteCode = code;
-        } finally {
-            lock.unlock();
-        }
+        enhancedByteCode = code;
     }
 
     /**
@@ -980,14 +794,14 @@ public class TemplateClass {
         }
         if (o instanceof TemplateClass) {
             TemplateClass that = (TemplateClass) o;
-            return that.getKey_().equals(getKey_());
+            return that.getKey().equals(getKey());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return getKey_().hashCode();
+        return getKey().hashCode();
     }
 
 
@@ -1054,88 +868,40 @@ public class TemplateClass {
     }
 
     public ICodeType getCodeType() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return codeType;
-        } finally {
-            lock.unlock();
-        }
+        return codeType;
     }
 
     public Set<String> getImportPaths() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            if (null == importPaths) {
-                return Collections.emptySet();
-            }
-            return Collections.unmodifiableSet(importPaths);
-        } finally {
-            lock.unlock();
+        if (null == importPaths) {
+            return Collections.emptySet();
         }
+        return Collections.unmodifiableSet(importPaths);
     }
 
     public String getJavaSource() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return javaSource;
-        } finally {
-            lock.unlock();
-        }
+        return javaSource;
     }
 
     @Deprecated
     public void setJavaPackage(Package javaPackage) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.javaPackage = javaPackage;
-        } finally {
-            lock.unlock();
-        }
+        this.javaPackage = javaPackage;
     }
 
     @Deprecated
     public void setJavaClass(Class<ITemplate> javaClass) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.javaClass = javaClass;
-        } finally {
-            lock.unlock();
-        }
+        this.javaClass = javaClass;
     }
 
     public CodeBuilder getCodeBuilder() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return codeBuilder;
-        } finally {
-            lock.unlock();
-        }
+        return codeBuilder;
     }
 
     public Class<ITemplate> getJavaClass() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return javaClass;
-        } finally {
-            lock.unlock();
-        }
+        return javaClass;
     }
 
     public byte[] getEnhancedByteCode() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return enhancedByteCode;
-        } finally {
-            lock.unlock();
-        }
+        return enhancedByteCode;
     }
 
     public byte[] getJavaByteCode() {
@@ -1143,44 +909,20 @@ public class TemplateClass {
     }
 
     public int getSigChecksum() {
-        Lock lock = mutationLock.readLock();
-        lock.lock();
-        try {
-            return sigChecksum;
-        } finally {
-            lock.unlock();
-        }
+        return sigChecksum;
     }
 
     @Deprecated
     public void setJavaSource(String javaSource) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.javaSource = javaSource;
-        } finally {
-            lock.unlock();
-        }
+        this.javaSource = javaSource;
     }
 
     @Deprecated
     public void setExtendedTemplateClass(TemplateClass extendedTemplateClass) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.extendedTemplateClass = extendedTemplateClass;
-        } finally {
-            lock.unlock();
-        }
+        this.extendedTemplateClass = extendedTemplateClass;
     }
 
     public void setIncludeTemplateClassNames(String includeTemplateClassNames) {
-        Lock lock = mutationLock.writeLock();
-        lock.lock();
-        try {
-            this.includeTemplateClassNames = includeTemplateClassNames;
-        } finally {
-            lock.unlock();
-        }
+        this.includeTemplateClassNames = includeTemplateClassNames;
     }
 }
