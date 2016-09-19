@@ -91,6 +91,10 @@ public abstract class TestBase extends Assert {
         assertTrue(msg, m.matches());
     }
     
+    /**
+     * check that the current generated equals the given result
+     * @param result - the result to compare to
+     */
     protected void eq(String result) {
         if (null == s) {
             s = r(t);
