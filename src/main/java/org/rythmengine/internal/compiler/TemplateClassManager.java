@@ -25,6 +25,8 @@ import java.util.Map;
 public class TemplateClassManager {
     protected final static ILogger logger = Logger.get(TemplateClassManager.class);
 
+    //private static final ILogger logger = Logger.get(TemplateClassCache.class);
+
     public RythmEngine engine = null;
 
     /**
@@ -116,12 +118,17 @@ public class TemplateClassManager {
         }
         return l;
     }
+    
+    @Deprecated
+    public void add(Object key, TemplateClass templateClass) {
+        //tmplIdx.put(key, templateClass);
+    }
 
     public void add(TemplateClass templateClass) {
         //clsNameIdx.put(templateClass.name0(), templateClass);
         clsNameIdx.put(templateClass.name(), templateClass);
         if (!templateClass.isInner()) {
-            tmplIdx.put(templateClass.getTemplateResource().getKey(), templateClass);
+            tmplIdx.put(templateClass.templateResource.getKey(), templateClass);
         }
     }
 
@@ -141,7 +148,7 @@ public class TemplateClassManager {
             if (cn.matches(name0 + "v[0-9]+\\$.*")) embedded.add(cn);
         }
         for (String cn : embedded) clsNameIdx.remove(cn);
-        if (null != templateClass && null != templateClass.getTemplateResource()) tmplIdx.remove(templateClass.getKey());
+        if (null != templateClass && null != templateClass.templateResource) tmplIdx.remove(templateClass.getKey());
     }
 
     public void remove(String name) {

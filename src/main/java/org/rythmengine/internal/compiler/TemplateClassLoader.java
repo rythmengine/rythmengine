@@ -70,7 +70,7 @@ public class TemplateClassLoader extends ClassLoader {
 
         private final Map<File, FileWithClassDefs> classDefsInFileCache = new HashMap<File, FileWithClassDefs>();
 
-        public int computePathHash(File... paths) {
+        public synchronized int computePathHash(File... paths) {
             StringBuilder buf = new StringBuilder();
             for (File file : paths) {
                 scan(buf, file);
@@ -207,7 +207,7 @@ public class TemplateClassLoader extends ClassLoader {
     }
 
     @Override
-    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+    protected synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (name.contains("UrlResolver")) {
             logger.info("loading UrlResovler...");
         }
@@ -270,39 +270,38 @@ public class TemplateClassLoader extends ClassLoader {
         TemplateClass templateClass = engine.classes().getByClassName(name);
         if (templateClass != null) {
             if (templateClass.isDefinable()) {
-                return templateClass.getJavaClass();
+                return templateClass.javaClass;
             }
-            byte[] bc = templateClass.getEnhancedByteCode();//bCache.getBytecode(name, templateClass.javaSource);
+            byte[] bc = templateClass.enhancedByteCode;//bCache.getBytecode(name, templateClass.javaSource);
             if (!templateClass.isClass()) {
                 definePackage(templateClass.getPackage(), null, null, null, null, null, null, null);
             } else {
                 loadPackage(name);
             }
             if (bc != null) {
-                // FIXME : Move this over to TemplateClass
                 //templateClass.enhancedByteCode = bc;
-                templateClass.setJavaClass((Class<ITemplate>) defineClass(templateClass.name(), templateClass.getEnhancedByteCode(), 0, templateClass.getEnhancedByteCode().length, protectionDomain));
-                resolveClass(templateClass.getJavaClass());
+                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
-                    templateClass.setJavaPackage(templateClass.getJavaClass().getPackage());
+                    templateClass.javaPackage = templateClass.javaClass.getPackage();
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to load class %s from clsNameIdx", System.currentTimeMillis() - start, name);
                 }
-                return templateClass.getJavaClass();
+                return templateClass.javaClass;
             }
 
-            if (templateClass.getJavaByteCode() != null || templateClass.compile() != null) {
+            if (templateClass.javaByteCode != null || templateClass.compile() != null) {
                 templateClass.enhance();
-                templateClass.setJavaClass((Class<ITemplate>) defineClass(templateClass.name(), templateClass.getEnhancedByteCode(), 0, templateClass.getEnhancedByteCode().length, protectionDomain));
-                resolveClass(templateClass.getJavaClass());
+                templateClass.javaClass = (Class<ITemplate>) defineClass(templateClass.name(), templateClass.enhancedByteCode, 0, templateClass.enhancedByteCode.length, protectionDomain);
+                resolveClass(templateClass.javaClass);
                 if (!templateClass.isClass()) {
-                    templateClass.setJavaPackage(templateClass.getJavaClass().getPackage());
+                    templateClass.javaPackage = templateClass.javaClass.getPackage();
                 }
                 if (logger.isTraceEnabled()) {
                     logger.trace("%sms to load class %s", System.currentTimeMillis() - start, name);
                 }
-                return templateClass.getJavaClass();
+                return templateClass.javaClass;
             }
             engine.classes().remove(name);
         } else if (name.lastIndexOf(TemplateClass.CN_SUFFIX) == -1) {
@@ -319,7 +318,7 @@ public class TemplateClassLoader extends ClassLoader {
                 }
                 TemplateClass tc = TemplateClass.createInnerClass(name, null, parent);
                 engine.classCache().loadTemplateClass(tc);
-                byte[] bc = tc.getEnhancedByteCode();
+                byte[] bc = tc.enhancedByteCode;
                 if (null == bc) {
                     // inner class byte code cache missed some how, let's try to recover it
                     while ((null != parent) && parent.isInner()) {
@@ -333,15 +332,15 @@ public class TemplateClassLoader extends ClassLoader {
                     parent.compile();
                     // now try again and see if we can find the class definition
                     tc = engine.classes().getByClassName(name);
-                    Class<?> c = tc.getJavaClass();
+                    Class<?> c = tc.javaClass;
                     if (null != c) return c;
-                    bc = tc.getEnhancedByteCode();
+                    bc = tc.enhancedByteCode;
                     if (null == bc) {
                         throw new RuntimeException("Cannot find bytecode cache for inner class: " + name);
                     }
                 }
-                tc.setJavaClass((Class<ITemplate>) defineClass(tc.name(), bc, 0, bc.length, protectionDomain));
-                return tc.getJavaClass();
+                tc.javaClass = (Class<ITemplate>) defineClass(tc.name(), bc, 0, bc.length, protectionDomain);
+                return tc.javaClass;
             }
         }
         return null;
@@ -458,12 +457,12 @@ public class TemplateClassLoader extends ClassLoader {
                 engine.classes().remove(tc);
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             } else {
-                int sigChecksum = tc.getSigChecksum();
+                int sigChecksum = tc.sigChecksum;
                 tc.enhance();
-                if (sigChecksum != tc.getSigChecksum()) {
+                if (sigChecksum != tc.sigChecksum) {
                     dirtySig = true;
                 }
-                newDefinitions.add(new ClassDefinition(tc.getJavaClass(), tc.getEnhancedByteCode()));
+                newDefinitions.add(new ClassDefinition(tc.javaClass, tc.enhancedByteCode));
                 currentState = new TemplateClassloaderState();//show others that we have changed..
             }
         }
@@ -480,7 +479,7 @@ public class TemplateClassLoader extends ClassLoader {
         if (hash != this.pathHash) {
             // Remove class for deleted files !!
             for (TemplateClass tc : engine.classes().all()) {
-                if (!tc.getTemplateResource().isValid()) {
+                if (!tc.templateResource.isValid()) {
                     engine.classes().remove(tc);
                     currentState = new TemplateClassloaderState();//show others that we have changed..
                 }
@@ -494,7 +493,7 @@ public class TemplateClassLoader extends ClassLoader {
      */
     int pathHash = 0;
 
-    int computePathHash() {
+    public int computePathHash() {
         return engine.isProdMode() ? 0 : classStateHashCreator.computePathHash(engine.conf().tmpDir());
     }
 
