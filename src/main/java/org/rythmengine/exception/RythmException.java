@@ -63,10 +63,10 @@ public class RythmException extends FastRuntimeException {
         super(message, t);
         boolean logJava = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_JAVA_ENABLED);
         boolean logTmpl = (Boolean) engine.conf().get(RythmConfigurationKey.LOG_SOURCE_TEMPLATE_ENABLED);
-        F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.getJavaSource(), tc.getTemplateSource(), tc);
+        F.T4<String, Integer, String, String> t4 = parse(message, logJava/* || (this instanceof CompileException)*/, logTmpl/*|| (this instanceof ParseException)*/, javaLineNumber, templateLineNumber, tc.javaSource, tc.getTemplateSource(), tc);
         this.javaLineNumber = javaLineNumber;
         this.templateClass = tc;
-        this.javaSource = tc.getJavaSource();
+        this.javaSource = tc.javaSource;
         this.templateSource = tc.getTemplateSource();
         this.templateLineNumber = t4._2;
         this.originalMessage = message;
@@ -203,22 +203,22 @@ public class RythmException extends FastRuntimeException {
 
     private static String getJavaSource(String javaSource, TemplateClass templateClass) {
         if (null != javaSource) return javaSource;
-        return (null == templateClass.getJavaSource()) ? "" : templateClass.getJavaSource();
+        return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
     }
 
     public String getJavaSource() {
         if (null != javaSource) return javaSource;
-        return (null == templateClass.getJavaSource()) ? "" : templateClass.getJavaSource();
+        return (null == templateClass.javaSource) ? "" : templateClass.javaSource;
     }
 
     private static String getTemplateSource(String templateSource, TemplateClass templateClass) {
         if (null != templateSource) return templateSource;
-        return templateClass.getTemplateResource().asTemplateContent();
+        return templateClass.templateResource.asTemplateContent();
     }
 
     public String getTemplateSource() {
         if (null != templateSource) return templateSource;
-        return templateClass.getTemplateResource().asTemplateContent();
+        return templateClass.templateResource.asTemplateContent();
     }
 
     public String getTemplateName() {

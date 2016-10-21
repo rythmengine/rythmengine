@@ -122,10 +122,10 @@ public class TemplateCompiler {
             if (null == tc) {
                 throw new NullPointerException("Error get java source content for " + clazzName + ": template class is null");
             }
-            if (null == tc.getJavaSource()) {
+            if (null == tc.javaSource) {
                 throw new NullPointerException("Error get java source content for " + clazzName + ": java source is null");
             }
-            return tc.getJavaSource().toCharArray();
+            return tc.javaSource.toCharArray();
             //return classCache.getByClassName(clazzName).javaSource.toCharArray();
         }
 
@@ -208,8 +208,8 @@ public class TemplateCompiler {
 
                     // TemplateClass exists
                     if (templateClass != null) {
-                        if (templateClass.getJavaByteCode() != null) {
-                            ClassFileReader classFileReader = new ClassFileReader(templateClass.getJavaByteCode(), fileName, true);
+                        if (templateClass.javaByteCode != null) {
+                            ClassFileReader classFileReader = new ClassFileReader(templateClass.javaByteCode, fileName, true);
                             return new NameEnvironmentAnswer(classFileReader, null);
                         }
                         // Cascade compilation

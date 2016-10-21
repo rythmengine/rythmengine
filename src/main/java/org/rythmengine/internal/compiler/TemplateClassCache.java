@@ -110,7 +110,7 @@ public class TemplateClassCache {
             if (source.length() != 0) {
                 String s = source.toString();
                 String[] sa = s.split("__INCLUDED_TAG_TYPES__");
-                tc.setJavaSource(sa[0]);
+                tc.javaSource = sa[0];
                 s = sa[1];
                 sa = s.split("__INCULDED_TEMPLATE_CLASS_NAME_LIST__");
                 tc.deserializeIncludeTagTypes(sa[0]);
@@ -153,7 +153,7 @@ public class TemplateClassCache {
         try {
             File f = getCacheSourceFile(tc);
             OutputStream os = new BufferedOutputStream(new FileOutputStream(f));
-            os.write(tc.getJavaSource().getBytes("utf-8"));
+            os.write(tc.javaSource.getBytes("utf-8"));
             os.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -173,20 +173,20 @@ public class TemplateClassCache {
 
             // --- cache java source
             os.write(0);
-            if (null != tc.getJavaSource()) {
+            if (null != tc.javaSource) {
                 TextBuilder tb = new TextBuilder();
-                tb.p(tc.getJavaSource());
+                tb.p(tc.javaSource);
                 tb.p("__INCLUDED_TAG_TYPES__").p(tc.serializeIncludeTagTypes());
                 tb.p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
                         .p("__IMPORT_PATH_LIST__");
-                Set<String> importPaths = new HashSet<String>();
-                if (tc.getImportPaths().isEmpty()) {
-                    tc.addImportPath("java.lang");
-                } else {
-                    importPaths = tc.getImportPaths();
+                if (tc.importPaths == null) {
+                    tc.importPaths = new HashSet<String>(0);
+                }
+                if (tc.importPaths.isEmpty()) {
+                    tc.importPaths.add("java.lang");
                 }
                 boolean first = true;
-                for (String s : importPaths) {
+                for (String s : tc.importPaths) {
                     if (!first) {
                         tb.p(";");
                     } else {
@@ -200,7 +200,7 @@ public class TemplateClassCache {
             // --- cache byte code
             os.write(0);
             //if (null != tc.enhancedByteCode) {
-            os.write(tc.getEnhancedByteCode());
+            os.write(tc.enhancedByteCode);
 
             os.close();
         } catch (Exception e) {
