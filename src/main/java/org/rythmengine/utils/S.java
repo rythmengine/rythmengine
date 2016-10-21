@@ -15,15 +15,9 @@ import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Currency;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.ResourceBundle;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
