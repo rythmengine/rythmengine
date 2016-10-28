@@ -839,7 +839,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
 
     @Override
     public ITemplate __setRenderArgs(Map<String, Object> args) {
-        __renderArgs.putAll(args);
+        __renderArgs = args;
         return this;
     }
 
