@@ -36,6 +36,13 @@ public class CompileException extends RythmException {
         return e;
     }
 
+    /**
+     * construct a compile exception
+     * @param engine
+     * @param tc
+     * @param javaLineNumber
+     * @param message
+     */
     public CompileException(RythmEngine engine, TemplateClass tc, int javaLineNumber, String message) {
         super(engine, tc, javaLineNumber, -1, message);
         RythmEvents.COMPILE_FAILED.trigger(engine, tc);
