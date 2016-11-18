@@ -1493,6 +1493,42 @@ public class RythmEngine implements IEventDispatcher {
         classes().add(tc);
         return this;
     }
+    
+    /**
+     * Transport Template Test Result
+     * especially if there was an error thrown
+     * @author wf
+     *
+     */
+    public static class TemplateTestResult {
+      private String fullName;
+      TemplateClass tc;
+      /**
+       * @return the fullName
+       */
+      public String getFullName() {
+        return fullName;
+      }
+      /**
+       * @param fullName the fullName to set
+       */
+      public void setFullName(String fullName) {
+        this.fullName = fullName;
+      }
+      
+      /**
+       * do we carry an error thrown earlier?
+       * @return - the error
+       */
+      public Throwable getError() {
+        if (tc.templateResource!=null && tc.templateResource.getError()!=null) {
+          return tc.templateResource.getError();
+        } else {
+          return null;
+        }
+      }
+    }
+     
 
     /**
      * Check if a template exists and return it's name
@@ -1501,14 +1537,20 @@ public class RythmEngine implements IEventDispatcher {
      *
      * @param name
      * @param callerClass
-     * @return template name
+     * @return the result including the callers name
      */
-    public String testTemplate(String name, TemplateClass callerClass, ICodeType codeType) {
+    public TemplateTestResult testTemplate(String name, TemplateClass callerClass, ICodeType codeType) {
+        // prepare a result
+        TemplateTestResult result=new TemplateTestResult();
         if (Keyword.THIS.toString().equals(name)) {
-            return callerClass.getTagName();
+            result.setFullName(callerClass.getTagName());
+            return result;
         }
         if (mode().isProd() && _nonTmpls.contains(name)) return null;
-        if (templateRegistered(name)) return name;
+        if (templateRegistered(name)) {
+          result.setFullName(name);
+          return result;
+        }
         // try imported path
         if (null != callerClass.importPaths) {
             for (String s : callerClass.importPaths) {
@@ -1516,7 +1558,10 @@ public class RythmEngine implements IEventDispatcher {
                     continue;
                 }
                 String name0 = s + "." + name;
-                if (_templates.containsKey(name0)) return name0;
+                if (_templates.containsKey(name0)) {
+                  result.setFullName(name0);
+                  return result;
+                }
             }
         }
         // try relative path
@@ -1528,12 +1573,18 @@ public class RythmEngine implements IEventDispatcher {
             if (-1 != pos) {
                 String s = callerName.substring(0, pos);
                 String name0 = s + "." + name;
-                if (_templates.containsKey(name0)) return name0;
+                if (_templates.containsKey(name0)) {
+                  result.setFullName(name0);
+                  return result;
+                }
                 pos = s.lastIndexOf(".");
                 if (-1 != pos) {
                     s = callerName.substring(0, pos);
                     name0 = s + "." + name;
-                    if (_templates.containsKey(name0)) return name0;
+                    if (_templates.containsKey(name0)) {
+                      result.setFullName(name0);
+                      return result;
+                    }
                 }
             }
         }
@@ -1545,8 +1596,9 @@ public class RythmEngine implements IEventDispatcher {
                 if (mode().isProd()) _nonTmpls.add(name);
                 return null;
             }
-            String fullName = tc.getTagName();
-            return fullName;
+            result.setFullName(tc.getTagName());
+            result.tc=tc;
+            return result;
         } catch (TagLoadException e) {
             throw e;
         } catch (RythmException e) {

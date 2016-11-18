@@ -6,8 +6,10 @@
 package org.rythmengine.internal;
 
 import com.stevesoft.pat.Regex;
+
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
+import org.rythmengine.RythmEngine.TemplateTestResult;
 import org.rythmengine.Sandbox;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmConfigurationKey;
@@ -38,7 +40,9 @@ import org.rythmengine.utils.TextBuilder;
 
 import java.util.*;
 
-
+/**
+ * code Builder
+ */
 public class CodeBuilder extends TextBuilder {
 
     protected final static ILogger logger = Logger.get(CodeBuilder.class);
@@ -541,13 +545,24 @@ public class CodeBuilder extends TextBuilder {
      * @return the string
      */
     public String addInclude(String include, int lineNo, ICodeType codeType) {
-        String tmplName = engine.testTemplate(include, templateClass, codeType);
-        if (null == tmplName) {
+        TemplateTestResult testResult = engine.testTemplate(include, templateClass, codeType);
+        if (null == testResult) {
             throw new ParseException(engine, templateClass, lineNo, "include template not found: %s", include);
         }
+        // if there was an error in the included template - report it here
+        if (testResult.getError()!=null) {
+           String errMsg=testResult.getError().getMessage();
+           throw new ParseException(engine, templateClass, lineNo,errMsg, include);
+        }
+        String tmplName=testResult.getFullName();
         TemplateBase includeTmpl = (TemplateBase) engine.getRegisteredTemplate(tmplName);
+        
         if (includeTmpl instanceof JavaTagBase) {
             throw new ParseException(engine, templateClass, lineNo, "cannot include Java tag: %s", include);
+        }
+        // check that we didn't get any include at all
+        if (includeTmpl==null) {
+            throw new ParseException(engine, templateClass, lineNo, "include for template failed: %s ", include);
         }
         TemplateClass includeTc = includeTmpl.__getTemplateClass(false);
         includeTc.buildSourceCode(includingClassName());
@@ -574,7 +589,8 @@ public class CodeBuilder extends TextBuilder {
         if (null != this.extended) {
             throw new ParseException(engine, templateClass, lineNo, "Extended template already declared");
         }
-        String fullName = engine.testTemplate(extended, templateClass, null);
+        TemplateTestResult testResult = engine.testTemplate(extended, templateClass, null);
+        String fullName=testResult.getFullName();
         if (null == fullName) {
             // try legacy style
             setExtended_deprecated(extended, args, lineNo);
@@ -941,6 +957,7 @@ public class CodeBuilder extends TextBuilder {
         return regex.search(type);
     }
     
+    @SuppressWarnings("unused")
     private static boolean isArray(String type) {
         Regex regex = new Regex(".*(?@[])");
         return regex.search(type);

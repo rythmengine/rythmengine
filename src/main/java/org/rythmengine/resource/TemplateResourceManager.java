@@ -31,9 +31,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class TemplateResourceManager {
 
+    @SuppressWarnings("unused")
     private static final ILogger logger = Logger.get(TemplateResourceManager.class); 
     
+    /**
+     * NULL TemplateResource
+     */
+    @SuppressWarnings("serial")
     public static final ITemplateResource NULL = new ITemplateResource() {
+        // this NULL TemplateResource can actually carry an error
+        // might not be necessary but is there in any case
+        private Throwable error;
+
         @Override
         public Object getKey() {
             return null;
@@ -67,6 +76,16 @@ public class TemplateResourceManager {
         @Override
         public ITemplateResourceLoader getLoader() {
             return null;
+        }
+
+        @Override
+        public Throwable getError() {
+          return error;
+        }
+
+        @Override
+        public void setError(Throwable error) {
+          this.error=error;
         }
     };
 
@@ -139,6 +158,10 @@ public class TemplateResourceManager {
         tmpBlackList.remove();
     }
 
+    /**
+     * construct the TemplateResourceManager for the give engine
+     * @param engine
+     */
     public TemplateResourceManager(RythmEngine engine) {
         this.engine = engine;
         RythmConfiguration conf = engine.conf();

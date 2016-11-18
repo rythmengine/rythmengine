@@ -201,14 +201,27 @@ public class Token extends TextBuilder {
 
     private static final Regex R_ = new Regex("^\\s*(?@())\\s*$");
 
+    /**
+     * strip the outer brackets of the given string s
+     * 
+     * @param s
+     * @return - the stripped string
+     */
     private static String stripOuterBrackets(String s) {
-        if (S.isEmpty(s)) return s;
-        if (R_.search(s)) {
-            // strip out the outer brackets
-            s = R_.stringMatched();
-            s = s.substring(1);
-            s = s.substring(0, s.length() - 1);
+        try {
+            if (S.isEmpty(s))
+                return s;
+            if (R_.search(s)) {
+                // strip out the outer brackets
+                s = R_.stringMatched();
+                s = s.substring(1);
+                s = s.substring(0, s.length() - 1);
+            }
+        } catch (RuntimeException re) {
+            // this unfortunately happens - so at least make it debuggable
+            throw re;
         }
+  
         return s;
     }
 

@@ -151,6 +151,8 @@ public class EventBus implements IEventDispatcher {
             public String handleEvent(RythmEngine engine, CodeBuilder c) {
                 // pre process template source
                 String tmpl = c.template();
+                if (tmpl==null)
+                  throw new RuntimeException("template for "+c.getClass().getName()+" not available");
                 tmpl = tmpl.replaceAll("(\\r\\n)", "\n");
                 tmpl = tmpl.replaceAll("\\r", "\n");
                 return tmpl;
