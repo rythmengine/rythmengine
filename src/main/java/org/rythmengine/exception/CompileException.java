@@ -17,8 +17,13 @@ import org.rythmengine.internal.parser.build_in.ExpressionParser;
  * Time: 7:47 AM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("serial")
 public class CompileException extends RythmException {
 
+    /**
+     * a Compiler Exception
+     *
+     */
     public static class CompilerException extends RuntimeException {
         public String className;
         public int javaLineNumber;
@@ -28,6 +33,13 @@ public class CompileException extends RythmException {
         }
     }
 
+    /**
+     * create a compiler exception for the given className, line number and message
+     * @param className
+     * @param line
+     * @param message
+     * @return the CompilerException
+     */
     public static CompilerException compilerException(String className, int line, String message) {
         CompilerException e = new CompilerException();
         e.javaLineNumber = line;

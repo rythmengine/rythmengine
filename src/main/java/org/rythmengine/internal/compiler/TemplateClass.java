@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -481,7 +478,8 @@ public class TemplateClass {
         codeBuilder.build();
         extendedTemplateClass = codeBuilder.getExtendedTemplateClass();
         javaSource = codeBuilder.toString();
-        if (engine().insideSandbox()) {
+        engine();
+        if (RythmEngine.insideSandbox()) {
             javaSource = CodeBuilder.preventInfiniteLoop(javaSource);
         }
         if (logger.isTraceEnabled()) {
@@ -653,6 +651,7 @@ public class TemplateClass {
         javaClass = null;
     }
 
+    @SuppressWarnings("unused")
     private String magic() {
         return name + magic;
     }
