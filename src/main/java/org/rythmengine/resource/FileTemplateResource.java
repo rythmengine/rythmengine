@@ -23,6 +23,11 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         return 1000 * 5;
     }
 
+    /**
+     * construct me from the givne path and loader
+     * @param path
+     * @param loader
+     */
     public FileTemplateResource(String path, FileResourceLoader loader) {
         super(loader);
         File f = new File(path);
@@ -37,6 +42,11 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
         key = path.replace('\\', '/');
     }
 
+    /**
+     * construct me from the given file and loader
+     * @param file
+     * @param loader
+     */
     FileTemplateResource(File file, FileResourceLoader loader) {
         super(loader);
         this.file = file;
@@ -69,7 +79,8 @@ public class FileTemplateResource extends TemplateResourceBase implements ITempl
 
     @Override
     protected String reload() {
-        return IO.readContentAsString(file);
+        String text=IO.readContentAsString(file);
+        return text;
     }
 
     @Override
