@@ -59,7 +59,7 @@ mvn install -DskipTests=true
 ```
 mvn test
 ...
-Tests run: 252, Failures: 0, Errors: 0, Skipped: 3
+Tests run: 254, Failures: 0, Errors: 0, Skipped: 3
 ```
 
 ## Development ##
