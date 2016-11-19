@@ -683,6 +683,10 @@ public class TemplateClass {
             }
             CompileException ce = new CompileException(engine(), tc, e.javaLineNumber, e.message); // init ce before reset java source to get template line info
             javaSource = null; // force parser to regenerate source. This helps to reload after fixing the tag file compilation failure
+            logger.warn("compile failed for %s at line %d",tc.tagName,e.javaLineNumber);
+            for (TemplateClass itc:this.includedTemplateClasses) {
+               logger.info("\tincluded: %s",itc.tagName);
+            }
             throw ce;
         } catch (NullPointerException e) {
             String clazzName = name;

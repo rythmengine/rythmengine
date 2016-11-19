@@ -5,8 +5,9 @@
  */
 package org.rythmengine.essential;
 
-import org.rythmengine.TestBase;
 import org.junit.Test;
+import org.rythmengine.TestBase;
+import org.rythmengine.exception.RythmException;
 
 /**
  * Test include parser
@@ -28,6 +29,24 @@ public class IncludeParserTest extends TestBase {
     public void testIncludeInLayoutTemplate() {
         s = r("foo/includeInLayoutTemplate.html");
         eqf("foo/includeInLayoutTemplate.result");
+    }
+    
+    @Test
+    public void testIncludeJava() {
+        s = r("foo/includeJavaTest.html");
+        s=s.trim();
+        eq("testString(10)");
+    }
+    
+    @Test
+    public void testIncludedRunTimeException() {
+      try {
+        s = r("foo/includedRunTimeException.html");
+      } catch (Throwable th) {
+        assertTrue(th instanceof RythmException);
+        String msg=th.getMessage();
+        assertTrue(msg.contains("caused by java.lang.NullPointerException"));
+      }
     }
 
     public static void main(String[] args) {

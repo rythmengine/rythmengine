@@ -1,0 +1,9 @@
+@def static{
+	String testString;
+}
+@def test(String someString) {
+@{
+	testString=someString+"("+someString.length()+")";
+}
+@testString
+}
