@@ -187,7 +187,7 @@ public class CodeBuilder extends TextBuilder {
     private String cName;
     public String includingCName;
     private String pName;
-    private String tagName;
+    String tagName;
 
     private String initCode = null;
     private String finalCode = null;
@@ -274,6 +274,15 @@ public class CodeBuilder extends TextBuilder {
 
     transient public IDialect requiredDialect = null;
 
+    /**
+     * create the given CodeBuilder
+     * @param template
+     * @param className
+     * @param tagName
+     * @param templateClass
+     * @param engine
+     * @param requiredDialect
+     */
     public CodeBuilder(String template, String className, String tagName, TemplateClass templateClass, RythmEngine engine, IDialect requiredDialect) {
         tmpl = template;
         className = className.replace('/', '.');
@@ -384,6 +393,11 @@ public class CodeBuilder extends TextBuilder {
 
     private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
 
+    /**
+     * add the given import
+     * @param imprt
+     * @param lineNo
+     */
     public void addImport(String imprt, int lineNo) {
         imports.add(imprt);
         if (imprt.endsWith(".*")) {
