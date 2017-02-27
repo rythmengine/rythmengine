@@ -192,7 +192,7 @@ public class CodeBuilder extends TextBuilder {
     private List<String> staticCodes = new ArrayList<String>();
 
     public void setInitCode(String code) {
-        if (S.empty(initCode)) {
+        if (S.isEmpty(initCode)) {
             initCode = code;
         } else {
             initCode = initCode + ";\n" + code;
@@ -200,7 +200,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void setFinalCode(String code) {
-        if (S.empty(finalCode)) {
+        if (S.isEmpty(finalCode)) {
             finalCode = code;
         } else {
             finalCode = finalCode + ";\n" + code;
@@ -232,7 +232,7 @@ public class CodeBuilder extends TextBuilder {
     public Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<Token> builders = new ArrayList<Token>();
     private List<Token> builders() {
-        if (macroStack.empty()) return builders;
+        if (macroStack.isEmpty()) return builders;
         String macro = macroStack.peek();
         List<Token> bl = macros.get(macro);
         if (null == bl) {
@@ -436,7 +436,7 @@ public class CodeBuilder extends TextBuilder {
         }
 
         public boolean noArgs() {
-            return S.empty(signature) || signature.matches("\\(\\s*\\)");
+            return S.isEmpty(signature) || signature.matches("\\(\\s*\\)");
         }
 
         InlineTag clone(CodeBuilder newCaller) {
@@ -481,7 +481,7 @@ public class CodeBuilder extends TextBuilder {
         return templateClass.returnObject(tagName);
     }
 
-    private Stack<List<Token>> inlineTagBodies = new Stack<List<Token>>();
+    private Deque<List<Token>> inlineTagBodies = new ArrayDeque<List<Token>>();
 
     public void addStaticCode(String codeSnippet) {
         staticCodes.add(codeSnippet);
@@ -517,7 +517,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void endTag(InlineTag tag) {
-        if (inlineTagBodies.empty())
+        if (inlineTagBodies.isEmpty())
             throw new ParseException(engine, templateClass, parser.currentLine(), "Unexpected tag definition close");
         if (tag.autoRet) {
             builders.add(new CodeToken("String __s = toString();this.setSelfOut(__sb);return s().raw(__s);", parser));
@@ -665,7 +665,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private Map<String, List<Token>> macros = new HashMap<String, List<Token>>();
-    private Stack<String> macroStack = new Stack<String>();
+    private Deque<String> macroStack = new ArrayDeque<String>();
 
     public void pushMacro(String macro) {
         if (macros.containsKey(macro)) {
@@ -676,7 +676,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void popMacro() {
-        if (macroStack.empty()) {
+        if (macroStack.isEmpty()) {
             throw new ParseException(engine, templateClass, parser.currentLine(), "no macro found in stack");
         }
         macroStack.pop();
@@ -699,7 +699,7 @@ public class CodeBuilder extends TextBuilder {
             if (tb instanceof BlockCodeToken) return true;
             else if (tb instanceof Token.StringToken) {
                 String s = tb.toString();
-                if (S.empty(s)) continue;
+                if (S.isEmpty(s)) continue;
                 else return false;
             } else {
                 return false;

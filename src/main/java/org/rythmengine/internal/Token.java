@@ -15,6 +15,8 @@ import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 import com.stevesoft.pat.Regex;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -296,7 +298,7 @@ public class Token extends TextBuilder {
                 signature = s;
             }
         }
-        Stack<Pair> allMatched = new Stack<Pair>();
+        Deque<Pair> allMatched = new ArrayDeque<Pair>();
         // try parse java extension first
         while (true) {
             boolean matched = false;
@@ -320,12 +322,12 @@ public class Token extends TextBuilder {
             }
             if (!matched) break;
         }
-        boolean hasJavaExtension = !allMatched.empty();
+        boolean hasJavaExtension = !allMatched.isEmpty();
         if (hasJavaExtension) {
             // process inner elvis expression
             s = processElvis(s);
             s = evalStr(s);
-            while (!allMatched.empty()) {
+            while (!allMatched.isEmpty()) {
                 Pair p = allMatched.pop();
                 if (!stripExtensions) {
                     s = p.extension.extend(s, p.signature);
@@ -352,7 +354,7 @@ public class Token extends TextBuilder {
                 if (!matched) break;
             }
             s = evalStr(s);
-            while (!stripExtensions && !allMatched.empty()) {
+            while (!stripExtensions && !allMatched.isEmpty()) {
                 // process inner elvis expression
                 s = processElvis(s);
                 Pair p = allMatched.pop();

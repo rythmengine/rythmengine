@@ -19,6 +19,7 @@
 
 	1.1.7-SNAPSHOT
 	* Revert #314 to fix issue #346 (entered release 1.1.5)
+	* Use Deque to replace Stack in the implementation
 
 	1.1.6-SNAPSHOT
 	* Update dependency versions:

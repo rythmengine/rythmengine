@@ -88,10 +88,10 @@ public class TemplateResourceManager {
      */
     private static Set<String> blackList = new HashSet<String>();
     
-    private static ThreadLocal<Stack<Set<String>>> tmpBlackList = new ThreadLocal<Stack<Set<String>>>() {
+    private static ThreadLocal<Deque<Set<String>>> tmpBlackList = new ThreadLocal<Deque<Set<String>>>() {
         @Override
-        protected Stack<Set<String>> initialValue() {
-            return new Stack<Set<String>>();
+        protected Deque<Set<String>> initialValue() {
+            return new ArrayDeque<Set<String>>();
         }
     };
     
@@ -100,7 +100,7 @@ public class TemplateResourceManager {
     } 
     
     public static void reportNonResource(String str) {
-        Stack<Set<String>> ss = tmpBlackList.get();
+        Deque<Set<String>> ss = tmpBlackList.get();
         if (ss.isEmpty()) {
             // invoked dynamically when running @invoke(...)
             tmpBlackList.remove();
@@ -111,7 +111,7 @@ public class TemplateResourceManager {
     }
     
     public static void commitTmpBlackList() {
-        Stack<Set<String>> sss = tmpBlackList.get();
+        Deque<Set<String>> sss = tmpBlackList.get();
         if (!sss.isEmpty()) {
             Set<String> ss = sss.pop();
             blackList.addAll(ss);
@@ -122,7 +122,7 @@ public class TemplateResourceManager {
     }
     
     public static void rollbackTmpBlackList() {
-        Stack<Set<String>> sss = tmpBlackList.get();
+        Deque<Set<String>> sss = tmpBlackList.get();
         if (!sss.isEmpty()) {
             sss.pop();
         }

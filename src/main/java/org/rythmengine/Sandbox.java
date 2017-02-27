@@ -11,6 +11,8 @@ import org.rythmengine.sandbox.RythmSecurityManager;
 import org.rythmengine.sandbox.SandboxExecutingService;
 
 import java.io.File;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Stack;
 
@@ -48,7 +50,7 @@ public class Sandbox {
         this.engine = engine;
         this.secureExecutor = executor;
         sandboxLive = true;
-        restrictedZone.set(new Stack<Boolean>());
+        restrictedZone.set(new ArrayDeque<Boolean>());
     }
     
     private static RythmSecurityManager rsm() {
@@ -92,10 +94,10 @@ public class Sandbox {
         return null;
     }
     
-    private final static ThreadLocal<Stack<Boolean>> restrictedZone = new ThreadLocal<Stack<Boolean>>(){
+    private final static ThreadLocal<Deque<Boolean>> restrictedZone = new ThreadLocal<Deque<Boolean>>(){
         @Override
-        protected Stack<Boolean> initialValue() {
-            return new Stack<Boolean>();
+        protected Deque<Boolean> initialValue() {
+            return new ArrayDeque<Boolean>();
         }
     };
     
@@ -114,7 +116,7 @@ public class Sandbox {
     public final static void leaveCurZone(String code) {
         if (!sandboxLive || !sandboxMode()) return;
         rsm().forbiddenIfCodeNotMatch(code);
-        Stack<Boolean> stack = restrictedZone.get();
+        Deque<Boolean> stack = restrictedZone.get();
         if (stack.isEmpty()) {
             throw new IllegalStateException("EMPTY ZONE");
         }
@@ -123,7 +125,7 @@ public class Sandbox {
     
     public final static boolean isRestricted() {
         if (!sandboxLive || !sandboxMode()) return false;
-        Stack<Boolean> stack = restrictedZone.get();
+        Deque<Boolean> stack = restrictedZone.get();
         if (stack.isEmpty()) return false;
         return stack.peek();
     }
