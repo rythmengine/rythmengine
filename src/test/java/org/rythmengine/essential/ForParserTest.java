@@ -176,49 +176,49 @@ public class ForParserTest extends TestBase {
         assertEquals("abca,\nb,\nc\nxyz", s);
     }
     
-    @Test
-    public void testSmartIterator() {
-        t = "@for(@1){@__sep}";
-        s = r(t, "a, b, c");
-        assertEquals("a,b,c",s);
-
-        s = r(t, "a : b:c");
-        assertEquals("a,b,c",s);
-
-        s = r(t, "a; b; c");
-        assertEquals("a,b,c",s);
-        
-        s = r(t, "a - b - c");
-        assertEquals("a,b,c",s);
-        
-        s = r(t, "a_b_c");
-        assertEquals("a,b,c",s);
-        
-        s = r(t, "a:1,b:2;x:10,y:12");
-        assertEquals("a:1,b:2,x:10,y:12", s);
-    }
-    
+//    @Test
+//    public void testSmartIterator() {
+//        t = "@for(@1){@__sep}";
+//        s = r(t, "a, b, c");
+//        assertEquals("a,b,c",s);
+//
+//        s = r(t, "a : b:c");
+//        assertEquals("a,b,c",s);
+//
+//        s = r(t, "a; b; c");
+//        assertEquals("a,b,c",s);
+//
+//        s = r(t, "a - b - c");
+//        assertEquals("a,b,c",s);
+//
+//        s = r(t, "a_b_c");
+//        assertEquals("a,b,c",s);
+//
+//        s = r(t, "a:1,b:2;x:10,y:12");
+//        assertEquals("a:1,b:2,x:10,y:12", s);
+//    }
+//
     @Test
     public void testLoopVarSeparator() {
-        t = "@for(\"a:b:c\"){@__sep}";
-        s = r(t);
-        assertEquals("a,b,c", r(t));
+//        t = "@for(\"a:b:c\"){@__sep}";
+//        s = r(t);
+//        assertEquals("a,b,c", r(t));
         
         t = "@for(\"a:b:c\"){@_ @_sep}";
         s = r(t);
         assertEquals("a ,b ,c ", r(t));
 
-        t = "@for(s in \"a:b:c\"){@s__sep}";
-        s = r(t);
-        assertEquals("a,b,c", r(t)); 
+//        t = "@for(s in \"a:b:c\"){@s__sep}";
+//        s = r(t);
+//        assertEquals("a,b,c", r(t));
 
         t = "@for(s in \"a:b:c\"){@s @s_sep}";
         s = r(t);
         assertEquals("a ,b ,c ", r(t));
         
-        t = "@for(\"a:b:c\"){@__utils.sep(\"|\")}";
-        s = r(t);
-        assertEquals("a|b|c", r(t));
+//        t = "@for(\"a:b:c\"){@__utils.sep(\"|\")}";
+//        s = r(t);
+//        assertEquals("a|b|c", r(t));
 
         t = "@for(\"a:b:c\"){@(_)@_utils.sep(\"|\")}";
         s = r(t);
@@ -254,21 +254,21 @@ public class ForParserTest extends TestBase {
     
     @Test
     public void testElse() {
-        t = "@for(@1){@__sep}else{empty list}";
+        t = "@for(@1){@(_)@_sep}else{empty list}";
         assertEquals("empty list", r(t, Arrays.asList(new String[]{})));
         assertEquals("a,b,c", r(t, Arrays.asList("a,b,c".split(","))));
     }
     
     @Test
     public void testShortNotation() {
-        t = "@for(@1)@__sep @else empty list@";
+        t = "@for(@1)@(_)@_sep @else empty list@";
         assertEquals("a,b,c", r(t, Arrays.asList("a,b,c".split(","))));
         assertEquals("empty list", r(t, Arrays.asList(new String[]{})));
     }
     
     @Test
     public void testElseWithLineBreaks() {
-        t = "abc\n\t@for(@1){\n\t\t@__sep\n\t} else {\n\t\tempty list\n\t}\n123";
+        t = "abc\n\t@for(@1){\n\t\t@(_)@_sep\n\t} else {\n\t\tempty list\n\t}\n123";
         assertEquals("abc\n\t\tempty list\n123", r(t, ""));
         assertEquals("abc\n\t\ta,\n\t\tb,\n\t\tc\n123", r(t, "a,b,c"));
     }
@@ -336,14 +336,14 @@ public class ForParserTest extends TestBase {
         t = "@for(\"a:b:c\"){@(_)@_utils.sep(\"|\")}";
         s = r(t);
         assertEquals("a|b|c", r(t));
-        t = "@for(channels){@__utils.sep(\"|\")}";
+        t = "@for(channels){@(_)@_utils.sep(\"|\")}";
         s = r(t, from(p("channels", "a,b".split(","))));
         eq("a|b");
     }
     
     @Test
     public void test5() {
-        t = "@for(items){@__sep}";
+        t = "@for(items){@_sep}";
         s = r(t, from(p("items", Collections.emptyList())));
         eq("");
     }
@@ -404,7 +404,4 @@ public class ForParserTest extends TestBase {
 //        eq("");
 //    }
 
-    public static void main(String[] args) {
-        run(ForParserTest.class);
-    }
 }

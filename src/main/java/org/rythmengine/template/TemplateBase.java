@@ -1449,23 +1449,22 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return i18n.getMessage(TemplateBase.this, key, args);
     }
 
-    private Stack<F.T2<String, Object>> itrVars = new Stack<F.T2<String, Object>>();
+    private Deque<F.T2<String, Object>> itrVars = new ArrayDeque<>();
 
     protected void __pushItrVar(String name, Object val) {
         itrVars.push(F.T2(name, val));
     }
 
     protected void __popItrVar() {
-        if (itrVars.isEmpty()) return;
-        itrVars.pop();
+        itrVars.poll();
     }
 
     private Map<String, Object> itrVars() {
         if (itrVars.isEmpty()) return Collections.EMPTY_MAP;
         if (itrVars.size() == 1) return itrVars.peek().asMap();
-        Stack<F.T2<String, Object>> tmp = new Stack<F.T2<String, Object>>();
+        Deque<F.T2<String, Object>> tmp = new ArrayDeque<>();
         Map<String, Object> m = new HashMap<String, Object>();
-        Stack<F.T2<String, Object>> vs = itrVars;
+        Deque<F.T2<String, Object>> vs = itrVars;
         while (!vs.isEmpty()) {
             F.T2<String, Object> var = vs.pop();
             tmp.push(var);

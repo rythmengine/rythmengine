@@ -5,17 +5,16 @@
  */
 package org.rythmengine.issue;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-
 import models.Foo;
-
 import org.junit.Test;
 import org.rythmengine.Rythm;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Test Github Issues
@@ -43,7 +42,7 @@ public class GhIssueTest70_140 extends TestBase {
     @Test
     public void test117() {
         System.getProperties().put("default.template_lang.impl", ICodeType.DefImpl.CSV);
-        t = "@for(\"FirstName,LastName,Email\"){@__sep}";
+        t = "@for(\"FirstName,LastName,Email\"){@(_)@_sep}";
         s = r(t);
         eq("FirstName,LastName,Email");
     }

@@ -17,6 +17,14 @@
 <!--
 	RELEASE HISTORY
 
+	1.2.0
+	* Fix #348 Update Java to 1.7
+	* Fix #351 Support windows line endings in nl2br?
+	* Fix #354 Issues with hardcoded temporary directory
+	* Fix #359 format null value handling
+	* Fix #362 Remove `__sep` and `__util` iterable variables
+	* Fix #361 Replace `Stack` with `Deque` in `TemplateBase`
+
 	1.1.7-SNAPSHOT
 	* Revert #314 to fix issue #346 (entered release 1.1.5)
 

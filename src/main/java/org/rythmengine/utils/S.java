@@ -5,20 +5,7 @@
  */
 package org.rythmengine.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.MessageFormat;
-import java.text.Normalizer;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
@@ -30,7 +17,11 @@ import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.template.ITemplate;
 
-import com.alibaba.fastjson.JSON;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.net.URLEncoder;
+import java.text.*;
+import java.util.*;
 
 /**
  * A utility class providing String manipulation methods. Commonly used in template engine process.
@@ -894,7 +885,7 @@ public class S {
      */
     @Transformer
     public static RawData nl2br(RawData data) {
-        return new RawData(data.toString().replace("\n", "<br/>"));
+        return new RawData(data.toString().replaceAll("(\\r\\n|\\n|\\r)", "<br/>"));
     }
 
     /**
@@ -903,7 +894,7 @@ public class S {
      * @return raw data of transformed result
      */
     public static RawData nl2br(Object data) {
-        return new RawData(StringEscapeUtils.escapeHtml4(str(data)).replace("\n", "<br/>"));
+        return new RawData(StringEscapeUtils.escapeHtml4(str(data)).replaceAll("(\\r\\n|\\n|\\r)", "<br/>"));
     }
 
     /**
@@ -985,7 +976,9 @@ public class S {
      * @see DecimalFormatSymbols
      */
     public static String format(ITemplate template, Number number, String pattern, Locale locale) {
-        if (null == number) number = 0;
+        if (null == number) {
+            throw new NullPointerException();
+        }
         if (null == locale) {
             locale = I18N.locale(template);
         }
@@ -1197,7 +1190,7 @@ public class S {
      * @return format result
      */
     public static String format(ITemplate template, Date date, String pattern, Locale locale, String timezone) {
-        if (null == date) date = new Date(0);
+        if (null == date) throw new NullPointerException();
         if (null == locale) {
             locale = I18N.locale(template);
         }

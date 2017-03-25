@@ -159,12 +159,15 @@ public class ForEachCodeToken extends BlockCodeToken {
         pline();
         p("org.rythmengine.utils.RawData ").p(varSep).p(" = new org.rythmengine.utils.RawData(").p(varIsLast).p(" ? \"\" : \",\");");
         pline();
-        p("org.rythmengine.utils.RawData ").p(varWithSep).p(" = new org.rythmengine.utils.RawData(org.rythmengine.utils.S.escape(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\"));");
+        /*p("org.rythmengine.utils.RawData ").p(varWithSep).p(" = new org.rythmengine.utils.RawData(org.rythmengine.utils.S.escape(").p(varname).p(")+(").p(varIsLast).p(" ? \"\" : \",\"));");
         pline();
+        */
         p("org.rythmengine.internal.LoopUtil ").p(varUtils).p(" = new org.rythmengine.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(");");
         pline();
+        /*
         p("org.rythmengine.internal.LoopUtil ").p(varWithUtils).p(" = new org.rythmengine.internal.LoopUtil(").p(varIsFirst).p(", ").p(varIsLast).p(", ").p(varname).p(");");
         pline();
+        */
         p("__pushItrVar(\"").p(varname).p("\", ").p(varname).p(");");
         pline();
     }

@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * {@link org.rythmengine.RythmEngine} configuration keys. General rules:
@@ -379,13 +380,15 @@ public enum RythmConfigurationKey {
      * <p/>
      * <p>Default value: a file created with the following logic</p>
      * <p/>
-     * <pre><code>new File(System.__getProperty("java.io.tmpdir"), "__rythm")</code></pre>
+     * <pre><code>new File(System.__getProperty("java.io.tmpdir"), "__rythm/&ltrandom-int&gt;")</code></pre>
      */
     HOME_TMP("home.tmp.dir") {
         @Override
         protected Object getDefVal(Map<String, ?> configuration) {
             String tmp = System.getProperty("java.io.tmpdir");
             File f =  new File(tmp, "__rythm");
+            int n = ThreadLocalRandom.current().nextInt(50, 10000);
+            f = new File(f, String.valueOf(n));
             if (!f.exists() && !f.mkdirs()) {
                 f = new File(tmp);
             }
