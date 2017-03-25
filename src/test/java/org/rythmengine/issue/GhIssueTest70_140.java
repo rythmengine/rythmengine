@@ -12,9 +12,7 @@ import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfigurationKey;
 import org.rythmengine.extension.ICodeType;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * Test Github Issues
@@ -108,13 +106,13 @@ public class GhIssueTest70_140 extends TestBase {
         eq("\n1,2");
     }
     
-    @Test
-    public void test140() {
-        t = "@args Date d;@d.format(\"yyyy-MM-dd\"):@args Number n;@n.format()";
-        s = r(t, null, null);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String refValue = sdf.format(new Date(0)) + ":0";
-        eq(refValue);
-    }
+//    @Test
+//    public void test140() {
+//        t = "@args Date d;@d.format(\"yyyy-MM-dd\"):@args Number n;@n.format()";
+//        s = r(t, null, null);
+//
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        String refValue = sdf.format(new Date(0)) + ":0";
+//        eq(refValue);
+//    }
 }
