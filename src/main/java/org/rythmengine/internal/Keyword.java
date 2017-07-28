@@ -5,6 +5,8 @@
  */
 package org.rythmengine.internal;
 
+import java.util.Locale;
+
 public enum Keyword implements IKeyword {
     /**
      * Assign enclosed part into a String variable
@@ -173,11 +175,11 @@ public enum Keyword implements IKeyword {
     private final String s;
 
     private Keyword() {
-        this.s = name().toLowerCase();
+        this.s = name().toLowerCase(Locale.US);
     }
 
     private Keyword(String s) {
-        this.s = (null == s) ? name().toLowerCase() : s;
+        this.s = (null == s) ? name().toLowerCase(Locale.US) : s;
     }
 
     @Override
@@ -187,6 +189,6 @@ public enum Keyword implements IKeyword {
 
     @Override
     public boolean isRegexp() {
-        return !s.equals(name().toLowerCase());
+        return !s.equals(name().toLowerCase(Locale.US));
     }
 }
