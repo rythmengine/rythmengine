@@ -118,7 +118,7 @@ public class CodeBuilder extends TextBuilder {
         private static String defValTransform(String type, String defVal) {
             if (S.isEmpty(defVal)) return null;
             if ("String".equalsIgnoreCase(type) && "null".equalsIgnoreCase(defVal)) return "\"\"";
-            if ("boolean".equalsIgnoreCase(type)) defVal = defVal.toLowerCase();
+            if ("boolean".equalsIgnoreCase(type)) defVal = defVal.toLowerCase(Locale.US);
             if ("long".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "L";
             if ("float".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "f";
             if ("double".equalsIgnoreCase(type) && defVal.matches("[0-9]+")) return defVal + "d";

@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FilePermission;
 import java.net.InetAddress;
 import java.security.Permission;
+import java.util.Locale;
 
 /**
  * The default security manager to ensure template code run in a secure mode
@@ -178,8 +179,8 @@ public class RythmSecurityManager extends SecurityManager {
         if (null != osm) osm.checkRead(file);
     }
     
-    private static final String BASE_RYTHM = RythmEngine.class.getResource(RythmEngine.class.getSimpleName() + ".class").getFile().replace("RythmEngine.class", "").toLowerCase(); 
-    private static final String BASE_JDK = Integer.class.getResource(Integer.class.getSimpleName() + ".class").getFile().replace("Integer.class", "").toLowerCase();
+    private static final String BASE_RYTHM = RythmEngine.class.getResource(RythmEngine.class.getSimpleName() + ".class").getFile().replace("RythmEngine.class", "").toLowerCase(Locale.US);
+    private static final String BASE_JDK = Integer.class.getResource(Integer.class.getSimpleName() + ".class").getFile().replace("Integer.class", "").toLowerCase(Locale.US);
     
     @Override
     public void checkWrite(String file) {

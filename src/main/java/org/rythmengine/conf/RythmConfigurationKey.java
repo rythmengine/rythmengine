@@ -1031,7 +1031,7 @@ public enum RythmConfigurationKey {
 
     private static Map<String, RythmConfigurationKey> lookup = new HashMap<String, RythmConfigurationKey>(50); static {
         for (RythmConfigurationKey k : values()) {
-            lookup.put(k.getKey().toLowerCase(), k);
+            lookup.put(k.getKey().toLowerCase(Locale.US), k);
         }
     }
 
@@ -1043,7 +1043,7 @@ public enum RythmConfigurationKey {
      */
     public static RythmConfigurationKey valueOfIgnoreCase(String s) {
         if (S.empty(s)) throw new IllegalArgumentException();
-        return lookup.get(s.trim().toLowerCase());
+        return lookup.get(s.trim().toLowerCase(Locale.US));
     }
 
 }
