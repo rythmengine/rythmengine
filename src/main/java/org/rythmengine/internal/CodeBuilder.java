@@ -6,7 +6,6 @@
 package org.rythmengine.internal;
 
 import com.stevesoft.pat.Regex;
-
 import org.rythmengine.Rythm;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.RythmEngine.TemplateTestResult;
@@ -24,7 +23,6 @@ import org.rythmengine.internal.parser.BlockCodeToken;
 import org.rythmengine.internal.parser.CodeToken;
 import org.rythmengine.internal.parser.NotRythmTemplateException;
 import org.rythmengine.internal.parser.build_in.BlockToken;
-import org.rythmengine.internal.parser.build_in.CompactParser;
 import org.rythmengine.internal.parser.build_in.CompactStateToken;
 import org.rythmengine.internal.parser.build_in.InvokeTemplateParser;
 import org.rythmengine.logger.ILogger;
@@ -1089,6 +1087,8 @@ public class CodeBuilder extends TextBuilder {
         ptn("}");
 
         ISourceCodeEnhancer ce = engine.conf().get(RythmConfigurationKey.CODEGEN_SOURCE_CODE_ENHANCER);
+        Map<String, ?> map = null == ce ? null : ce.getRenderArgDescriptions();
+        Set<String> implicitVarNames = null == map ? Collections.EMPTY_SET : map.keySet();
         int userDefinedArgNumber = basicTemplate() ? renderArgs.size() : (renderArgs.size() - ((null == ce) ? 0 : ce.getRenderArgDescriptions().size()));
         if (0 < userDefinedArgNumber) {
             // -- output __setRenderArgs method with args passed in positioned order
@@ -1098,6 +1098,9 @@ public class CodeBuilder extends TextBuilder {
                 p2tn("int __p = 0, __l = __args.length;");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
+                    if (implicitVarNames.contains(arg.name)) {
+                        continue;
+                    }
                     p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; \n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t\t__renderArgs.put(\"").p(arg.name).p("\",").p(arg.name).p(");\n\t\t}\n"); 
                     if (--i == 0) break;
                 }
@@ -1112,6 +1115,9 @@ public class CodeBuilder extends TextBuilder {
                 p2t("return new java.lang.Class[]{");
                 int i = userDefinedArgNumber;
                 for (RenderArgDeclaration arg : renderArgList) {
+                    if (implicitVarNames.contains(arg.name)) {
+                        continue;
+                    }
                     p(toNonGeneric(arg.type)).p(".class").p(", ");
                     if (--i == 0) break;
                 }
@@ -1145,6 +1151,9 @@ public class CodeBuilder extends TextBuilder {
         if (true) {
             first = true;
             for (RenderArgDeclaration arg : renderArgList) {
+                if (implicitVarNames.contains(arg.name)) {
+                    continue;
+                }
                 if (first) {
                     first = false;
                     p2t("");

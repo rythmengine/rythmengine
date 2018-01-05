@@ -5,11 +5,13 @@
  */
 package org.rythmengine.cache;
 
+import org.junit.Ignore;
 import org.rythmengine.extension.ICacheService;
 
 /**
  * Test 
  */
+@Ignore
 public class SimpleCacheServiceTest extends CacheServiceTestBase {
     @Override
     protected ICacheService cacheService() {

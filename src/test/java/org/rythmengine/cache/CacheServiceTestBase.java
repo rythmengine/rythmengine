@@ -6,6 +6,7 @@
 package org.rythmengine.cache;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rythmengine.TestBase;
 import org.rythmengine.extension.ICacheService;
@@ -14,6 +15,7 @@ import org.rythmengine.extension.ICacheService;
  * base test class for testing the SimpleCacheService
  *
  */
+@Ignore
 public abstract class CacheServiceTestBase extends TestBase {
     protected ICacheService cache = SimpleCacheService.INSTANCE;
     @Before
