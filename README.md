@@ -39,7 +39,7 @@ Maven dependency:
 <dependency>
     <groupId>org.rythmengine</groupId>
     <artifactId>rythm-engine</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 

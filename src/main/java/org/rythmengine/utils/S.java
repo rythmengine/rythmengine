@@ -614,7 +614,77 @@ public class S {
         if (null == o) return RawData.NULL;
         if (o instanceof RawData)
             return (RawData) o;
-        return new RawData(StringEscapeUtils.escapeXml(o.toString()));
+        return new RawData(_escapeXML(o.toString()));
+    }
+
+    // The code is copied from
+    // https://github.com/httl/httl/blob/master/httl/src/main/java/httl/util/StringUtils.java#L464
+    // we use this method to replace apache StringEscapeUtils, which is slower
+    private static String _escapeXML(String value) {
+        int len = value.length();
+        if (0 == len) {
+            return value;
+        }
+        StringBuilder buf = null;
+        for (int i = 0; i < len; i++) {
+            char ch = value.charAt(i);
+            switch (ch) {
+                case '<':
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if (i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&lt;");
+                    break;
+                case '>':
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if (i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&gt;");
+                    break;
+                case '\"':
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if (i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&quot;");
+                    break;
+                case '\'':
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if (i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&apos;");
+                    break;
+                case '&':
+                    if (buf == null) {
+                        buf = new StringBuilder(len * 2);
+                        if (i > 0) {
+                            buf.append(value.substring(0, i));
+                        }
+                    }
+                    buf.append("&amp;");
+                    break;
+                default:
+                    if (buf != null) {
+                        buf.append(ch);
+                    }
+                    break;
+            }
+        }
+        if (buf != null) {
+            return buf.toString();
+        }
+        return value;
     }
 
     /**
@@ -627,7 +697,7 @@ public class S {
         if (null == o) return RawData.NULL;
         if (o instanceof RawData)
             return (RawData) o;
-        return new RawData(StringEscapeUtils.escapeXml(o.toString()));
+        return new RawData(_escapeXML(o.toString()));
     }
 
     /**
@@ -1692,6 +1762,31 @@ public class S {
     
     public static String join(char sep, Double[] a) {
         return join(String.valueOf(sep), a);
+    }
+
+    public static String pathConcat(String prefix, char sep, String suffix) {
+        boolean prefixHasSep = endsWith(prefix, sep);
+        boolean suffixHasSep = startsWith(suffix, sep);
+        int prefixLen = len(prefix), suffixLen = len(suffix);
+        int len = prefixLen + suffixLen + 1;
+        StringBuilder buffer = new StringBuilder(len).append(prefix);
+        if (prefixHasSep && suffixHasSep) {
+            return buffer.deleteCharAt(prefixLen - 1).append(suffix).toString();
+        } else if (prefixHasSep || suffixHasSep) {
+            return buffer.append(suffix).toString();
+        } else {
+            return buffer.append(sep).append(suffix).toString();
+        }
+    }
+
+    public static boolean endsWith(String string, char suffix) {
+        String s = string(string);
+        return !s.isEmpty() && s.charAt(string.length() - 1) == suffix;
+    }
+
+    public static boolean startsWith(String string, char prefix) {
+        String s = string(string);
+        return !s.isEmpty() && s.charAt(0) == prefix;
     }
 
 }

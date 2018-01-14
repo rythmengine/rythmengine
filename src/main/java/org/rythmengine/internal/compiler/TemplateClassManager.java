@@ -8,6 +8,7 @@ package org.rythmengine.internal.compiler;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
+import org.rythmengine.resource.ClasspathTemplateResource;
 import org.rythmengine.resource.ITemplateResource;
 
 import java.util.ArrayList;
@@ -128,7 +129,15 @@ public class TemplateClassManager {
         //clsNameIdx.put(templateClass.name0(), templateClass);
         clsNameIdx.put(templateClass.name(), templateClass);
         if (!templateClass.isInner()) {
-            tmplIdx.put(templateClass.templateResource.getKey(), templateClass);
+            ITemplateResource rsrc = templateClass.templateResource;
+            Object key = rsrc.getKey();
+            tmplIdx.put(key, templateClass);
+            if (rsrc instanceof ClasspathTemplateResource) {
+                String key2 = ((ClasspathTemplateResource) rsrc).getKey2();
+                if (key != key2) {
+                    tmplIdx.put(key2, templateClass);
+                }
+            }
         }
     }
 

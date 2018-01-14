@@ -5,7 +5,6 @@
  */
 package org.rythmengine.resource;
 
-import org.rythmengine.extension.ITemplateResourceLoader;
 import org.rythmengine.utils.IO;
 
 import java.net.URL;
@@ -22,8 +21,9 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     private static final long serialVersionUID = -164305020378609839L;
     private URL url;
     private String key;
+    private String key2;
 
-    ClasspathTemplateResource(String path, ITemplateResourceLoader loader) {
+    ClasspathTemplateResource(String path, ClasspathResourceLoader loader) {
         super(loader);
         ClassLoader cl = loader.getEngine().classLoader();
 
@@ -42,6 +42,14 @@ public class ClasspathTemplateResource extends TemplateResourceBase implements I
     @Override
     public String getKey() {
         return key;
+    }
+
+    public void setKey2(String key) {
+        key2 = key;
+    }
+
+    public String getKey2() {
+        return key2;
     }
 
     @Override

@@ -205,8 +205,15 @@ public class TemplateResourceManager {
     }
 
     private ITemplateResource cache(ITemplateResource resource) {
+        return cache(null, resource);
+    }
+
+    private ITemplateResource cache(Object key, ITemplateResource resource) {
         if (resource.isValid()) {
             cache.put(resource.getKey(), resource);
+            if (null != key) {
+                cache.put(key, resource);
+            }
         }
         return resource;
     }
@@ -249,21 +256,25 @@ public class TemplateResourceManager {
         return whichLoader.get(resource.getKey());
     }
 
-    public ITemplateResource getResource(String str) {
-        ITemplateResource resource = cache.get(str);
+    public ITemplateResource getResource(String key) {
+        ITemplateResource resource = cache.get(key);
         if (null != resource) return resource;
 
         if (Sandbox.isRestricted()) return NULL;
 
         for (ITemplateResourceLoader loader : loaders) {
-            resource = loader.load(str);
+            resource = loader.load(key);
             if (null != resource && resource.isValid()) {
                 whichLoader.put(resource.getKey(), loader);
+                whichLoader.put(key, loader);
+                if (key != resource.getKey() && resource instanceof ClasspathTemplateResource) {
+                    ((ClasspathTemplateResource) resource).setKey2(key);
+                }
                 break;
             }
         }
 
-        return null == resource ? NULL : cache(resource);
+        return null == resource ? NULL : cache(key, resource);
     }
     
     public void scan() {
