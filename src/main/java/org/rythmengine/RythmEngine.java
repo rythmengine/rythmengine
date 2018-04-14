@@ -306,6 +306,16 @@ public class RythmEngine implements IEventDispatcher {
 
     private ICacheService _cacheService = null;
 
+    private IDateFormatFactory _dateFormatFactory = IDateFormatFactory.DefaultDateFormatFactory.INSTANCE;
+
+    public void setDateFormatFactory(IDateFormatFactory factory) {
+        _dateFormatFactory = Objects.requireNonNull(factory);
+    }
+
+    public IDateFormatFactory dateFormatFactory() {
+        return _dateFormatFactory;
+    }
+
     /**
      * Define the render time settings, which is intialized each time a renderXX method
      * get called

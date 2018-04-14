@@ -70,15 +70,5 @@ the Rythm Engine Project:
 * IntelliJ IDEA https://www.jetbrains.com/idea/
 
 ## Version history
-|  Version     | Date    | Comment
-| ------------ | ------- | -------------------------
-| 1.1.7-SNAPSHOT | 2016-11 | current development state
-| 1.1.6-SNAPSHOT | 2016-07 | latest 1.6 JDK compatible version - to be released as 1.1.6 on Maven central
-| 1.1.5          | 2016-05 | latest stable release
-| 1.0.1        | 2014-08 |
-| 1.0          | 2014-02 |
-| 1.0-b10      | 2013-12 |
-| 1.0-b9       | 2013-05 |
-| 1.0-b8       | 2013-05 |
 
-
+See the [change log](CHANGELOG.md)

@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.conf.RythmConfiguration;
+import org.rythmengine.extension.IDateFormatFactory;
 import org.rythmengine.extension.IFormatter;
 import org.rythmengine.extension.II18nMessageResolver;
 import org.rythmengine.extension.Transformer;
@@ -1187,6 +1188,106 @@ public class S {
     public static String format(Date date, String pattern, Locale locale) {
         return format(date, pattern, locale, null);
     }
+    
+    private static String styleFormatDate(Date date, int style, ITemplate template) {
+        Locale locale = I18N.locale(template);
+        DateFormat format = DateFormat.getDateInstance(style, locale);
+        return format.format(date);
+    }
+
+    private static String styleFormatTime(Date date, int style, ITemplate template) {
+        Locale locale = I18N.locale(template);
+        DateFormat format = DateFormat.getTimeInstance(style, locale);
+        return format.format(date);
+    }
+
+    private static String styleFormatDateTime(Date date, int style, ITemplate template) {
+        Locale locale = I18N.locale(template);
+        DateFormat format = DateFormat.getDateTimeInstance(style, style, locale);
+        return format.format(date);
+    }
+    
+    public static String longDate(ITemplate template, Date date) {
+        return styleFormatDate(date, DateFormat.LONG, template);
+    }
+    
+    @Transformer(requireTemplate = true)
+    public static String longDate(Date date) {
+        return longDate(null, date);
+    }
+
+    public static String longTime(ITemplate template, Date date) {
+        return styleFormatTime(date, DateFormat.LONG, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String longTime(Date date) {
+        return longTime(null, date);
+    }
+
+    public static String longDateTime(ITemplate template, Date date) {
+        return styleFormatDateTime(date, DateFormat.LONG, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String longDateTime(Date date) {
+        return longDateTime(null, date);
+    }
+
+    public static String mediumDate(ITemplate template, Date date) {
+        return styleFormatDate(date, DateFormat.MEDIUM, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String mediumDate(Date date) {
+        return mediumDate(null, date);
+    }
+
+    public static String mediumTime(ITemplate template, Date date) {
+        return styleFormatTime(date, DateFormat.MEDIUM, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String mediumTime(Date date) {
+        return mediumTime(null, date);
+    }
+
+    public static String mediumDateTime(ITemplate template, Date date) {
+        return styleFormatDateTime(date, DateFormat.MEDIUM, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String mediumDateTime(Date date) {
+        return mediumDateTime(null, date);
+    }
+
+
+    public static String shortDate(ITemplate template, Date date) {
+        return styleFormatDate(date, DateFormat.SHORT, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String shortDate(Date date) {
+        return shortDate(null, date);
+    }
+
+    public static String shortTime(ITemplate template, Date date) {
+        return styleFormatTime(date, DateFormat.SHORT, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String shortTime(Date date) {
+        return shortTime(null, date);
+    }
+
+    public static String shortDateTime(ITemplate template, Date date) {
+        return styleFormatDateTime(date, DateFormat.SHORT, template);
+    }
+
+    @Transformer(requireTemplate = true)
+    public static String shortDateTime(Date date) {
+        return shortDateTime(null, date);
+    }
 
     /**
      * Generalize format parameter for the sake of dynamic evaluation
@@ -1261,16 +1362,9 @@ public class S {
      */
     public static String format(ITemplate template, Date date, String pattern, Locale locale, String timezone) {
         if (null == date) throw new NullPointerException();
-        if (null == locale) {
-            locale = I18N.locale(template);
-        }
+        RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
+        DateFormat df =  (null == engine ? IDateFormatFactory.DefaultDateFormatFactory.INSTANCE : engine.dateFormatFactory()).createDateFormat(template, pattern, locale, timezone);
 
-        DateFormat df;
-        if (null != pattern) df = new SimpleDateFormat(pattern, locale);
-        else df = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
-        
-        if (null != timezone) df.setTimeZone(TimeZone.getTimeZone(timezone));
-        
         return df.format(date);
     }
 
