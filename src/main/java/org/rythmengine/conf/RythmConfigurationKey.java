@@ -452,6 +452,15 @@ public enum RythmConfigurationKey {
     I18N_MESSAGE_SOURCES("i18n.message.sources", "messages"),
 
     /**
+     * "i18n.message.sources.charset": Set message charset. Should be as a String of charset name,
+     *  E.g. "ISO-8859-1" or "UTF-8".
+     * <p>Default value: <code>message</code></p>
+     * 
+     * @see <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html#context-functionality-messagesource">[Spring]Internationalization using MessageSource</a>
+     */
+    I18N_MESSAGE_SOURCES_CHARSET("i18n.message.sources.charset", "ISO-8859-1"),
+    
+    /**
      * "i18n.message.resolver.impl": Set i18n message resolver. Should implement {@link org.rythmengine.extension.II18nMessageResolver}
      * interface. Default value: {@link org.rythmengine.extension.II18nMessageResolver.DefaultImpl#INSTANCE}, which delegate
      * to {@link org.rythmengine.utils.S#i18n(org.rythmengine.template.ITemplate, Object, Object...)} method

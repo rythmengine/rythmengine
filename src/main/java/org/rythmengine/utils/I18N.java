@@ -75,10 +75,13 @@ public class I18N {
             retval = bundleCache.get(cacheKey);
         }
 
+        String charset=  engine.conf().get("i18n.message.sources.charset").toString();
+        CharsetControl control = new CharsetControl(charset);
+        
         if (null == retval) {
             try {
                 if (null == locale) locale = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
-                retval = ResourceBundle.getBundle(name, locale);
+                retval = ResourceBundle.getBundle(name, locale, control);
                 bundleCache.put(cacheKey, retval);
             } catch (RuntimeException e) {
                 logger.warn(e, "Error getting resource bundle by name %s", name);
