@@ -712,7 +712,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
                                 re.templateLineNumber = re0.templateLineNumber;
                                 break;
                             } else {
-                                t = t.getCause();
+                                if (t!=null)
+                                  t = t.getCause();
                             }
                         }
                     }
