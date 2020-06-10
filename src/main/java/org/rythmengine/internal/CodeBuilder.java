@@ -37,6 +37,9 @@ import org.rythmengine.utils.S;
 import org.rythmengine.utils.TextBuilder;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * code Builder
@@ -55,7 +58,7 @@ public class CodeBuilder extends TextBuilder {
         public int lineNo;
         
         private static final Map<String, String> byPrimitive; static {
-            HashMap<String, String> m = new HashMap<String, String>();
+            ConcurrentHashMap<String, String> m = new ConcurrentHashMap<String, String>();
             m.put("int", "Integer");
             m.put("long", "Long");
             m.put("short", "Short");
@@ -75,7 +78,7 @@ public class CodeBuilder extends TextBuilder {
         }
         
         private static final Map<String, String> nullVals; static {
-            HashMap<String, String> m = new HashMap<String, String>();
+            ConcurrentHashMap<String, String> m = new ConcurrentHashMap<String, String>();
             m.put("int", "0");
             m.put("long", "0L");
             m.put("short", "0");
@@ -190,7 +193,7 @@ public class CodeBuilder extends TextBuilder {
     private String initCode = null;
     private String finalCode = null;
 
-    private Set<InlineClass> inlineClasses = new HashSet<InlineClass>();
+    private Set<InlineClass> inlineClasses = new CopyOnWriteArraySet<InlineClass>();
     private List<String> staticCodes = new ArrayList<String>();
 
     public void setInitCode(String code) {
@@ -228,13 +231,13 @@ public class CodeBuilder extends TextBuilder {
     }
 
     private InvokeTemplateParser.ParameterDeclarationList extendArgs = null;
-    public Set<String> imports = new HashSet<String>();
+    public Set<String> imports = new CopyOnWriteArraySet<String>();
     private int extendDeclareLineNo = -1;
     // <argName, argClass>
     public Map<String, RenderArgDeclaration> renderArgs = new LinkedHashMap<String, RenderArgDeclaration>();
     private List<Token> builders = new ArrayList<Token>();
     private List<Token> builders() {
-        if (macroStack.empty()) return builders;
+        if (macroStack.isEmpty()) return builders;
         String macro = macroStack.peek();
         List<Token> bl = macros.get(macro);
         if (null == bl) {
@@ -389,7 +392,7 @@ public class CodeBuilder extends TextBuilder {
         return null == includingCName ? cName : includingCName;
     }
 
-    private Map<String, Integer> importLineMap = new HashMap<String, Integer>();
+    private Map<String, Integer> importLineMap = new ConcurrentHashMap<String, Integer>();
 
     /**
      * add the given import
@@ -482,7 +485,7 @@ public class CodeBuilder extends TextBuilder {
         }
     }
 
-    private Set<InlineTag> inlineTags = new HashSet<InlineTag>();
+    private Set<InlineTag> inlineTags = new CopyOnWriteArraySet<InlineTag>();
 
     public boolean hasInlineTagWithoutArgument(String tagName) {
         for (InlineTag tag : inlineTags) {
@@ -497,7 +500,7 @@ public class CodeBuilder extends TextBuilder {
         return templateClass.returnObject(tagName);
     }
 
-    private Stack<List<Token>> inlineTagBodies = new Stack<List<Token>>();
+    private Deque<List<Token>> inlineTagBodies = new ConcurrentLinkedDeque<List<Token>>();
 
     public void addStaticCode(String codeSnippet) {
         staticCodes.add(codeSnippet);
@@ -533,7 +536,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void endTag(InlineTag tag) {
-        if (inlineTagBodies.empty())
+        if (inlineTagBodies.isEmpty())
             throw new ParseException(engine, templateClass, parser.currentLine(), "Unexpected tag definition close");
         if (tag.autoRet) {
             builders.add(new CodeToken("String __s = toString();this.setSelfOut(__sb);return s().raw(__s);", parser));
@@ -674,26 +677,26 @@ public class CodeBuilder extends TextBuilder {
         else return null;
     }
 
-    public void addRenderArgs(RenderArgDeclaration declaration) {
+    public synchronized void addRenderArgs(RenderArgDeclaration declaration) {
         renderArgs.put(declaration.name, declaration);
     }
 
-    public void addRenderArgs(int lineNo, String type, String name, String defVal) {
+    public synchronized void addRenderArgs(int lineNo, String type, String name, String defVal) {
         renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name, defVal));
     }
 
-    public void addRenderArgs(int lineNo, String type, String name) {
+    public synchronized void addRenderArgs(int lineNo, String type, String name) {
         renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name));
     }
 
-    public void addRenderArgsIfNotDeclared(int lineNo, String type, String name) {
+    public synchronized void addRenderArgsIfNotDeclared(int lineNo, String type, String name) {
         if (!renderArgs.containsKey(name)) {
             renderArgs.put(name, new RenderArgDeclaration(renderArgCounter++, lineNo, type, name));
         }
     }
 
-    private Map<String, List<Token>> macros = new HashMap<String, List<Token>>();
-    private Stack<String> macroStack = new Stack<String>();
+    private Map<String, List<Token>> macros = new ConcurrentHashMap<String, List<Token>>();
+    private Deque<String> macroStack = new ConcurrentLinkedDeque<String>();
 
     public void pushMacro(String macro) {
         if (macros.containsKey(macro)) {
@@ -704,7 +707,7 @@ public class CodeBuilder extends TextBuilder {
     }
 
     public void popMacro() {
-        if (macroStack.empty()) {
+        if (macroStack.isEmpty()) {
             throw new ParseException(engine, templateClass, parser.currentLine(), "no macro found in stack");
         }
         macroStack.pop();
@@ -1223,7 +1226,7 @@ public class CodeBuilder extends TextBuilder {
 
     public String buildBody = null;
 
-    transient Map<Token.StringToken, String> consts = new HashMap<Token.StringToken, String>();
+    transient Map<Token.StringToken, String> consts = new ConcurrentHashMap<Token.StringToken, String>();
 
     private RythmEngine.OutputMode outputMode = RythmEngine.outputMode();
 
@@ -1365,7 +1368,7 @@ public class CodeBuilder extends TextBuilder {
         p("// line:").pn(st.getLineNo());
     }
 
-    private Set<String> varNames = new HashSet<String>();
+    private Set<String> varNames = new CopyOnWriteArraySet<String>();
 
     public String newVarName() {
         int i = 0;

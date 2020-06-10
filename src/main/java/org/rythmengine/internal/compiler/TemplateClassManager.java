@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +39,7 @@ public class TemplateClassManager {
     /**
      * Index template class with class name
      */
-    public Map<String, TemplateClass> clsNameIdx = new HashMap<String, TemplateClass>();
+    public Map<String, TemplateClass> clsNameIdx = new ConcurrentHashMap<String, TemplateClass>();
     /**
      * Index template class with inline template content or template file name
      */
@@ -53,7 +55,7 @@ public class TemplateClassManager {
      * Clear the classCache cache
      */
     public void clear() {
-        clsNameIdx = new HashMap<String, TemplateClass>();
+        clsNameIdx = new ConcurrentHashMap<String, TemplateClass>();
         tmplIdx = new HashMap<Object, TemplateClass>();
     }
 
@@ -63,7 +65,7 @@ public class TemplateClassManager {
      * @return All loaded classes
      */
     public List<TemplateClass> all() {
-        return new ArrayList<TemplateClass>(clsNameIdx.values());
+        return new CopyOnWriteArrayList<TemplateClass>(clsNameIdx.values());
     }
 
     /**

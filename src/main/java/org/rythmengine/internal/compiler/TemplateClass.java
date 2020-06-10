@@ -9,12 +9,12 @@ import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,9 +68,9 @@ public class TemplateClass {
      */
     private String name;
     public TemplateClass extendedTemplateClass;
-    private Set<TemplateClass> includedTemplateClasses = new HashSet<TemplateClass>();
+    private Set<TemplateClass> includedTemplateClasses = new CopyOnWriteArraySet<TemplateClass>();
     private String includeTemplateClassNames = null;
-    private Map<String, String> includeTagTypes = new HashMap<String, String>();
+    private Map<String, String> includeTagTypes = new ConcurrentHashMap<String, String>();
     private String tagName;
 
     /**
@@ -238,7 +238,7 @@ public class TemplateClass {
      * WRITE : includeTagTypes
      */
     public void deserializeIncludeTagTypes(String s) {
-        includeTagTypes = new HashMap<String, String>();
+        includeTagTypes = new ConcurrentHashMap<String, String>();
         if (S.isEmpty(s)) {
             return;
         }
@@ -449,7 +449,7 @@ public class TemplateClass {
 
     public void buildSourceCode(String includingClassName) {
         long start = System.currentTimeMillis();
-        importPaths = new HashSet<String>();
+        importPaths = new CopyOnWriteArraySet<String>();
         // Possible bug here?
         if (null != codeBuilder) codeBuilder.clear();
         codeBuilder = new CodeBuilder(templateResource.asTemplateContent(), name(), tagName, this, engine, dialect);
@@ -464,7 +464,7 @@ public class TemplateClass {
 
     public void buildSourceCode() {
         long start = System.currentTimeMillis();
-        importPaths = new HashSet<String>();
+        importPaths = new CopyOnWriteArraySet<String>();
         // Possible bug here?
         if (null != codeBuilder) {
             codeBuilder.clear();

@@ -16,8 +16,8 @@ import org.rythmengine.utils.TextBuilder;
 import java.io.*;
 import java.net.URI;
 import java.security.MessageDigest;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Used to speed up compilation time
@@ -120,7 +120,7 @@ public class TemplateClassCache {
                 if (sa.length > 1) {
                     s = sa[1];
                     sa = s.split(";");
-                    Set<String> importPaths = new HashSet<String>();
+                    Set<String> importPaths = new CopyOnWriteArraySet<String>();
                     for (String path : sa) {
                         if ("java.lang".equals(path)) continue;
                         importPaths.add(path);
@@ -180,7 +180,7 @@ public class TemplateClassCache {
                 tb.p("__INCULDED_TEMPLATE_CLASS_NAME_LIST__").p(tc.refreshIncludeTemplateClassNames())
                         .p("__IMPORT_PATH_LIST__");
                 if (tc.importPaths == null) {
-                    tc.importPaths = new HashSet<String>(0);
+                    tc.importPaths = new CopyOnWriteArraySet<String>();
                 }
                 if (tc.importPaths.isEmpty()) {
                     tc.importPaths.add("java.lang");

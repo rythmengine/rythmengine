@@ -16,6 +16,7 @@ import org.rythmengine.utils.JSONWrapper;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Define a template instance API
@@ -215,18 +216,18 @@ public interface ITemplate extends ITag, Cloneable {
          * 
          * @see {@link #localeStack}
          */
-        private Deque<ICodeType> codeTypeStack = new ArrayDeque<ICodeType>();
+        private Deque<ICodeType> codeTypeStack = new ConcurrentLinkedDeque<ICodeType>();
 
         /**
          * template escape stack. Used to enable the
          * {@link org.rythmengine.conf.RythmConfigurationKey#FEATURE_SMART_ESCAPE_ENABLED}
          */
-        private Deque<Escape> escapeStack = new ArrayDeque<Escape>();
+        private Deque<Escape> escapeStack = new ConcurrentLinkedDeque<Escape>();
 
         /**
          * template locale stack. Used to track the locale in the current context.
          */
-        private Deque<Locale> localeStack = new ArrayDeque<Locale>();
+        private Deque<Locale> localeStack = new ConcurrentLinkedDeque<Locale>();
 
         private TemplateBase tmpl;
         

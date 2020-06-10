@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.lang.instrument.ClassDefinition;
 import java.security.ProtectionDomain;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,7 +70,7 @@ public class TemplateClassLoader extends ClassLoader {
             }
         }
 
-        private final Map<File, FileWithClassDefs> classDefsInFileCache = new HashMap<File, FileWithClassDefs>();
+        private final Map<File, FileWithClassDefs> classDefsInFileCache = new ConcurrentHashMap<File, FileWithClassDefs>();
 
         public synchronized int computePathHash(File... paths) {
             StringBuilder buf = new StringBuilder();
@@ -448,7 +450,7 @@ public class TemplateClassLoader extends ClassLoader {
         for (TemplateClass tc : engine.classes().all()) {
             if (tc.refresh()) modifieds.add(tc);
         }
-        Set<TemplateClass> modifiedWithDependencies = new HashSet<TemplateClass>();
+        Set<TemplateClass> modifiedWithDependencies = new CopyOnWriteArraySet<TemplateClass>();
         modifiedWithDependencies.addAll(modifieds);
         List<ClassDefinition> newDefinitions = new ArrayList<ClassDefinition>();
         boolean dirtySig = false;

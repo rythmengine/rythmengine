@@ -261,13 +261,13 @@ public class RythmSecurityManager extends SecurityManager {
         if (null != osm) osm.checkPropertyAccess(key);
     }
 
-    @Override
-    public boolean checkTopLevelWindow(Object window) {
-        checkRythm();
-        if (null != csm) return csm.checkTopLevelWindow(window);
-        else if (null != osm) return osm.checkTopLevelWindow(window);
-        else return true;
-    }
+//    @Override
+//    public boolean checkTopLevelWindow(Object window) {
+//        checkRythm();
+//        if (null != csm) return csm.checkTopLevelWindow(window);
+//        else if (null != osm) return osm.checkTopLevelWindow(window);
+//        else return true;
+//    }
 
     @Override
     public void checkPrintJobAccess() {
@@ -276,19 +276,19 @@ public class RythmSecurityManager extends SecurityManager {
         if (null != osm) osm.checkPrintJobAccess();
     }
 
-    @Override
-    public void checkSystemClipboardAccess() {
-        checkRythm();
-        if (null != osm) osm.checkSystemClipboardAccess();
-        if (null != csm) csm.checkSystemClipboardAccess();
-    }
+//    @Override
+//    public void checkSystemClipboardAccess() {
+//        checkRythm();
+//        if (null != osm) osm.checkSystemClipboardAccess();
+//        if (null != csm) csm.checkSystemClipboardAccess();
+//    }
 
-    @Override
-    public void checkAwtEventQueueAccess() {
-        checkRythm();
-        if (null != osm) osm.checkAwtEventQueueAccess();
-        if (null != csm) csm.checkAwtEventQueueAccess();
-    }
+//    @Override
+//    public void checkAwtEventQueueAccess() {
+//        checkRythm();
+//        if (null != osm) osm.checkAwtEventQueueAccess();
+//        if (null != csm) csm.checkAwtEventQueueAccess();
+//    }
 
     @Override
     public void checkPackageAccess(String pkg) {
@@ -334,12 +334,12 @@ public class RythmSecurityManager extends SecurityManager {
         if (null != csm) csm.checkPermission(perm);
     }
 
-    @Override
-    public void checkMemberAccess(Class<?> clazz, int which) {
-        if (null != osm) osm.checkMemberAccess(clazz, which);
-        if (null != csm) csm.checkMemberAccess(clazz, which);
-        //Todo check rythm member access
-    }
+//    @Override
+//    public void checkMemberAccess(Class<?> clazz, int which) {
+//        if (null != osm) osm.checkMemberAccess(clazz, which);
+//        if (null != csm) csm.checkMemberAccess(clazz, which);
+//        //Todo check rythm member access
+//    }
 
     @Override
     public void checkSetFactory() {

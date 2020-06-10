@@ -28,6 +28,8 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * The base class of template implementation. It provides a set of
@@ -126,7 +128,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
      * will also declare render args as separate protected field while keeping
      * a copy inside this Map data structure
      */
-    protected Map<String, Object> __renderArgs = new HashMap<String, Object>();
+    protected Map<String, Object> __renderArgs = new ConcurrentHashMap<String, Object>();
 
     /**
      * Return the {@link RythmEngine engine} running this template
@@ -245,10 +247,10 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     /* to be used by dynamic generated sub classes */
     private String layoutContent = "";
     // store the current template section content
-    private Map<String, String> layoutSections = new HashMap<String, String>();
+    private Map<String, String> layoutSections = new ConcurrentHashMap<String, String>();
     // store the parent default section content
-    private Map<String, String> layoutSections0 = new HashMap<String, String>();
-    private Map<String, Object> renderProperties = new HashMap<String, Object>();
+    private Map<String, String> layoutSections0 = new ConcurrentHashMap<String, String>();
+    private Map<String, Object> renderProperties = new ConcurrentHashMap<String, Object>();
 
     /**
      * The parent template (layout template)
@@ -449,11 +451,11 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         tmpl.__ctx = new __Context();
         //if (null != buffer) tmpl.__buffer = buffer;
         if (null != __buffer) tmpl.__buffer = new StringBuilder();
-        tmpl.__renderArgs = new HashMap<String, Object>(__renderArgs.size());
+        tmpl.__renderArgs = new ConcurrentHashMap<String, Object>(__renderArgs.size());
         //tmpl.layoutContent = "";
-        tmpl.layoutSections = new HashMap<String, String>();
-        tmpl.layoutSections0 = new HashMap<String, String>();
-        tmpl.renderProperties = new HashMap<String, Object>();
+        tmpl.layoutSections = new ConcurrentHashMap<String, String>();
+        tmpl.layoutSections0 = new ConcurrentHashMap<String, String>();
+        tmpl.renderProperties = new ConcurrentHashMap<String, Object>();
         //tmpl.section = null;
         //tmpl.tmpCaller = null;
         //tmpl.tmpOut = null;
@@ -1399,7 +1401,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     }
 
     protected final Object __eval(String expr) {
-        Map<String, Object> ctx = new HashMap<String, Object>(__renderArgs);
+        Map<String, Object> ctx = new ConcurrentHashMap<String, Object>(__renderArgs);
         ctx.putAll(itrVars());
         try {
             Object retval = __engine().eval(expr, this, ctx);
@@ -1450,7 +1452,7 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
         return i18n.getMessage(TemplateBase.this, key, args);
     }
 
-    private Deque<F.T2<String, Object>> itrVars = new ArrayDeque<>();
+    private Deque<F.T2<String, Object>> itrVars = new ConcurrentLinkedDeque<>();
 
     protected void __pushItrVar(String name, Object val) {
         itrVars.push(F.T2(name, val));
@@ -1463,8 +1465,8 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
     private Map<String, Object> itrVars() {
         if (itrVars.isEmpty()) return Collections.EMPTY_MAP;
         if (itrVars.size() == 1) return itrVars.peek().asMap();
-        Deque<F.T2<String, Object>> tmp = new ArrayDeque<>();
-        Map<String, Object> m = new HashMap<String, Object>();
+        Deque<F.T2<String, Object>> tmp = new ConcurrentLinkedDeque<>();
+        Map<String, Object> m = new ConcurrentHashMap<String, Object>();
         Deque<F.T2<String, Object>> vs = itrVars;
         while (!vs.isEmpty()) {
             F.T2<String, Object> var = vs.pop();
