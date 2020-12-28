@@ -13,7 +13,12 @@ import org.rythmengine.resource.ITemplateResource;
 import org.rythmengine.utils.RawData;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 import static org.rythmengine.conf.RythmConfigurationKey.*;
@@ -524,6 +529,67 @@ public class RythmConfiguration {
             _i18n = get(I18N_MESSAGE_RESOLVER);
         }
         return _i18n;
+    }
+
+    private String _resourceBundleEncoding = null;
+
+    /**
+     * Get {@link RythmConfigurationKey#RESOURCE_BUNDLE_ENCODING} without lookup
+     * @return
+     */
+    public String resourceBundleEncoding() {
+        if (null == _resourceBundleEncoding) {
+            _resourceBundleEncoding = get(RESOURCE_BUNDLE_ENCODING);
+            if (null == _resourceBundleEncoding) {
+                _resourceBundleEncoding = "default";
+            }
+        }
+        return _resourceBundleEncoding;
+    }
+
+    public static final ResourceBundle.Control DEF_RESOURCE_BUNDLE_CONTROL = ResourceBundle.Control.getControl(ResourceBundle.Control.FORMAT_DEFAULT);
+    private ResourceBundle.Control _resourceBundleControl;
+    public synchronized ResourceBundle.Control resourceBundleControl() {
+        if (null != _resourceBundleControl) {
+            return _resourceBundleControl;
+        }
+        final String encoding = resourceBundleEncoding();
+        if ("default".equals(encoding)) {
+            _resourceBundleControl = DEF_RESOURCE_BUNDLE_CONTROL;
+        } else {
+            _resourceBundleControl = new ResourceBundle.Control() {
+                @Override
+                public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException, InstantiationException, IOException {
+                    // The below is a copy of the default implementation.
+                    String bundleName = toBundleName(baseName, locale);
+                    String resourceName = toResourceName(bundleName, "properties");
+                    ResourceBundle bundle = null;
+                    InputStream stream = null;
+                    if (reload) {
+                        URL url = loader.getResource(resourceName);
+                        if (url != null) {
+                            URLConnection connection = url.openConnection();
+                            if (connection != null) {
+                                connection.setUseCaches(false);
+                                stream = connection.getInputStream();
+                            }
+                        }
+                    } else {
+                        stream = loader.getResourceAsStream(resourceName);
+                    }
+                    if (stream != null) {
+                        try {
+                            // Only this line is changed to make it to read properties files as UTF-8.
+                            bundle = new PropertyResourceBundle(new InputStreamReader(stream, encoding));
+                        } finally {
+                            stream.close();
+                        }
+                    }
+                    return bundle;
+                }
+            };
+        }
+        return _resourceBundleControl;
     }
 
     private String _suffix = null;

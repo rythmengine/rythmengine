@@ -26,7 +26,8 @@ import java.util.Map;
  * which as I called, the default engine</p>
  */
 public class Rythm {
-    
+
+    public static final int JAVA_VERSION = _VM.VERSION;
     public static boolean debug = false;
 
     /**

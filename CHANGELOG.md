@@ -1,5 +1,8 @@
 # Change History
 
+# 1.3.1
+* Support customised resource bundle encoding #392
+
 ## 1.3.0
 * Allow application to configure `DateFormat` factory #375
 * Add long/short/medium format for Date type object

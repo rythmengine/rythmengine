@@ -521,6 +521,19 @@ public enum RythmConfigurationKey {
     RENDER_EXCEPTION_HANDLER("render.exception_handler.impl"),
 
     /**
+     * `resource_bundle.encoding` specifies the encoding to load
+     * resource bundle.
+     *
+     * This configuration allows override the default resource bundle
+     * encoding setting used by specific Java runtime:
+     * - Before Java 9: ISO-8859-1
+     * - Java 9 and above: UTF-8
+     *
+     * Default value: `null` meaning follow JDK default encoding setting
+     */
+    RESOURCE_BUNDLE_ENCODING("resource_bundle.encoding"),
+
+    /**
      * "resource.refresh.interval": Set resource check refresh interval. Resource refresh is
      * only available in the dev mode. When engine running in dev mode, the resource manager
      * will check if a template resource has been changed before rendering the template. this

@@ -69,7 +69,7 @@ public class I18N {
         if (null == locale) {
             locale = locale(template);
         }
-        RythmEngine engine = null == template ? RythmEngine.get() : template.__engine(); 
+        final RythmEngine engine = null == template ? RythmEngine.get() : template.__engine();
         if (null != engine && null != locale) {
             cacheKey = CacheKey.i18nBundle(engine, locale);
             retval = bundleCache.get(cacheKey);
@@ -78,13 +78,18 @@ public class I18N {
         if (null == retval) {
             try {
                 if (null == locale) locale = RythmConfigurationKey.I18N_LOCALE.getDefaultConfiguration();
-                retval = ResourceBundle.getBundle(name, locale);
+                ClassLoader loader = null != engine ? engine.classLoader() : I18N.class.getClassLoader();
+                retval = ResourceBundle.getBundle(name, locale, loader, engine.conf().resourceBundleControl());
                 bundleCache.put(cacheKey, retval);
             } catch (RuntimeException e) {
                 logger.warn(e, "Error getting resource bundle by name %s", name);
             }
         }
         return retval;
+    }
+
+    public static void clearBundleCache() {
+        bundleCache.clear();
     }
 
 }
