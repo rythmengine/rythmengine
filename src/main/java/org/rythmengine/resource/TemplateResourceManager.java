@@ -22,6 +22,10 @@ import java.io.File;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -91,35 +95,35 @@ public class TemplateResourceManager {
 
     private RythmEngine engine;
 
-    private Map<Object, ITemplateResource> cache = new HashMap<Object, ITemplateResource>();
+    private Map<Object, ITemplateResource> cache = new ConcurrentHashMap<Object, ITemplateResource>();
 
     private List<ITemplateResourceLoader> loaders;
     
     private FileResourceLoader adhocFileLoader = null;
 
     // the <key, loader> map allows 
-    private Map<Object, ITemplateResourceLoader> whichLoader = new HashMap<Object, ITemplateResourceLoader>();
+    private Map<Object, ITemplateResourceLoader> whichLoader = new ConcurrentHashMap<Object, ITemplateResourceLoader>();
     
     private boolean typeInference;
 
     /**
      * Store the String that is NOT a resource
      */
-    private static Set<String> blackList = new HashSet<String>();
+    private static Set<String> blackList = new CopyOnWriteArraySet<String>();
     
-    private static ThreadLocal<Stack<Set<String>>> tmpBlackList = new ThreadLocal<Stack<Set<String>>>() {
+    private static ThreadLocal<Deque<Set<String>>> tmpBlackList = new ThreadLocal<Deque<Set<String>>>() {
         @Override
-        protected Stack<Set<String>> initialValue() {
-            return new Stack<Set<String>>();
+        protected Deque<Set<String>> initialValue() {
+            return new ConcurrentLinkedDeque<Set<String>>();
         }
     };
     
     public static void setUpTmpBlackList() {
-        tmpBlackList.get().push(new HashSet<String>());
+        tmpBlackList.get().push(new CopyOnWriteArraySet<String>());
     } 
     
     public static void reportNonResource(String str) {
-        Stack<Set<String>> ss = tmpBlackList.get();
+        Deque<Set<String>> ss = tmpBlackList.get();
         if (ss.isEmpty()) {
             // invoked dynamically when running @invoke(...)
             tmpBlackList.remove();
@@ -130,7 +134,7 @@ public class TemplateResourceManager {
     }
     
     public static void commitTmpBlackList() {
-        Stack<Set<String>> sss = tmpBlackList.get();
+        Deque<Set<String>> sss = tmpBlackList.get();
         if (!sss.isEmpty()) {
             Set<String> ss = sss.pop();
             blackList.addAll(ss);
@@ -141,7 +145,7 @@ public class TemplateResourceManager {
     }
     
     public static void rollbackTmpBlackList() {
-        Stack<Set<String>> sss = tmpBlackList.get();
+        Deque<Set<String>> sss = tmpBlackList.get();
         if (!sss.isEmpty()) {
             sss.pop();
         }
@@ -166,7 +170,7 @@ public class TemplateResourceManager {
         this.engine = engine;
         RythmConfiguration conf = engine.conf();
         typeInference = conf.typeInferenceEnabled();
-        loaders = new ArrayList(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
+        loaders = new CopyOnWriteArrayList<>(conf.getList(RythmConfigurationKey.RESOURCE_LOADER_IMPLS, ITemplateResourceLoader.class));
         if (!loaders.isEmpty()) {
             for (ITemplateResourceLoader loader: loaders) {
                 loader.setEngine(this.engine);

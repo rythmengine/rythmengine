@@ -42,6 +42,8 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -484,7 +486,7 @@ public class RythmEngine implements IEventDispatcher {
 
     // trim "rythm." from conf keys
     private Map<String, Object> _processConf(Map<String, ?> conf) {
-        Map<String, Object> m = new HashMap<String, Object>(conf.size());
+        Map<String, Object> m = new ConcurrentHashMap<String, Object>(conf.size());
         for (String s : conf.keySet()) {
             Object o = conf.get(s);
             if (s.startsWith("rythm.")) s = s.replaceFirst("rythm\\.", "");
@@ -554,7 +556,7 @@ public class RythmEngine implements IEventDispatcher {
         init(userConfiguration, null);
     }
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
 
     /**
      * Set user property to the engine. Note The property is not used by the engine program
@@ -608,7 +610,7 @@ public class RythmEngine implements IEventDispatcher {
                 }
             }
         }
-        return new HashMap();
+        return new ConcurrentHashMap();
     }
 
     private void init(Map<String, ?> conf, File file) {
@@ -1322,7 +1324,7 @@ public class RythmEngine implements IEventDispatcher {
         return toString(obj, option, ToStringStyle.fromApacheStyle(style));
     }
 
-    private Set<String> nonExistsTemplates = new HashSet<String>();
+    private Set<String> nonExistsTemplates = new CopyOnWriteArraySet<String>();
 
     private class NonExistsTemplatesChecker implements IShutdownListener {
         boolean started = false;
@@ -1427,7 +1429,7 @@ public class RythmEngine implements IEventDispatcher {
         return eval(script, Collections.<String, Object>emptyMap());
     }
 
-    private Map<String, Serializable> mvels = new HashMap<String, Serializable>();
+    private Map<String, Serializable> mvels = new ConcurrentHashMap<String, Serializable>();
 
     public Object eval(String script, Map<String, Object> params) {
         Serializable ce = mvels.get(script);
@@ -1451,9 +1453,9 @@ public class RythmEngine implements IEventDispatcher {
       Tags
     -------------------------------------------------------------------------------*/
 
-    private final Map<String, ITemplate> _templates = new HashMap<String, ITemplate>();
-    private final Map<String, JavaTagBase> _tags = new HashMap<String, JavaTagBase>();
-    private final Set<String> _nonTmpls = new HashSet<String>();
+    private final Map<String, ITemplate> _templates = new ConcurrentHashMap<String, ITemplate>();
+    private final Map<String, JavaTagBase> _tags = new ConcurrentHashMap<String, JavaTagBase>();
+    private final Set<String> _nonTmpls = new CopyOnWriteArraySet<String>();
 
     /**
      * Whether a {@link ITemplate template} is registered to the engine by name specified
@@ -1675,7 +1677,7 @@ public class RythmEngine implements IEventDispatcher {
         invokeTemplate(line, name, caller, params, body, context, false);
     }
 
-    private Set<String> _nonExistsTags = new HashSet<String>();
+    private Set<String> _nonExistsTags = new CopyOnWriteArraySet<String>();
 
     /**
      * Invoke a tag
@@ -1887,7 +1889,7 @@ public class RythmEngine implements IEventDispatcher {
 
     // -- SPI interface
     // -- issue #47
-    private Map<TemplateClass, Set<TemplateClass>> extendMap = new HashMap<TemplateClass, Set<TemplateClass>>();
+    private Map<TemplateClass, Set<TemplateClass>> extendMap = new ConcurrentHashMap<TemplateClass, Set<TemplateClass>>();
 
     /**
      * Not an API for user application
@@ -1899,7 +1901,7 @@ public class RythmEngine implements IEventDispatcher {
         if (mode().isProd()) return;
         Set<TemplateClass> children = extendMap.get(parent);
         if (null == children) {
-            children = new HashSet<TemplateClass>();
+            children = new CopyOnWriteArraySet<TemplateClass>();
             extendMap.put(parent, children);
         }
         children.add(child);

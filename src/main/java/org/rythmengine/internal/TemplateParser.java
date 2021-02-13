@@ -18,8 +18,9 @@ import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.TemplateResourceManager;
 
+import java.util.Deque;
 import java.util.Locale;
-import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class TemplateParser implements IContext {
     private final static ILogger logger = Logger.get(TemplateParser.class);
@@ -172,7 +173,7 @@ public class TemplateParser implements IContext {
         return template.substring(start, end);
     }
 
-    private Stack<IBlockHandler> blocks = new Stack<IBlockHandler>();
+    private Deque<IBlockHandler> blocks = new ConcurrentLinkedDeque<>();
 
     @Override
     public void openBlock(IBlockHandler bh) {
@@ -195,9 +196,8 @@ public class TemplateParser implements IContext {
 
     @Override
     public String currentSection() {
-        int len = blocks.size();
-        for (int i = len - 1; i >= 0; --i) {
-            IBlockHandler h = blocks.get(i);
+        while (!blocks.isEmpty()){
+            IBlockHandler h = blocks.pollLast();
             if (h instanceof SectionParser.SectionToken) {
                 return ((SectionParser.SectionToken)h).section();
             }
@@ -220,11 +220,11 @@ public class TemplateParser implements IContext {
 
     @Override
     public boolean compactMode() {
-        if (!compactStack.empty()) return compactStack.peek();
+        if (!compactStack.isEmpty()) return compactStack.peek();
         return compactMode;
     }
 
-    private Stack<Boolean> compactStack = new Stack<Boolean>();
+    private Deque<Boolean> compactStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public void pushCompact(Boolean compact) {
@@ -233,17 +233,17 @@ public class TemplateParser implements IContext {
 
     @Override
     public Boolean peekCompact() {
-        if (compactStack.empty()) return null;
+        if (compactStack.isEmpty()) return null;
         return compactStack.peek();
     }
 
     @Override
     public Boolean popCompact() {
-        if (compactStack.empty()) return null;
+        if (compactStack.isEmpty()) return null;
         return compactStack.pop();
     }
 
-    private Stack<Break> breakStack = new Stack<Break>();
+    private Deque<Break> breakStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public void pushBreak(Break b) {
@@ -252,17 +252,17 @@ public class TemplateParser implements IContext {
 
     @Override
     public Break peekBreak() {
-        if (breakStack.empty()) return null;
+        if (breakStack.isEmpty()) return null;
         return breakStack.peek();
     }
 
     @Override
     public Break popBreak() {
-        if (breakStack.empty()) return null;
+        if (breakStack.isEmpty()) return null;
         return breakStack.pop();
     }
 
-    private Stack<Continue> continueStack = new Stack<Continue>();
+    private Deque<Continue> continueStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public void pushContinue(Continue b) {
@@ -271,23 +271,23 @@ public class TemplateParser implements IContext {
 
     @Override
     public Continue peekContinue() {
-        if (continueStack.empty()) return null;
+        if (continueStack.isEmpty()) return null;
         return continueStack.peek();
     }
 
     @Override
     public Continue popContinue() {
-        if (continueStack.empty()) return null;
+        if (continueStack.isEmpty()) return null;
         return continueStack.pop();
     }
 
     @Override
     public boolean insideBody() {
-        if (!inBodyStack.empty()) return inBodyStack.peek();
+        if (!inBodyStack.isEmpty()) return inBodyStack.peek();
         return false;
     }
 
-    private Stack<Boolean> inBodyStack = new Stack<Boolean>();
+    private Deque<Boolean> inBodyStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public void pushInsideBody(Boolean b) {
@@ -296,23 +296,23 @@ public class TemplateParser implements IContext {
 
     @Override
     public Boolean peekInsideBody() {
-        if (inBodyStack.empty()) return false;
+        if (inBodyStack.isEmpty()) return false;
         return inBodyStack.peek();
     }
 
     @Override
     public Boolean popInsideBody() {
-        if (inBodyStack.empty()) return null;
+        if (inBodyStack.isEmpty()) return null;
         return inBodyStack.pop();
     }
 
     @Override
     public boolean insideBody2() {
-        if (!inBodyStack2.empty()) return inBodyStack2.peek();
+        if (!inBodyStack2.isEmpty()) return inBodyStack2.peek();
         return false;
     }
 
-    private Stack<Boolean> inBodyStack2 = new Stack<Boolean>();
+    private Deque<Boolean> inBodyStack2 = new ConcurrentLinkedDeque<>();
 
     @Override
     public void pushInsideBody2(Boolean b) {
@@ -321,13 +321,13 @@ public class TemplateParser implements IContext {
 
     @Override
     public Boolean peekInsideBody2() {
-        if (inBodyStack2.empty()) return false;
+        if (inBodyStack2.isEmpty()) return false;
         return inBodyStack2.peek();
     }
 
     @Override
     public Boolean popInsideBody2() {
-        if (inBodyStack2.empty()) return null;
+        if (inBodyStack2.isEmpty()) return null;
         return inBodyStack2.pop();
     }
 
@@ -348,7 +348,7 @@ public class TemplateParser implements IContext {
         insideDirectiveComment = false;
     }
 
-    private Stack<ICodeType> codeTypeStack = new Stack<ICodeType>();
+    private Deque<ICodeType> codeTypeStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public ICodeType peekCodeType() {
@@ -376,7 +376,7 @@ public class TemplateParser implements IContext {
         return cur;
     }
 
-    private Stack<Locale> localeStack = new Stack<Locale>();
+    private Deque<Locale> localeStack = new ConcurrentLinkedDeque<>();
 
     @Override
     public Locale peekLocale() {

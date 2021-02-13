@@ -13,7 +13,8 @@ import org.rythmengine.logger.ILogger;
 import org.rythmengine.logger.Logger;
 import org.rythmengine.utils.S;
 
-import java.util.Stack;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class DialectManager {
     protected final static ILogger logger = Logger.get(DialectManager.class);
@@ -45,10 +46,10 @@ public class DialectManager {
         return defDialects[i];
     }
 
-    private static final InheritableThreadLocal<Stack<IDialect>> cur = new InheritableThreadLocal<Stack<IDialect>>() {
+    private static final InheritableThreadLocal<Deque<IDialect>> cur = new InheritableThreadLocal<Deque<IDialect>>() {
         @Override
-        protected Stack<IDialect> initialValue() {
-            return new Stack<IDialect>();
+        protected Deque<IDialect> initialValue() {
+            return new ConcurrentLinkedDeque<>();
         }
     };
 
@@ -62,7 +63,7 @@ public class DialectManager {
     }
 
     private static IDialect pop() {
-        Stack<IDialect> sd = cur.get();
+        Deque<IDialect> sd = cur.get();
         IDialect d = sd.pop();
         if (sd.isEmpty()) {
             cur.remove();
