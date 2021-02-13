@@ -59,7 +59,9 @@ public class BraceParser implements IParserFactory {
                     boolean isLiteral = null == bh ? false : bh instanceof BlockToken.LiteralBlock;
                     if ('}' == c) {
                         step(1);
-                        if (null == bh) raiseParseException("no open block found");
+                        if (null == bh) {
+                            raiseParseException("no open block found");
+                        }
                         String s = ctx().closeBlock();
                         if (isLiteral) {
                             if ("".equals(s)) {

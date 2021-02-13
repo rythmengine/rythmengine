@@ -118,7 +118,7 @@ public abstract class TestBase extends Assert {
     }
     
     protected static void run(Class<? extends TestBase> cls) {
-        new JUnitCore().runMain(new RealSystem(), cls.getName());
+        new JUnitCore().run(cls);
     }
     
 }

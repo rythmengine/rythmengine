@@ -1104,7 +1104,7 @@ public class CodeBuilder extends TextBuilder {
                     if (implicitVarNames.contains(arg.name)) {
                         continue;
                     }
-                    p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; \n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t\t__renderArgs.put(\"").p(arg.name).p("\",").p(arg.name).p(");\n\t\t}\n"); 
+                    p2t("if (__p < __l) { \n\t\t\tObject v = __args[__p++]; if (null != v) {\n\t\t\t").p(arg.name).p(" = __safeCast(v, ").p(arg.objectType()).p(".class); \n\t\t\t__renderArgs.put(\"").p(arg.name).p("\",").p(arg.name).p(");\n\t\t}}\n");
                     if (--i == 0) break;
                 }
             }

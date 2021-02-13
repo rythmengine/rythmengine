@@ -19,6 +19,7 @@ import org.rythmengine.logger.Logger;
 import org.rythmengine.resource.TemplateResourceManager;
 
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -173,7 +174,7 @@ public class TemplateParser implements IContext {
         return template.substring(start, end);
     }
 
-    private Deque<IBlockHandler> blocks = new ConcurrentLinkedDeque<>();
+    private final Deque<IBlockHandler> blocks = new ConcurrentLinkedDeque<>();
 
     @Override
     public void openBlock(IBlockHandler bh) {
@@ -196,8 +197,8 @@ public class TemplateParser implements IContext {
 
     @Override
     public String currentSection() {
-        while (!blocks.isEmpty()){
-            IBlockHandler h = blocks.pollLast();
+        for (Iterator<IBlockHandler> itr = blocks.descendingIterator(); itr.hasNext(); ) {
+            IBlockHandler h = itr.next();
             if (h instanceof SectionParser.SectionToken) {
                 return ((SectionParser.SectionToken)h).section();
             }

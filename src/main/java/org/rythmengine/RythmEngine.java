@@ -1640,6 +1640,9 @@ public class RythmEngine implements IEventDispatcher {
             name = template.__getName();
         } else {
             name = template.__getTemplateClass(false).getTagName();
+            if (S.isEmpty(name)) {
+                name = template.__getTemplateClass(false).getKey();
+            }
         }
         registerTemplate(name, template);
     }
