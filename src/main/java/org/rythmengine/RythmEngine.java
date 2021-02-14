@@ -37,6 +37,8 @@ import org.rythmengine.utils.F;
 import org.rythmengine.utils.IO;
 import org.rythmengine.utils.JSONWrapper;
 import org.rythmengine.utils.S;
+import osgl.version.Version;
+import osgl.version.Versioned;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -58,7 +60,9 @@ import java.util.concurrent.TimeUnit;
  * <p>The {@link Rythm} facade contains a default <code>RythmEngine</code> instance to make it
  * easy to use for most cases</p>
  */
+@Versioned
 public class RythmEngine implements IEventDispatcher {
+    public static final Version VERSION = Version.of(RythmEngine.class);
     private static final ILogger logger = Logger.get(RythmEngine.class);
 
     /**
@@ -67,11 +71,7 @@ public class RythmEngine implements IEventDispatcher {
      * check if the cached template bytecode need to be refreshed or not
      * <p/>
      */
-    private static final String version;
-
-    static {
-        version = IO.readContentAsString(RythmEngine.class.getClassLoader().getResourceAsStream("rythm-engine-version"));
-    }
+    private static final String version = VERSION.getVersion();
 
     private static final InheritableThreadLocal<RythmEngine> _engine = new InheritableThreadLocal<RythmEngine>();
 
