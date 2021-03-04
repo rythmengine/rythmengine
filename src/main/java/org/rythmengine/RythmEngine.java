@@ -1779,7 +1779,7 @@ public class RythmEngine implements IEventDispatcher {
                 } else {
                     for (int i = 0; i < params.size(); ++i) {
                         ITag.__Parameter param = params.get(i);
-                        if (null != param.name) {
+                        if (null != param.name && null != param.value) {
                             t.__setRenderArg(param.name, param.value);
                         } else if (null != param.value) {
                             t.__setRenderArg(i, param.value);
