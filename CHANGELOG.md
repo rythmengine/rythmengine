@@ -1,5 +1,11 @@
 # Change History
 
+# 1.4.1
+* Merge PR #394
+
+# 1.4.0
+* Merge PR #389, #390, #391, #393
+
 # 1.3.1
 * Support customised resource bundle encoding #392
 
