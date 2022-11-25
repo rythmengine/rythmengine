@@ -498,6 +498,9 @@ public abstract class TemplateBase extends TemplateBuilder implements ITemplate 
             }
         }
         tmpl.__setUserContext(engine.renderSettings.userContext());
+
+        tmpl.itrVars = new ConcurrentLinkedDeque<>();
+
         return tmpl;
     }
 

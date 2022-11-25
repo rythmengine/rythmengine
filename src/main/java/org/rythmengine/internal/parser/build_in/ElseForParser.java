@@ -67,7 +67,7 @@ public class ElseForParser extends CaretParserFactoryBase {
 
                 try {
                     ctx.closeBlock();
-                    s1 = "\n\t}\n} else {\n";
+                    s1 = "\n\t__popItrVar();\n\t}\n} else {\n";
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
