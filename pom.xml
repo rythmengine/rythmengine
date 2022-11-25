@@ -34,7 +34,7 @@
 	<parent>
 		<groupId>org.osgl</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.0.0-BETA-10</version>
+		<version>1.0.0-BETA-11</version>
 	</parent>
 
 	<properties>
@@ -56,10 +56,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
-	<build>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-	</build>
 
 	<dependencies>
 		<dependency>
