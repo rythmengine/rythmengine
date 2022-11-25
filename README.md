@@ -1,6 +1,12 @@
 Rythm Template Engine
 ======================
 
+[![APL v2](https://img.shields.io/badge/license-Apache%202-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Maven Central](https://img.shields.io/maven-central/v/org.rythmengine/rythm-engine.svg)](https://central.sonatype.dev/artifact/org.rythmengine/rythm-engine/1.4.1/versions)
+[![Javadocs](http://www.javadoc.io/badge/org.rythmengine/rythm-engine.svg?color=blue)](https://www.javadoc.io/doc/org.rythmengine/rythm-engine/latest/index.html)
+[![Get Support on StackOverflow](https://img.shields.io/stackexchange/stackoverflow/t/rythm.svg)](https://stackoverflow.com/questions/tagged/rythm)
+
+
 A "Razor" like, rich featured, high performance and easy to use Java template engine
 
 
